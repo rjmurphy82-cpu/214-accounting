@@ -97,6 +97,7 @@ section{margin-top:34px;scroll-margin-top:70px}
     <nav aria-label="Site">
       <a class="home" href="/" aria-current="page"><span class="ch">⌂</span>Home</a>
       <div class="ng">Review Games</div>
+      <a href="chapter-6.html"><span class="ch">6</span>Make It Match</a>
       <a href="chapter-5.html"><span class="ch">5</span>Same Goods, Three Costs</a>
       <a href="chapter-4.html"><span class="ch">4</span>Same Deal, Two Books</a>
       <div class="ng">Interactive Practices</div>
@@ -120,6 +121,7 @@ section{margin-top:34px;scroll-margin-top:70px}
       <p class="lede">Review games to play solo or as a class, and click-to-reveal practices that walk through every problem step by step. Pick a chapter to narrow the list.</p>
       <div class="filters" role="group" aria-label="Filter by chapter">
         <button id="f-all" data-ch="all" aria-pressed="true">All chapters</button>
+        <button id="f-6" data-ch="6" aria-pressed="false">Chapter 6</button>
         <button id="f-5" data-ch="5" aria-pressed="false">Chapter 5</button>
         <button id="f-4" data-ch="4" aria-pressed="false">Chapter 4</button>
         <button id="f-3" data-ch="3" aria-pressed="false">Chapter 3</button>
@@ -129,6 +131,12 @@ section{margin-top:34px;scroll-margin-top:70px}
     <section id="games">
       <div class="sechead"><h2>Review Games</h2><span>Blitz, Practice, or 8-team class mode</span></div>
       <div class="grid">
+        <a class="card" href="chapter-6.html" data-ch="6">
+          <div class="ctop"><span class="chip">Ch 6</span><span class="kind">Bank Reconciliations</span></div>
+          <h3>Make It Match</h3>
+          <p>Sort the reconciling items, book the adjusting entries, and find the adjusted balance. Random team picks and 5-second steals.</p>
+          <div class="cfoot"><span class="meta">41 cards</span><span class="go">Play →</span></div>
+        </a>
         <a class="card" href="chapter-5.html" data-ch="5">
           <div class="ctop"><span class="chip">Ch 5</span><span class="kind">Inventory Costing</span></div>
           <h3>Same Goods, Three Costs</h3>
@@ -196,11 +204,8 @@ section{margin-top:34px;scroll-margin-top:70px}
 </div>
 <script>
 (function(){const s=document.getElementById("side"),b=document.getElementById("menuBtn"),c=document.getElementById("scrim");
-function set(o){s.classList.toggle("open",o);c.classList.toggle("on",o);b.setAttribute("aria-expanded",o);if(!b.dataset.icon)b.textContent=o?"Close":"Menu"}
-const ov=s.closest(".overlay");let t=null;
-if(ov){const open=()=>{clearTimeout(t);set(true)},close=()=>{clearTimeout(t);t=setTimeout(()=>set(false),250)};
-if(matchMedia("(hover:hover)").matches){b.addEventListener("mouseenter",open);document.getElementById("edge").addEventListener("mouseenter",open);s.addEventListener("mouseenter",open);s.addEventListener("mouseleave",close);c.addEventListener("mouseenter",close);b.addEventListener("mouseleave",close)}}
-const hov=!!s.closest(".overlay")&&matchMedia("(hover:hover)").matches;b.addEventListener("click",()=>set(hov?true:!s.classList.contains("open")));c.addEventListener("click",()=>set(false));
+function set(o){s.classList.toggle("open",o);c.classList.toggle("on",o);b.setAttribute("aria-expanded",o);b.textContent=o?"Close":"Menu"}
+b.addEventListener("click",()=>set(!s.classList.contains("open")));c.addEventListener("click",()=>set(false));
 document.addEventListener("keydown",e=>{if(e.key==="Escape")set(false)});
 const cur=s.querySelector('[aria-current="page"]');if(cur&&cur.scrollIntoView)cur.scrollIntoView({block:"nearest"});})();
 </script>
