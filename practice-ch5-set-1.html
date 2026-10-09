@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-/* Layout: one screen. Top bar (menu, title, problem strip), stage with the problem on the left and its steps on the right, controls pinned at the bottom */
+/* Layout: logo bar, deck title, numbered problem strip, one problem card with click-to-reveal steps */
 :root{
   --bg:#F4F3F3; --paper:#FFFFFF; --ink:#111111; --muted:#5C5C5C; --line:rgba(17,17,17,.14);
   --red:#C1102F; --redtext:#B00E2A; --redsoft:#FBE7EA; --black:#111111; --onblack:#FFFFFF;
@@ -22,7 +22,7 @@
 }
 :root[data-theme="dark"]{--bg:#121212; --paper:#1E1E1E; --ink:#F2F2F2; --muted:#A8A8A8; --line:rgba(242,242,242,.14); --redtext:#FF5C70; --redsoft:#3A1219; --black:#2B2B2B; color-scheme:dark}
 *,*::before,*::after{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);font:calc(18px * var(--scale))/1.45 var(--body)}
+body{margin:0;min-height:100%;background:var(--bg);color:var(--ink);font:calc(18px * var(--scale))/1.5 var(--body)}
 button{font:inherit;color:inherit;cursor:pointer}
 button:focus-visible,a:focus-visible{outline:3px solid var(--red);outline-offset:2px}
 [hidden]{display:none!important}
@@ -60,96 +60,61 @@ html,body{height:100%}
 }
 @media (prefers-reduced-motion: reduce){.side{transition:none}}
 
-/* overlay sidebar on practice pages */
-.shell.overlay{display:block;height:100%}
-.shell.overlay .side{position:fixed;left:0;top:0;bottom:0;height:auto;width:290px;z-index:40;transform:translateX(-102%);transition:transform .2s ease;box-shadow:none}
-.shell.overlay .side.open{transform:none;box-shadow:0 0 40px rgba(0,0,0,.45)}
-.shell.overlay .scrim.on{display:block;position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:35}
-.edge{position:fixed;left:0;top:0;bottom:0;width:10px;z-index:30}
-
-.app{height:100%;display:flex;flex-direction:column;min-height:0}
-.bar{display:flex;align-items:center;gap:14px;padding:10px clamp(12px,2vw,24px);background:var(--paper);border-bottom:1px solid var(--line);flex-wrap:wrap}
-.burger{width:44px;height:44px;flex:none;border:0;border-radius:8px;background:var(--black);display:grid;place-content:center;gap:5px;padding:0}
-.burger i{display:block;width:20px;height:2.5px;border-radius:2px;background:#fff}
-.ttl{min-width:0;flex:1 1 260px}
-.crumb{font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
-.crumb a{color:inherit}
-.ttl h1{font-family:var(--display);font-weight:700;font-size:clamp(22px,2.4vw,30px);line-height:1.05;margin:2px 0 0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.tools{display:flex;gap:6px;align-items:center}
-.tool{background:var(--paper);border:2px solid var(--line);border-radius:8px;padding:6px 12px;font-weight:700;font-size:15px;line-height:1.2}
-.tool:hover{border-color:var(--red)}
-.strip{display:flex;gap:6px;overflow-x:auto;padding:8px clamp(12px,2vw,24px);background:var(--paper);border-bottom:1px solid var(--line);scrollbar-width:thin}
-.strip button{flex:0 0 auto;min-width:38px;height:36px;border-radius:7px;border:2px solid var(--line);background:var(--paper);font-family:var(--display);font-weight:600;font-size:16px}
-.strip button.seen{border-color:color-mix(in srgb,var(--red) 45%,var(--line))}
+.inner{max-width:1080px}
+.top{display:flex;align-items:center;gap:14px;flex-wrap:wrap;font-size:15px;font-weight:600;color:var(--muted)}
+.top a{color:inherit}
+.top .sp{flex:1}
+.size{display:flex;gap:6px}
+.size button{background:var(--paper);border:2px solid var(--line);border-radius:8px;padding:2px 10px;font-weight:700;font-size:15px}
+h1{font-family:var(--display);font-weight:700;font-size:clamp(32px,5vw,52px);line-height:1;margin:20px 0 6px;text-wrap:balance}
+.sub{color:var(--muted);margin:0 0 18px;font-size:calc(17px * var(--scale))}
+.strip{display:flex;gap:6px;overflow-x:auto;padding:4px 2px 10px;scrollbar-width:thin}
+.strip button{flex:0 0 auto;min-width:40px;height:40px;border-radius:8px;border:2px solid var(--line);background:var(--paper);font-family:var(--display);font-weight:600;font-size:17px}
+.strip button.seen{border-color:color-mix(in srgb,var(--red) 40%,var(--line))}
 .strip button[aria-current="true"]{background:var(--red);border-color:var(--red);color:#fff}
-
-.stage{flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:clamp(12px,1.6vw,22px);padding:clamp(12px,1.6vw,22px)}
-.stage.solo{grid-template-columns:minmax(0,1fr)}
-.panel{min-height:0;display:flex;flex-direction:column;background:var(--paper);border:1px solid var(--line);border-radius:12px;overflow:hidden}
-.phead{background:var(--black);color:var(--onblack);padding:12px 20px;display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 12px;flex:none}
-.phead .section{width:100%;font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#FF8A99}
-.phead .label{font-family:var(--display);font-weight:600;font-size:calc(24px * var(--scale));line-height:1.1}
-.phead .tag{background:var(--red);color:#fff;border-radius:999px;padding:1px 11px;font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
-.phead .date{margin-left:auto;font-weight:600;font-size:14px;letter-spacing:.06em;text-transform:uppercase;opacity:.85}
-.phead .count{margin-left:auto;font-weight:600;font-size:14px;opacity:.85}
-.pbody{flex:1;min-height:0;overflow:auto;padding:18px 20px 22px;display:grid;gap:14px;align-content:start}
-.pbody h2{font-family:var(--display);font-weight:600;font-size:calc(23px * var(--scale));margin:0;line-height:1.15}
-.pbody p{margin:0;max-width:70ch}
-.pbody ul{margin:0;padding-left:1.2em}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:14px;overflow:hidden;margin-top:6px}
+.head{background:var(--black);color:var(--onblack);padding:16px 24px 14px;display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 14px}
+.head .label{font-family:var(--display);font-weight:600;font-size:calc(26px * var(--scale));line-height:1.1}
+.head .tag{background:var(--red);color:#fff;border-radius:999px;padding:2px 12px;font-size:14px;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+.head .date{margin-left:auto;font-weight:600;font-size:15px;letter-spacing:.06em;text-transform:uppercase;opacity:.85}
+.head .section{width:100%;font-size:13px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#FF8A99}
+.body{padding:20px 24px 24px;display:grid;gap:16px}
+.body h2{font-family:var(--display);font-weight:600;font-size:calc(24px * var(--scale));margin:0;line-height:1.15}
+.body p{margin:0;max-width:72ch}
+.body ul{margin:0;padding-left:1.2em}
 .q{font-weight:700;font-size:calc(20px * var(--scale))}
 .tw{overflow-x:auto;min-width:0}
-table{border-collapse:collapse;font-variant-numeric:tabular-nums;font-size:calc(16px * var(--scale));min-width:100%}
-th,td{border:1px solid var(--line);padding:5px 10px;text-align:left;vertical-align:top}
+table{border-collapse:collapse;font-variant-numeric:tabular-nums;font-size:calc(17px * var(--scale));min-width:100%}
+th,td{border:1px solid var(--line);padding:6px 12px;text-align:left;vertical-align:top}
 th{background:var(--black);color:var(--onblack);font-family:var(--display);font-weight:500;letter-spacing:.02em}
 td.s{text-decoration:line-through;text-decoration-color:var(--red);text-decoration-thickness:2px;color:var(--muted)}
-.tnote{font-size:14px;color:var(--muted);margin-top:4px}
-
-.steps .pbody{gap:10px}
-.slot{border:2px dashed var(--line);border-radius:10px;padding:10px 16px;color:var(--muted);font-weight:600;font-size:15px;display:flex;gap:10px;align-items:center}
-.slot b{font-family:var(--display);font-weight:600;color:var(--ink);opacity:.5}
-.rv{border:2px solid var(--line);border-left:6px solid var(--muted);border-radius:10px;padding:10px 16px 12px;display:grid;gap:8px;background:var(--paper)}
-.rv.new{border-color:var(--red);border-left-color:var(--red);background:color-mix(in srgb,var(--redsoft) 60%,var(--paper));animation:in .25s ease-out}
-@keyframes in{from{opacity:.25;transform:translateY(6px)}to{opacity:1;transform:none}}
-.rl{display:flex;gap:10px;align-items:baseline;font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--redtext)}
-.rl .n{font-family:var(--display);font-size:15px;letter-spacing:0;color:var(--muted)}
-.lines{display:grid;gap:2px;font-variant-numeric:tabular-nums;font-size:calc(18px * var(--scale));font-weight:500}
-.answer{justify-self:start;background:var(--red);color:#fff;font-family:var(--display);font-weight:600;font-size:calc(26px * var(--scale));line-height:1.15;padding:4px 16px;border-radius:8px}
-.jt{font-size:14px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
-table.journal{background:var(--paper)}
-table.journal td.acct{min-width:12em}
-table.journal td.cr{padding-left:2.6em}
-table.journal td.n{text-align:right;width:7em}
-.none{color:var(--muted);font-weight:600}
-
-.controls{flex:none;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px;padding:10px clamp(12px,2vw,24px);background:var(--paper);border-top:1px solid var(--line)}
-.controls .l{display:flex;gap:8px;align-items:center}
-.controls .r{display:flex;gap:8px;justify-content:flex-end;align-items:center}
-.btn{background:var(--red);color:#fff;border:0;border-radius:10px;padding:12px 26px;font-family:var(--display);font-weight:600;font-size:21px;line-height:1.1;min-width:200px}
-.btn:disabled{background:var(--line);color:var(--muted);cursor:default}
-.ghost{background:transparent;color:var(--ink);border:2px solid var(--line);border-radius:10px;padding:9px 16px;font-family:var(--display);font-weight:600;font-size:17px;line-height:1.1}
-.ghost:hover:not(:disabled){border-color:var(--red)}
-.ghost:disabled{opacity:.4;cursor:default}
-.pos{color:var(--muted);font-weight:700;font-size:15px;white-space:nowrap}
-.help{color:var(--muted);font-size:13px}
-kbd{font-family:var(--display);font-size:12px;border:1.5px solid var(--line);border-bottom-width:3px;border-radius:5px;padding:0 5px;background:var(--paper)}
-
-@media (max-width:900px){
-  .app{height:auto;min-height:100%}
-  .stage{grid-template-columns:minmax(0,1fr)}
-  .panel{overflow:visible}
-  .pbody{overflow:visible}
-  .controls{position:sticky;bottom:0;grid-template-columns:1fr;justify-items:stretch}
-  .controls .l,.controls .r{justify-content:space-between}
-  .btn{min-width:0;width:100%}
-  .help{display:none}
-  .phead .date{margin-left:0}
-}
-@media (prefers-reduced-motion: reduce){.rv.new{animation:none}.shell.overlay .side{transition:none}}
+.tnote{font-size:15px;color:var(--muted);margin-top:4px}
+.reveals{display:grid;gap:12px}
+.rv{border-left:6px solid var(--red);background:color-mix(in srgb,var(--redsoft) 55%,var(--paper));border-radius:0 10px 10px 0;padding:12px 18px 14px;display:grid;gap:10px;animation:in .25s ease-out}
+@keyframes in{from{opacity:.2;transform:translateY(6px)}to{opacity:1;transform:none}}
+.rv .rl{font-size:14px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--redtext)}
+.lines{display:grid;gap:2px;font-variant-numeric:tabular-nums;font-size:calc(19px * var(--scale));font-weight:500}
+.answer{justify-self:start;background:var(--red);color:#fff;font-family:var(--display);font-weight:600;font-size:calc(28px * var(--scale));line-height:1.15;padding:6px 18px;border-radius:8px}
+.jt{font-size:15px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+table.journal{min-width:min(100%,560px);background:var(--paper)}
+table.journal td.acct{min-width:16em}
+table.journal td.cr{padding-left:3em}
+table.journal td.n{text-align:right;width:8em}
+.controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center;padding:0 24px 22px}
+.btn{background:var(--red);color:#fff;border:0;border-radius:10px;padding:12px 22px;font-family:var(--display);font-weight:600;font-size:20px}
+.btn.ghost{background:transparent;color:var(--ink);border:2px solid var(--line);padding:10px 18px;font-size:17px}
+.btn:disabled{opacity:.4;cursor:default}
+.left{color:var(--muted);font-size:15px;font-weight:600}
+.nav{display:flex;justify-content:space-between;gap:10px;margin-top:16px;flex-wrap:wrap}
+.hint{color:var(--muted);font-size:14px;margin-top:14px}
+kbd{font-family:var(--display);font-size:13px;border:1.5px solid var(--line);border-bottom-width:3px;border-radius:5px;padding:0 6px;background:var(--paper)}
+@media (max-width:600px){.head,.body{padding-inline:16px}.controls{padding-inline:16px}.head .date{margin-left:0}table.journal td.acct{min-width:10em}}
+@media (prefers-reduced-motion: reduce){.rv{animation:none}}
 </style>
 </head>
 <body>
-<div class="shell overlay">
-  <div class="edge" id="edge"></div>
+<div class="shell">
+  <div class="mbar"><a href="/"><img src="logo-214.png" alt="High School District 214"></a><button id="menuBtn" aria-expanded="false" aria-controls="side">Menu</button></div>
   <aside class="side" id="side">
     <a class="brandlink" href="/"><img src="logo-214.png" alt="High School District 214"></a>
     <div class="sitename">Accounting</div>
@@ -172,45 +137,37 @@ kbd{font-family:var(--display);font-size:12px;border:1.5px solid var(--line);bor
     <div class="sidefoot">High School District 214 | Accounting</div>
   </aside>
   <div class="scrim" id="scrim"></div>
-  
-<div class="app">
-  <div class="bar">
-    <button class="burger" id="menuBtn" data-icon="1" aria-label="Open menu" aria-expanded="false" aria-controls="side"><i></i><i></i><i></i></button>
-    <div class="ttl">
-      <div class="crumb"><a href="/#practices">Interactive Practices</a> · Chapter 5 · FIFO and LIFO</div>
-      <h1>Practice Problem Set 1</h1>
-    </div>
-    <div class="tools">
-      <button class="tool" id="smaller" aria-label="Smaller text">A−</button>
-      <button class="tool" id="bigger" aria-label="Bigger text">A+</button>
-      <button class="tool" id="fsBtn">Full screen</button>
-    </div>
+  <main class="main"><div class="inner">
+  <div class="top">
+    <span><a href="/#practices">Interactive Practices</a> / Chapter 5</span>
+    <span class="sp"></span>
+    <span class="size" aria-label="Text size"><button id="smaller" aria-label="Smaller text">A−</button><button id="bigger" aria-label="Bigger text">A+</button></span>
   </div>
+  <h1>Practice Problem Set 1</h1>
+  <p class="sub">FIFO and LIFO</p>
   <nav class="strip" id="strip" aria-label="Problems"></nav>
-  <div class="stage" id="stage">
-    <section class="panel" aria-label="Problem">
-      <header class="phead" id="head"></header>
-      <div class="pbody" id="given"></div>
-    </section>
-    <section class="panel steps" id="stepsPanel" aria-label="Steps">
-      <header class="phead"><span class="label">Steps</span><span class="count" id="count"></span></header>
-      <div class="pbody" id="reveals" aria-live="polite"></div>
-    </section>
+  <article class="card">
+    <header class="head" id="head"></header>
+    <div class="body"><div id="given" style="display:grid;gap:14px"></div><div class="reveals" id="reveals"></div></div>
+    <div class="controls">
+      <button class="btn" id="revealBtn">Reveal next</button>
+      <button class="btn ghost" id="allBtn">Show all</button>
+      <button class="btn ghost" id="resetBtn">Hide answers</button>
+      <span class="left" id="left"></span>
+    </div>
+  </article>
+  <div class="nav">
+    <button class="btn ghost" id="prevBtn">Previous</button>
+    <span class="left" id="pos" style="align-self:center"></span>
+    <button class="btn ghost" id="nextBtn">Next problem</button>
   </div>
-  <div class="controls">
-    <div class="l"><button class="ghost" id="prevBtn">← Previous</button><span class="help"><kbd>Space</kbd> reveal · <kbd>←</kbd><kbd>→</kbd> move · <kbd>F</kbd> full screen</span></div>
-    <button class="btn" id="revealBtn">Reveal</button>
-    <div class="r"><button class="ghost" id="allBtn">Show all</button><button class="ghost" id="resetBtn">Hide</button><span class="pos" id="pos"></span><button class="ghost" id="nextBtn">Next →</button></div>
-  </div>
-</div>
+  <p class="hint">Keys: <kbd>Space</kbd> or <kbd>→</kbd> reveals the next step, then moves on. <kbd>←</kbd> goes back a problem. <kbd>H</kbd> hides answers.</p>
+  </div></main>
 </div>
 <script>
 (function(){const s=document.getElementById("side"),b=document.getElementById("menuBtn"),c=document.getElementById("scrim");
-function set(o){s.classList.toggle("open",o);c.classList.toggle("on",o);b.setAttribute("aria-expanded",o);if(!b.dataset.icon)b.textContent=o?"Close":"Menu"}
-const ov=s.closest(".overlay");let t=null;
-if(ov){const open=()=>{clearTimeout(t);set(true)},close=()=>{clearTimeout(t);t=setTimeout(()=>set(false),250)};
-if(matchMedia("(hover:hover)").matches){b.addEventListener("mouseenter",open);document.getElementById("edge").addEventListener("mouseenter",open);s.addEventListener("mouseenter",open);s.addEventListener("mouseleave",close);c.addEventListener("mouseenter",close);b.addEventListener("mouseleave",close)}}
-const hov=!!s.closest(".overlay")&&matchMedia("(hover:hover)").matches;b.addEventListener("click",()=>set(hov?true:!s.classList.contains("open")));c.addEventListener("click",()=>set(false));
+function set(o){s.classList.toggle("open",o);c.classList.toggle("on",o);b.setAttribute("aria-expanded",o);b.textContent=o?"Close":"Menu"}
+b.addEventListener("click",()=>set(!s.classList.contains("open")));c.addEventListener("click",()=>set(false));
 document.addEventListener("keydown",e=>{if(e.key==="Escape")set(false)});
 const cur=s.querySelector('[aria-current="page"]');if(cur&&cur.scrollIntoView)cur.scrollIntoView({block:"nearest"});})();
 </script>
@@ -225,22 +182,8 @@ const store={get(k){try{return localStorage.getItem(k)}catch(_){return null}},se
 let scale=Number(store.get("d214-scale"))||1;
 function applyScale(){document.documentElement.style.setProperty("--scale",scale);store.set("d214-scale",scale)}
 applyScale();
-$("smaller").onclick=()=>{scale=Math.max(.8,+(scale-.1).toFixed(2));applyScale()};
-$("bigger").onclick=()=>{scale=Math.min(1.8,+(scale+.1).toFixed(2));applyScale()};
-/* full screen */
-const fsOK=document.fullscreenEnabled||document.webkitFullscreenEnabled;
-if(!fsOK)$("fsBtn").hidden=true;
-function toggleFS(){
-  const d=document;
-  try{
-    if(d.fullscreenElement||d.webkitFullscreenElement){(d.exitFullscreen||d.webkitExitFullscreen).call(d)}
-    else{const el=d.documentElement;const r=(el.requestFullscreen||el.webkitRequestFullscreen).call(el);if(r&&r.catch)r.catch(()=>{})}
-  }catch(_){}
-}
-function fsLabel(){$("fsBtn").textContent=(document.fullscreenElement||document.webkitFullscreenElement)?"Exit full screen":"Full screen"}
-$("fsBtn").onclick=toggleFS;
-document.addEventListener("fullscreenchange",fsLabel);document.addEventListener("webkitfullscreenchange",fsLabel);
-
+$("smaller").onclick=()=>{scale=Math.max(.85,+(scale-.1).toFixed(2));applyScale()};
+$("bigger").onclick=()=>{scale=Math.min(1.6,+(scale+.1).toFixed(2));applyScale()};
 const el=(tag,cls,text)=>{const e=document.createElement(tag);if(cls)e.className=cls;if(text!=null)e.textContent=text;return e};
 function table(t){
   const w=el("div","tw"),tb=el("table");
@@ -251,8 +194,8 @@ function table(t){
   if(t.note){const box=el("div");box.appendChild(w);box.appendChild(el("div","tnote",t.note));return box}
   return w;
 }
-function entry(e,noTitle){
-  const box=el("div");if(e.title&&!noTitle)box.appendChild(el("div","jt",e.title));
+function entry(e){
+  const box=el("div");if(e.title)box.appendChild(el("div","jt",e.title));
   const w=el("div","tw"),tb=el("table","journal");
   const hr=el("tr");["Account","Debit","Credit"].forEach(h=>hr.appendChild(el("th",null,h)));const th=el("thead");th.appendChild(hr);tb.appendChild(th);
   const body=el("tbody");
@@ -267,15 +210,12 @@ function block(b){
   if(b.table)return table(b.table);
   return el("div");
 }
-function stepName(r,k){return r.label||(r.entry&&r.entry.title)||(r.entries&&r.entries[0]&&r.entries[0].title&&r.entries.length===1?r.entries[0].title:null)||"Step "+(k+1)}
-function reveal(r,k,isNew){
-  const d=el("div","rv"+(isNew?" new":""));
-  const fromEntry=!r.label&&r.entry&&r.entry.title;
-  const lab=el("div","rl");lab.appendChild(el("span","n",String(k+1)));lab.appendChild(el("span",null,stepName(r,k)));d.appendChild(lab);
+function reveal(r){
+  const d=el("div","rv");if(r.label)d.appendChild(el("div","rl",r.label));
   if(r.lines){const l=el("div","lines");r.lines.forEach(x=>l.appendChild(el("div",null,x)));d.appendChild(l)}
   if(r.list){const u=el("ul");r.list.forEach(x=>u.appendChild(el("li",null,x)));d.appendChild(u)}
   if(r.table)d.appendChild(table(r.table));
-  if(r.entry)d.appendChild(entry(r.entry,fromEntry));
+  if(r.entry)d.appendChild(entry(r.entry));
   if(r.entries)r.entries.forEach(e=>d.appendChild(entry(e)));
   if(r.answer)d.appendChild(el("div","answer",r.answer));
   return d;
@@ -285,7 +225,7 @@ function strip(){
   P.forEach((p,k)=>{const b=el("button",seen.has(k)?"seen":null,String(k+1));b.title=p.label+(p.heading?": "+p.heading:"");b.setAttribute("aria-label",b.title);if(k===i)b.setAttribute("aria-current","true");b.onclick=()=>go(k);s.appendChild(b)});
   const cur=s.children[i];if(cur)cur.scrollIntoView({block:"nearest",inline:"center"});
 }
-function render(newest){
+function render(){
   const p=P[i],h=$("head");h.innerHTML="";
   if(p.section)h.appendChild(el("div","section",p.section));
   h.appendChild(el("span","label",p.label));
@@ -294,40 +234,69 @@ function render(newest){
   const g=$("given");g.innerHTML="";
   if(p.heading)g.appendChild(el("h2",null,p.heading));
   p.given.forEach(b=>g.appendChild(block(b)));
-  const n=p.reveals.length,left=n-shown;
-  $("stage").classList.toggle("solo",n===0);$("stepsPanel").hidden=n===0;
   const rv=$("reveals");rv.innerHTML="";
-  p.reveals.forEach((r,k)=>{
-    if(k<shown)rv.appendChild(reveal(r,k,k===newest));
-    else{const s=el("div","slot");s.appendChild(el("b",null,String(k+1)));s.appendChild(el("span",null,stepName(r,k)));rv.appendChild(s)}
-  });
-  $("count").textContent=n?`${shown} of ${n} shown`:"";
-  $("revealBtn").textContent=left===0?(i<P.length-1?"Next problem →":"Done"):(n>1?`Reveal step ${shown+1}`:"Reveal");
-  $("revealBtn").disabled=left===0&&i===P.length-1;
-  $("allBtn").disabled=left===0;$("resetBtn").disabled=shown===0;
-  $("pos").textContent=`${i+1} / ${P.length}`;
+  p.reveals.slice(0,shown).forEach(r=>rv.appendChild(reveal(r)));
+  const n=p.reveals.length,left=n-shown;
+  $("revealBtn").disabled=left===0;$("allBtn").disabled=left===0;$("resetBtn").disabled=shown===0;
+  $("revealBtn").textContent=left===0?"All revealed":(shown===0?"Reveal":"Reveal next");
+  $("left").textContent=n===0?"Nothing to reveal on this one.":left?`${left} step${left===1?"":"s"} left`:"";
+  $("pos").textContent=`${i+1} of ${P.length}`;
   $("prevBtn").disabled=i===0;$("nextBtn").disabled=i===P.length-1;
   strip();
-  if(newest!=null){const t=rv.children[newest];if(t)t.scrollIntoView({block:"nearest",behavior:"smooth"})}else rv.scrollTop=0;
 }
-function go(k){i=Math.max(0,Math.min(P.length-1,k));shown=0;seen.add(i);try{history.replaceState(null,"","#p"+(i+1))}catch(_){}$("given").scrollTop=0;render()}
-function advance(){if(shown<P[i].reveals.length){shown++;render(shown-1)}else if(i<P.length-1)go(i+1)}
+function go(k){i=Math.max(0,Math.min(P.length-1,k));shown=0;seen.add(i);try{history.replaceState(null,"","#p"+(i+1))}catch(_){}render();window.scrollTo({top:0})}
+function advance(){if(shown<P[i].reveals.length){shown++;render();const r=$("reveals").lastElementChild;if(r)r.scrollIntoView({block:"nearest",behavior:"smooth"})}else if(i<P.length-1)go(i+1)}
 $("revealBtn").onclick=advance;
 $("allBtn").onclick=()=>{shown=P[i].reveals.length;render()};
 $("resetBtn").onclick=()=>{shown=0;render()};
 $("prevBtn").onclick=()=>go(i-1);
 $("nextBtn").onclick=()=>go(i+1);
 document.addEventListener("keydown",e=>{
-  if(e.metaKey||e.ctrlKey||e.altKey)return;
   if(e.target.closest&&e.target.closest("input,textarea"))return;
-  const k=e.key;
-  if(k===" "||k==="Enter"){if(e.target.tagName==="BUTTON"||e.target.tagName==="A")return;e.preventDefault();advance()}
-  else if(k==="ArrowRight"){e.preventDefault();advance()}
-  else if(k==="ArrowLeft"){e.preventDefault();if(shown>0){shown--;render()}else go(i-1)}
-  else if(k==="f"||k==="F"){toggleFS()}
-  else if(k==="h"||k==="H"){shown=0;render()}
+  if(e.key===" "||e.key==="ArrowRight"||e.key==="Enter"){if(e.target.tagName==="BUTTON"&&e.key!=="ArrowRight")return;e.preventDefault();advance()}
+  else if(e.key==="ArrowLeft"){e.preventDefault();go(i-1)}
+  else if(e.key==="h"||e.key==="H"){shown=0;render()}
 });
 const m=/^#p(\d+)$/.exec(location.hash);go(m?(+m[1]-1):0);
+})();
+</script>
+<style>.top .size{display:none!important}</style>
+<script>try{document.documentElement.style.setProperty("--scale",1);localStorage.removeItem("d214-scale")}catch(e){}</script>
+<!-- Text size controls: scale the page content, remembered across pages -->
+<style id="tsz-css">
+#tsz{position:fixed;left:14px;bottom:14px;z-index:9999;display:flex;align-items:center;gap:2px;background:#111;color:#fff;border-radius:999px;padding:4px;box-shadow:0 2px 10px rgba(0,0,0,.3);font:600 15px "Barlow",system-ui,sans-serif}
+#tsz button{background:transparent;border:0;color:#fff;font:inherit;cursor:pointer;border-radius:999px;min-width:40px;height:36px;padding:0 10px}
+#tsz button:hover{background:rgba(255,255,255,.15)}
+#tsz button:focus-visible{outline:3px solid #C1102F;outline-offset:1px}
+#tsz button:disabled{opacity:.35;cursor:default}
+#tsz .big{font-size:20px}
+#tsz .pct{min-width:58px;font-variant-numeric:tabular-nums}
+@media print{#tsz{display:none}}
+</style>
+<div id="tsz" role="group" aria-label="Text size">
+  <button type="button" data-d="-1" aria-label="Smaller text" title="Smaller text (-)">A−</button>
+  <button type="button" data-d="0" class="pct" aria-label="Reset text size" title="Reset text size (0)">100%</button>
+  <button type="button" data-d="1" class="big" aria-label="Bigger text" title="Bigger text (+)">A+</button>
+</div>
+<script>
+(function(){
+  var STEPS=[0.8,0.9,1,1.1,1.25,1.4,1.6,1.8,2],KEY="d214-text-size",box=document.getElementById("tsz");
+  var target=document.querySelector("main")||document.body;
+  var i=2;try{var v=parseFloat(localStorage.getItem(KEY));var j=STEPS.indexOf(v);if(j>=0)i=j}catch(e){}
+  function apply(){
+    var z=STEPS[i];target.style.zoom=z;
+    box.style.zoom=target===document.body?1/z:1;
+    box.children[1].textContent=Math.round(z*100)+"%";
+    box.children[0].disabled=i===0;box.children[2].disabled=i===STEPS.length-1;
+    try{localStorage.setItem(KEY,z)}catch(e){}
+  }
+  function step(d){i=d===0?2:Math.max(0,Math.min(STEPS.length-1,i+d));apply()}
+  box.addEventListener("click",function(e){var b=e.target.closest("button");if(b){step(+b.dataset.d);b.blur()}});
+  document.addEventListener("keydown",function(e){
+    if(e.metaKey||e.ctrlKey||e.altKey)return;var t=e.target.tagName;if(t==="INPUT"||t==="TEXTAREA"||t==="SELECT")return;
+    if(e.key==="+"||e.key==="=")step(1);else if(e.key==="-"||e.key==="_")step(-1);else if(e.key==="0")step(0);
+  });
+  apply();
 })();
 </script>
 </body>
