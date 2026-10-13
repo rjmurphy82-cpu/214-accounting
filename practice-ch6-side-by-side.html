@@ -131,6 +131,34 @@ ol.facts li.cur{background:var(--redsoft)}
 .badge.book{background:var(--red);color:#fff}
 @media (max-width:760px){.board{grid-template-columns:1fr}}
 
+
+:root{--good:#1E7A3C;--goodsoft:#E7F4EB}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--good:#3FB86A;--goodsoft:#123020}}
+:root[data-theme="dark"]{--good:#3FB86A;--goodsoft:#123020}
+.qbox{border:2px solid var(--line);border-radius:12px;padding:16px 18px;display:grid;gap:12px;background:var(--paper)}
+.qbox .ql{font-size:14px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--redtext)}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.opt{display:flex;gap:12px;align-items:center;text-align:left;background:var(--bg);color:var(--ink);border:2px solid var(--line);border-radius:10px;padding:10px 14px;font:600 calc(19px * var(--scale))/1.25 var(--body);min-height:58px;cursor:pointer}
+.opt:hover:not(:disabled){border-color:var(--ink)}
+.opt .k{flex:none;width:32px;height:32px;border-radius:7px;background:var(--black);color:#fff;display:grid;place-items:center;font-family:var(--display);font-size:17px}
+.opt:disabled{cursor:default}
+.opt.right{background:var(--good);border-color:var(--good);color:#fff}
+.opt.right .k{background:rgba(0,0,0,.25)}
+.opt.wrong{border-color:var(--red);color:var(--redtext);text-decoration:line-through;background:transparent}
+.opt.dim{opacity:.45}
+.fb{border-left:6px solid var(--red);background:color-mix(in srgb,var(--redsoft) 55%,var(--paper));border-radius:0 10px 10px 0;padding:12px 16px;display:grid;gap:8px;animation:in .25s ease-out}
+.fb.ok{border-color:var(--good);background:var(--goodsoft)}
+.fb.key{border-color:var(--ink);background:var(--bg)}
+.fb .fh{font-family:var(--display);font-weight:600;font-size:calc(22px * var(--scale))}
+.fb.ok .fh{color:var(--good)}
+.fb.no .fh{color:var(--redtext)}
+.fb .muted{color:var(--muted)}
+.head .score{margin-left:auto;background:rgba(255,255,255,.14);border-radius:999px;padding:2px 12px;font-weight:700;font-size:15px}
+.head .date+.score{margin-left:12px}
+#given{grid-template-columns:minmax(0,1fr)}
+#given>*,.qbox>*,.fb>*,.board>*,.opts>*{min-width:0}
+.opt span:last-child{min-width:0;overflow-wrap:anywhere}
+@media (max-width:600px){.opts{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -169,7 +197,7 @@ ol.facts li.cur{background:var(--redsoft)}
     <span class="size" aria-label="Text size"><button id="smaller" aria-label="Smaller text">A−</button><button id="bigger" aria-label="Bigger text">A+</button></span>
   </div>
   <h1>Side-by-Side Bank Recs</h1>
-  <p class="sub">Eight full reconciliations: bank side and book side, worked line by line</p>
+  <p class="sub">Eight full reconciliations: pick where each item goes, then the adjusted balance</p>
   <nav class="strip" id="strip" aria-label="Problems"></nav>
   <article class="card">
     <header class="head" id="head"></header>
@@ -186,7 +214,7 @@ ol.facts li.cur{background:var(--redsoft)}
     <span class="left" id="pos" style="align-self:center"></span>
     <button class="btn ghost" id="nextBtn">Next problem</button>
   </div>
-  <p class="hint">Keys: <kbd>Space</kbd> or <kbd>→</kbd> places the next item or reveals the next step, then moves on. <kbd>←</kbd> goes back a problem. <kbd>H</kbd> hides answers.</p>
+  <p class="hint">Keys: <kbd>A</kbd> to <kbd>D</kbd> or <kbd>1</kbd> to <kbd>4</kbd> pick an answer. <kbd>Space</kbd> or <kbd>→</kbd> goes to the next question. <kbd>←</kbd> goes back a problem.</p>
   </div></main>
 </div>
 <script>
@@ -197,88 +225,171 @@ document.addEventListener("keydown",e=>{if(e.key==="Escape")set(false)});
 const cur=s.querySelector('[aria-current="page"]');if(cur&&cur.scrollIntoView)cur.scrollIntoView({block:"nearest"});})();
 </script>
 <script>
-const RECS=[{"co": "Lakeside Coffee", "date": "March 31", "bank": 6420, "items": [{"f": "A $1,150 deposit made on March 31 does not appear on the bank statement.", "side": "bank", "s": 1, "amt": 1150, "short": "Deposit in transit", "why": "The books already have it. The bank hasn't processed it yet.", "je": null}, {"f": "Outstanding checks total $1,790.", "side": "bank", "s": -1, "amt": 1790, "short": "Outstanding checks", "why": "The books already took these out. The bank hasn't paid them yet.", "je": null}, {"f": "The bank statement shows a $22 service charge.", "side": "book", "s": -1, "amt": 22, "short": "Service charge", "why": "The bank already took the fee. The books don't have it yet.", "je": [{"account": "Bank Service Charge Expense", "debit": "22"}, {"account": "Cash", "credit": "22"}]}, {"f": "A $140 check from a customer was returned marked NSF.", "side": "book", "s": -1, "amt": 140, "short": "NSF check", "why": "The check bounced, so that cash was never collected.", "je": [{"account": "Accounts Receivable", "debit": "140"}, {"account": "Cash", "credit": "140"}]}, {"f": "The bank statement shows $18 of interest earned.", "side": "book", "s": 1, "amt": 18, "short": "Interest earned", "why": "The bank already added it. The books don't have it yet.", "je": [{"account": "Cash", "debit": "18"}, {"account": "Interest Revenue", "credit": "18"}]}], "adj": 5780, "book": 5924}, {"co": "Northgate Cycles", "date": "April 30", "bank": 9315, "items": [{"f": "Checks #418 for $615, #421 for $1,280, and #422 for $96 have not cleared the bank.", "side": "bank", "s": -1, "amt": 1991, "short": "Outstanding checks (#418, #421, #422)", "why": "$615 + $1,280 + $96 = $1,991. The books already took these out. The bank hasn't paid them yet.", "je": null}, {"f": "The bank collected a $1,500 note receivable for Northgate and charged a $15 collection fee.", "side": "book", "s": 1, "amt": 1485, "short": "Note collected, less $15 fee", "why": "$1,500 − $15 = $1,485. The bank has the money; the books don't know yet.", "je": [{"account": "Cash", "debit": "1,485"}, {"account": "Bank Service Charge Expense", "debit": "15"}, {"account": "Notes Receivable", "credit": "1,500"}]}, {"f": "The April 30 deposit of $2,040 is not on the bank statement.", "side": "bank", "s": 1, "amt": 2040, "short": "Deposit in transit", "why": "The books already have it. The bank hasn't processed it yet.", "je": null}, {"f": "The bank paid the $210 electric bill by EFT. Northgate has not recorded it.", "side": "book", "s": -1, "amt": 210, "short": "EFT: electric bill", "why": "The money already left the account.", "je": [{"account": "Utilities Expense", "debit": "210"}, {"account": "Cash", "credit": "210"}]}, {"f": "The bank charged an $18 monthly service fee.", "side": "book", "s": -1, "amt": 18, "short": "Service charge", "why": "The bank already took the fee. The books don't have it yet.", "je": [{"account": "Bank Service Charge Expense", "debit": "18"}, {"account": "Cash", "credit": "18"}]}], "adj": 9364, "book": 8107}, {"co": "Ridgeview Dental", "date": "May 31", "bank": 12880, "items": [{"f": "Check #1052 for office supplies was written for $428 but recorded in the books as $482.", "side": "book", "s": 1, "amt": 54, "short": "Error: check #1052 recorded too high", "why": "$482 − $428 = $54. The books took out $54 too much.", "je": [{"account": "Cash", "debit": "54"}, {"account": "Supplies Expense", "credit": "54"}]}, {"f": "Deposit in transit, $960.", "side": "bank", "s": 1, "amt": 960, "short": "Deposit in transit", "why": "The books already have it. The bank hasn't processed it yet.", "je": null}, {"f": "A patient's $325 check was returned marked NSF.", "side": "book", "s": -1, "amt": 325, "short": "NSF check", "why": "The check bounced, so that cash was never collected.", "je": [{"account": "Accounts Receivable", "debit": "325"}, {"account": "Cash", "credit": "325"}]}, {"f": "Outstanding checks total $2,315.", "side": "bank", "s": -1, "amt": 2315, "short": "Outstanding checks", "why": "The books already took these out. The bank hasn't paid them yet.", "je": null}, {"f": "The bank charged $32 for printing new checks.", "side": "book", "s": -1, "amt": 32, "short": "Printed checks", "why": "The bank already charged the account.", "je": [{"account": "Bank Service Charge Expense", "debit": "32"}, {"account": "Cash", "credit": "32"}]}], "adj": 11525, "book": 11828}, {"co": "Harbor Print Shop", "date": "June 30", "bank": 7640, "items": [{"f": "Outstanding checks total $2,880.", "side": "bank", "s": -1, "amt": 2880, "short": "Outstanding checks", "why": "The books already took these out. The bank hasn't paid them yet.", "je": null}, {"f": "The bank mistakenly charged Harbor's account for a $350 check written by Harbor Pizza.", "side": "bank", "s": 1, "amt": 350, "short": "Bank error: Harbor Pizza check", "why": "The bank took out money it shouldn't have. Add it back and tell the bank. No entry.", "je": null}, {"f": "A $1,260 customer payment on account was deposited correctly but recorded in the books as $1,620.", "side": "book", "s": -1, "amt": 360, "short": "Error: deposit recorded too high", "why": "$1,620 − $1,260 = $360. The books show $360 more cash than was deposited.", "je": [{"account": "Accounts Receivable", "debit": "360"}, {"account": "Cash", "credit": "360"}]}, {"f": "Deposit in transit, $1,425.", "side": "bank", "s": 1, "amt": 1425, "short": "Deposit in transit", "why": "The books already have it. The bank hasn't processed it yet.", "je": null}, {"f": "Service charge, $25.", "side": "book", "s": -1, "amt": 25, "short": "Service charge", "why": "The bank already took the fee. The books don't have it yet.", "je": [{"account": "Bank Service Charge Expense", "debit": "25"}, {"account": "Cash", "credit": "25"}]}, {"f": "Interest earned, $14.", "side": "book", "s": 1, "amt": 14, "short": "Interest earned", "why": "The bank already added it. The books don't have it yet.", "je": [{"account": "Cash", "debit": "14"}, {"account": "Interest Revenue", "credit": "14"}]}], "adj": 6535, "book": 6906}, {"co": "Summit Landscaping", "date": "July 31", "bank": 15204, "items": [{"f": "The July 31 deposit of $2,380 was made after the bank closed for the day.", "side": "bank", "s": 1, "amt": 2380, "short": "Deposit in transit", "why": "The books already have it. The bank hasn't processed it yet.", "je": null}, {"f": "Check #775 for July rent cleared the bank for $1,790 but was recorded in the books as $1,970.", "side": "book", "s": 1, "amt": 180, "short": "Error: check #775 recorded too high", "why": "$1,970 − $1,790 = $180. The books took out $180 too much.", "je": [{"account": "Cash", "debit": "180"}, {"account": "Rent Expense", "credit": "180"}]}, {"f": "A customer paid $640 on account by EFT. Summit has not recorded it.", "side": "book", "s": 1, "amt": 640, "short": "EFT: customer payment", "why": "The money is already in the account. The books don't know yet.", "je": [{"account": "Cash", "debit": "640"}, {"account": "Accounts Receivable", "credit": "640"}]}, {"f": "Outstanding checks total $3,975.", "side": "bank", "s": -1, "amt": 3975, "short": "Outstanding checks", "why": "The books already took these out. The bank hasn't paid them yet.", "je": null}, {"f": "A customer's $210 check was returned NSF, and the bank charged a $20 fee.", "side": "book", "s": -1, "amt": 230, "short": "NSF check plus $20 fee", "why": "$210 + $20 = $230. The check bounced and the bank charged for it.", "je": [{"account": "Accounts Receivable", "debit": "210"}, {"account": "Bank Service Charge Expense", "debit": "20"}, {"account": "Cash", "credit": "230"}]}], "adj": 13609, "book": 13019}, {"co": "Prairie Pet Supply", "date": "August 31", "bank": 4118, "items": [{"f": "Deposits of $780 and $1,045 made on August 31 are not on the bank statement.", "side": "bank", "s": 1, "amt": 1825, "short": "Deposits in transit", "why": "$780 + $1,045 = $1,825. The books already have it. The bank hasn't processed it yet.", "je": null}, {"f": "The bank mistakenly credited Prairie's account for a $500 deposit made by Prairie Pharmacy.", "side": "bank", "s": -1, "amt": 500, "short": "Bank error: Prairie Pharmacy deposit", "why": "The bank added money that isn't ours. Take it out and tell the bank. No entry.", "je": null}, {"f": "Outstanding checks total $2,603.", "side": "bank", "s": -1, "amt": 2603, "short": "Outstanding checks", "why": "The books already took these out. The bank hasn't paid them yet.", "je": null}, {"f": "Check #340 for new equipment was written for $2,150 but recorded in the books as $2,510.", "side": "book", "s": 1, "amt": 360, "short": "Error: check #340 recorded too high", "why": "$2,510 − $2,150 = $360. The books took out $360 too much.", "je": [{"account": "Cash", "debit": "360"}, {"account": "Equipment", "credit": "360"}]}, {"f": "A customer's $415 check was returned marked NSF.", "side": "book", "s": -1, "amt": 415, "short": "NSF check", "why": "The check bounced, so that cash was never collected.", "je": [{"account": "Accounts Receivable", "debit": "415"}, {"account": "Cash", "credit": "415"}]}, {"f": "Bank service charge, $30.", "side": "book", "s": -1, "amt": 30, "short": "Service charge", "why": "The bank already took the fee. The books don't have it yet.", "je": [{"account": "Bank Service Charge Expense", "debit": "30"}, {"account": "Cash", "credit": "30"}]}], "adj": 2840, "book": 2925}, {"co": "Copper Canyon Outfitters", "date": "September 30", "bank": 21560, "items": [{"f": "Outstanding checks total $5,872.", "side": "bank", "s": -1, "amt": 5872, "short": "Outstanding checks", "why": "The books already took these out. The bank hasn't paid them yet.", "je": null}, {"f": "The bank collected a $4,000 note receivable plus $120 of interest for Copper Canyon and charged a $25 collection fee.", "side": "book", "s": 1, "amt": 4095, "short": "Note plus interest, less $25 fee", "why": "$4,000 + $120 − $25 = $4,095.", "je": [{"account": "Cash", "debit": "4,095"}, {"account": "Bank Service Charge Expense", "debit": "25"}, {"account": "Notes Receivable", "credit": "4,000"}, {"account": "Interest Revenue", "credit": "120"}]}, {"f": "Deposit in transit, $3,410.", "side": "bank", "s": 1, "amt": 3410, "short": "Deposit in transit", "why": "The books already have it. The bank hasn't processed it yet.", "je": null}, {"f": "A customer's $685 check was returned marked NSF.", "side": "book", "s": -1, "amt": 685, "short": "NSF check", "why": "The check bounced, so that cash was never collected.", "je": [{"account": "Accounts Receivable", "debit": "685"}, {"account": "Cash", "credit": "685"}]}, {"f": "The bank paid the $312 monthly insurance bill by EFT. It has not been recorded.", "side": "book", "s": -1, "amt": 312, "short": "EFT: insurance bill", "why": "The money already left the account.", "je": [{"account": "Insurance Expense", "debit": "312"}, {"account": "Cash", "credit": "312"}]}, {"f": "Check #2219 for advertising cleared the bank for $575 but was recorded in the books as $557.", "side": "book", "s": -1, "amt": 18, "short": "Error: check #2219 recorded too low", "why": "$575 − $557 = $18. The books took out $18 too little.", "je": [{"account": "Advertising Expense", "debit": "18"}, {"account": "Cash", "credit": "18"}]}], "adj": 19098, "book": 16018}, {"co": "Maple Grove Tutoring", "date": "October 31", "bank": 3276, "items": [{"f": "Deposit in transit, $890.", "side": "bank", "s": 1, "amt": 890, "short": "Deposit in transit", "why": "The books already have it. The bank hasn't processed it yet.", "je": null}, {"f": "Outstanding checks total $1,412.", "side": "bank", "s": -1, "amt": 1412, "short": "Outstanding checks", "why": "The books already took these out. The bank hasn't paid them yet.", "je": null}, {"f": "A $2,180 customer payment on account was recorded in the books as $2,810.", "side": "book", "s": -1, "amt": 630, "short": "Error: deposit recorded too high", "why": "$2,810 − $2,180 = $630. The books show $630 more cash than was deposited.", "je": [{"account": "Accounts Receivable", "debit": "630"}, {"account": "Cash", "credit": "630"}]}, {"f": "Service charge, $15.", "side": "book", "s": -1, "amt": 15, "short": "Service charge", "why": "The bank already took the fee. The books don't have it yet.", "je": [{"account": "Bank Service Charge Expense", "debit": "15"}, {"account": "Cash", "credit": "15"}]}, {"f": "Interest earned, $6.", "side": "book", "s": 1, "amt": 6, "short": "Interest earned", "why": "The bank already added it. The books don't have it yet.", "je": [{"account": "Cash", "debit": "6"}, {"account": "Interest Revenue", "credit": "6"}]}], "adj": 2754, "book": 3393}];
+const P=[{"type": "info", "label": "How it works", "blocks": [{"h2": "Side-by-Side Bank Reconciliations"}, {"p": "Each problem gives you the bank statement balance, the Cash balance per books, and a list of items. For each item, pick where it goes on the reconciliation. Right or wrong, you'll see why, and the item drops onto the correct side."}, {"p": "After the last item, pick the adjusted balance. Then you'll see the adjusting entries for the book side."}, {"demo": true}, {"q": "Bank side: deposits in transit, outstanding checks, bank errors. Book side: anything the bank did that the books don't know about yet, plus errors in the books. Only book-side items get an entry."}]}, {"type": "rec", "label": "Lakeside Coffee", "date": "March 31", "bank": 6420, "book": 5924, "adj": 5780, "items": [{"f": "A $1,150 deposit made on March 31 does not appear on the bank statement.", "side": "bank", "s": 1, "amt": 1150, "short": "Deposit in transit", "why": "The books already have it. The bank hasn't processed it yet.", "je": null}, {"f": "Outstanding checks total $1,790.", "side": "bank", "s": -1, "amt": 1790, "short": "Outstanding checks", "why": "The books already took these out. The bank hasn't paid them yet.", "je": null}, {"f": "The bank statement shows a $22 service charge.", "side": "book", "s": -1, "amt": 22, "short": "Service charge", "why": "The bank already took the fee. The books don't have it yet.", "je": [["Bank Service Charge Expense", "D", "22"], ["Cash", "C", "22"]]}, {"f": "A $140 check from a customer was returned marked NSF.", "side": "book", "s": -1, "amt": 140, "short": "NSF check", "why": "The check bounced, so that cash was never collected.", "je": [["Accounts Receivable", "D", "140"], ["Cash", "C", "140"]]}, {"f": "The bank statement shows $18 of interest earned.", "side": "book", "s": 1, "amt": 18, "short": "Interest earned", "why": "The bank already added it. The books don't have it yet.", "je": [["Cash", "D", "18"], ["Interest Revenue", "C", "18"]]}]}, {"type": "rec", "label": "Northgate Cycles", "date": "April 30", "bank": 9315, "book": 8107, "adj": 9364, "items": [{"f": "Checks #418 for $615, #421 for $1,280, and #422 for $96 have not cleared the bank.", "side": "bank", "s": -1, "amt": 1991, "short": "Outstanding checks (#418, #421, #422)", "why": "$615 + $1,280 + $96 = $1,991. The books already took these out. The bank hasn't paid them yet.", "je": null}, {"f": "The bank collected a $1,500 note receivable for Northgate and charged a $15 collection fee.", "side": "book", "s": 1, "amt": 1485, "short": "Note collected, less $15 fee", "why": "$1,500 − $15 = $1,485. The bank has the money; the books don't know yet.", "je": [["Cash", "D", "1,485"], ["Bank Service Charge Expense", "D", "15"], ["Notes Receivable", "C", "1,500"]]}, {"f": "The April 30 deposit of $2,040 is not on the bank statement.", "side": "bank", "s": 1, "amt": 2040, "short": "Deposit in transit", "why": "The books already have it. The bank hasn't processed it yet.", "je": null}, {"f": "The bank paid the $210 electric bill by EFT. Northgate has not recorded it.", "side": "book", "s": -1, "amt": 210, "short": "EFT: electric bill", "why": "The money already left the account.", "je": [["Utilities Expense", "D", "210"], ["Cash", "C", "210"]]}, {"f": "The bank charged an $18 monthly service fee.", "side": "book", "s": -1, "amt": 18, "short": "Service charge", "why": "The bank already took the fee. The books don't have it yet.", "je": [["Bank Service Charge Expense", "D", "18"], ["Cash", "C", "18"]]}]}, {"type": "rec", "label": "Ridgeview Dental", "date": "May 31", "bank": 12880, "book": 11828, "adj": 11525, "items": [{"f": "Check #1052 for office supplies was written for $428 but recorded in the books as $482.", "side": "book", "s": 1, "amt": 54, "short": "Error: check #1052 recorded too high", "why": "$482 − $428 = $54. The books took out $54 too much.", "je": [["Cash", "D", "54"], ["Supplies Expense", "C", "54"]]}, {"f": "Deposit in transit, $960.", "side": "bank", "s": 1, "amt": 960, "short": "Deposit in transit", "why": "The books already have it. The bank hasn't processed it yet.", "je": null}, {"f": "A patient's $325 check was returned marked NSF.", "side": "book", "s": -1, "amt": 325, "short": "NSF check", "why": "The check bounced, so that cash was never collected.", "je": [["Accounts Receivable", "D", "325"], ["Cash", "C", "325"]]}, {"f": "Outstanding checks total $2,315.", "side": "bank", "s": -1, "amt": 2315, "short": "Outstanding checks", "why": "The books already took these out. The bank hasn't paid them yet.", "je": null}, {"f": "The bank charged $32 for printing new checks.", "side": "book", "s": -1, "amt": 32, "short": "Printed checks", "why": "The bank already charged the account.", "je": [["Bank Service Charge Expense", "D", "32"], ["Cash", "C", "32"]]}]}, {"type": "rec", "label": "Harbor Print Shop", "date": "June 30", "bank": 7640, "book": 6906, "adj": 6535, "items": [{"f": "Outstanding checks total $2,880.", "side": "bank", "s": -1, "amt": 2880, "short": "Outstanding checks", "why": "The books already took these out. The bank hasn't paid them yet.", "je": null}, {"f": "The bank mistakenly charged Harbor's account for a $350 check written by Harbor Pizza.", "side": "bank", "s": 1, "amt": 350, "short": "Bank error: Harbor Pizza check", "why": "The bank took out money it shouldn't have. Add it back and tell the bank. No entry.", "je": null}, {"f": "A $1,260 customer payment on account was deposited correctly but recorded in the books as $1,620.", "side": "book", "s": -1, "amt": 360, "short": "Error: deposit recorded too high", "why": "$1,620 − $1,260 = $360. The books show $360 more cash than was deposited.", "je": [["Accounts Receivable", "D", "360"], ["Cash", "C", "360"]]}, {"f": "Deposit in transit, $1,425.", "side": "bank", "s": 1, "amt": 1425, "short": "Deposit in transit", "why": "The books already have it. The bank hasn't processed it yet.", "je": null}, {"f": "Service charge, $25.", "side": "book", "s": -1, "amt": 25, "short": "Service charge", "why": "The bank already took the fee. The books don't have it yet.", "je": [["Bank Service Charge Expense", "D", "25"], ["Cash", "C", "25"]]}, {"f": "Interest earned, $14.", "side": "book", "s": 1, "amt": 14, "short": "Interest earned", "why": "The bank already added it. The books don't have it yet.", "je": [["Cash", "D", "14"], ["Interest Revenue", "C", "14"]]}]}, {"type": "rec", "label": "Summit Landscaping", "date": "July 31", "bank": 15204, "book": 13019, "adj": 13609, "items": [{"f": "The July 31 deposit of $2,380 was made after the bank closed for the day.", "side": "bank", "s": 1, "amt": 2380, "short": "Deposit in transit", "why": "The books already have it. The bank hasn't processed it yet.", "je": null}, {"f": "Check #775 for July rent cleared the bank for $1,790 but was recorded in the books as $1,970.", "side": "book", "s": 1, "amt": 180, "short": "Error: check #775 recorded too high", "why": "$1,970 − $1,790 = $180. The books took out $180 too much.", "je": [["Cash", "D", "180"], ["Rent Expense", "C", "180"]]}, {"f": "A customer paid $640 on account by EFT. Summit has not recorded it.", "side": "book", "s": 1, "amt": 640, "short": "EFT: customer payment", "why": "The money is already in the account. The books don't know yet.", "je": [["Cash", "D", "640"], ["Accounts Receivable", "C", "640"]]}, {"f": "Outstanding checks total $3,975.", "side": "bank", "s": -1, "amt": 3975, "short": "Outstanding checks", "why": "The books already took these out. The bank hasn't paid them yet.", "je": null}, {"f": "A customer's $210 check was returned NSF, and the bank charged a $20 fee.", "side": "book", "s": -1, "amt": 230, "short": "NSF check plus $20 fee", "why": "$210 + $20 = $230. The check bounced and the bank charged for it.", "je": [["Accounts Receivable", "D", "210"], ["Bank Service Charge Expense", "D", "20"], ["Cash", "C", "230"]]}]}, {"type": "rec", "label": "Prairie Pet Supply", "date": "August 31", "bank": 4118, "book": 2925, "adj": 2840, "items": [{"f": "Deposits of $780 and $1,045 made on August 31 are not on the bank statement.", "side": "bank", "s": 1, "amt": 1825, "short": "Deposits in transit", "why": "$780 + $1,045 = $1,825. The books already have it. The bank hasn't processed it yet.", "je": null}, {"f": "The bank mistakenly credited Prairie's account for a $500 deposit made by Prairie Pharmacy.", "side": "bank", "s": -1, "amt": 500, "short": "Bank error: Prairie Pharmacy deposit", "why": "The bank added money that isn't ours. Take it out and tell the bank. No entry.", "je": null}, {"f": "Outstanding checks total $2,603.", "side": "bank", "s": -1, "amt": 2603, "short": "Outstanding checks", "why": "The books already took these out. The bank hasn't paid them yet.", "je": null}, {"f": "Check #340 for new equipment was written for $2,150 but recorded in the books as $2,510.", "side": "book", "s": 1, "amt": 360, "short": "Error: check #340 recorded too high", "why": "$2,510 − $2,150 = $360. The books took out $360 too much.", "je": [["Cash", "D", "360"], ["Equipment", "C", "360"]]}, {"f": "A customer's $415 check was returned marked NSF.", "side": "book", "s": -1, "amt": 415, "short": "NSF check", "why": "The check bounced, so that cash was never collected.", "je": [["Accounts Receivable", "D", "415"], ["Cash", "C", "415"]]}, {"f": "Bank service charge, $30.", "side": "book", "s": -1, "amt": 30, "short": "Service charge", "why": "The bank already took the fee. The books don't have it yet.", "je": [["Bank Service Charge Expense", "D", "30"], ["Cash", "C", "30"]]}]}, {"type": "rec", "label": "Copper Canyon Outfitters", "date": "September 30", "bank": 21560, "book": 16018, "adj": 19098, "items": [{"f": "Outstanding checks total $5,872.", "side": "bank", "s": -1, "amt": 5872, "short": "Outstanding checks", "why": "The books already took these out. The bank hasn't paid them yet.", "je": null}, {"f": "The bank collected a $4,000 note receivable plus $120 of interest for Copper Canyon and charged a $25 collection fee.", "side": "book", "s": 1, "amt": 4095, "short": "Note plus interest, less $25 fee", "why": "$4,000 + $120 − $25 = $4,095.", "je": [["Cash", "D", "4,095"], ["Bank Service Charge Expense", "D", "25"], ["Notes Receivable", "C", "4,000"], ["Interest Revenue", "C", "120"]]}, {"f": "Deposit in transit, $3,410.", "side": "bank", "s": 1, "amt": 3410, "short": "Deposit in transit", "why": "The books already have it. The bank hasn't processed it yet.", "je": null}, {"f": "A customer's $685 check was returned marked NSF.", "side": "book", "s": -1, "amt": 685, "short": "NSF check", "why": "The check bounced, so that cash was never collected.", "je": [["Accounts Receivable", "D", "685"], ["Cash", "C", "685"]]}, {"f": "The bank paid the $312 monthly insurance bill by EFT. It has not been recorded.", "side": "book", "s": -1, "amt": 312, "short": "EFT: insurance bill", "why": "The money already left the account.", "je": [["Insurance Expense", "D", "312"], ["Cash", "C", "312"]]}, {"f": "Check #2219 for advertising cleared the bank for $575 but was recorded in the books as $557.", "side": "book", "s": -1, "amt": 18, "short": "Error: check #2219 recorded too low", "why": "$575 − $557 = $18. The books took out $18 too little.", "je": [["Advertising Expense", "D", "18"], ["Cash", "C", "18"]]}]}, {"type": "rec", "label": "Maple Grove Tutoring", "date": "October 31", "bank": 3276, "book": 3393, "adj": 2754, "items": [{"f": "Deposit in transit, $890.", "side": "bank", "s": 1, "amt": 890, "short": "Deposit in transit", "why": "The books already have it. The bank hasn't processed it yet.", "je": null}, {"f": "Outstanding checks total $1,412.", "side": "bank", "s": -1, "amt": 1412, "short": "Outstanding checks", "why": "The books already took these out. The bank hasn't paid them yet.", "je": null}, {"f": "A $2,180 customer payment on account was recorded in the books as $2,810.", "side": "book", "s": -1, "amt": 630, "short": "Error: deposit recorded too high", "why": "$2,810 − $2,180 = $630. The books show $630 more cash than was deposited.", "je": [["Accounts Receivable", "D", "630"], ["Cash", "C", "630"]]}, {"f": "Service charge, $15.", "side": "book", "s": -1, "amt": 15, "short": "Service charge", "why": "The bank already took the fee. The books don't have it yet.", "je": [["Bank Service Charge Expense", "D", "15"], ["Cash", "C", "15"]]}, {"f": "Interest earned, $6.", "side": "book", "s": 1, "amt": 6, "short": "Interest earned", "why": "The bank already added it. The books don't have it yet.", "je": [["Cash", "D", "6"], ["Interest Revenue", "C", "6"]]}]}];
 (function(){
 const $=id=>document.getElementById(id);
 const m$=n=>"$"+n.toLocaleString("en-US");
 const el=(t,c,x)=>{const e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e};
-const INTRO={intro:true};
-const P=[INTRO,...RECS];
-let i=0,shown=0;const seen=new Set();
-const steps=p=>p.intro?0:p.items.length+2;
-function sideBox(p,side,k){
+const shuffle=a=>{for(let k=a.length-1;k>0;k--){const j=Math.floor(Math.random()*(k+1));[a[k],a[j]]=[a[j],a[k]]}return a};
+const OPTS=[["bank",1,"Add to the bank balance"],["bank",-1,"Deduct from the bank balance"],["book",1,"Add to the book balance"],["book",-1,"Deduct from the book balance"]];
+const where=x=>(x.s>0?"added to the ":"deducted from the ")+x.side+" balance";
+const correctIdx=x=>OPTS.findIndex(o=>o[0]===x.side&&o[1]===x.s);
+let i=0;const ST={},seen=new Set();
+const S=()=>ST[i]||(ST[i]={step:0,picks:[],adj:null,adjOpts:null});
+const nQ=p=>p.type!=="rec"?0:p.items.length+(p.single?0:1);
+
+/* ---------- reconciliation board ---------- */
+function sideBox(p,side,placedIdx,showAdj){
   const box=el("div","sideb "+side);
   box.appendChild(el("div","sh",side==="bank"?"Bank side":"Book side"));
-  const st=el("div","r");st.appendChild(el("span",null,side==="bank"?"Balance per bank statement":"Balance per books"));st.appendChild(el("b",null,m$(p[side])));box.appendChild(st);
-  const placed=p.items.map((it,n)=>({...it,n})).filter(it=>it.n<k&&it.side===side);
+  const st=el("div","r");st.appendChild(el("span",null,side==="bank"?"Balance per bank statement":"Balance per books"));st.appendChild(el("b",null,p[side]!=null?m$(p[side]):"$ ____"));box.appendChild(st);
+  const placed=p.items.map((x,n)=>({...x,n})).filter(x=>placedIdx.has(x.n)&&x.side===side);
   [[1,"Add"],[-1,"Deduct"]].forEach(([sg,word])=>{
     const rows=placed.filter(x=>x.s===sg);if(!rows.length)return;
     box.appendChild(el("div","grp",word+":"));
-    rows.forEach(x=>{const r=el("div","r it"+(x.n===k-1&&k<=p.items.length?" new":""));r.appendChild(el("span",null,x.short));r.appendChild(el("b",null,(sg>0?"+ ":"− ")+m$(x.amt)));box.appendChild(r)});
+    rows.forEach(x=>{const r=el("div","r it"+(x.n===p._new?" new":""));r.appendChild(el("span",null,x.short));r.appendChild(el("b",null,(sg>0?"+ ":"− ")+(x.amt!=null?m$(x.amt):"$ ____")));box.appendChild(r)});
   });
-  if(!placed.length)box.appendChild(el("div","none",k>=p.items.length?"No items on this side":"No items placed yet"));
-  const done=k>p.items.length;
-  const a=el("div","r adj"+(done?" done":""));a.appendChild(el("span",null,side==="bank"?"Adjusted bank balance":"Adjusted book balance"));
-  a.appendChild(el("b",done?null:"q",done?m$(p.adj):"?"));box.appendChild(a);
+  if(!placed.length)box.appendChild(el("div","none",p.single?(placedIdx.size?"Nothing on this side":"Where does the item go?"):"No items placed yet"));
+  if(!p.single){
+    const a=el("div","r adj"+(showAdj?" done":""));a.appendChild(el("span",null,side==="bank"?"Adjusted bank balance":"Adjusted book balance"));
+    a.appendChild(el("b",showAdj?null:"q",showAdj?m$(p.adj):"?"));box.appendChild(a);
+  }
   return box;
 }
-function mathLine(p,side){
-  let t=m$(p[side]).slice(1);p.items.filter(x=>x.side===side).forEach(x=>t+=(x.s>0?" + ":" − ")+x.amt.toLocaleString("en-US"));
-  return (side==="bank"?"Bank: ":"Books: ")+t+" = "+m$(p.adj);
-}
-function rv(label){const d=el("div","rv");d.appendChild(el("div","rl",label));return d}
-function entryTable(e){
-  const box=el("div");box.appendChild(el("div","jt",e.title));
+function board(p,placedIdx,showAdj){const b=el("div","board");b.appendChild(sideBox(p,"bank",placedIdx,showAdj));b.appendChild(sideBox(p,"book",placedIdx,showAdj));return b}
+const DEMO={bank:5000,book:4380,adj:4500,_new:-1,items:[{side:"bank",s:1,amt:800,short:"Deposit in transit"},{side:"bank",s:-1,amt:1300,short:"Outstanding checks"},{side:"book",s:1,amt:150,short:"Interest earned"},{side:"book",s:-1,amt:30,short:"Service charge"}]};
+
+/* ---------- entries ---------- */
+function entryTable(title,rows){
+  const box=el("div");if(title)box.appendChild(el("div","jt",title));
   const w=el("div","tw"),tb=el("table","journal");const hr=el("tr");["Account","Debit","Credit"].forEach(h=>hr.appendChild(el("th",null,h)));const th=el("thead");th.appendChild(hr);tb.appendChild(th);
-  const body=el("tbody");e.rows.forEach(r=>{const tr=el("tr");tr.appendChild(el("td","acct"+(r.credit?" cr":""),r.account));tr.appendChild(el("td","n",r.debit||""));tr.appendChild(el("td","n",r.credit||""));body.appendChild(tr)});
+  const body=el("tbody");rows.forEach(([a,dc,v])=>{const tr=el("tr");tr.appendChild(el("td","acct"+(dc==="C"?" cr":""),a));tr.appendChild(el("td","n",dc==="D"?v:""));tr.appendChild(el("td","n",dc==="C"?v:""));body.appendChild(tr)});
   tb.appendChild(body);w.appendChild(tb);box.appendChild(w);return box;
+}
+
+/* ---------- feedback ---------- */
+function itemFeedback(x,pick){
+  const c=correctIdx(x),shown=pick.shown,ok=!shown&&pick.i===c,[ps]=OPTS[pick.i];
+  const d=el("div","fb "+(ok?"ok":shown?"key":"no"));
+  d.appendChild(el("div","fh",shown?"Answer: "+OPTS[c][2]:ok?"Correct!":"Not quite. The answer is: "+OPTS[c][2]));
+  const l=el("div","lines");
+  if(!ok&&!shown){
+    if(ps===x.side)l.appendChild(el("div",null,`Right side, wrong direction. It gets ${where(x)}.`));
+    else l.appendChild(el("div",null,x.side==="bank"?"This is a bank-side item. The company's books are already right; the difference is on the bank's end.":"This is a book-side item. The bank's number is already right; the company's books need to catch up."));
+  }
+  l.appendChild(el("div",null,x.why));d.appendChild(l);
+  if(x.je){d.appendChild(el("div","jt","Book-side item, so it needs an adjusting entry:"));d.appendChild(entryTable(null,x.je))}
+  else d.appendChild(el("div","lines")).appendChild(el("div","muted","Bank-side item, so no adjusting entry."));
+  return d;
+}
+function adjOptions(p){
+  const sb=p.items.filter(x=>x.side==="bank").reduce((t,x)=>t+x.s*x.amt,0),sk=p.items.filter(x=>x.side==="book").reduce((t,x)=>t+x.s*x.amt,0);
+  const cand=[[p.bank-sb,"That's the bank side with every sign flipped. Deposits in transit get added and outstanding checks get deducted, not the other way around."],
+    [p.book-sk,"That's the book side with every sign flipped. Check which book items add (money the bank collected) and which deduct (fees, NSF checks, payments)."],
+    [p.bank,"That's the bank statement balance before any adjustments."],
+    [p.book,"That's the Cash balance per books before any adjustments."],
+    [p.bank+sb+sk,"That's what you get by putting the book-side items on the bank side too."]];
+  const out=[[p.adj,null]];
+  cand.forEach(c=>{if(out.length<4&&c[0]>0&&!out.some(o=>o[0]===c[0]))out.push(c)});
+  return shuffle(out);
+}
+function mathLine(p,side){let t=p[side].toLocaleString("en-US");p.items.filter(x=>x.side===side).forEach(x=>t+=(x.s>0?" + ":" − ")+x.amt.toLocaleString("en-US"));return (side==="bank"?"Bank: ":"Books: ")+t+" = "+m$(p.adj)}
+
+/* ---------- render ---------- */
+function score(p,s){let r=0,a=0;s.picks.forEach((k,n)=>{if(k&&!k.shown){a++;if(k.i===correctIdx(p.items[n]))r++}});if(s.adj&&!s.adj.shown){a++;if(s.adjOpts[s.adj.i][1]===null)r++}return [r,a]}
+function optButtons(labels,pick,correct,onPick){
+  const g=el("div","opts");
+  labels.forEach((t,k)=>{const b=el("button","opt");b.appendChild(el("span","k","ABCD"[k]));b.appendChild(el("span",null,t));
+    if(pick){b.disabled=true;if(k===correct)b.classList.add("right");else if(k===pick.i&&!pick.shown)b.classList.add("wrong");else b.classList.add("dim")}
+    else b.onclick=()=>onPick(k);g.appendChild(b)});
+  return g;
 }
 function strip(){
   const s=$("strip");s.innerHTML="";
-  P.forEach((p,k)=>{const b=el("button",seen.has(k)?"seen":null,String(k+1));b.title=p.intro?"How it works":p.co;b.setAttribute("aria-label",b.title);if(k===i)b.setAttribute("aria-current","true");b.onclick=()=>go(k);s.appendChild(b)});
+  P.forEach((p,k)=>{const b=el("button",seen.has(k)?"seen":null,String(k+1));b.title=(p.section?p.section+", ":"")+p.label;b.setAttribute("aria-label",b.title);if(k===i)b.setAttribute("aria-current","true");b.onclick=()=>go(k);s.appendChild(b)});
   const c=s.children[i];if(c)c.scrollIntoView({block:"nearest",inline:"center"});
 }
 function render(){
-  const p=P[i],h=$("head"),g=$("given"),rvs=$("reveals");h.innerHTML="";g.innerHTML="";rvs.innerHTML="";
-  if(p.intro){
-    h.appendChild(el("span","label","How it works"));
-    g.appendChild(el("h2",null,"Side-by-Side Bank Reconciliations"));
-    g.appendChild(el("p",null,"Each problem gives you the bank statement balance, the Cash balance per books, and a list of items. Work the whole reconciliation: put every item on the bank side or the book side, add or deduct it, and find both adjusted balances. They should match."));
-    g.appendChild(el("p",null,"Each click places the next item so you can check your work line by line. After the last item come the adjusted balances, then the adjusting entries for the book side."));
-    const demo={bank:5000,book:4380,adj:4500,items:[{side:"bank",s:1,amt:800,short:"Deposit in transit"},{side:"bank",s:-1,amt:1300,short:"Outstanding checks"},{side:"book",s:1,amt:150,short:"Interest earned"},{side:"book",s:-1,amt:30,short:"Service charge"}]};
-    const b=el("div","board");b.appendChild(sideBox(demo,"bank",9));b.appendChild(sideBox(demo,"book",9));g.appendChild(b);
-    g.appendChild(el("p","q","Bank side: deposits in transit, outstanding checks, bank errors. Book side: anything the bank did that the books don't know about yet, plus errors in the books. Only book-side items get an entry."));
+  const p=P[i],s=S(),h=$("head"),g=$("given"),rv=$("reveals");h.innerHTML="";g.innerHTML="";rv.innerHTML="";
+  if(p.section)h.appendChild(el("div","section",p.section));
+  h.appendChild(el("span","label",p.label));if(p.date)h.appendChild(el("span","date",p.date));
+  if(p.type==="info"){
+    p.blocks.forEach(b=>{
+      if(b.h2)g.appendChild(el("h2",null,b.h2));else if(b.p)g.appendChild(el("p",null,b.p));else if(b.q)g.appendChild(el("p","q",b.q));
+      else if(b.demo)g.appendChild(board(DEMO,new Set([0,1,2,3]),true));
+      else if(b.table){const w=el("div","tw"),t=el("table"),tr=el("tr");b.table.head.forEach(x=>tr.appendChild(el("th",null,x)));const th=el("thead");th.appendChild(tr);t.appendChild(th);const tb=el("tbody");b.table.rows.forEach(r=>{const r2=el("tr");r.forEach(c=>r2.appendChild(el("td",null,c)));tb.appendChild(r2)});t.appendChild(tb);w.appendChild(t);g.appendChild(w)}
+    });
   }else{
-    const n=p.items.length,k=Math.min(shown,n);
-    h.appendChild(el("span","label",p.co));h.appendChild(el("span","date",p.date));
-    const intro=el("p");intro.textContent=`Prepare the bank reconciliation for ${p.co} on ${p.date}, then record the adjusting entries.`;g.appendChild(intro);
-    const lst=el("ol","facts");
-    p.items.forEach((x,j)=>{const li=el("li",j===k-1&&shown<=n?"cur":null,x.f);if(j<k){li.appendChild(el("span","badge"+(x.side==="book"?" book":""),(x.side==="bank"?"Bank ":"Book ")+(x.s>0?"+":"−")))}lst.appendChild(li)});
-    g.appendChild(lst);
-    const b=el("div","board");b.appendChild(sideBox(p,"bank",shown));b.appendChild(sideBox(p,"book",shown));g.appendChild(b);
-    if(shown>=1&&shown<=n){const x=p.items[shown-1];const d=rv(`Item ${shown}: ${x.side==="bank"?"bank side":"book side"}, ${x.s>0?"add":"deduct"}`);const l=el("div","lines");l.appendChild(el("div",null,x.why));if(x.side==="book")l.appendChild(el("div",null,"Book-side item, so it needs an entry."));d.appendChild(l);rvs.appendChild(d)}
-    if(shown>n){const d=rv("Adjusted balances");d.appendChild(el("div","answer","Both sides: "+m$(p.adj)));const l=el("div","lines");l.appendChild(el("div",null,mathLine(p,"bank")));l.appendChild(el("div",null,mathLine(p,"book")));d.appendChild(l);rvs.appendChild(d)}
-    if(shown>n+1){const d=rv("Adjusting entries (book side only)");p.items.filter(x=>x.je).forEach(x=>d.appendChild(entryTable({title:x.short,rows:x.je})));d.appendChild(el("div","lines")).appendChild(el("div",null,"Bank-side items need no entry."));rvs.appendChild(d)}
+    const n=p.items.length,[r,a]=score(p,s);
+    if(a)h.appendChild(el("span","score",`${r} of ${a} correct`));
+    const placed=new Set();s.picks.forEach((k,j)=>{if(k)placed.add(j)});
+    const cur=Math.min(s.step,n-1);p._new=s.picks[cur]&&s.step<n?cur:-1;
+    if(!p.single){
+      g.appendChild(el("p",null,`Prepare the bank reconciliation for ${p.label} on ${p.date}. Pick where each item goes, then pick the adjusted balance.`));
+      const lst=el("ol","facts");
+      p.items.forEach((x,j)=>{const li=el("li",j===s.step?"cur":null,x.f);if(placed.has(j))li.appendChild(el("span","badge"+(x.side==="book"?" book":""),(x.side==="bank"?"Bank ":"Book ")+(x.s>0?"+":"−")));lst.appendChild(li)});
+      g.appendChild(lst);
+    }
+    g.appendChild(board(p,placed,s.adj!=null));
+    const qb=el("div","qbox");
+    if(s.step<n){
+      const x=p.items[s.step],pick=s.picks[s.step];
+      qb.appendChild(el("div","ql",p.single?"Where does this item go?":`Item ${s.step+1} of ${n}`));
+      qb.appendChild(el("p","q",x.f));
+      qb.appendChild(optButtons(OPTS.map(o=>o[2]),pick,correctIdx(x),k=>{s.picks[s.step]={i:k};render()}));
+      if(pick)qb.appendChild(itemFeedback(x,pick));
+    }else{
+      if(!s.adjOpts)s.adjOpts=adjOptions(p);
+      const ci=s.adjOpts.findIndex(o=>o[1]===null);
+      qb.appendChild(el("div","ql","Last step"));
+      qb.appendChild(el("p","q","What is the adjusted cash balance? Both sides should end at this number."));
+      qb.appendChild(optButtons(s.adjOpts.map(o=>m$(o[0])),s.adj,ci,k=>{s.adj={i:k};render()}));
+      if(s.adj){
+        const ok=!s.adj.shown&&s.adj.i===ci,d=el("div","fb "+(ok?"ok":s.adj.shown?"key":"no"));
+        d.appendChild(el("div","fh",s.adj.shown?"Answer: "+m$(p.adj):ok?"Correct! Both sides end at "+m$(p.adj)+".":"Not quite. The adjusted balance is "+m$(p.adj)+"."));
+        const l=el("div","lines");if(!ok&&!s.adj.shown)l.appendChild(el("div",null,s.adjOpts[s.adj.i][1]));
+        l.appendChild(el("div",null,mathLine(p,"bank")));l.appendChild(el("div",null,mathLine(p,"book")));d.appendChild(l);qb.appendChild(d);
+        const e=el("div","rv");e.appendChild(el("div","rl","Adjusting entries (book side only)"));
+        p.items.filter(x=>x.je).forEach(x=>e.appendChild(entryTable(x.short,x.je)));
+        e.appendChild(el("div","lines")).appendChild(el("div",null,"Bank-side items need no entry."));rv.appendChild(e);
+      }
+    }
+    g.appendChild(qb);
   }
-  const tot=steps(p),left=tot-shown;
-  $("revealBtn").disabled=left===0;$("allBtn").disabled=left===0;$("resetBtn").disabled=shown===0;
-  const n=p.intro?0:p.items.length;
-  $("revealBtn").textContent=left===0?"All revealed":shown<n?(shown===0?"Place first item":"Place next item"):shown===n?"Adjusted balances":"Adjusting entries";
-  $("left").textContent=tot===0?"Nothing to reveal on this one.":left?`${left} step${left===1?"":"s"} left`:"";
-  $("pos").textContent=`${i+1} of ${P.length}`;$("prevBtn").disabled=i===0;$("nextBtn").disabled=i===P.length-1;
+  // controls
+  const answered=curAnswered(),last=i===P.length-1,done=isDone();
+  const nb=$("revealBtn");nb.disabled=!answered||(done&&last);
+  nb.textContent=p.type==="info"?"Start":(!answered?"Pick an answer":done?"Next problem":(s.step===p.items.length-1&&!p.single?"Adjusted balance":"Next item"));
+  if(p.type==="info"&&!last)nb.textContent=i===0?"Start":"Next problem";
+  $("allBtn").disabled=p.type==="info"||answered;$("allBtn").textContent="Show answer";
+  $("resetBtn").disabled=p.type==="info"||(!s.picks.length&&!s.adj);$("resetBtn").textContent="Start over";
+  $("left").textContent=p.type==="info"?"":(p.single?"":`${Math.min(s.step+1,nQ(p))} of ${nQ(p)}`);
+  $("pos").textContent=`${i+1} of ${P.length}`;$("prevBtn").disabled=i===0;$("nextBtn").disabled=last;
   strip();
 }
-function go(k){i=Math.max(0,Math.min(P.length-1,k));shown=0;seen.add(i);try{history.replaceState(null,"","#p"+(i+1))}catch(_){}render();window.scrollTo({top:0})}
-function advance(){if(shown<steps(P[i])){shown++;render();const r=$("reveals").lastElementChild||document.querySelector(".board");if(r)r.scrollIntoView({block:"nearest",behavior:"smooth"})}else if(i<P.length-1)go(i+1)}
-$("revealBtn").onclick=advance;
-$("allBtn").onclick=()=>{shown=steps(P[i]);render()};
-$("resetBtn").onclick=()=>{shown=0;render()};
+function curAnswered(){const p=P[i],s=S();if(p.type!=="rec")return true;return s.step<p.items.length?!!s.picks[s.step]:!!s.adj}
+function isDone(){const p=P[i],s=S();if(p.type!=="rec")return true;return p.single?!!s.picks[0]:!!s.adj}
+function go(k){i=Math.max(0,Math.min(P.length-1,k));seen.add(i);try{history.replaceState(null,"","#p"+(i+1))}catch(_){}render();window.scrollTo({top:0})}
+function next(){
+  if(!curAnswered())return;
+  if(isDone()){if(i<P.length-1)go(i+1);return}
+  S().step++;render();const q=document.querySelector(".qbox");if(q)q.scrollIntoView({block:"nearest",behavior:"smooth"});
+}
+function pickKey(k){
+  const p=P[i],s=S();if(p.type!=="rec"||curAnswered())return;
+  if(s.step<p.items.length)s.picks[s.step]={i:k};else{if(!s.adjOpts)return;s.adj={i:k}}render();
+}
+$("revealBtn").onclick=next;
+$("allBtn").onclick=()=>{const p=P[i],s=S();if(p.type!=="rec"||curAnswered())return;
+  if(s.step<p.items.length)s.picks[s.step]={i:correctIdx(p.items[s.step]),shown:true};else s.adj={i:s.adjOpts.findIndex(o=>o[1]===null),shown:true};render()};
+$("resetBtn").onclick=()=>{delete ST[i];render()};
 $("prevBtn").onclick=()=>go(i-1);$("nextBtn").onclick=()=>go(i+1);
 document.addEventListener("keydown",e=>{
-  if(e.target.closest&&e.target.closest("input,textarea"))return;
-  if(e.key===" "||e.key==="ArrowRight"||e.key==="Enter"){if(e.target.tagName==="BUTTON"&&e.key!=="ArrowRight")return;e.preventDefault();advance()}
+  if(e.metaKey||e.ctrlKey||e.altKey)return;if(e.target.closest&&e.target.closest("input,textarea"))return;
+  const k=e.key.toLowerCase(),idx="abcd".indexOf(k)>=0?"abcd".indexOf(k):"1234".indexOf(k);
+  if(idx>=0&&k.length===1){e.preventDefault();pickKey(idx);return}
+  if(e.key===" "||e.key==="ArrowRight"||e.key==="Enter"){if(e.target.tagName==="BUTTON"&&e.key!=="ArrowRight")return;e.preventDefault();next()}
   else if(e.key==="ArrowLeft"){e.preventDefault();go(i-1)}
-  else if(e.key==="h"||e.key==="H"){shown=0;render()}
 });
 const mm=/^#p(\d+)$/.exec(location.hash);go(mm?(+mm[1]-1):0);
 })();
