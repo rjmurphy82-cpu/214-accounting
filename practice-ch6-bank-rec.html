@@ -159,6 +159,78 @@ ol.facts li.cur{background:var(--redsoft)}
 #given>*,.qbox>*,.fb>*,.board>*,.opts>*{min-width:0}
 .opt span:last-child{min-width:0;overflow-wrap:anywhere}
 @media (max-width:600px){.opts{grid-template-columns:1fr}}
+/* ---- layout pieces (all sizes) ---- */
+.layout{display:flex;flex-direction:column;gap:14px}
+.lc,.rc{display:contents}
+.o1{order:1}.o2{order:2}.o3{order:3}.o4{order:4}.o5{order:5}.o6{order:6}
+.egrid{display:grid;gap:10px}
+/* ---- one-screen mode: MacBook and iPad ---- */
+body.fit #tsz{display:none!important}
+body.fit main.main{zoom:1!important}
+body.fit .main{height:var(--avail,100vh);overflow-y:auto;padding-block:calc(10px * var(--k));padding-inline:clamp(14px,2vw,28px);display:flex;flex-direction:column}
+body.fit .inner{max-width:none;width:100%;display:flex;flex-direction:column}
+body.fit .top,body.fit .sub,body.fit .hint{display:none}
+body.fit .titlerow{display:flex;align-items:center;gap:calc(16px * var(--k));min-width:0}
+body.fit h1{font-size:calc(26px * var(--k));margin:0;white-space:nowrap}
+body.fit .strip{padding:2px;min-width:0;flex:1;gap:5px}
+body.fit .strip button{min-width:calc(32px * var(--k));height:calc(32px * var(--k));font-size:calc(15px * var(--k))}
+body.fit .card{margin-top:calc(8px * var(--k))}
+body.fit .head{padding:calc(7px * var(--k)) 18px calc(7px * var(--k))}
+body.fit .head .label{font-size:calc(21px * var(--k))}
+body.fit .head .section{font-size:calc(11px * var(--k))}
+body.fit .head .date,body.fit .head .score{font-size:calc(13px * var(--k))}
+body.fit .body{padding:calc(10px * var(--k)) 18px;gap:calc(8px * var(--k))}
+body.fit .body h2{font-size:calc(22px * var(--k))}
+body.fit .body p,body.fit .body td,body.fit .body th{font-size:calc(15px * var(--k))}
+body.fit .layout{display:grid;grid-template-columns:minmax(0,1.12fr) minmax(0,1fr);gap:calc(16px * var(--k));align-items:start}
+body.fit .lc{display:grid;gap:calc(9px * var(--k));min-width:0}
+body.fit .rc{display:block;min-width:0}
+body.fit .intro{font-size:calc(14.5px * var(--k))!important;color:var(--muted)}
+body.fit ol.facts{font-size:calc(15px * var(--k));gap:calc(1px * var(--k));padding-left:1.4em}
+body.fit ol.facts li{padding:calc(2px * var(--k)) 6px;line-height:1.3}
+body.fit .badge{font-size:calc(11px * var(--k))}
+body.fit .board{grid-template-columns:1fr;gap:calc(9px * var(--k))}
+body.fit .board.demo{grid-template-columns:1fr 1fr}
+body.fit .sideb{font-size:calc(15px * var(--k));line-height:1.3}
+body.fit .sideb .sh{font-size:calc(17px * var(--k));padding:calc(4px * var(--k)) 12px}
+body.fit .sideb .r{padding:calc(3px * var(--k)) 12px}
+body.fit .sideb .grp{font-size:calc(11px * var(--k));padding:calc(3px * var(--k)) 12px 0}
+body.fit .sideb .r.adj{font-size:calc(17px * var(--k))}
+body.fit .sideb .none{font-size:calc(13px * var(--k));padding:calc(3px * var(--k)) 12px}
+body.fit .qbox{padding:calc(9px * var(--k)) 14px;gap:calc(7px * var(--k))}
+body.fit .qbox .ql{font-size:calc(12px * var(--k))}
+body.fit .q{font-size:calc(16px * var(--k))!important}
+body.fit .q.fact{display:none}
+body.fit .opts{gap:calc(7px * var(--k))}
+body.fit .opt{font-size:calc(15px * var(--k));min-height:calc(42px * var(--k));padding:calc(5px * var(--k)) 10px;gap:10px}
+body.fit .opt .k{width:calc(26px * var(--k));height:calc(26px * var(--k));font-size:calc(14px * var(--k))}
+body.fit .fb{padding:calc(7px * var(--k)) 12px;gap:calc(4px * var(--k))}
+body.fit .fb .fh{font-size:calc(17px * var(--k))}
+body.fit .lines{font-size:calc(14.5px * var(--k));line-height:1.35}
+body.fit .jt{font-size:calc(11px * var(--k));margin-bottom:2px}
+body.fit .rv{padding:calc(7px * var(--k)) 12px;gap:calc(5px * var(--k))}
+body.fit .rv .rl{font-size:calc(11.5px * var(--k))}
+body.fit table.journal{min-width:0;width:100%}
+body.fit table.journal td,body.fit table.journal th{font-size:calc(13.5px * var(--k));padding:calc(2px * var(--k)) 7px}
+body.fit table.journal td.acct{min-width:0}
+body.fit table.journal td.cr{padding-left:1.6em}
+body.fit table.journal td.n{width:5.2em}
+body.fit .egrid{grid-template-columns:1fr 1fr;gap:calc(8px * var(--k))}
+body.fit .controls{padding:calc(6px * var(--k)) 18px calc(10px * var(--k));gap:8px}
+body.fit .btn{font-size:calc(17px * var(--k));padding:calc(7px * var(--k)) 16px}
+body.fit .btn.ghost{font-size:calc(15px * var(--k));padding:calc(5px * var(--k)) 12px}
+body.fit .left{font-size:calc(14px * var(--k))}
+body.fit .nav{margin-top:calc(8px * var(--k))}
+
+.fitmenu{display:none}
+body.fit .fitmenu{display:inline-flex;align-items:center;gap:6px;background:var(--black);color:#fff;border:0;border-radius:8px;padding:calc(6px * var(--k)) 12px;font:600 calc(14px * var(--k)) var(--body);letter-spacing:.04em;white-space:nowrap}
+body.fit .shell{grid-template-columns:1fr}
+body.fit .side{position:fixed;left:0;top:0;bottom:0;height:auto;width:min(300px,86vw);z-index:30;transform:translateX(-102%);transition:transform .22s ease}
+body.fit .side.open{transform:none;box-shadow:0 0 40px rgba(0,0,0,.5)}
+body.fit .scrim.on{display:block;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:25}
+body.fit .mbar{display:none!important}
+body.fit .nav,body.fit .intro{display:none!important}
+body.fit .rc{display:grid;gap:calc(9px * var(--k))}
 </style>
 </head>
 <body>
@@ -278,7 +350,8 @@ function itemFeedback(x,pick){
     else l.appendChild(el("div",null,x.side==="bank"?"This is a bank-side item. The company's books are already right; the difference is on the bank's end.":"This is a book-side item. The bank's number is already right; the company's books need to catch up."));
   }
   l.appendChild(el("div",null,x.why));d.appendChild(l);
-  if(x.je){d.appendChild(el("div","jt","Book-side item, so it needs an adjusting entry:"));d.appendChild(entryTable(null,x.je))}
+  if(FIT){d.appendChild(el("div","lines")).appendChild(el("div","muted",x.je?"Book-side item, so it needs an adjusting entry (shown under the reconciliation).":"Bank-side item, so no adjusting entry."))}
+  else if(x.je){d.appendChild(el("div","jt","Book-side item, so it needs an adjusting entry:"));d.appendChild(entryTable(null,x.je))}
   else d.appendChild(el("div","lines")).appendChild(el("div","muted","Bank-side item, so no adjusting entry."));
   return d;
 }
@@ -316,7 +389,7 @@ function render(){
   if(p.type==="info"){
     p.blocks.forEach(b=>{
       if(b.h2)g.appendChild(el("h2",null,b.h2));else if(b.p)g.appendChild(el("p",null,b.p));else if(b.q)g.appendChild(el("p","q",b.q));
-      else if(b.demo)g.appendChild(board(DEMO,new Set([0,1,2,3]),true));
+      else if(b.demo){const d=board(DEMO,new Set([0,1,2,3]),true);d.classList.add("demo");g.appendChild(d)}
       else if(b.table){const w=el("div","tw"),t=el("table"),tr=el("tr");b.table.head.forEach(x=>tr.appendChild(el("th",null,x)));const th=el("thead");th.appendChild(tr);t.appendChild(th);const tb=el("tbody");b.table.rows.forEach(r=>{const r2=el("tr");r.forEach(c=>r2.appendChild(el("td",null,c)));tb.appendChild(r2)});t.appendChild(tb);w.appendChild(t);g.appendChild(w)}
     });
   }else{
@@ -324,20 +397,25 @@ function render(){
     if(a)h.appendChild(el("span","score",`${r} of ${a} correct`));
     const placed=new Set();s.picks.forEach((k,j)=>{if(k)placed.add(j)});
     const cur=Math.min(s.step,n-1);p._new=s.picks[cur]&&s.step<n?cur:-1;
+    const lay=el("div","layout"),lc=el("div","lc"),rc=el("div","rc");lay.appendChild(lc);lay.appendChild(rc);g.appendChild(lay);
+    const fitDone=FIT&&s.adj!=null;
     if(!p.single){
-      g.appendChild(el("p",null,`Prepare the bank reconciliation for ${p.label} on ${p.date}. Pick where each item goes, then pick the adjusted balance.`));
-      const lst=el("ol","facts");
-      p.items.forEach((x,j)=>{const li=el("li",j===s.step?"cur":null,x.f);if(placed.has(j))li.appendChild(el("span","badge"+(x.side==="book"?" book":""),(x.side==="bank"?"Bank ":"Book ")+(x.s>0?"+":"−")));lst.appendChild(li)});
-      g.appendChild(lst);
+      lc.appendChild(el("p","intro o1",`Prepare the bank reconciliation for ${p.label} on ${p.date}. Pick where each item goes, then pick the adjusted balance.`));
+      if(!fitDone){
+        const lst=el("ol","facts o2");
+        p.items.forEach((x,j)=>{const li=el("li",j===s.step?"cur":null,x.f);if(placed.has(j))li.appendChild(el("span","badge"+(x.side==="book"?" book":""),(x.side==="bank"?"Bank ":"Book ")+(x.s>0?"+":"−")));lst.appendChild(li)});
+        lc.appendChild(lst);
+      }
     }
-    g.appendChild(board(p,placed,s.adj!=null));
-    const qb=el("div","qbox");
+    const bd=board(p,placed,s.adj!=null);bd.classList.add("o3");rc.appendChild(bd);
+    const qb=el("div","qbox o4");
     if(s.step<n){
       const x=p.items[s.step],pick=s.picks[s.step];
       qb.appendChild(el("div","ql",p.single?"Where does this item go?":`Item ${s.step+1} of ${n}`));
-      qb.appendChild(el("p","q",x.f));
+      qb.appendChild(el("p","q"+(p.single?"":" fact"),x.f));
       qb.appendChild(optButtons(OPTS.map(o=>o[2]),pick,correctIdx(x),k=>{s.picks[s.step]={i:k};render()}));
-      if(pick)qb.appendChild(itemFeedback(x,pick));
+      if(pick){qb.appendChild(itemFeedback(x,pick));
+        if(FIT&&x.je){const e1=el("div","rv o6");e1.appendChild(el("div","rl","Adjusting entry for this item"));e1.appendChild(entryTable(x.short,x.je));rc.appendChild(e1)}}
     }else{
       if(!s.adjOpts)s.adjOpts=adjOptions(p);
       const ci=s.adjOpts.findIndex(o=>o[1]===null);
@@ -349,12 +427,11 @@ function render(){
         d.appendChild(el("div","fh",s.adj.shown?"Answer: "+m$(p.adj):ok?"Correct! Both sides end at "+m$(p.adj)+".":"Not quite. The adjusted balance is "+m$(p.adj)+"."));
         const l=el("div","lines");if(!ok&&!s.adj.shown)l.appendChild(el("div",null,s.adjOpts[s.adj.i][1]));
         l.appendChild(el("div",null,mathLine(p,"bank")));l.appendChild(el("div",null,mathLine(p,"book")));d.appendChild(l);qb.appendChild(d);
-        const e=el("div","rv");e.appendChild(el("div","rl","Adjusting entries (book side only)"));
-        p.items.filter(x=>x.je).forEach(x=>e.appendChild(entryTable(x.short,x.je)));
-        e.appendChild(el("div","lines")).appendChild(el("div",null,"Bank-side items need no entry."));rv.appendChild(e);
+        const e=el("div","rv entries o5");e.appendChild(el("div","rl","Adjusting entries (book side only).  Bank-side items need no entry."));
+        const eg=el("div","egrid");p.items.filter(x=>x.je).forEach(x=>eg.appendChild(entryTable(x.short,x.je)));e.appendChild(eg);lc.appendChild(e);
       }
     }
-    g.appendChild(qb);
+    lc.insertBefore(qb,lc.querySelector(".entries"));
   }
   // controls
   const answered=curAnswered(),last=i===P.length-1,done=isDone();
@@ -366,10 +443,36 @@ function render(){
   $("left").textContent=p.type==="info"?"":(p.single?"":`${Math.min(s.step+1,nQ(p))} of ${nQ(p)}`);
   $("pos").textContent=`${i+1} of ${P.length}`;$("prevBtn").disabled=i===0;$("nextBtn").disabled=last;
   strip();
+  if(!SIM)requestAnimationFrame(()=>fitNow(false));
 }
+/* ---------- one-screen fitting (MacBook / iPad) ---------- */
+let FIT=false,SIM=false,K=1;const KMAX=1.3,KMIN=.6;
+const mainEl=document.querySelector(".main"),root=document.documentElement;
+function setK(k){K=k;root.style.setProperty("--k",k.toFixed(3))}
+function avail(){const mb=document.querySelector(".mbar");const h=window.innerHeight-(mb&&getComputedStyle(mb).display!=="none"?mb.offsetHeight:0);root.style.setProperty("--avail",h+"px")}
+function over(){return mainEl.scrollHeight>mainEl.clientHeight+1}
+function shrink(k){setK(k);while(K>KMIN&&over())setK(Math.max(KMIN,K-.03));return K}
+function fitNow(grow){if(!FIT)return;if(grow){shrink(Math.min(KMAX,K));return}if(over())shrink(K)}
+function fitProblem(){
+  if(!FIT)return;
+  const p=P[i],saved=ST[i];let k=KMAX;SIM=true;
+  const states=[];
+  if(p.type==="rec"){
+    p.items.forEach((x,j)=>{const picks=p.items.slice(0,j+1).map((y,t)=>({i:t===j?(correctIdx(y)^2):correctIdx(y)}));states.push({step:j,picks,adj:null,adjOpts:null})});
+    if(!p.single){const picks=p.items.map(y=>({i:correctIdx(y)}));const ao=adjOptions(p);states.push({step:p.items.length,picks,adj:{i:ao.findIndex(o=>o[1]!==null)},adjOpts:ao})}
+  }else states.push(null);
+  states.forEach(st=>{if(st)ST[i]=st;else delete ST[i];render();k=shrink(k)});
+  if(saved)ST[i]=saved;else delete ST[i];SIM=false;render();setK(k);
+}
+function setMode(){
+  const on=window.innerWidth>=700&&window.innerHeight>=500;
+  FIT=on;document.body.classList.toggle("fit",on);avail();
+  if(!on){root.style.removeProperty("--k")}
+}
+let rt=null;window.addEventListener("resize",()=>{clearTimeout(rt);rt=setTimeout(()=>{setMode();render();fitProblem()},150)});
 function curAnswered(){const p=P[i],s=S();if(p.type!=="rec")return true;return s.step<p.items.length?!!s.picks[s.step]:!!s.adj}
 function isDone(){const p=P[i],s=S();if(p.type!=="rec")return true;return p.single?!!s.picks[0]:!!s.adj}
-function go(k){i=Math.max(0,Math.min(P.length-1,k));seen.add(i);try{history.replaceState(null,"","#p"+(i+1))}catch(_){}render();window.scrollTo({top:0})}
+function go(k){i=Math.max(0,Math.min(P.length-1,k));seen.add(i);try{history.replaceState(null,"","#p"+(i+1))}catch(_){}render();fitProblem();window.scrollTo({top:0});mainEl.scrollTop=0}
 function next(){
   if(!curAnswered())return;
   if(isDone()){if(i<P.length-1)go(i+1);return}
@@ -383,6 +486,10 @@ $("revealBtn").onclick=next;
 $("allBtn").onclick=()=>{const p=P[i],s=S();if(p.type!=="rec"||curAnswered())return;
   if(s.step<p.items.length)s.picks[s.step]={i:correctIdx(p.items[s.step]),shown:true};else s.adj={i:s.adjOpts.findIndex(o=>o[1]===null),shown:true};render()};
 $("resetBtn").onclick=()=>{delete ST[i];render()};
+(function(){const h=document.querySelector(".inner h1"),st=$("strip");if(h&&st){const w=document.createElement("div");w.className="titlerow";h.parentNode.insertBefore(w,h);
+  const mb=document.createElement("button");mb.className="fitmenu";mb.type="button";mb.textContent="☰  Menu";mb.setAttribute("aria-label","Open the site menu");mb.onclick=()=>{const m=document.getElementById("menuBtn");if(m)m.click()};
+  w.appendChild(mb);w.appendChild(h);w.appendChild(st)}})();
+setMode();
 $("prevBtn").onclick=()=>go(i-1);$("nextBtn").onclick=()=>go(i+1);
 document.addEventListener("keydown",e=>{
   if(e.metaKey||e.ctrlKey||e.altKey)return;if(e.target.closest&&e.target.closest("input,textarea"))return;
