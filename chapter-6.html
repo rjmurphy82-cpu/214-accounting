@@ -125,11 +125,8 @@ button:focus-visible,a:focus-visible{outline:3px solid var(--accent);outline-off
 .solo .clock{background:var(--dark);color:#fff}
 @media (max-width:760px){.modes{grid-template-columns:1fr}.row{grid-template-columns:1fr}.opts{grid-template-columns:1fr}}
 @media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
-#qBox.veil .card{filter:blur(7px);pointer-events:none}
-#qBox .card{transition:filter .25s}
-.frtag{display:inline-flex;align-items:center;gap:8px;background:#fff;color:#0B3D91;border-radius:8px;padding:2px 12px;font-size:clamp(15px,1.6vw,19px);letter-spacing:.06em;white-space:nowrap}
-.frtag i{display:inline-block;width:24px;height:16px;border-radius:2px;background:linear-gradient(90deg,#0055A4 0 33%,#fff 33% 66%,#EF4135 66%);box-shadow:0 0 0 1px rgba(0,0,0,.25)}
-#qBox.fr .card{box-shadow:inset 6px 0 0 #0055A4}
+#qBox.big .prompt{font-size:clamp(30px,3.9vw,48px);line-height:1.25}
+#qBox.big .opt{font-size:clamp(20px,2.2vw,27px)}
 </style>
 </head>
 <body>
@@ -159,9 +156,6 @@ button:focus-visible,a:focus-visible{outline:3px solid var(--accent);outline-off
           <button data-v="random" aria-pressed="true">Random (spin)</button>
           <button data-v="order" aria-pressed="false">In order</button></div>
           <div class="note" style="margin-top:6px">Random still gives every team exactly one question per round, just in a shuffled order. Steal teams are always picked at random.</div></div></div>
-      <div class="row"><div class="lab">French team<small>That team's questions appear in French</small></div>
-        <div><div class="seg" id="segFr"></div>
-          <div class="note" style="margin-top:6px">If the French team steals, the question switches to French. If another team steals a French question, it switches back to English.</div></div></div>
       <div class="row"><div class="lab">Seconds to answer<small>Steals are always 5 seconds</small></div>
         <div><div class="seg" id="segTime">
           <button data-v="auto" aria-pressed="true">Auto (recommended)</button>
@@ -205,7 +199,7 @@ button:focus-visible,a:focus-visible{outline:3px solid var(--accent);outline-off
     <div class="solo" id="soloBar" hidden><span id="soloScore">0 pts</span><span id="soloProg" style="color:var(--muted);font-size:20px"></span><span class="clock" id="blitzClock" hidden style="margin-left:auto">3:00</span></div>
     <div id="introBox" class="card intro" hidden></div>
     <div id="qBox" hidden>
-      <div class="turn" id="turn"><span class="msg" id="turnMsg"></span><span class="frtag" id="frTag" hidden><i></i>EN FRANÇAIS</span><span class="clock" id="clock" hidden></span></div>
+      <div class="turn" id="turn"><span class="msg" id="turnMsg"></span><span class="clock" id="clock" hidden></span></div>
       <div class="meta"><span><span class="tag" id="qTag"></span> <span class="tag pts" id="qPts"></span></span><span id="qCount"></span></div>
       <div class="card">
         <p class="prompt" id="prompt"></p>
@@ -279,55 +273,6 @@ const BANK=[
  {t:"calc",p:"A company's book-side items were $30 of interest, a $28 recording error that understated an expense, and a $225 NSF check. What is the net effect on Cash after posting the adjusting entries?",o:["Decrease of $223","Decrease of $283","Increase of $223","Decrease of $253"],a:0,raw:true,x:"+$30 − $28 − $225 = −$223. Cash goes down by $223."},
  {t:"calc",p:"What is the adjusted bank balance?",d:[["Bank statement balance",3480],["Outstanding check #201",615],["Outstanding check #204",240],["Deposit in transit",1050]],o:[3675,2625,4530,5385],a:0,x:"$3,480 + $1,050 − ($615 + $240) = $3,675."}
 ];
-/* ---------- French versions (same order as BANK) ---------- */
-const SORT_FR=["Ajouter au solde bancaire","Déduire du solde bancaire","Ajouter au solde comptable","Déduire du solde comptable"];
-const NOE_FR="Aucune écriture nécessaire";
-const ACC_FR={"Accounts Receivable":"Comptes clients","Cash":"Trésorerie","Miscellaneous Expense":"Charges diverses","Bank Service Charge Expense":"Frais bancaires","Service Revenue":"Produits de services","Interest Revenue":"Produits d'intérêts","Interest Expense":"Charges d'intérêts","Notes Receivable":"Effets à recevoir","Notes Payable":"Effets à payer","Supplies Expense":"Charges de fournitures","Rent Expense":"Charge de loyer","Deposits in Transit":"Dépôts en circulation","Utilities Expense":"Charges de services publics","Accounts Payable":"Comptes fournisseurs"};
-const FR=[
- {p:"Un dépôt de $1,200 fait le dernier jour du mois n'apparaît pas sur le relevé bancaire.",x:"Dépôt en circulation. L'entreprise l'a déjà enregistré, mais la banque ne l'a pas encore traité. Ajoutez-le au solde bancaire."},
- {p:"Les chèques n° 412 et n° 415, pour un total de $860, n'ont pas encore été payés par la banque.",x:"Chèques en circulation. Les livres montrent déjà l'argent comme sorti, mais la banque ne les a pas encore payés. Déduisez-les du solde bancaire."},
- {p:"Le relevé bancaire montre que le chèque de $310 d'un client a été retourné avec la mention NSF (sans provision).",x:"L'entreprise a enregistré cet argent lors du dépôt, mais il n'a jamais été encaissé. Déduisez-le du solde comptable."},
- {p:"La banque a facturé des frais de service mensuels de $18.",x:"La banque a déjà prélevé les frais. L'entreprise l'apprend grâce au relevé, donc déduisez-les du solde comptable."},
- {p:"Le relevé bancaire montre $22 d'intérêts gagnés sur le compte chèques.",x:"La banque a déjà ajouté les intérêts. L'entreprise ne les a pas encore enregistrés, donc ajoutez-les au solde comptable."},
- {p:"La banque a encaissé un effet à recevoir de $2,000 pour l'entreprise et l'a déposé dans le compte.",x:"La banque a déjà l'argent. Les livres ne le savent pas encore, donc ajoutez-le au solde comptable."},
- {p:"Le chèque n° 530 de $450 a été payé correctement par la banque, mais inscrit dans les livres pour $540.",x:"Les livres ont retiré $90 de trop. Rajoutez $90 au solde comptable."},
- {p:"Le chèque n° 618 de $380 a été payé correctement par la banque, mais inscrit dans les livres pour $308.",x:"Les livres ont retiré $72 de moins. Déduisez $72 du solde comptable."},
- {p:"La banque a déduit par erreur de notre compte le chèque de $200 d'une autre entreprise.",x:"Erreur bancaire qui a diminué le solde bancaire. Rajoutez $200 au solde bancaire et avertissez la banque."},
- {p:"La banque a crédité par erreur notre compte d'un dépôt de $486 fait par une autre entreprise.",x:"Erreur bancaire qui a augmenté le solde bancaire. Déduisez $486 du solde bancaire et avertissez la banque."},
- {p:"Un paiement client de $630 a été déposé correctement, mais inscrit dans les livres pour $360.",x:"Les livres montrent $270 de moins que ce qui a été déposé. Ajoutez $270 au solde comptable."},
- {p:"La banque a payé la facture d'électricité de $145 par virement automatique (TEF). L'entreprise ne l'a pas enregistrée.",x:"L'argent a déjà quitté le compte bancaire. Déduisez-le du solde comptable."},
- {p:"La banque a facturé $35 pour une nouvelle boîte de chèques imprimés.",x:"Des frais bancaires que l'entreprise découvre sur le relevé. Déduisez-les du solde comptable."},
- {p:"Quel est le but d'un rapprochement bancaire ?",o:["Expliquer la différence entre le solde du relevé bancaire et le solde comptable de la trésorerie","Prouver que la banque ne fait jamais d'erreurs","Calculer combien d'intérêts l'entreprise doit à la banque","Remplacer le compte Trésorerie dans le grand livre"],x:"Un rapprochement explique pourquoi le chiffre de la banque et celui de l'entreprise sont différents, et trouve le vrai solde de trésorerie."},
- {p:"Après un rapprochement, quels éléments exigent une écriture de journal dans les livres de l'entreprise ?",o:["Seulement les éléments de la section des livres","Seulement les éléments de la section de la banque","Tous les éléments de rapprochement","Aucun"],x:"Seuls les éléments du côté des livres exigent une écriture. Ceux du côté de la banque sont des décalages ou des erreurs que la banque corrigera."},
- {p:"Pourquoi un dépôt en circulation n'exige-t-il pas d'écriture ?",o:["L'entreprise l'a déjà enregistré ; la banque ne l'a simplement pas encore traité","La banque va le retourner","Les dépôts ne sont jamais enregistrés dans les livres","La banque enregistre l'écriture pour l'entreprise"],x:"Il est déjà dans les livres. Il apparaîtra sur le relevé du mois prochain, donc il n'y a rien à corriger."},
- {p:"Qu'est-ce qu'un chèque en circulation ?",o:["Un chèque émis et enregistré par l'entreprise que la banque n'a pas encore payé","Un chèque qu'un client doit encore à l'entreprise","Un chèque retourné pour provision insuffisante","Un chèque que la banque a payé deux fois"],x:"L'entreprise l'a déjà soustrait dans ses livres. La banque ne l'a pas encore payé, donc on le déduit du solde bancaire."},
- {p:"Sur un relevé bancaire, NSF signifie :",o:["Fonds insuffisants (Nonsufficient funds)","Frais de règlement net","Aucune signature trouvée","Finance non standard"],x:"Un chèque NSF est un chèque sans provision : le compte du client n'avait pas assez d'argent pour le couvrir."},
- {p:"Le solde bancaire rapproché et le solde comptable rapproché ne correspondent pas. Qu'est-ce que cela vous dit ?",o:["Il reste une erreur ou un élément de rapprochement manquant","Utilisez le solde bancaire, car la banque a toujours raison","Déclarez le plus grand des deux soldes","Mettez la différence dans Écart de caisse"],x:"Les soldes rapprochés doivent être égaux. S'ils ne le sont pas, quelque chose a été oublié ou mal calculé. Cherchez-le."},
- {p:"Quel employé devrait préparer le rapprochement bancaire ?",o:["Quelqu'un qui ne manipule pas l'argent et n'émet pas de chèques","Le caissier qui fait les dépôts","La personne qui signe les chèques","Celui qui ouvre le courrier"],x:"Séparation des tâches. La personne qui vérifie les registres ne devrait pas être celle qui peut toucher à l'argent."},
- {p:"Une erreur bancaire apparaît pendant le rapprochement. Que fait l'entreprise ?",o:["Avertir la banque ; aucune écriture n'est nécessaire","Enregistrer une écriture pour la corriger","L'ignorer jusqu'à la fin de l'année","Fermer le compte"],x:"C'est à la banque de corriger ses erreurs. Elles vont dans la section de la banque, et les livres de l'entreprise ne changent pas."},
- {p:"Un employé ouvre le courrier et dresse la liste des chèques reçus. Un autre employé les enregistre. Quel contrôle de la trésorerie est-ce ?",o:["Séparer la manipulation de l'argent de la tenue des registres","Déposer rapidement les encaissements","Faire les paiements par chèque","Utiliser une petite caisse"],x:"La personne qui a l'argent et celle qui tient les registres sont différentes, donc un vol exigerait la complicité de deux personnes."},
- {p:"Après la comptabilisation des écritures d'ajustement, quel montant est présenté comme Trésorerie au bilan ?",o:["Le solde rapproché","Le solde du relevé bancaire","Le solde comptable non rapproché","La moyenne des soldes bancaire et comptable"],x:"Après les écritures du côté des livres, le compte Trésorerie est égal au solde rapproché. C'est l'argent réel de l'entreprise."},
- {p:"Lequel de ces éléments fait partie de la trésorerie ?",o:["Un mandat reçu d'un client","Des fournitures de bureau","Un certificat de dépôt de 2 ans","Un compte client"],x:"La trésorerie comprend les billets, les pièces, les dépôts bancaires, les chèques des clients, les chèques de banque, les chèques certifiés et les mandats."},
- {p:"La banque a retourné le chèque de $310 d'un client avec la mention NSF. Passez l'écriture d'ajustement.",x:"Le client doit toujours l'argent, donc Comptes clients augmente et Trésorerie diminue."},
- {p:"La banque a facturé des frais de service de $18. Passez l'écriture d'ajustement.",x:"Une charge augmente (débit) et la Trésorerie diminue (crédit)."},
- {p:"Le relevé bancaire montre $22 d'intérêts gagnés. Passez l'écriture d'ajustement.",x:"La Trésorerie augmente (débit) et l'entreprise a gagné un produit (crédit Produits d'intérêts)."},
- {p:"La banque a encaissé un effet à recevoir de $2,000 pour l'entreprise. Passez l'écriture d'ajustement.",x:"La Trésorerie augmente et l'effet n'est plus dû à l'entreprise, donc Effets à recevoir diminue."},
- {p:"Le chèque n° 781 pour des fournitures a été payé par la banque pour $268, mais inscrit dans les livres pour $240. Passez l'écriture d'ajustement.",x:"Les livres ont enregistré $28 de moins. Ajoutez $28 de charge et retirez $28 de plus de la Trésorerie."},
- {p:"Un chèque de loyer de $1,450 a été payé correctement par la banque, mais inscrit dans les livres pour $1,540. Passez l'écriture d'ajustement.",x:"Les livres ont retiré $90 de trop. Remettez $90 dans la Trésorerie et diminuez la Charge de loyer de $90."},
- {p:"Un dépôt en circulation de $900 apparaît sur le rapprochement. Passez l'écriture d'ajustement.",x:"Les dépôts en circulation sont du côté de la banque. Les livres sont déjà exacts, donc aucune écriture."},
- {p:"La banque a payé la facture d'électricité de $145 par TEF. L'entreprise ne l'a pas enregistrée. Passez l'écriture d'ajustement.",x:"La facture est payée et l'argent est parti. Débitez la charge, créditez la Trésorerie."},
- {p:"Un paiement client de $630 sur compte a été déposé correctement, mais inscrit dans les livres pour $360. Passez l'écriture d'ajustement.",x:"Il manque $270 dans les livres. Augmentez la Trésorerie et diminuez Comptes clients de la différence de $270."},
- {p:"Quel est le solde bancaire rapproché ?",d:["Solde du relevé bancaire","Dépôt en circulation","Chèques en circulation"],x:"$5,000 + $800 de dépôt en circulation − $1,300 de chèques en circulation = $4,500."},
- {p:"Quel est le solde comptable rapproché ?",d:["Solde de trésorerie selon les livres","Intérêts gagnés","Frais bancaires","Chèque NSF"],x:"$4,620 + $25 d'intérêts − $15 de frais − $130 NSF = $4,500."},
- {p:"Quel est le solde bancaire rapproché ?",d:["Solde du relevé bancaire","Dépôt en circulation","Chèques en circulation","La banque nous a crédité le dépôt d'une autre entreprise"],x:"$8,250 + $1,100 − $1,940 − $300 d'erreur bancaire = $7,110."},
- {p:"Quel est le solde comptable rapproché ?",d:["Solde de trésorerie selon les livres","Effet encaissé par la banque","Frais bancaires","Chèque NSF"],x:"$6,900 + $400 d'effet − $40 de frais − $150 NSF = $7,110."},
- {p:"Le solde comptable rapproché est de $3,200. Les seuls éléments du côté des livres étaient $20 d'intérêts et un chèque NSF de $180. Quel était le solde comptable non rapproché ?",x:"On remonte : non rapproché + $20 − $180 = $3,200, donc non rapproché = $3,200 − $20 + $180 = $3,360."},
- {p:"Le solde bancaire rapproché est de $7,207. Que montrait le relevé bancaire ?",d:["Dépôt en circulation","Chèques en circulation"],x:"Relevé + $500 − $2,417 = $7,207, donc relevé = $7,207 − $500 + $2,417 = $9,124."},
- {p:"Les éléments du côté des livres étaient $30 d'intérêts, une erreur de $28 qui sous-estimait une charge et un chèque NSF de $225. Quel est l'effet net sur la Trésorerie après les écritures d'ajustement ?",o:["Diminution de $223","Diminution de $283","Augmentation de $223","Diminution de $253"],x:"+$30 − $28 − $225 = −$223. La Trésorerie diminue de $223."},
- {p:"Quel est le solde bancaire rapproché ?",d:["Solde du relevé bancaire","Chèque en circulation n° 201","Chèque en circulation n° 204","Dépôt en circulation"],x:"$3,480 + $1,050 − ($615 + $240) = $3,675."}
-];
-if(FR.length!==BANK.length)console.error("FR length mismatch",FR.length,BANK.length);
-BANK.forEach((q,i)=>{q.fr=FR[i];if(q.d&&(!q.fr.d||q.fr.d.length!==q.d.length))console.error("FR data mismatch",i);if(q.t==="concept"&&!q.fr.o)console.error("FR opts missing",i)});
 const ROUNDS={
  sort:{n:1,name:"Sort It",pts:100,secs:15,desc:"Read the item. Does it go on the bank side or the book side, and is it added or deducted?",tag:"Sort It"},
  concept:{n:2,name:"Why It Works",pts:100,secs:20,desc:"Concepts behind cash controls and the reconciliation.",tag:"Why It Works"},
@@ -355,37 +300,26 @@ const sTick2=()=>beep(520,.05,"sine",.04);
 // Build a playable copy of a question with options in display order
 function inst(q){
   const c={...q};
-  if(q.t==="sort"){c.opts=SORT_OPTS.map((o,i)=>({v:o,fr:SORT_FR[i],ok:i===q.a}));}
-  else{c.opts=shuffle(q.o.map((o,i)=>({v:o,fr:q.fr&&q.fr.o?q.fr.o[i]:null,ok:i===q.a})));}
+  if(q.t==="sort"){c.opts=SORT_OPTS.map((o,i)=>({v:o,ok:i===q.a}));}
+  else{c.opts=shuffle(q.o.map((o,i)=>({v:o,ok:i===q.a})));}
   return c;
 }
-const acc=(a,fr)=>fr?(ACC_FR[a]||a):a;
-function optHTML(o,fr){
-  const v=o.v;
-  if(v&&v.je)return `<span class="je"><span>${esc(acc(v.je[0][0],fr))}</span><span class="amt">${money(v.je[0][1])}</span><span class="cr">${esc(acc(v.je[1][0],fr))}</span><span class="amt">${money(v.je[1][1])}</span></span>`;
+function optHTML(v,raw){
+  if(v&&v.je)return `<span class="je"><span>${esc(v.je[0][0])}</span><span class="amt">${money(v.je[0][1])}</span><span class="cr">${esc(v.je[1][0])}</span><span class="amt">${money(v.je[1][1])}</span></span>`;
   if(typeof v==="number")return money(v);
-  if(fr)return esc(o.fr||(v===NOE?NOE_FR:v));
   return esc(v);
 }
-function optText(o,fr){const v=o.v;if(v&&v.je)return `${fr?"Débit":"Dr"} ${acc(v.je[0][0],fr)} ${money(v.je[0][1])}, ${fr?"Crédit":"Cr"} ${acc(v.je[1][0],fr)} ${money(v.je[1][1])}`;if(typeof v==="number")return money(v);if(fr)return o.fr||(v===NOE?NOE_FR:v);return v}
-function isFr(team){return S.mode==="teams"&&cfg.fr>=0&&team===cfg.fr}
-function setLang(fr){
-  S.fr=fr;const q=S.q;
-  $("prompt").textContent=fr?q.fr.p:q.p;
-  if(q.d)$("data").innerHTML=q.d.map(([l,v],i)=>`<tr><td>${esc(fr&&q.fr.d?q.fr.d[i]:l)}</td><td>${money(v)}</td></tr>`).join("");
-  optBtns().forEach((b,k)=>{b.lastElementChild.innerHTML=optHTML(q.opts[k],fr)});
-  $("frTag").hidden=!fr;$("qBox").classList.toggle("fr",fr);
-}
+function optText(v){if(v&&v.je)return `Dr ${v.je[0][0]} ${money(v.je[0][1])}, Cr ${v.je[1][0]} ${money(v.je[1][1])}`;if(typeof v==="number")return money(v);return v}
 
 /* ---------- Setup ---------- */
-const cfg={mode:"teams",n:6,pick:"random",time:"auto",len:4,per:1,fr:2};
+const cfg={mode:"teams",n:6,pick:"random",time:"auto",len:4,per:1};
 function segInit(id,key,parse){
   $(id).addEventListener("click",e=>{const b=e.target.closest("button");if(!b||b.disabled)return;cfg[key]=parse(b.dataset.v);[...$(id).children].forEach(x=>x.setAttribute("aria-pressed",x===b));refreshSetup()});
 }
 (function(){
   const s=$("segTeams");for(let i=2;i<=8;i++){const b=document.createElement("button");b.dataset.v=i;b.textContent=i;b.setAttribute("aria-pressed",i===cfg.n);s.appendChild(b)}
   segInit("segTeams","n",Number);segInit("segPick","pick",String);segInit("segTime","time",v=>v==="auto"?"auto":Number(v));
-  segInit("segLen","len",Number);segInit("segPer","per",Number);segInit("segFr","fr",Number);
+  segInit("segLen","len",Number);segInit("segPer","per",Number);
   document.querySelectorAll(".mode").forEach(b=>b.addEventListener("click",()=>{cfg.mode=b.dataset.mode;document.querySelectorAll(".mode").forEach(x=>x.setAttribute("aria-pressed",x===b));refreshSetup()}));
   refreshSetup();
 })();
@@ -393,8 +327,6 @@ function roundTypes(){return cfg.len===4?["sort","concept","entry","calc"]:["sor
 function maxPer(){const lim=Math.min(...roundTypes().map(count));return Math.floor(lim/cfg.n)}
 function refreshSetup(){
   const team=cfg.mode==="teams";$("teamOpts").hidden=!team;$("soloOpts").hidden=team;
-  if(cfg.fr>=cfg.n)cfg.fr=-1;
-  $("segFr").innerHTML=`<button data-v="-1" aria-pressed="${cfg.fr<0}">Off</button>`+TEAMS.slice(0,cfg.n).map(([n],i)=>`<button data-v="${i}" aria-pressed="${cfg.fr===i}">Team ${i+1} (${n})</button>`).join("");
   $("teamChips").innerHTML=TEAMS.slice(0,cfg.n).map(([n,c])=>`<span class="chip" style="background:${c}">${n}</span>`).join("");
   const two=$("segPer").children[1];two.disabled=maxPer()<2;
   if(two.disabled&&cfg.per===2){cfg.per=1;[...$("segPer").children].forEach((x,i)=>x.setAttribute("aria-pressed",i===0))}
@@ -471,13 +403,13 @@ function nextQuestion(){
   renderQuestion();
   const t=S.teams[S.turn],gen=++S.gen;
   if(cfg.pick==="random"){
-    S.phase="picking";lockOpts(true);setTurn("Picking a team...",t.color);$("qBox").classList.add("veil");
+    S.phase="picking";lockOpts(true);setTurn("Picking a team...",t.color);
     spin([...Array(S.teams.length).keys()],S.turn,gen,()=>beginTurn());
   }else beginTurn();
 }
 function beginTurn(){
-  const t=S.teams[S.turn];S.phase="turn";$("qBox").classList.remove("veil");setLang(isFr(S.turn));renderBoard();lockOpts(false);sTick2();
-  setTurn(S.fr?`${t.name}, à vous ! (your question, in French)`:`${t.name}, your question`,t.color);
+  const t=S.teams[S.turn];S.phase="turn";renderBoard();lockOpts(false);sTick2();
+  setTurn(`${t.name}, your question`,t.color);
   const secs=secsFor(S.q.t);
   $("passBtn").hidden=false;$("pauseBtn").hidden=!secs;$("pauseBtn").textContent="Pause (P)";
   if(secs)startClock(secs,$("clock"),"",()=>{if(S.phase==="turn"){sBad();firstMiss(-1,true)}});
@@ -502,10 +434,10 @@ function renderQuestion(){
   $("qPts").textContent=R.pts+" pts";
   $("qCount").textContent=S.mode==="teams"?`Question ${S.qi+1} of ${S.rounds[S.ri].qs.length}`:"";
   $("prompt").textContent=q.p;
+  $("qBox").classList.toggle("big",q.t==="sort");
   const d=$("data");
   if(q.d){d.hidden=false;d.innerHTML=q.d.map(([l,v])=>`<tr><td>${esc(l)}</td><td>${money(v)}</td></tr>`).join("")}else{d.hidden=true;d.innerHTML=""}
-  $("opts").innerHTML=q.opts.map((o,i)=>`<button class="opt" data-i="${i}"><span class="k">${"ABCD"[i]}</span><span>${optHTML(o,false)}</span></button>`).join("");
-  S.fr=false;$("frTag").hidden=true;$("qBox").classList.remove("fr");
+  $("opts").innerHTML=q.opts.map((o,i)=>`<button class="opt" data-i="${i}"><span class="k">${"ABCD"[i]}</span><span>${optHTML(o.v)}</span></button>`).join("");
   $("explain").hidden=true;$("nextBtn").hidden=true;$("passBtn").hidden=true;$("pauseBtn").hidden=true;$("clock").hidden=true;
   $("turn").hidden=S.mode!=="teams";
   $("hint").textContent=S.mode==="teams"?"Click the answer the team gives (or press A to D). P pauses the clock.":"Press A to D to answer.";
@@ -537,8 +469,8 @@ function firstMiss(i,timeout){
   setTurn(`${timeout?"Time's up":i<0?"No answer":"Missed"}. Picking a team to steal...`,S.teams[S.turn].color);
   $("clock").hidden=true;const gen=++S.gen;
   spin(others,pick,gen,()=>{
-    S.stealer=pick;S.phase="steal";if(isFr(pick)!==!!S.fr)setLang(isFr(pick));renderBoard();lockOpts(false);
-    const t=S.teams[pick];setTurn(S.fr?`${t.name}, volez-la ! (steal it, in French)`:`${t.name}, steal it!`,t.color);$("passBtn").hidden=false;
+    S.stealer=pick;S.phase="steal";renderBoard();lockOpts(false);
+    const t=S.teams[pick];setTurn(`${t.name}, steal it!`,t.color);$("passBtn").hidden=false;
     startClock(STEAL,$("clock"),"steal",()=>{if(S.phase==="steal"){sBad();award(S.stealer,-PENALTY);finishQ(-1,false,`Time's up, no steal. ${t.name} −${PENALTY}`)}});
   });
 }
@@ -552,9 +484,9 @@ function finishQ(picked,ok,msg){
   const btns=optBtns();btns.forEach((b,k)=>{b.disabled=true;if(S.q.opts[k].ok)b.classList.add("right");else if(!b.classList.contains("wrong"))b.classList.add("dim")});
   const who=S.phase==="done"&&S.stealer>=0?S.teams[S.stealer]:S.teams[S.turn];
   setTurn(msg,ok?who.color:"#5C5C5C");renderBoard();
-  const ansO=S.q.opts.find(o=>o.ok),fr=!!S.fr;
+  const ans=S.q.opts.find(o=>o.ok).v;
   const e=$("explain");e.hidden=false;e.className="explain"+(ok?"":" miss");
-  e.innerHTML=fr?`<b>${ok?"Correct !":"Réponse : "+esc(optText(ansO,true))}</b>${esc(S.q.fr.x)}`:`<b>${ok?"Correct":"Answer: "+esc(optText(ansO,false))}</b>${esc(S.q.x)}`;
+  e.innerHTML=`<b>${ok?"Correct":"Answer: "+esc(optText(ans))}</b>${esc(S.q.x)}`;
   const last=S.qi===S.rounds[S.ri].qs.length-1;
   $("nextBtn").hidden=false;$("nextBtn").textContent=last?(S.ri===S.rounds.length-1?"Final standings":"Next round"):"Next question";
   $("nextBtn").focus({preventScroll:true});
@@ -597,8 +529,8 @@ function soloChoose(i){
   if(ok){S.right++;S.score+=ROUNDS[S.q.t].pts;sGood()}else sBad();
   soloBar();
   if(S.mode==="practice"){
-    const ans=S.q.opts.find(o=>o.ok);const e=$("explain");e.hidden=false;e.className="explain"+(ok?"":" miss");
-    e.innerHTML=`<b>${ok?"Correct":"Answer: "+esc(optText(ans,false))}</b>${esc(S.q.x)}`;
+    const ans=S.q.opts.find(o=>o.ok).v;const e=$("explain");e.hidden=false;e.className="explain"+(ok?"":" miss");
+    e.innerHTML=`<b>${ok?"Correct":"Answer: "+esc(optText(ans))}</b>${esc(S.q.x)}`;
     $("nextBtn").hidden=false;$("nextBtn").textContent=S.idx===S.deck.length-1?"Finish":"Next question";$("nextBtn").focus({preventScroll:true});
   }else{const gen=++S.gen;setTimeout(()=>{if(gen!==S.gen||S.mode!=="blitz")return;S.idx++;soloNext()},ok?700:1500)}
 }
