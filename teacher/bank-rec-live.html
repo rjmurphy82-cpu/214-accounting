@@ -241,6 +241,15 @@ body.host-reveal #app{display:grid;grid-template-columns:minmax(0,1fr) minmax(30
 .sb #nx{position:relative;align-self:stretch;font-size:calc(24px * var(--k));padding:calc(10px * var(--k))}
 @media (max-width:900px){body.host-reveal #app{grid-template-columns:1fr}}
 @media (prefers-reduced-motion: reduce){.sb.anim .sbr,.sb.anim .sbr .bar i,.dist div{animation:none}}
+
+.sbr .sc em.neg{color:#FF8A99}
+.sb.dense .sbrows{gap:calc(5px * var(--k))}
+.sb.dense .sbr{padding:calc(5px * var(--k)) calc(10px * var(--k));row-gap:calc(3px * var(--k))}
+.sb.dense .sbr .rk{width:calc(34px * var(--k));height:calc(34px * var(--k));font-size:calc(19px * var(--k))}
+.sb.dense .sbr .nm b{font-size:calc(20px * var(--k))}
+.sb.dense .sbr .sc{display:flex;align-items:baseline;gap:calc(8px * var(--k))}
+.sb.dense .sbr .sc b{font-size:calc(21px * var(--k))}
+.sb.dense .sbr .bar{height:calc(4px * var(--k))}
 </style>
 </head>
 <body>
@@ -405,7 +414,7 @@ const CFG=window.LIVE_CONFIG||null;
 const MOCK=/[?&]mock=1/.test(location.search);
 const ROLE=window.BRL_ROLE||"student";
 const hdr=()=>`<h1 class="title">Bank Rec <span>Live.</span></h1>
-  <p class="lede">${ROLE==="teacher"?"Teacher screen. Put this on the projector, create a game, and students join on their devices with the code. Six rounds on bank reconciliations; right answers earn 600 points plus up to 400 for speed, wrong answers earn 0.":"Six quick rounds on bank reconciliations, run by your teacher. Right answers earn 600 points plus up to 400 more for speed. Wrong answers earn 0, so accuracy comes first. At the end you get a report on what to practice, and you can practice it right here."}</p>`;
+  <p class="lede">${ROLE==="teacher"?"Teacher screen. Put this on the projector, create a game, and students join on their devices with the code. Six rounds on bank reconciliations; right answers earn 600 points plus up to 400 for speed, and wrong answers lose points.":"Six quick rounds on bank reconciliations, run by your teacher. Right answers earn 600 points plus up to 400 more for speed. Wrong answers lose points, so don't guess. Accuracy comes first. At the end you get a report on what to practice, and you can practice it right here."}</p>`;
 function home(){
   stopTick();KEYPICK=KEYNEXT=null;setFit(false);$("#who").hidden=true;
   ROLE==="teacher"?hostSetup():joinForm();
@@ -565,21 +574,22 @@ function fitHost(){
 window.addEventListener("resize",()=>{clearTimeout(fitHost.t);fitHost.t=setTimeout(()=>{ZOOM?zoomApp():fitHost()},120)});
 async function hostSetup(){
   const N=await net().catch(()=>null);if(!N)return needSetup();
-  let per=3,mult=1;
+  let per=3,mult=1,pen=250;
   app.innerHTML=`${hdr()}<div class="panel" style="margin-top:0"><h2>Host a class game</h2>
     <p>Questions per round (6 rounds):</p><div class="seg" id="sp"><button data-v="2">2 (12 total)</button><button data-v="3" aria-pressed="true">3 (18 total)</button><button data-v="4">4 (24 total)</button></div>
+    <p>Wrong answer:</p><div class="seg" id="pn"><button data-v="0">No penalty</button><button data-v="100">−100</button><button data-v="250" aria-pressed="true">−250</button><button data-v="500">−500</button></div>
     <p>Time:</p><div class="seg" id="st"><button data-v="1" aria-pressed="true">Standard</button><button data-v="1.5">Extra time (+50%)</button><button data-v="2">Double time</button></div>
     <p class="note">Standard: 15 seconds to sort, 20 for errors, entries and concepts, 25 for error hunt, 40 for the math round.</p>
     <div class="err" id="er"></div><button class="btn main" id="go">Create game</button></div>`;
   const seg=(id,set)=>$(id).onclick=e=>{const b=e.target.closest("button");if(!b)return;[...$(id).children].forEach(x=>x.setAttribute("aria-pressed",x===b));set(+b.dataset.v)};
-  seg("#sp",v=>per=v);seg("#st",v=>mult=v);
+  seg("#sp",v=>per=v);seg("#st",v=>mult=v);seg("#pn",v=>pen=v);
   $("#go").onclick=async()=>{
     $("#go").disabled=true;
     try{
       let code;for(let t=0;t<20;t++){code=String(Math.floor(1000+Math.random()*9000));if(!(await N.get("games/"+code)))break}
       const seed=Math.floor(Math.random()*1e9),ids=buildGame(per,seed);
-      await N.set("games/"+code,{created:Date.now(),seed,ids,mult,state:{phase:"lobby",qi:-1}});
-      HOST={N,code,seed,ids,mult,players:{},state:{phase:"lobby",qi:-1}};timeMult=mult;
+      await N.set("games/"+code,{created:Date.now(),seed,ids,mult,pen,state:{phase:"lobby",qi:-1}});
+      HOST={N,code,seed,ids,mult,pen,players:{},state:{phase:"lobby",qi:-1}};timeMult=mult;
       HOST.off=N.on("games/"+code+"/players",v=>{HOST.players=v||{};hostRender()});
       hostRender();
     }catch(e){$("#er").textContent="Couldn't reach the live database. Check live-config.js and the database rules.";$("#go").disabled=false}
@@ -639,18 +649,18 @@ function hostRender(){
     // scoreboard: rank now vs. rank before this question, points earned this question
     const ps=activeArr().map(p=>{const x=p.a&&p.a[st.qi];return {...p,gain:x&&x.pts||0,prev:p.score-(x&&x.pts||0)}});
     const before={};[...ps].sort((a,b)=>b.prev-a.prev).forEach((p,i)=>before[p.id]=i+1);
-    const now=[...ps].sort((a,b)=>b.score-a.score),top=now.slice(0,5),best=Math.max(1,now[0]?now[0].score:1);
+    const now=[...ps].sort((a,b)=>b.score-a.score),top=now.slice(0,10),best=Math.max(1,now[0]?now[0].score:1);
     const anim=H.sbq!==st.qi;H.sbq=st.qi;
     const right=counts[q.ans],tot=activeArr().length;
     app.querySelector(".fbbox").insertAdjacentHTML("beforeend",`
       <div class="dist">${counts.map((n,i)=>`<div class="${i===q.ans?"ok":"wrong"}" style="--oc:${COLORS[i]};--h:${Math.max(14,n/mx*100)}%"><b>${i===q.ans?"✓":SHAPES[i]} ${n}</b></div>`).join("")}</div>`);
-    app.querySelector(".qwrap").insertAdjacentHTML("afterend",`<aside class="sb ${anim?"anim":""}">
+    app.querySelector(".qwrap").insertAdjacentHTML("afterend",`<aside class="sb ${anim?"anim":""} ${top.length>5?"dense":""}">
       <div class="sbh"><span>Leaderboard</span><small>${right} of ${tot} got it</small></div>
       <div class="sbrows">${top.map((p,i)=>{const mv=before[p.id]-(i+1);
-        return `<div class="sbr r${i+1}" style="--d:${i*110}ms">
+        return `<div class="sbr r${i+1}" style="--d:${i*80}ms">
           <span class="rk">${i+1}</span>
           <span class="nm"><b>${esc(p.name)}</b>${mv>0?`<i class="mv up">▲ ${mv}</i>`:mv<0?`<i class="mv dn">▼ ${-mv}</i>`:""}</span>
-          <span class="sc"><b data-from="${anim?p.prev:p.score}" data-to="${p.score}">${(anim?p.prev:p.score).toLocaleString()}</b>${p.gain?`<em>+${p.gain}</em>`:`<em class="z">+0</em>`}</span>
+          <span class="sc"><b data-from="${anim?p.prev:p.score}" data-to="${p.score}">${(anim?p.prev:p.score).toLocaleString()}</b>${p.gain>0?`<em>+${p.gain}</em>`:p.gain<0?`<em class="neg">−${-p.gain}</em>`:`<em class="z">+0</em>`}</span>
           <span class="bar"><i style="--w:${Math.max(3,p.score/best*100)}%"></i></span>
         </div>`}).join("")||'<div class="sbr"><span class="nm"><b>No players yet</b></span></div>'}</div>
       <button class="btn main" id="nx">${last?"Final results":"Next question"} →</button>
@@ -781,7 +791,7 @@ async function enterGame(N,code,name,forcePid){
     const answered={},log=[];let last=-1;
     Object.entries((rec&&rec.a)||{}).sort((x,y)=>+x[0]-+y[0]).forEach(([qi,x])=>{answered[qi]=x;const sk=byId[g.ids[qi]]&&byId[g.ids[qi]].sk;if(sk)log.push({sk,ok:!!x.ok,ms:x.ms||0});if(x.c>=0)last=Math.max(last,+qi)});
     if(ME&&ME.off)ME.off();
-    ME={N,code,pid,name,seed:g.seed,ids:g.ids,score:(rec&&rec.score)||0,log,answered,state:null,base:Math.max(base,last),out:false};timeMult=g.mult||1;
+    ME={N,code,pid,name,seed:g.seed,ids:g.ids,score:(rec&&rec.score)||0,log,answered,state:null,base:Math.max(base,last),out:false,pen:+g.pen||0};timeMult=g.mult||1;
     $("#who").textContent=name;$("#who").hidden=false;rejoinBtn();
     ME.off=N.on(`games/${code}/state`,st=>{if(!ME)return;if(!st){joinGone();return}ME.state=st;joinRender()});
     return null;
@@ -826,7 +836,7 @@ function joinRender(){
     renderQuestion(app,q,{label:SKILLS[q.sk].name,num:`Question ${st.qi+1} of ${M.ids.length}`,score:M.score,timed:true,secs,noFit:true,onAnswer:(c,ms)=>{
       if(M.answered[st.qi]||M.out)return;
       if(c<0){document.body.classList.remove("stu-live");app.innerHTML=`<div class="wait"><h2>Time's up</h2><p>Waiting for the answer…</p></div>`;M.rq=st.qi+"w";return} // the reveal records the miss
-      const ok=c===q.ans,pts=points(ok,ms,secs);M.answered[st.qi]={c,ok,pts,ms};M.score+=pts;M.log.push({sk:q.sk,ok,ms});
+      const ok=c===q.ans,old=M.score;M.score=Math.max(0,old+(ok?points(ok,ms,secs):-M.pen));const pts=M.score-old;M.answered[st.qi]={c,ok,pts,ms};M.log.push({sk:q.sk,ok,ms});
       M.N.update(`games/${M.code}/players/${M.pid}`,{score:M.score,["a/"+st.qi]:{c,ok,ms:Math.round(ms),pts}});
       document.body.classList.remove("stu-live");setFit(false);app.innerHTML=`<div class="wait"><h2>Answer locked in</h2><p>Waiting for everyone else…</p></div>`;M.rq=st.qi+"w";
     }});
@@ -837,7 +847,7 @@ function joinRender(){
     if(M.rq===st.qi+"r")return;M.rq=st.qi+"r";
     let a=M.answered[st.qi];
     if(!a){a={c:-1,ok:false,pts:0,ms:secs*1000};M.answered[st.qi]=a;M.log.push({sk:q.sk,ok:false,ms:secs*1000});M.N.update(`games/${M.code}/players/${M.pid}`,{["a/"+st.qi]:{c:-1,ok:false,ms:secs*1000,pts:0}})}
-    app.innerHTML=`<div class="wait"><h2 style="color:${a.ok?"var(--good)":"var(--bad)"}">${a.ok?"Correct!":a.c<0?"Time's up":"Not quite"}</h2><div class="big">+${a.pts}</div><p>${a.ok?"":"Answer: "+esc(optText(q.opts[q.ans]))+"<br>"}${esc(q.x)}</p><p><b>${M.score.toLocaleString()}</b> points total</p></div>`;
+    app.innerHTML=`<div class="wait"><h2 style="color:${a.ok?"var(--good)":"var(--bad)"}">${a.ok?"Correct!":a.c<0?"Time's up":"Not quite"}</h2><div class="big" style="color:${a.pts<0?"var(--bad)":"inherit"}">${a.pts<0?"−"+(-a.pts):"+"+a.pts}</div>${!a.ok&&a.c>=0&&M.pen?`<p>Wrong answers cost ${M.pen} points.</p>`:""}<p>${a.ok?"":"Answer: "+esc(optText(q.opts[q.ans]))+"<br>"}${esc(q.x)}</p><p><b>${M.score.toLocaleString()}</b> points total</p></div>`;
     return;
   }
   if(st.phase==="end"){
