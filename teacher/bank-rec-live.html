@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Teacher | Bank Rec Live</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="description" content="Chapter 6 bank reconciliation class game for District 214 Accounting: join your teacher's game with a code, then practice your weakest skills.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F4F3F3; --paper:#FFFFFF; --ink:#111111; --muted:#5C5C5C; --dark:#111111; --soft:#F7F6F6;
+  --red:#C1102F; --red2:#D9203F; --accent:#C1102F; --line:rgba(17,17,17,.14);
+  --good:#1E7A3C; --goodsoft:#E7F4EB; --bad:#C1102F; --badsoft:#FBE7EA;
+  --c0:#C1102F; --c1:#1F5FAD; --c2:#9A6B00; --c3:#23763A;
+  --display:"Oswald","Arial Narrow",Impact,sans-serif;
+  --body:"Barlow",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --k:1;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){--bg:#121212;--paper:#1E1E1E;--ink:#F2F2F2;--muted:#A8A8A8;--dark:#2B2B2B;--soft:#262626;--accent:#FF4D63;--line:rgba(242,242,242,.14);--good:#3FB86A;--goodsoft:#123020;--bad:#FF4D63;--badsoft:#3A1219;color-scheme:dark}
+}
+:root[data-theme="dark"]{--bg:#121212;--paper:#1E1E1E;--ink:#F2F2F2;--muted:#A8A8A8;--dark:#2B2B2B;--soft:#262626;--accent:#FF4D63;--line:rgba(242,242,242,.14);--good:#3FB86A;--goodsoft:#123020;--bad:#FF4D63;--badsoft:#3A1219;color-scheme:dark}
+*,*::before,*::after{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:18px/1.45 var(--body);min-height:100vh}
+button,input{font:inherit;color:inherit}
+button{cursor:pointer}
+button:focus-visible,a:focus-visible,input:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+[hidden]{display:none!important}
+.wrap{max-width:1100px;margin:0 auto;padding:14px 18px 40px}
+.top{display:flex;align-items:center;gap:12px;flex-wrap:wrap;color:var(--muted);font-size:15px;font-weight:600}
+.top a{color:inherit;text-decoration:none}.top a:hover{text-decoration:underline}
+.d214{height:36px;width:auto;background:#fff;padding:3px 6px;border-radius:4px;display:block}
+.top .sp{flex:1}
+.pill{background:var(--dark);color:#fff;border-radius:999px;padding:3px 12px;font-size:14px;font-weight:700}
+h1.title{font-family:var(--display);font-weight:700;font-size:clamp(40px,6.5vw,72px);line-height:.98;margin:22px 0 8px}
+h1.title span{color:var(--accent)}
+.lede{max-width:62ch;color:var(--muted);margin:0 0 22px}
+.doors{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.door{text-align:left;background:var(--paper);border:2px solid var(--line);border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:6px}
+.door:hover{border-color:var(--ink)}
+.door b{font-family:var(--display);font-weight:600;font-size:26px}
+.door span{color:var(--muted);font-size:16px}
+.door .tag{align-self:flex-start;background:var(--red);color:#fff;border-radius:6px;padding:1px 9px;font-size:13px;font-weight:700;letter-spacing:.04em}
+.panel{background:var(--paper);border:2px solid var(--line);border-radius:14px;padding:22px;max-width:620px;margin:20px auto 0}
+.panel h2{font-family:var(--display);font-weight:600;font-size:32px;margin:0 0 6px}
+.panel p{color:var(--muted);margin:0 0 14px}
+.field{display:block;width:100%;font-size:26px;font-weight:600;padding:12px 14px;border:2px solid var(--line);border-radius:10px;background:var(--soft);margin:6px 0 14px}
+.field.code{letter-spacing:.3em;text-align:center;font-family:var(--display);font-size:40px}
+.btn{background:var(--paper);border:2px solid var(--line);border-radius:10px;padding:8px 18px;font-weight:700}
+.btn.main{background:var(--red);border-color:var(--red);color:#fff;font-family:var(--display);font-weight:600;font-size:24px;padding:10px 30px}
+.btn.main:hover{background:var(--red2)}
+.btn:disabled{opacity:.45;cursor:default}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.err{color:var(--bad);font-weight:700;min-height:1.4em}
+.seg{display:flex;flex-wrap:wrap;gap:8px;margin:4px 0 14px}
+.seg button{background:var(--soft);border:2px solid var(--line);border-radius:8px;padding:6px 14px;font-weight:600}
+.seg button[aria-pressed="true"]{background:var(--dark);color:#fff;border-color:var(--dark)}
+.note{font-size:15px;color:var(--muted)}
+
+/* question */
+.qwrap{display:flex;flex-direction:column;gap:calc(10px * var(--k))}
+.qhead{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.qhead .rd{font-family:var(--display);font-weight:600;font-size:calc(20px * var(--k));letter-spacing:.04em;color:var(--accent);text-transform:uppercase}
+.qhead .num{color:var(--muted);font-weight:700;font-size:calc(16px * var(--k))}
+.qhead .score{margin-left:auto;font-family:var(--display);font-weight:600;font-size:calc(24px * var(--k))}
+.timer{height:calc(12px * var(--k));background:var(--soft);border-radius:999px;overflow:hidden;border:1px solid var(--line)}
+.timer i{display:block;height:100%;background:var(--good);width:100%;transform-origin:left;transition:background .3s}
+.timer.low i{background:var(--bad)}
+.secs{font-family:var(--display);font-weight:600;font-size:calc(22px * var(--k));min-width:2.4em;text-align:center;background:var(--dark);color:#fff;border-radius:8px;padding:0 10px}
+.card{background:var(--paper);border:2px solid var(--line);border-radius:14px;padding:calc(18px * var(--k)) calc(22px * var(--k))}
+.prompt{font-size:calc(30px * var(--k));font-weight:600;line-height:1.28;margin:0}
+.data{margin-top:calc(10px * var(--k));border-collapse:collapse;font-size:calc(23px * var(--k));min-width:min(520px,100%)}
+.data td{padding:calc(3px * var(--k)) 0;border-bottom:1px solid var(--line)}
+.data td:last-child{text-align:right;font-weight:700;padding-left:30px;font-variant-numeric:tabular-nums}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:calc(10px * var(--k))}
+.opt{display:flex;gap:calc(14px * var(--k));align-items:center;text-align:left;border:0;border-radius:12px;padding:calc(10px * var(--k)) calc(16px * var(--k));min-height:calc(70px * var(--k));font-size:calc(23px * var(--k));font-weight:700;color:#fff;background:var(--oc);box-shadow:0 4px 0 rgba(0,0,0,.22)}
+.opt:hover:not(:disabled){filter:brightness(1.08)}
+.opt .sh{flex:none;width:calc(40px * var(--k));height:calc(40px * var(--k));border-radius:8px;background:rgba(0,0,0,.22);display:grid;place-items:center;font-family:var(--display);font-size:calc(22px * var(--k))}
+.opt:disabled{cursor:default}
+.opt.dim{opacity:.32}
+.opt.right{outline:5px solid var(--good);outline-offset:2px;opacity:1}
+.opt.pick{outline:5px solid var(--ink);outline-offset:2px}
+.opt .je{display:grid;grid-template-columns:1fr auto;column-gap:14px;width:100%;font-size:.92em}
+.opt .je .cr{padding-left:1.4em}
+.fb{border-radius:12px;padding:calc(10px * var(--k)) calc(16px * var(--k));font-size:calc(20px * var(--k));border-left:8px solid var(--good);background:var(--goodsoft)}
+.fb.no{border-color:var(--bad);background:var(--badsoft)}
+.fb b{display:block;font-family:var(--display);font-weight:600;font-size:1.15em}
+.fb .pts{float:right;font-family:var(--display);font-size:1.3em;color:var(--good)}
+.fb.no .pts{color:var(--bad)}
+.next{align-self:flex-end}
+.interstitial{text-align:center;padding:60px 10px}
+.interstitial .r{font-family:var(--display);color:var(--accent);font-size:24px;letter-spacing:.12em;text-transform:uppercase}
+.interstitial h2{font-family:var(--display);font-weight:700;font-size:clamp(46px,8vw,92px);line-height:1;margin:8px 0 10px}
+.interstitial p{color:var(--muted);font-size:22px;max-width:44ch;margin:0 auto 22px}
+
+/* report */
+.rep h2{font-family:var(--display);font-weight:700;font-size:clamp(34px,5vw,54px);margin:10px 0 4px;line-height:1.05}
+.stats{display:flex;gap:12px;flex-wrap:wrap;margin:12px 0 18px}
+.stat{background:var(--paper);border:2px solid var(--line);border-radius:12px;padding:10px 16px;min-width:140px}
+.stat b{display:block;font-family:var(--display);font-size:34px;line-height:1}
+.stat span{color:var(--muted);font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:.06em}
+.skills{background:var(--paper);border:2px solid var(--line);border-radius:12px;padding:8px 16px}
+.sk{display:grid;grid-template-columns:200px 1fr 80px;gap:12px;align-items:center;padding:7px 0;border-bottom:1px solid var(--line)}
+.sk:last-child{border-bottom:0}
+.sk .bar{height:14px;background:var(--soft);border-radius:999px;overflow:hidden}
+.sk .bar i{display:block;height:100%;background:var(--good)}
+.sk .bar i.mid{background:#C98A00}.sk .bar i.lo{background:var(--bad)}
+.sk .v{text-align:right;font-weight:700;font-variant-numeric:tabular-nums}
+.todo{margin-top:18px}
+.todo h3{font-family:var(--display);font-weight:600;font-size:26px;margin:0 0 8px}
+.tip{display:flex;gap:14px;align-items:flex-start;background:var(--paper);border:2px solid var(--line);border-left:8px solid var(--red);border-radius:12px;padding:12px 16px;margin-bottom:10px}
+.tip .t{flex:1}
+.tip b{font-family:var(--display);font-weight:600;font-size:21px;display:block}
+.tip .done{color:var(--good);font-weight:700;font-size:15px}
+.links{margin-top:16px;color:var(--muted);font-size:16px}
+.links a{color:var(--accent);font-weight:700}
+
+/* live host */
+.lobby{text-align:center}
+.endgrid{display:grid;gap:18px;margin-top:14px}
+@media (min-width:1000px){.endgrid{grid-template-columns:1fr 1.25fr}}
+.lobby .join{font-size:clamp(20px,2.4vw,30px);color:var(--muted);font-weight:600}
+.lobby .code{font-family:var(--display);font-weight:700;font-size:clamp(80px,14vw,170px);line-height:1;letter-spacing:.12em;margin:6px 0}
+.names{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin:20px 0}
+.names span{background:var(--paper);border:2px solid var(--line);border-radius:999px;padding:6px 16px;font-weight:700;font-size:clamp(18px,1.8vw,24px)}
+.count{font-family:var(--display);font-size:calc(22px * var(--k));font-weight:600}
+.lb{display:grid;gap:calc(8px * var(--k));max-width:820px;margin:0 auto;width:100%}
+.lb div{display:flex;gap:14px;align-items:center;background:var(--paper);border:2px solid var(--line);border-radius:12px;padding:calc(6px * var(--k)) calc(16px * var(--k));font-size:calc(24px * var(--k));font-weight:700}
+.lb div .p{width:2em;color:var(--muted);font-family:var(--display)}
+.lb div .s{margin-left:auto;font-family:var(--display)}
+.lb div.me{border-color:var(--red)}
+.dist{display:grid;grid-template-columns:repeat(4,1fr);gap:calc(10px * var(--k));align-items:end;height:calc(130px * var(--k))}
+.dist div{background:var(--oc);border-radius:8px 8px 0 0;color:#fff;font-family:var(--display);font-weight:700;font-size:calc(22px * var(--k));display:flex;align-items:flex-start;justify-content:center;padding-top:4px;min-height:calc(34px * var(--k))}
+.dist div.wrong{opacity:.35}
+body.wide .wrap{max-width:min(96vw,1500px)}
+body.fit .wrap{max-width:min(98vw,2200px)}
+body.fit .top{font-size:calc(14px * var(--k))}
+
+/* student device */
+.wait{text-align:center;padding:60px 10px}
+.wait h2{font-family:var(--display);font-size:clamp(32px,6vw,54px);margin:0 0 8px}
+.wait p{color:var(--muted);font-size:20px}
+.big{font-family:var(--display);font-size:clamp(46px,10vw,90px);font-weight:700;line-height:1}
+@media (max-width:760px){.doors{grid-template-columns:1fr}.opts{grid-template-columns:1fr}.sk{grid-template-columns:1fr 70px}.sk .bar{grid-column:1 / -1;order:3}.tip{flex-direction:column;align-items:stretch}.tip .prac,.tip #again{width:100%}}
+@media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top"><img src="../logo-214.png" alt="District 214" class="d214"><a href="/">District 214 Accounting</a> | <a href="/teacher">Teacher</a> | Chapter 6: Bank Rec Live<span class="sp"></span><span class="pill" id="who" hidden></span></div>
+  <main id="app"></main>
+</div>
+<script>window.BRL_ROLE="teacher"</script>
+<script src="../live-config.js"></script>
+<script>
+"use strict";
+/* ============================================================ QUESTION BANK
+   First option is always the correct one; options are shuffled when a game is built. */
+const SORT=["Add to the bank balance","Deduct from the bank balance","Add to the book balance","Deduct from the book balance"];
+const so=(p,a,x)=>({t:"sort",p,a,x});
+const je=(dr,cr,amt)=>({dr,cr,amt});
+const NOE="No entry needed";
+const SKILLS={
+ sort:{name:"Where Does It Go?",short:"Bank side or book side",secs:15,desc:"Pick the side and whether you add or deduct.",
+   tip:"Ask who doesn't know about it yet. If the bank hasn't caught up (deposits in transit, outstanding checks, bank errors), it goes on the bank side. If the books haven't caught up (NSF, fees, interest, collections, EFTs), it goes on the book side."},
+ errors:{name:"Fix the Error",short:"Book and bank errors",secs:20,desc:"Find the difference and which way it goes.",
+   tip:"Use only the difference between the right and wrong amounts. A check recorded too high means the books took out too much, so add it back. Too low means deduct."},
+ entries:{name:"Book It",short:"Adjusting entries",secs:20,desc:"Pick the journal entry the company records.",
+   tip:"Only book-side items get an entry, and every one has Cash in it. Book-side adds debit Cash. Book-side deducts credit Cash. An NSF check goes back to Accounts Receivable."},
+ math:{name:"Balance It",short:"Adjusted balances",secs:40,desc:"Calculators out. Find the adjusted balance.",
+   tip:"Start with the balance, add every Add item, subtract every Deduct item. The adjusted bank and adjusted book balances must match."},
+ hunt:{name:"Error Hunt",short:"Finding mistakes",secs:25,desc:"Use the tricks of the trade to find the mistake.",
+   tip:"Find the difference first. Equals one item? It was left out. Half the difference matches an item? Wrong sign. Divides by 9? Two digits got swapped."},
+ concepts:{name:"Why It Works",short:"Concepts and controls",secs:20,desc:"The ideas behind cash controls and the rec.",
+   tip:"A reconciliation explains why the bank and the books differ. Bank errors are the bank's to fix. Only the adjusted balance goes on the balance sheet."}
+};
+const ORDER=["sort","errors","entries","math","hunt","concepts"];
+const BANK=[
+ // ---- sort (answer index into SORT)
+ {id:"s1",sk:"sort",...so("A $1,350 deposit made on the last day of the month is not on the bank statement.",0,"Deposit in transit. The books already have it; the bank hasn't processed it yet.")},
+ {id:"s2",sk:"sort",...so("Checks totaling $2,180 have not cleared the bank.",1,"Outstanding checks. The books already took them out; the bank hasn't paid them yet.")},
+ {id:"s3",sk:"sort",...so("A customer's $260 check came back marked NSF.",3,"The check bounced, so the cash the books recorded never really came in.")},
+ {id:"s4",sk:"sort",...so("The bank charged a $15 monthly service fee.",3,"The bank already took the fee. The books learn about it from the statement.")},
+ {id:"s5",sk:"sort",...so("The bank statement shows $9 of interest earned.",2,"The bank already added the interest. The books don't have it yet.")},
+ {id:"s6",sk:"sort",...so("The bank collected a $3,000 note receivable for the company.",2,"The money is already in the account. The books don't know yet.")},
+ {id:"s7",sk:"sort",...so("The bank paid the $220 internet bill by EFT. The company hasn't recorded it.",3,"The money already left the account. Deduct it on the book side.")},
+ {id:"s8",sk:"sort",...so("The day's receipts went into the night depository after the bank closed on the last day of the month.",0,"That's a deposit in transit. Add it to the bank balance.")},
+ // ---- errors
+ {id:"e1",sk:"errors",p:"Check #301 was written for $560 but recorded in the books as $650. On the book side you should…",o:["Add $90","Deduct $90","Add $650","Deduct $560"],x:"$650 − $560 = $90. The books took out $90 too much, so add it back."},
+ {id:"e2",sk:"errors",p:"Check #415 was written for $384 but recorded in the books as $348. On the book side you should…",o:["Deduct $36","Add $36","Deduct $384","Add $348"],x:"$384 − $348 = $36. The books took out $36 too little, so deduct it."},
+ {id:"e3",sk:"errors",p:"A $1,240 customer payment was deposited correctly but recorded in the books as $1,420. On the book side you should…",o:["Deduct $180","Add $180","Deduct $1,420","Add $1,240"],x:"The books show $180 more cash than was deposited, so deduct the $180."},
+ {id:"e4",sk:"errors",p:"A $975 deposit was recorded in the books as $795. On the book side you should…",o:["Add $180","Deduct $180","Add $975","Deduct $795"],x:"The books show $180 too little cash, so add the $180 difference."},
+ {id:"e5",sk:"errors",p:"The bank charged our account for a $300 check written by a different company. What do you do?",o:["Add $300 to the bank side","Deduct $300 from the bank side","Deduct $300 from the book side","Add $300 to the book side"],x:"The bank took out money that isn't ours. Add it back on the bank side and tell the bank."},
+ {id:"e6",sk:"errors",p:"The bank added a $450 deposit that belongs to another company to our account. What do you do?",o:["Deduct $450 from the bank side","Add $450 to the bank side","Add $450 to the book side","Nothing, since it isn't our money"],x:"The bank balance is $450 too high. Deduct it on the bank side and tell the bank."},
+ {id:"e7",sk:"errors",p:"A $1,200 rent check was recorded correctly in the books, but the bank paid it as $1,020 by mistake. What do you do?",o:["Deduct $180 from the bank side","Add $180 to the bank side","Deduct $180 from the book side","Add $180 to the book side"],x:"The bank's mistake: it only took out $1,020, so its balance is $180 too high. Deduct it on the bank side."},
+ {id:"e8",sk:"errors",p:"For a book error, which amount goes on the reconciliation?",o:["Only the difference between the right and wrong amounts","The full correct amount","The full wrong amount","Both amounts"],x:"Only the difference. The rest of the amount was already recorded correctly."},
+ // ---- entries
+ {id:"n1",sk:"entries",p:"The bank returned a customer's $260 check marked NSF. Which adjusting entry?",o:[je("Accounts Receivable","Cash",260),je("Cash","Accounts Receivable",260),je("Miscellaneous Expense","Cash",260),NOE],x:"The customer still owes the money: debit Accounts Receivable, credit Cash."},
+ {id:"n2",sk:"entries",p:"The bank charged a $15 service fee. Which adjusting entry?",o:[je("Bank Service Charge Expense","Cash",15),je("Cash","Bank Service Charge Expense",15),je("Cash","Service Revenue",15),NOE],x:"An expense goes up (debit) and Cash goes down (credit)."},
+ {id:"n3",sk:"entries",p:"The bank statement shows $9 of interest earned. Which adjusting entry?",o:[je("Cash","Interest Revenue",9),je("Interest Revenue","Cash",9),je("Interest Expense","Cash",9),NOE],x:"Cash goes up (debit) and the company earned revenue (credit Interest Revenue)."},
+ {id:"n4",sk:"entries",p:"The bank collected a $3,000 note receivable for the company. Which adjusting entry?",o:[je("Cash","Notes Receivable",3000),je("Notes Receivable","Cash",3000),je("Cash","Notes Payable",3000),je("Cash","Service Revenue",3000)],x:"Cash goes up and the note is no longer owed to the company."},
+ {id:"n5",sk:"entries",p:"The bank paid the $220 internet bill by EFT. Which adjusting entry?",o:[je("Utilities Expense","Cash",220),je("Cash","Utilities Expense",220),je("Utilities Expense","Accounts Payable",220),NOE],x:"The bill is paid and the money is gone: debit the expense, credit Cash."},
+ {id:"n6",sk:"entries",p:"A $1,350 deposit in transit is on the reconciliation. Which adjusting entry?",o:[NOE,je("Cash","Accounts Receivable",1350),je("Accounts Receivable","Cash",1350),je("Cash","Deposits in Transit",1350)],x:"Deposits in transit are on the bank side. The books are already right."},
+ {id:"n7",sk:"entries",p:"Check #301 paid a bill. It was written for $560 but recorded as $650. Which adjusting entry?",o:[je("Cash","Accounts Payable",90),je("Accounts Payable","Cash",90),je("Cash","Accounts Payable",650),NOE],x:"The books took out $90 too much. Put $90 back in Cash and fix Accounts Payable by $90."},
+ {id:"n8",sk:"entries",p:"Outstanding checks of $2,180 are on the reconciliation. Which adjusting entry?",o:[NOE,je("Cash","Accounts Payable",2180),je("Accounts Payable","Cash",2180),je("Cash","Outstanding Checks",2180)],x:"Outstanding checks are on the bank side, so no entry. The books already recorded them."},
+ // ---- math
+ {id:"m1",sk:"math",p:"What is the adjusted bank balance?",d:[["Bank statement balance",6200],["Deposit in transit",900],["Outstanding checks",1450]],o:[5650,6750,3850,7100],x:"$6,200 + $900 − $1,450 = $5,650."},
+ {id:"m2",sk:"math",p:"What is the adjusted book balance?",d:[["Cash balance per books",5480],["Interest earned",12],["NSF check",160],["Bank service charge",25]],o:[5307,5653,5295,5677],x:"$5,480 + $12 − $160 − $25 = $5,307."},
+ {id:"m3",sk:"math",p:"What is the adjusted bank balance?",d:[["Bank statement balance",9100],["Deposit in transit",1200],["Outstanding checks",2350],["Bank charged us for another company's check",200]],o:[8150,7750,7950,10450],x:"$9,100 + $1,200 − $2,350 + $200 bank error = $8,150."},
+ {id:"m4",sk:"math",p:"What is the adjusted book balance?",d:[["Cash balance per books",4060],["Note collected by the bank",1500],["Collection fee",20],["NSF check",300]],o:[5240,5280,5540,2880],x:"$4,060 + $1,500 − $20 − $300 = $5,240."},
+ {id:"m5",sk:"math",p:"What is the adjusted book balance?",d:[["Cash balance per books",4410],["NSF check",410],["Bank service charge",25]],o:[3975,4845,4385,4435],x:"$4,410 − $410 − $25 = $3,975."},
+ {id:"m6",sk:"math",p:"The adjusted book balance is $6,000. The only book-side items were $40 of interest and a $260 NSF check. What was the unadjusted book balance?",o:[6220,5780,6300,5700],x:"Work backward: $6,000 − $40 + $260 = $6,220."},
+ {id:"m7",sk:"math",p:"What is the adjusted bank balance?",d:[["Bank statement balance",7640],["Deposit in transit",1425],["Outstanding checks",2880],["Bank charged us for another company's check",350]],o:[6535,5835,6185,9595],x:"$7,640 + $1,425 − $2,880 + $350 = $6,535."},
+ {id:"m8",sk:"math",p:"Book-side items: $18 of interest, a $22 service charge, and a $140 NSF check. What is the net effect on Cash after posting the entries?",o:["Decrease of $144","Decrease of $180","Increase of $144","Decrease of $100"],x:"+$18 − $22 − $140 = −$144."},
+ // ---- hunt
+ {id:"h1",sk:"hunt",p:"Adjusted bank balance: $4,380. Adjusted book balance: $4,660. What is the difference?",o:["$280","$140","$9,040","$4,520"],x:"$4,660 − $4,380 = $280. Always find the difference first."},
+ {id:"h2",sk:"hunt",p:"Your adjusted balances are $280 apart. Which item most likely has the wrong sign (added instead of deducted)?",o:["A $140 NSF check","A $280 service charge","A $28 book error","A $560 deposit in transit"],x:"$280 ÷ 2 = $140. An item with the wrong sign throws you off by twice its amount."},
+ {id:"h3",sk:"hunt",p:"Your adjusted balances are $90 apart, and $90 divides evenly by 9. What mistake is most likely?",o:["Two digits got swapped, like $540 and $450","An item was left out","An item has the wrong sign","An adding slip of exactly $100"],x:"Differences that divide evenly by 9 usually mean a transposition."},
+ {id:"h4",sk:"hunt",p:"Your balances are exactly $75 apart, and the book side has $75 of interest earned. What probably happened?",o:["The $75 item was left out","It was added twice","Two digits were swapped","Nothing. Small differences are fine."],x:"When the difference equals one item exactly, you probably left that item out."},
+ {id:"h5",sk:"hunt",p:"Your balances are off by exactly $1,000. What should you check first?",o:["Re-add both columns","Look for swapped digits","Look for a $9 item","Start over with new numbers"],x:"Round differences like $10, $100, or $1,000 are usually adding slips."},
+ {id:"h6",sk:"hunt",p:"Adjusted bank: $5,075. Adjusted book: $5,525. If one item has the wrong sign, how big is that item?",o:["$225","$450","$45","$900"],x:"Difference $450 ÷ 2 = $225."},
+ {id:"h7",sk:"hunt",p:"Your adjusted balances match. Does that guarantee every item is right?",o:["No. Two mistakes can cancel out, so check each item","Yes. Matching balances mean no mistakes","Yes, if the bank balance is larger","No. Balances should never match"],x:"Matching is required, but two errors can hide each other."},
+ {id:"h8",sk:"hunt",p:"The difference is $54. Which mistake would cause exactly that?",o:["$482 recorded as $428","$400 recorded as $440","$27 recorded as $72","$540 recorded as $504"],x:"$482 − $428 = $54, a swap of two digits (and 54 ÷ 9 = 6)."},
+ // ---- concepts
+ {id:"c1",sk:"concepts",p:"What is the purpose of a bank reconciliation?",o:["To explain the difference between the bank balance and the book balance","To prove the bank never makes mistakes","To figure out how much interest the company owes","To replace the Cash account"],x:"It explains why the two numbers differ and finds the true cash balance."},
+ {id:"c2",sk:"concepts",p:"Which reconciling items need a journal entry?",o:["Only the items on the book side","Only the items on the bank side","Every item","None of them"],x:"Book-side items are things the books don't have yet, so only they need entries."},
+ {id:"c3",sk:"concepts",p:"Why doesn't a deposit in transit need a journal entry?",o:["The company already recorded it; the bank just hasn't processed it","The bank will return it","Deposits are never recorded","The bank records the entry for you"],x:"It's already in the books. It will show up on next month's statement."},
+ {id:"c4",sk:"concepts",p:"Who should prepare the bank reconciliation?",o:["Someone who doesn't handle cash or write checks","The cashier who makes deposits","The person who signs checks","Whoever opens the mail"],x:"Separation of duties: the person checking the records shouldn't be able to touch the cash."},
+ {id:"c5",sk:"concepts",p:"A bank error shows up during the reconciliation. What does the company do?",o:["Tell the bank; no journal entry is needed","Record a journal entry","Ignore it until year end","Close the account"],x:"Bank errors are the bank's to fix. The company's books stay as they are."},
+ {id:"c6",sk:"concepts",p:"After the entries are posted, which amount is reported as Cash on the balance sheet?",o:["The adjusted balance","The bank statement balance","The unadjusted book balance","The average of the two"],x:"After posting, the Cash account equals the adjusted balance."},
+ {id:"c7",sk:"concepts",p:"On a bank statement, NSF stands for:",o:["Nonsufficient funds","Net settlement fee","No signature found","Non-standard financial"],x:"An NSF check bounced because the customer didn't have enough money in their account."},
+ {id:"c8",sk:"concepts",p:"What is an outstanding check?",o:["A check the company wrote and recorded that the bank hasn't paid yet","A check a customer still owes","A check returned for nonsufficient funds","A check the bank paid twice"],x:"The books already took it out, so it's deducted on the bank side."}
+];
+BANK.forEach(q=>{if(q.t==="sort"){q.o=[...SORT];q.ans=q.a;}else q.ans=0});
+
+/* ============================================================ HELPERS */
+const $=s=>document.querySelector(s);
+const app=$("#app");
+const money=n=>"$"+Number(n).toLocaleString("en-US");
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const COLORS=["var(--c0)","var(--c1)","var(--c2)","var(--c3)"],SHAPES=["▲","◆","●","■"];
+function rng(seed){let a=seed>>>0;return()=>{a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+function shuffle(arr,r=Math.random){const a=arr.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(r()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function hash(s){let h=2166136261;for(const c of s)h=Math.imul(h^c.charCodeAt(0),16777619);return h>>>0}
+function optHTML(v){
+  if(v&&typeof v==="object")return `<span class="je"><span>Dr ${esc(v.dr)}</span><span>${money(v.amt)}</span><span class="cr">Cr ${esc(v.cr)}</span><span>${money(v.amt)}</span></span>`;
+  if(typeof v==="number")return money(v);
+  return esc(v);
+}
+function optText(v){if(v&&typeof v==="object")return `Dr ${v.dr} ${money(v.amt)}, Cr ${v.cr} ${money(v.amt)}`;if(typeof v==="number")return money(v);return v}
+/* Build a question instance. Sort questions keep their fixed order; others shuffle with a seed so every device in a live game shows the same order. */
+function inst(q,seed){
+  if(q.t==="sort")return {...q,opts:q.o.slice(),ans:q.ans};
+  const r=rng(hash(q.id+":"+seed));const idx=shuffle([0,1,2,3],r);
+  return {...q,opts:idx.map(i=>q.o[i]),ans:idx.indexOf(0)};
+}
+function buildGame(perSkill,seed){
+  const r=rng(seed);const list=[];
+  ORDER.forEach(sk=>{shuffle(BANK.filter(q=>q.sk===sk),r).slice(0,perSkill).forEach(q=>list.push(q.id))});
+  return list;
+}
+const byId=Object.fromEntries(BANK.map(q=>[q.id,q]));
+function points(ok,ms,secs){return ok?Math.round(600+400*Math.max(0,1-ms/(secs*1000))):0}
+let timeMult=1;
+const secsFor=q=>Math.round(SKILLS[q.sk].secs*timeMult);
+function beep(f,d){try{const c=beep.c||(beep.c=new (window.AudioContext||window.webkitAudioContext)());const o=c.createOscillator(),g=c.createGain();o.frequency.value=f;g.gain.value=.06;o.connect(g);g.connect(c.destination);const t=c.currentTime;g.gain.exponentialRampToValueAtTime(.0001,t+d);o.start(t);o.stop(t+d)}catch(e){}}
+
+/* ============================================================ QUESTION SCREEN (solo, student device, practice) */
+let TICK=null;
+function stopTick(){clearInterval(TICK);TICK=null}
+function renderQuestion(el,q,o){
+  // o: {label, num, score, timed, secs, onAnswer(choice, ms), showText}
+  stopTick();
+  el.innerHTML=`<div class="qwrap">
+    <div class="qhead"><span class="rd">${esc(o.label||"")}</span><span class="num">${esc(o.num||"")}</span>${o.score!=null?`<span class="score">${o.score.toLocaleString()} pts</span>`:""}</div>
+    ${o.timed?`<div class="row" style="gap:10px"><div class="timer" style="flex:1"><i></i></div><span class="secs">${o.secs}</span></div>`:""}
+    <div class="card"><p class="prompt">${esc(q.p)}</p>${q.d?`<table class="data">${q.d.map(([l,v])=>`<tr><td>${esc(l)}</td><td>${money(v)}</td></tr>`).join("")}</table>`:""}</div>
+    <div class="opts">${q.opts.map((v,i)=>`<button class="opt" data-i="${i}" style="--oc:${COLORS[i]}"><span class="sh">${SHAPES[i]}</span><span>${optHTML(v)}</span></button>`).join("")}</div>
+    <div class="fbbox"></div></div>`;
+  const t0=performance.now();let done=false;
+  const pick=(i)=>{if(done)return;done=true;stopTick();const ms=performance.now()-t0;o.onAnswer(i,ms)};
+  el.querySelectorAll(".opt").forEach(b=>b.onclick=()=>pick(+b.dataset.i));
+  if(o.timed){
+    const bar=el.querySelector(".timer i"),sec=el.querySelector(".secs"),tm=el.querySelector(".timer");let last=o.secs;
+    TICK=setInterval(()=>{const left=Math.max(0,o.secs-(performance.now()-t0)/1000);bar.style.transform=`scaleX(${left/o.secs})`;const c=Math.ceil(left);if(c!==last){last=c;sec.textContent=c;if(c<=3&&c>0)beep(880,.05)}tm.classList.toggle("low",left<=5);if(left<=0)pick(-1)},100);
+  }
+  KEYPICK=(i)=>{const b=el.querySelector(`.opt[data-i="${i}"]`);if(b&&!b.disabled)b.click()};
+  if(!o.noFit){setFit(true);requestAnimationFrame(fitHost)}
+  return {lock(){done=true;stopTick();el.querySelectorAll(".opt").forEach(b=>b.disabled=true)}};
+}
+function showAnswer(el,q,choice,ok,pts,extra){
+  el.querySelectorAll(".opt").forEach((b,i)=>{b.disabled=true;if(i===q.ans)b.classList.add("right");else b.classList.add("dim");if(i===choice&&!ok)b.classList.add("pick")});
+  const fb=el.querySelector(".fbbox");
+  requestAnimationFrame(()=>{if(document.body.classList.contains("fit"))fitHost()});
+  fb.innerHTML=`<div class="fb ${ok?"":"no"}">${pts!=null?`<span class="pts">+${pts}</span>`:""}<b>${ok?"Correct!":choice<0?"Time's up. Answer: "+esc(optText(q.opts[q.ans])):"Not quite. Answer: "+esc(optText(q.opts[q.ans]))}</b>${esc(q.x)}</div>${extra||""}`;
+}
+let KEYPICK=null,KEYNEXT=null;
+document.addEventListener("keydown",e=>{
+  if(e.target.tagName==="INPUT")return;
+  const k=e.key.toLowerCase(),i="abcd".indexOf(k)>=0?"abcd".indexOf(k):"1234".indexOf(k);
+  if(i>=0&&k.length===1&&KEYPICK){KEYPICK(i);return}
+  if((e.key===" "||e.key==="Enter")&&KEYNEXT){e.preventDefault();KEYNEXT()}
+});
+
+/* ============================================================ HOME */
+const CFG=window.LIVE_CONFIG||null;
+const MOCK=/[?&]mock=1/.test(location.search);
+const ROLE=window.BRL_ROLE||"student";
+const hdr=()=>`<h1 class="title">Bank Rec <span>Live.</span></h1>
+  <p class="lede">${ROLE==="teacher"?"Teacher screen. Put this on the projector, create a game, and students join on their devices with the code. Six rounds on bank reconciliations; right answers earn 600 points plus up to 400 for speed, wrong answers earn 0.":"Six quick rounds on bank reconciliations, run by your teacher. Right answers earn 600 points plus up to 400 more for speed. Wrong answers earn 0, so accuracy comes first. At the end you get a report on what to practice, and you can practice it right here."}</p>`;
+function home(){
+  stopTick();KEYPICK=KEYNEXT=null;setFit(false);$("#who").hidden=true;
+  ROLE==="teacher"?hostSetup():joinForm();
+}
+
+/* ============================================================ SOLO */
+let SOLO=null;
+function soloStart(){
+  app.innerHTML=`<div class="panel"><h2>What's your name?</h2><p>First name and last initial is perfect.</p>
+    <input class="field" id="nm" maxlength="24" autocomplete="off" placeholder="Jordan M.">
+    <div class="err" id="er"></div><button class="btn main" id="go">Start</button> <button class="btn" id="back">Back</button></div>`;
+  const nm=$("#nm");nm.focus();
+  const go=()=>{const n=nm.value.trim();if(!n){$("#er").textContent="Type your name first.";return}
+    timeMult=1;SOLO={name:n,ids:buildGame(3,Math.floor(Math.random()*1e9)),seed:Math.floor(Math.random()*1e9),i:0,score:0,log:[]};
+    $("#who").textContent=n;$("#who").hidden=false;soloNext()};
+  $("#go").onclick=go;nm.onkeydown=e=>{if(e.key==="Enter")go()};$("#back").onclick=home;
+}
+function interstitial(sk,roundNo,total,cb){
+  const S=SKILLS[sk];setFit(false);
+  app.innerHTML=`<div class="interstitial"><div class="r">Round ${roundNo} of ${total}</div><h2>${esc(S.name)}</h2><p>${esc(S.desc)} ${secsLabel(sk)}</p><button class="btn main" id="go">Go</button></div>`;
+  KEYPICK=null;KEYNEXT=()=>{KEYNEXT=null;cb()};$("#go").onclick=KEYNEXT;$("#go").focus();
+}
+const secsLabel=sk=>`${Math.round(SKILLS[sk].secs*timeMult)} seconds per question.`;
+function soloNext(){
+  const s=SOLO;if(s.i>=s.ids.length)return report(s.name,s.log,s.score,null);
+  const q=inst(byId[s.ids[s.i]],s.seed);
+  const first=s.i===0||byId[s.ids[s.i-1]].sk!==q.sk;
+  const go=()=>{
+    const secs=secsFor(q),per=s.ids.filter(id=>byId[id].sk===q.sk).length,k=s.ids.slice(0,s.i+1).filter(id=>byId[id].sk===q.sk).length;
+    const view=renderQuestion(app,q,{label:SKILLS[q.sk].name,num:`Question ${k} of ${per}`,score:s.score,timed:true,secs,onAnswer:(c,ms)=>{
+      const ok=c===q.ans,pts=points(ok,ms,secs);s.score+=pts;s.log.push({sk:q.sk,ok,ms});ok?beep(990,.15):beep(200,.3);
+      showAnswer(app,q,c,ok,pts,`<div class="row next" style="justify-content:flex-end;margin-top:10px"><button class="btn main" id="nx">${s.i===s.ids.length-1?"See my report":"Next"}</button></div>`);
+      app.querySelector(".score").textContent=s.score.toLocaleString()+" pts";
+      KEYPICK=null;KEYNEXT=()=>{KEYNEXT=null;s.i++;soloNext()};$("#nx").onclick=KEYNEXT;$("#nx").focus({preventScroll:true});
+    }});
+  };
+  if(first){const roundNo=ORDER.indexOf(q.sk)+1;interstitial(q.sk,roundNo,ORDER.length,go)}else go();
+}
+
+/* ============================================================ REPORT + PRACTICE */
+function report(name,log,score,rank){
+  stopTick();setFit(false);KEYPICK=null;
+  const by={};ORDER.forEach(k=>by[k]={n:0,r:0,ms:0});
+  log.forEach(a=>{const b=by[a.sk];if(!b)return;b.n++;if(a.ok)b.r++;b.ms+=a.ms});
+  const n=log.length,r=log.filter(a=>a.ok).length,avg=n?log.reduce((t,a)=>t+a.ms,0)/n/1000:0;
+  const weak=ORDER.filter(k=>by[k].n&&by[k].r<by[k].n).sort((a,b)=>(by[a].r/by[a].n)-(by[b].r/by[b].n)||by[b].n-by[a].n).slice(0,3);
+  const slow=ORDER.filter(k=>by[k].n&&by[k].r===by[k].n).sort((a,b)=>(by[b].ms/by[b].n/SKILLS[b].secs)-(by[a].ms/by[a].n/SKILLS[a].secs))[0];
+  const tips=weak.map(k=>`<div class="tip" data-sk="${k}"><div class="t"><b>${esc(SKILLS[k].short)}: ${by[k].r} of ${by[k].n} right</b>${esc(SKILLS[k].tip)} <span class="done" data-done="${k}"></span></div><button class="btn main prac" data-sk="${k}" style="font-size:19px;padding:8px 18px">Practice this now</button></div>`).join("");
+  const perfect=!weak.length&&n;
+  app.innerHTML=`<div class="rep">
+    <h2>${esc(name)}: ${score.toLocaleString()} points</h2>
+    <div class="stats">
+      <div class="stat"><b>${r} / ${n}</b><span>Correct</span></div>
+      <div class="stat"><b>${n?Math.round(r/n*100):0}%</b><span>Accuracy</span></div>
+      <div class="stat"><b>${avg.toFixed(1)}s</b><span>Avg time</span></div>
+      ${rank?`<div class="stat"><b>#${rank}</b><span>Class rank</span></div>`:""}
+    </div>
+    <div class="skills">${ORDER.filter(k=>by[k].n).map(k=>{const p=by[k].r/by[k].n;return `<div class="sk"><span><b>${esc(SKILLS[k].short)}</b></span><div class="bar"><i class="${p>=.99?"":p>=.5?"mid":"lo"}" style="width:${Math.max(4,p*100)}%"></i></div><span class="v">${by[k].r} / ${by[k].n}</span></div>`}).join("")}</div>
+    <div class="todo"><h3>${perfect?"What to work on":"Practice these next"}</h3>
+      ${perfect?`<div class="tip"><div class="t"><b>Every answer right. Nice work.</b>Your next goal is speed. ${slow?`Your slowest round was ${esc(SKILLS[slow].short)}. `:""}Next game, try to beat ${score.toLocaleString()}.</div></div>`:tips}
+    </div>
+    <div class="links">More practice on the site: <a href="practice-ch6-bank-rec">Bank Rec Practice</a> · <a href="practice-ch6-side-by-side">Side-by-Side Recs</a> · <a href="chapter-6">Make It Match game</a> · <a href="#" id="home2">Join another game</a></div>
+  </div>`;
+  app.querySelectorAll(".prac").forEach(b=>b.onclick=()=>practice(b.dataset.sk,()=>{report(name,log,score,rank);const pr=PRACTICED[b.dataset.sk];if(pr){const d=app.querySelector(`[data-done="${b.dataset.sk}"]`);if(d)d.textContent=`Practiced: ${pr.r} of ${pr.n} right.`}}));
+  const ag=$("#again");if(ag)ag.onclick=soloStart;
+  $("#home2").onclick=e=>{e.preventDefault();home()};
+  // restore practice marks
+  Object.entries(PRACTICED).forEach(([k,pr])=>{const d=app.querySelector(`[data-done="${k}"]`);if(d)d.textContent=`Practiced: ${pr.r} of ${pr.n} right.`});
+  window.scrollTo(0,0);
+}
+const PRACTICED={};
+function practice(sk,back){
+  const ids=shuffle(BANK.filter(q=>q.sk===sk).map(q=>q.id)).slice(0,5);let i=0,r=0;const seed=Math.floor(Math.random()*1e9);
+  const step=()=>{
+    if(i>=ids.length){PRACTICED[sk]={r,n:ids.length};setFit(false);
+      app.innerHTML=`<div class="interstitial"><div class="r">Practice: ${esc(SKILLS[sk].short)}</div><h2>${r} of ${ids.length}</h2><p>${r===ids.length?"All right. That skill is back on track.":"Read the tip once more, then try another set or head back."}</p><div class="row" style="justify-content:center"><button class="btn main" id="bk">Back to my report</button><button class="btn" id="more">Practice again</button></div></div>`;
+      KEYPICK=null;KEYNEXT=()=>{KEYNEXT=null;back()};$("#bk").onclick=KEYNEXT;$("#more").onclick=()=>practice(sk,back);return}
+    const q=inst(byId[ids[i]],seed);
+    renderQuestion(app,q,{label:"Practice: "+SKILLS[sk].short,num:`${i+1} of ${ids.length} · no clock`,timed:false,onAnswer:(c)=>{
+      const ok=c===q.ans;if(ok)r++;
+      showAnswer(app,q,c,ok,null,`<div class="row" style="justify-content:flex-end;margin-top:10px"><button class="btn main" id="nx">Next</button></div>`);
+      KEYPICK=null;KEYNEXT=()=>{KEYNEXT=null;i++;step()};$("#nx").onclick=KEYNEXT;
+    }});
+  };
+  step();
+}
+
+/* ============================================================ LIVE BACKEND */
+function mockNet(){
+  const KEY="bankRecLiveMock",bc=("BroadcastChannel" in window)?new BroadcastChannel(KEY):null,subs=[];
+  const read=()=>{try{return JSON.parse(localStorage.getItem(KEY)||"{}")}catch(e){return{}}};
+  const write=t=>{localStorage.setItem(KEY,JSON.stringify(t));fire();if(bc)bc.postMessage(1)};
+  const at=(t,p)=>p.split("/").filter(Boolean).reduce((o,k)=>o==null?undefined:o[k],t);
+  const put=(t,p,v)=>{const ks=p.split("/").filter(Boolean);let o=t;ks.slice(0,-1).forEach(k=>{if(typeof o[k]!=="object"||o[k]===null)o[k]={};o=o[k]});if(v===null)delete o[ks[ks.length-1]];else o[ks[ks.length-1]]=v};
+  const fire=()=>{const t=read();subs.forEach(s=>{const v=JSON.stringify(at(t,s.p)??null);if(v!==s.last){s.last=v;s.cb(JSON.parse(v))}})};
+  if(bc)bc.onmessage=fire;window.addEventListener("storage",e=>{if(e.key===KEY)fire()});
+  return{
+    kind:"mock",
+    get:async p=>at(read(),p)??null,
+    set:async(p,v)=>{const t=read();put(t,p,v);write(t)},
+    update:async(p,o)=>{const t=read();Object.entries(o).forEach(([k,v])=>put(t,p+"/"+k,v));write(t)},
+    remove:async p=>{const t=read();put(t,p,null);write(t)},
+    on:(p,cb)=>{const s={p,cb,last:undefined};subs.push(s);setTimeout(fire,0);return()=>{const i=subs.indexOf(s);if(i>=0)subs.splice(i,1)}}
+  };
+}
+async function vercelNet(){
+  const call=async(op,path,v)=>{const r=await fetch("/api/live",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({op,path,v})});
+    const j=await r.json().catch(()=>({}));if(!r.ok)throw new Error(j.error||r.status);return j};
+  try{const p=await call("ping");if(!p.ok)return null}catch(e){return null}
+  return{kind:"vercel",
+    get:async p=>(await call("get",p)).v??null,
+    set:(p,v)=>call("set",p,v),
+    update:(p,o)=>call("update",p,o),
+    remove:p=>call("remove",p),
+    on:(p,cb)=>{let last,stop=false,t;
+      const tick=async()=>{if(stop)return;
+        if(!document.hidden){try{const v=(await call("get",p)).v??null,s=JSON.stringify(v);if(s!==last){last=s;cb(v)}}catch(e){}}
+        if(!stop)t=setTimeout(tick,1200)};
+      tick();return()=>{stop=true;clearTimeout(t)}}};
+}
+function loadScript(src){return new Promise((res,rej)=>{const s=document.createElement("script");s.src=src;s.onload=res;s.onerror=rej;document.head.appendChild(s)})}
+let NET=null;
+async function net(){
+  if(NET)return NET;
+  if(MOCK){NET=mockNet();return NET}
+  if(!CFG){NET=await vercelNet();return NET}
+  await loadScript("https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js");
+  await loadScript("https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js");
+  const fb=window.firebase;if(!fb.apps.length)fb.initializeApp(CFG);const db=fb.database();
+  NET={kind:"firebase",
+    get:async p=>(await db.ref(p).get()).val(),
+    set:(p,v)=>db.ref(p).set(v),
+    update:(p,o)=>db.ref(p).update(o),
+    remove:p=>db.ref(p).remove(),
+    on:(p,cb)=>{const r=db.ref(p),h=s=>cb(s.val());r.on("value",h);return()=>r.off("value",h)}};
+  return NET;
+}
+function needSetup(){
+  app.innerHTML=`${hdr()}<div class="panel" style="margin-top:0">${ROLE==="teacher"?`<h2>Class games need a one-time setup</h2>
+  <p>In Vercel, open this project, go to <b>Storage</b>, add <b>Upstash for Redis</b> (free plan), connect it to the project, then redeploy.</p>`:`<h2>The class game isn't open yet</h2><p>Wait for your teacher to start it, then reload this page.</p>`}
+  <button class="btn main" id="b">Reload</button></div>`;$("#b").onclick=()=>location.reload();
+}
+
+/* ============================================================ LIVE: HOST */
+let HOST=null;
+let ZOOM=false;
+function zoomApp(){const a=$("#app");a.style.zoom="";ZOOM=true;const R=document.documentElement;let lo=1,hi=2.4;
+  for(let i=0;i<12;i++){const m=(lo+hi)/2;a.style.zoom=m.toFixed(3);(R.scrollHeight<=innerHeight+1&&R.scrollWidth<=innerWidth+1)?lo=m:hi=m}
+  a.style.zoom=lo.toFixed(3)}
+function setFit(on){ZOOM=false;document.body.classList.remove("wide");$("#app").style.zoom="";document.body.classList.toggle("fit",on);if(!on)document.documentElement.style.setProperty("--k",1)}
+function fitHost(){
+  if(!document.body.classList.contains("fit"))return;
+  const R=document.documentElement;let lo=.6,hi=2.4;
+  for(let i=0;i<12;i++){const m=(lo+hi)/2;R.style.setProperty("--k",m.toFixed(3));(R.scrollHeight<=innerHeight+1&&R.scrollWidth<=innerWidth+1)?lo=m:hi=m}
+  R.style.setProperty("--k",lo.toFixed(3));
+}
+window.addEventListener("resize",()=>{clearTimeout(fitHost.t);fitHost.t=setTimeout(()=>{ZOOM?zoomApp():fitHost()},120)});
+async function hostSetup(){
+  const N=await net().catch(()=>null);if(!N)return needSetup();
+  let per=3,mult=1;
+  app.innerHTML=`${hdr()}<div class="panel" style="margin-top:0"><h2>Host a class game</h2>
+    <p>Questions per round (6 rounds):</p><div class="seg" id="sp"><button data-v="2">2 (12 total)</button><button data-v="3" aria-pressed="true">3 (18 total)</button><button data-v="4">4 (24 total)</button></div>
+    <p>Time:</p><div class="seg" id="st"><button data-v="1" aria-pressed="true">Standard</button><button data-v="1.5">Extra time (+50%)</button><button data-v="2">Double time</button></div>
+    <p class="note">Standard: 15 seconds to sort, 20 for errors, entries and concepts, 25 for error hunt, 40 for the math round.</p>
+    <div class="err" id="er"></div><button class="btn main" id="go">Create game</button></div>`;
+  const seg=(id,set)=>$(id).onclick=e=>{const b=e.target.closest("button");if(!b)return;[...$(id).children].forEach(x=>x.setAttribute("aria-pressed",x===b));set(+b.dataset.v)};
+  seg("#sp",v=>per=v);seg("#st",v=>mult=v);
+  $("#go").onclick=async()=>{
+    $("#go").disabled=true;
+    try{
+      let code;for(let t=0;t<20;t++){code=String(Math.floor(1000+Math.random()*9000));if(!(await N.get("games/"+code)))break}
+      const seed=Math.floor(Math.random()*1e9),ids=buildGame(per,seed);
+      await N.set("games/"+code,{created:Date.now(),seed,ids,mult,state:{phase:"lobby",qi:-1}});
+      HOST={N,code,seed,ids,mult,players:{},state:{phase:"lobby",qi:-1}};timeMult=mult;
+      HOST.off=N.on("games/"+code+"/players",v=>{HOST.players=v||{};hostRender()});
+      hostRender();
+    }catch(e){$("#er").textContent="Couldn't reach the live database. Check live-config.js and the database rules.";$("#go").disabled=false}
+  };
+}
+function hostSet(state){HOST.state=state;HOST.N.set("games/"+HOST.code+"/state",state);hostRender()}
+function playersArr(){return Object.entries(HOST.players).map(([id,p])=>({id,...p,score:p.score||0}))}
+function answered(qi){return playersArr().filter(p=>p.a&&p.a[qi]).length}
+function hostRender(){
+  const H=HOST,st=H.state;KEYPICK=null;
+  if(st.phase==="lobby"){
+    setFit(false);
+    const ps=playersArr();
+    app.innerHTML=`<div class="lobby"><div class="join">Go to the accounting site, open <b>Bank Rec Live</b>, and enter</div>
+      <div class="code">${H.code}</div>
+      <div class="count">${ps.length} player${ps.length===1?"":"s"} joined</div>
+      <div class="names">${ps.map(p=>`<span>${esc(p.name)}</span>`).join("")||'<span style="opacity:.5">Waiting for players…</span>'}</div>
+      <button class="btn main" id="start" ${ps.length?"":"disabled"}>Start game</button> <button class="btn" id="end">Cancel</button></div>`;
+    $("#start").onclick=()=>hostQuestion(0);$("#end").onclick=hostErase;requestAnimationFrame(zoomApp);return;
+  }
+  if(st.phase==="intro"){
+    setFit(false);const sk=byId[H.ids[st.qi]].sk;
+    app.innerHTML=`<div class="interstitial"><div class="r">Round ${ORDER.indexOf(sk)+1} of ${ORDER.length}</div><h2>${esc(SKILLS[sk].name)}</h2><p>${esc(SKILLS[sk].desc)} ${secsLabel(sk)}</p><button class="btn main" id="go">Show question</button></div>`;
+    KEYNEXT=()=>{KEYNEXT=null;hostSet({phase:"question",qi:st.qi,t:Date.now()})};$("#go").onclick=KEYNEXT;requestAnimationFrame(zoomApp);return;
+  }
+  const q=inst(byId[H.ids[st.qi]],H.seed),secs=secsFor(q),total=playersArr().length;
+  if(st.phase==="question"){
+    setFit(true);
+    if(H.rq!==st.qi){H.rq=st.qi;H.qStart=performance.now();
+      renderQuestion(app,q,{label:SKILLS[q.sk].name,num:`Question ${st.qi+1} of ${H.ids.length}`,timed:true,secs,onAnswer:()=>{}});
+      app.querySelectorAll(".opt").forEach(b=>b.disabled=true);
+      const fb=app.querySelector(".fbbox");fb.innerHTML=`<div class="row" style="justify-content:space-between"><span class="count" id="cnt"></span><button class="btn" id="skip">Show answer now</button></div>`;
+      $("#skip").onclick=()=>hostSet({phase:"reveal",qi:st.qi});
+      clearInterval(H.watch);H.watch=setInterval(()=>{if(H.state.phase!=="question"){clearInterval(H.watch);return}if((performance.now()-H.qStart)/1000>=secs+0.6)hostSet({phase:"reveal",qi:st.qi})},200);
+      KEYNEXT=()=>hostSet({phase:"reveal",qi:st.qi});
+      requestAnimationFrame(fitHost);
+    }
+    const a=answered(st.qi);const c=$("#cnt");if(c)c.textContent=`${a} of ${total} answered`;
+    if(total&&a>=total)hostSet({phase:"reveal",qi:st.qi});
+    return;
+  }
+  if(st.phase==="reveal"){
+    stopTick();clearInterval(H.watch);setFit(true);
+    const counts=[0,0,0,0];playersArr().forEach(p=>{const x=p.a&&p.a[st.qi];if(x&&x.c>=0)counts[x.c]++});
+    const mx=Math.max(1,...counts);
+    renderQuestion(app,q,{label:SKILLS[q.sk].name,num:`Question ${st.qi+1} of ${H.ids.length}`,timed:false,onAnswer:()=>{}});
+    showAnswer(app,q,-2,true,null,"");
+    const fb=app.querySelector(".fb");fb.querySelector("b").textContent="Answer: "+optText(q.opts[q.ans]);
+    const top=playersArr().sort((a,b)=>b.score-a.score).slice(0,5);
+    const last=st.qi>=H.ids.length-1;
+    app.querySelector(".fbbox").insertAdjacentHTML("beforeend",`
+      <div class="dist" style="margin-top:12px">${counts.map((n,i)=>`<div class="${i===q.ans?"":"wrong"}" style="--oc:${COLORS[i]};background:${COLORS[i]};height:${Math.max(18,n/mx*100)}%">${SHAPES[i]} ${n}</div>`).join("")}</div>
+      <div class="lb" style="margin-top:12px">${top.map((p,i)=>`<div><span class="p">${i+1}</span>${esc(p.name)}<span class="s">${p.score.toLocaleString()}</span></div>`).join("")}</div>
+      <div class="row" style="justify-content:flex-end;margin-top:10px"><button class="btn main" id="nx">${last?"Final results":"Next question"}</button></div>`);
+    KEYNEXT=()=>{KEYNEXT=null;last?hostSet({phase:"end",qi:st.qi}):hostQuestion(st.qi+1)};$("#nx").onclick=KEYNEXT;
+    requestAnimationFrame(fitHost);return;
+  }
+  if(st.phase==="end"){
+    setFit(false);stopTick();
+    const ps=playersArr().sort((a,b)=>b.score-a.score);
+    const by={};ORDER.forEach(k=>by[k]={n:0,r:0});
+    ps.forEach(p=>Object.entries(p.a||{}).forEach(([qi,x])=>{const sk=byId[H.ids[qi]]&&byId[H.ids[qi]].sk;if(sk){by[sk].n++;if(x.ok)by[sk].r++}}));
+    const weak=ORDER.filter(k=>by[k].n).sort((a,b)=>by[a].r/by[a].n-by[b].r/by[b].n).slice(0,2);
+    app.innerHTML=`<div class="rep"><h2 style="text-align:center">Final standings${ps.length>10?" (top 10)":""}</h2>
+      <div class="endgrid"><div class="lb" style="margin:0 auto;align-content:start">${ps.slice(0,10).map((p,i)=>`<div style="${i<3?"font-size:"+(32-i*3)+"px":""}"><span class="p">${i+1}</span>${esc(p.name)}<span class="s">${p.score.toLocaleString()}</span></div>`).join("")}</div>
+      <div><div class="skills" style="margin:0"><div style="font-family:var(--display);font-size:22px;font-weight:600;padding:6px 0">Class results by skill</div>
+      ${ORDER.filter(k=>by[k].n).map(k=>{const p=by[k].r/by[k].n;return `<div class="sk"><span><b>${esc(SKILLS[k].short)}</b></span><div class="bar"><i class="${p>=.85?"":p>=.6?"mid":"lo"}" style="width:${Math.max(4,p*100)}%"></i></div><span class="v">${Math.round(p*100)}%</span></div>`}).join("")}</div>
+      <div class="todo" style="margin:14px 0 0"><h3>Reteach first</h3>${weak.map(k=>`<div class="tip"><div class="t"><b>${esc(SKILLS[k].short)}: ${Math.round(by[k].r/by[k].n*100)}% correct</b>${esc(SKILLS[k].tip)}</div></div>`).join("")}</div></div></div>
+      <p class="note" style="text-align:center">Each student now sees their own report and practice on their device.</p>
+      <div class="row" style="justify-content:center"><button class="btn main" id="erase">Erase this game's data</button> <button class="btn" id="home3">Done</button></div></div>`;
+    $("#erase").onclick=hostErase;$("#home3").onclick=()=>{cleanupHost();home()};document.body.classList.add("wide");requestAnimationFrame(zoomApp);
+  }
+}
+function hostQuestion(qi){
+  const prev=qi>0?byId[HOST.ids[qi-1]].sk:null,sk=byId[HOST.ids[qi]].sk;
+  hostSet(prev!==sk?{phase:"intro",qi}:{phase:"question",qi,t:Date.now()});
+}
+function cleanupHost(){if(HOST){clearInterval(HOST.watch);HOST.off&&HOST.off()}}
+async function hostErase(){if(!HOST)return home();cleanupHost();try{await HOST.N.remove("games/"+HOST.code)}catch(e){}HOST=null;home()}
+
+/* ============================================================ LIVE: STUDENT */
+let ME=null;
+async function joinForm(){
+  const N=await net().catch(()=>null);if(!N)return needSetup();
+  app.innerHTML=`${hdr()}<div class="panel" style="margin-top:0"><h2>Join a class game</h2><p>Type the code on the board and your name (first name and last initial).</p>
+    <input class="field code" id="cd" inputmode="numeric" maxlength="4" placeholder="0000" autocomplete="off">
+    <input class="field" id="nm" maxlength="24" placeholder="Jordan M." autocomplete="off">
+    <div class="err" id="er"></div><button class="btn main" id="go">Join</button></div>`;
+  $("#cd").focus();
+  const go=async()=>{
+    const code=$("#cd").value.trim(),name=$("#nm").value.trim();
+    if(!/^\d{4}$/.test(code)){$("#er").textContent="The code is 4 numbers.";return}
+    if(!name){$("#er").textContent="Type your name.";return}
+    $("#go").disabled=true;
+    try{
+      const g=await N.get("games/"+code);
+      if(!g){$("#er").textContent="No game with that code. Check the board.";$("#go").disabled=false;return}
+      if(g.state&&g.state.phase!=="lobby"&&g.state.phase!=="intro"&&g.state.qi>0){/* late join is allowed */}
+      const pid="p"+Math.random().toString(36).slice(2,10);
+      await N.set(`games/${code}/players/${pid}`,{name,score:0,joined:Date.now()});
+      ME={N,code,pid,name,seed:g.seed,ids:g.ids,score:0,log:[],answered:{},state:null};timeMult=g.mult||1;
+      $("#who").textContent=name;$("#who").hidden=false;
+      ME.off=N.on(`games/${code}/state`,st=>{if(!st){joinGone();return}ME.state=st;joinRender()});
+    }catch(e){$("#er").textContent="Couldn't connect. Try again.";$("#go").disabled=false}
+  };
+  $("#go").onclick=go;$("#nm").onkeydown=e=>{if(e.key==="Enter")go()};
+}
+function joinGone(){stopTick();if(ME&&ME.off)ME.off();const was=ME;ME=null;
+  if(was&&was.log.length)report(was.name,was.log,was.score,null);else{app.innerHTML=`<div class="wait"><h2>The game has ended</h2><p>Your teacher closed this game.</p><button class="btn main" id="h">OK</button></div>`;$("#h").onclick=home}}
+function joinRender(){
+  const M=ME,st=M.state;if(!st)return;if(st.phase!=="question")setFit(false);
+  if(st.phase==="lobby"){app.innerHTML=`<div class="wait"><h2>You're in, ${esc(M.name)}!</h2><p>Watch the board. The game starts soon.</p></div>`;return}
+  if(st.phase==="intro"){stopTick();const sk=byId[M.ids[st.qi]].sk;app.innerHTML=`<div class="wait"><div class="r" style="color:var(--accent);font-family:var(--display);letter-spacing:.1em">ROUND ${ORDER.indexOf(sk)+1}</div><h2>${esc(SKILLS[sk].name)}</h2><p>${esc(SKILLS[sk].desc)}</p><div class="big">${M.score.toLocaleString()}</div><p>points so far</p></div>`;return}
+  const q=inst(byId[M.ids[st.qi]],M.seed),secs=secsFor(q);
+  if(st.phase==="question"){
+    if(M.answered[st.qi]){if(M.rq!==st.qi+"w"){M.rq=st.qi+"w";setFit(false);app.innerHTML=`<div class="wait"><h2>Answer locked in</h2><p>Waiting for everyone else…</p></div>`}return}
+    if(M.rq===st.qi)return;M.rq=st.qi;
+    renderQuestion(app,q,{label:SKILLS[q.sk].name,num:`Question ${st.qi+1} of ${M.ids.length}`,score:M.score,timed:true,secs,onAnswer:(c,ms)=>{
+      if(M.answered[st.qi])return;
+      const ok=c===q.ans,pts=points(ok,ms,secs);M.answered[st.qi]={c,ok,pts,ms};M.score+=pts;M.log.push({sk:q.sk,ok,ms});
+      M.N.update(`games/${M.code}/players/${M.pid}`,{score:M.score,["a/"+st.qi]:{c,ok,ms:Math.round(ms),pts}});
+      setFit(false);app.innerHTML=`<div class="wait"><h2>Answer locked in</h2><p>Waiting for everyone else…</p></div>`;M.rq=st.qi+"w";
+    }});
+    return;
+  }
+  if(st.phase==="reveal"){
+    stopTick();
+    if(M.rq===st.qi+"r")return;M.rq=st.qi+"r";
+    let a=M.answered[st.qi];
+    if(!a){a={c:-1,ok:false,pts:0,ms:secs*1000};M.answered[st.qi]=a;M.log.push({sk:q.sk,ok:false,ms:secs*1000});M.N.update(`games/${M.code}/players/${M.pid}`,{["a/"+st.qi]:{c:-1,ok:false,ms:secs*1000,pts:0}})}
+    app.innerHTML=`<div class="wait"><h2 style="color:${a.ok?"var(--good)":"var(--bad)"}">${a.ok?"Correct!":a.c<0?"Time's up":"Not quite"}</h2><div class="big">+${a.pts}</div><p>${a.ok?"":"Answer: "+esc(optText(q.opts[q.ans]))+"<br>"}${esc(q.x)}</p><p><b>${M.score.toLocaleString()}</b> points total</p></div>`;
+    return;
+  }
+  if(st.phase==="end"){
+    stopTick();if(M.rq==="end")return;M.rq="end";
+    M.N.get(`games/${M.code}/players`).then(ps=>{const arr=Object.values(ps||{}).map(p=>p.score||0).sort((a,b)=>b-a);const rank=arr.indexOf(M.score)+1;if(M.off)M.off();const keep=M;ME=null;report(keep.name,keep.log,keep.score,rank||null)}).catch(()=>{const keep=M;ME=null;report(keep.name,keep.log,keep.score,null)});
+  }
+}
+
+home();
+</script>
+</body>
+</html>
