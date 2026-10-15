@@ -133,9 +133,6 @@ h1.title span{color:var(--accent)}
 .lb div .p{width:2em;color:var(--muted);font-family:var(--display)}
 .lb div .s{margin-left:auto;font-family:var(--display)}
 .lb div.me{border-color:var(--red)}
-.dist{display:grid;grid-template-columns:repeat(4,1fr);gap:calc(10px * var(--k));align-items:end;height:calc(130px * var(--k))}
-.dist div{background:var(--oc);border-radius:8px 8px 0 0;color:#fff;font-family:var(--display);font-weight:700;font-size:calc(22px * var(--k));display:flex;align-items:flex-start;justify-content:center;padding-top:4px;min-height:calc(34px * var(--k))}
-.dist div.wrong{opacity:.35}
 body.wide .wrap{max-width:min(96vw,1500px)}
 body.fit .wrap{max-width:min(98vw,2200px)}
 body.fit .top{font-size:calc(14px * var(--k))}
@@ -153,11 +150,12 @@ body.finale-on{overflow:hidden}
 body.finale-on .top{visibility:hidden}
 .finale{position:fixed;inset:0;z-index:50;background:radial-gradient(120% 80% at 50% 110%,#5a0614 0%,#1a0207 45%,#070707 100%);color:#fff;display:grid;grid-template-rows:auto 1fr auto auto;justify-items:center;padding:2.2vh 3vw 2vh;overflow:hidden}
 .finale canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:1}
-.finale .rays{position:absolute;left:50%;top:62%;width:160vmax;height:160vmax;transform:translate(-50%,-50%);background:repeating-conic-gradient(from 0deg,rgba(255,201,60,.07) 0deg 8deg,transparent 8deg 22deg);animation:spin 60s linear infinite;z-index:0;mask:radial-gradient(circle,#000 0%,transparent 55%);-webkit-mask:radial-gradient(circle,#000 0%,transparent 55%)}
+.finale .rays{position:absolute;left:50%;top:62%;width:160vmax;height:160vmax;transform:translate(-50%,-50%);background:repeating-conic-gradient(from 0deg,rgba(255,255,255,.05) 0deg 8deg,transparent 8deg 22deg);animation:spin 60s linear infinite;z-index:0;mask:radial-gradient(circle,#000 0%,transparent 55%);-webkit-mask:radial-gradient(circle,#000 0%,transparent 55%)}
 @keyframes spin{to{transform:translate(-50%,-50%) rotate(360deg)}}
 .fhead{position:relative;z-index:2;text-align:center}
+.fhead .lg{height:clamp(34px,6vh,64px);display:block;margin:0 auto 1vh;border-radius:4px}
 .fhead .kick{font-family:var(--display);letter-spacing:.3em;text-transform:uppercase;color:#FF4D63;font-size:clamp(14px,2.2vh,26px)}
-.fhead h2{font-family:var(--display);font-weight:700;font-size:clamp(48px,10vh,130px);line-height:.95;margin:0;background:linear-gradient(180deg,#fff 30%,#FFC93C);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 4px 18px rgba(193,16,47,.6))}
+.fhead h2{font-family:var(--display);font-weight:700;font-size:clamp(48px,10vh,130px);line-height:.95;margin:0;background:linear-gradient(180deg,#fff 45%,#F4B6C0);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 4px 18px rgba(193,16,47,.6))}
 .podium{position:relative;z-index:2;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));align-items:end;gap:1.6vw;width:min(92vw,1500px);align-self:end}
 .pod{display:flex;flex-direction:column;align-items:center;opacity:0;transform:translateY(40px) scale(.9);transition:opacity .5s, transform .7s cubic-bezier(.2,1.6,.4,1)}
 .pod.in{opacity:1;transform:none}
@@ -168,7 +166,7 @@ body.finale-on .top{visibility:hidden}
 .p2 .medal{background:radial-gradient(circle at 35% 30%,#FFFFFF,#CFD6DD 55%,#8C98A3)}
 .p3 .medal{background:radial-gradient(circle at 35% 30%,#FFD9B8,#D88B4A 55%,#8E4F1C);color:#2b1300}
 .pod .nm{font-family:var(--display);font-weight:600;font-size:clamp(26px,5.4vh,72px);line-height:1.05;overflow-wrap:anywhere}
-.p1 .nm{font-size:clamp(32px,7vh,96px);color:#FFE08A}
+.p1 .nm{font-size:clamp(32px,7vh,96px);color:#fff;text-shadow:0 0 24px rgba(232,25,60,.8)}
 .pod .pts{font-weight:700;font-size:clamp(18px,3.2vh,40px);opacity:.85}
 .pod .block{width:100%;border-radius:12px 12px 0 0;display:grid;place-items:start center;padding-top:1.4vh;font-family:var(--display);font-weight:700;font-size:clamp(28px,6vh,80px);color:rgba(255,255,255,.92);background:linear-gradient(180deg,#E0213F,#8F0A20);box-shadow:inset 0 3px 0 rgba(255,255,255,.25),0 -10px 40px rgba(193,16,47,.35)}
 .p1 .block{height:26vh;background:linear-gradient(180deg,#F23A55,#A90C26)}
@@ -187,11 +185,66 @@ body.finale-on .top{visibility:hidden}
 .fbar .btn{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.25);color:#fff;font-size:15px;padding:6px 14px}
 @media (max-width:700px){.rest{grid-template-columns:1fr}}
 @media (prefers-reduced-motion: reduce){.finale .rays{animation:none}.pod,.row45{transition:none}.p1.in .who{animation:none}}
+
+/* student live: big answer buttons that fill the screen */
+body.stu-live .wrap{min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;padding-bottom:12px}
+body.stu-live #app{flex:1;display:flex;flex-direction:column}
+body.stu-live .qwrap{flex:1;gap:10px}
+body.stu-live .prompt{font-size:clamp(20px,2.6vh + 1vw,30px)}
+body.stu-live .data{font-size:clamp(17px,2.2vh,24px)}
+body.stu-live .opts{flex:1;grid-auto-rows:minmax(84px,1fr);gap:12px}
+body.stu-live .opt{min-height:0;height:100%;font-size:clamp(20px,2.4vh + .6vw,30px);padding:14px 18px;border-radius:16px;box-shadow:0 6px 0 rgba(0,0,0,.25)}
+body.stu-live .opt:active{transform:translateY(4px);box-shadow:0 2px 0 rgba(0,0,0,.25)}
+body.stu-live .opt .sh{width:48px;height:48px;font-size:26px}
+@media (max-width:760px){body.stu-live .opts{grid-template-columns:1fr}}
+.rejoin{margin-left:8px;background:var(--red);color:#fff;border:0;border-radius:999px;padding:7px 16px;font:700 16px var(--body);cursor:pointer;box-shadow:0 2px 0 rgba(0,0,0,.2)}
+.big-rejoin{font-size:28px;padding:14px 34px}
+.count .kick{display:block;font-size:.6em;color:var(--muted);font-family:var(--body);font-weight:600}
+
+/* per-question scoreboard (projector) */
+body.host-reveal #app{display:grid;grid-template-columns:minmax(0,1fr) minmax(300px,34%);gap:calc(18px * var(--k));align-items:stretch}
+.dist{display:grid;grid-template-columns:repeat(4,1fr);gap:calc(10px * var(--k));align-items:end;height:calc(96px * var(--k));margin-top:calc(10px * var(--k));border-bottom:3px solid var(--ink)}
+.dist div{height:var(--h);background:var(--oc);border-radius:8px 8px 0 0;color:#fff;display:flex;align-items:flex-start;justify-content:center;padding-top:calc(4px * var(--k));min-height:calc(30px * var(--k));transform-origin:bottom;animation:grow .6s cubic-bezier(.2,1.2,.4,1) both}
+.dist div b{font-family:var(--display);font-weight:700;font-size:calc(22px * var(--k))}
+.dist div.wrong{opacity:.3}
+.dist div.ok{box-shadow:0 0 0 3px #fff,0 0 0 6px var(--good)}
+@keyframes grow{from{transform:scaleY(0)}}
+.sb{position:relative;display:flex;flex-direction:column;gap:calc(10px * var(--k));background:linear-gradient(165deg,#1b1b1b 0%,#0c0c0c 60%,#2a0610 100%);color:#fff;border-radius:16px;padding:calc(16px * var(--k)) calc(16px * var(--k)) calc(14px * var(--k));border-top:calc(6px * var(--k)) solid #C1102F;box-shadow:0 18px 40px rgba(0,0,0,.25);overflow:hidden}
+.sb::after{content:"";position:absolute;right:-30%;top:-40%;width:90%;height:90%;background:radial-gradient(circle,rgba(193,16,47,.35),transparent 65%);pointer-events:none}
+.sbh{display:flex;align-items:baseline;justify-content:space-between;gap:8px;position:relative}
+.sbh span{font-family:var(--display);font-weight:700;letter-spacing:.14em;text-transform:uppercase;font-size:calc(22px * var(--k))}
+.sbh small{color:#bdbdbd;font-weight:700;font-size:calc(15px * var(--k))}
+.sbrows{display:flex;flex-direction:column;gap:calc(8px * var(--k));flex:1;position:relative}
+.sbr{display:grid;grid-template-columns:auto minmax(0,1fr) auto;grid-template-rows:auto auto;column-gap:calc(12px * var(--k));row-gap:calc(5px * var(--k));align-items:center;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:calc(9px * var(--k)) calc(12px * var(--k))}
+.sb.anim .sbr{animation:slidein .55s cubic-bezier(.2,1.1,.4,1) both;animation-delay:var(--d)}
+@keyframes slidein{from{opacity:0;transform:translateX(40px)}}
+.sbr .rk{grid-row:1 / 3;width:calc(44px * var(--k));height:calc(44px * var(--k));border-radius:50%;display:grid;place-items:center;font-family:var(--display);font-weight:700;font-size:calc(24px * var(--k));border:2px solid rgba(255,255,255,.35);color:#fff}
+.sbr.r1 .rk{background:radial-gradient(circle at 35% 30%,#FFF3B0,#FFC93C 55%,#C98A00);color:#3b2600;border:0}
+.sbr.r2 .rk{background:radial-gradient(circle at 35% 30%,#fff,#CFD6DD 55%,#8C98A3);color:#222;border:0}
+.sbr.r3 .rk{background:radial-gradient(circle at 35% 30%,#FFD9B8,#D88B4A 55%,#8E4F1C);color:#2b1300;border:0}
+.sbr.r1{background:linear-gradient(90deg,rgba(193,16,47,.45),rgba(193,16,47,.12));border-color:rgba(255,77,99,.55)}
+.sbr .nm{min-width:0;display:flex;align-items:center;gap:calc(8px * var(--k))}
+.sbr .nm b{font-size:calc(24px * var(--k));font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mv{font-style:normal;font-weight:800;font-size:calc(14px * var(--k));padding:1px calc(7px * var(--k));border-radius:999px;white-space:nowrap}
+.mv.up{background:rgba(63,184,106,.2);color:#6EE397}
+.mv.dn{background:rgba(255,77,99,.18);color:#FF8A99}
+.sbr .sc{text-align:right;line-height:1.05}
+.sbr .sc b{display:block;font-family:var(--display);font-weight:700;font-size:calc(26px * var(--k));font-variant-numeric:tabular-nums}
+.sbr .sc em{font-style:normal;font-weight:800;font-size:calc(14px * var(--k));color:#6EE397}
+.sbr .sc em.z{color:#8a8a8a}
+.sbr .bar{grid-column:2 / 4;height:calc(6px * var(--k));background:rgba(255,255,255,.1);border-radius:999px;overflow:hidden}
+.sbr .bar i{display:block;height:100%;width:var(--w);background:linear-gradient(90deg,#C1102F,#FF4D63);border-radius:999px}
+.sbr.r1 .bar i{background:linear-gradient(90deg,#FF4D63,#fff)}
+.sb.anim .sbr .bar i{animation:fillbar 1.2s cubic-bezier(.2,.9,.3,1) both;animation-delay:calc(var(--d) + .4s)}
+@keyframes fillbar{from{width:0}}
+.sb #nx{position:relative;align-self:stretch;font-size:calc(24px * var(--k));padding:calc(10px * var(--k))}
+@media (max-width:900px){body.host-reveal #app{grid-template-columns:1fr}}
+@media (prefers-reduced-motion: reduce){.sb.anim .sbr,.sb.anim .sbr .bar i,.dist div{animation:none}}
 </style>
 </head>
 <body>
 <div class="wrap">
-  <div class="top"><img src="logo-214.png" alt="District 214" class="d214"><a href="/">District 214 Accounting</a> | Chapter 6: Bank Rec Live<span class="sp"></span><span class="pill" id="who" hidden></span></div>
+  <div class="top"><img src="logo-214.png" alt="District 214" class="d214"><a href="/">District 214 Accounting</a> | Chapter 6: Bank Rec Live<span class="sp"></span><span class="pill" id="who" hidden></span><button class="rejoin" id="rejoin" hidden>↻ Rejoin</button></div>
   <main id="app"></main>
 </div>
 <script src="live-config.js"></script>
@@ -500,7 +553,7 @@ let ZOOM=false;
 function zoomApp(){const a=$("#app");a.style.zoom="";ZOOM=true;const R=document.documentElement;let lo=1,hi=2.4;
   for(let i=0;i<12;i++){const m=(lo+hi)/2;a.style.zoom=m.toFixed(3);(R.scrollHeight<=innerHeight+1&&R.scrollWidth<=innerWidth+1)?lo=m:hi=m}
   a.style.zoom=lo.toFixed(3)}
-function setFit(on){ZOOM=false;document.body.classList.remove("wide");$("#app").style.zoom="";document.body.classList.toggle("fit",on);if(!on)document.documentElement.style.setProperty("--k",1)}
+function setFit(on){document.body.classList.remove("host-reveal");ZOOM=false;document.body.classList.remove("wide");$("#app").style.zoom="";document.body.classList.toggle("fit",on);if(!on)document.documentElement.style.setProperty("--k",1)}
 function fitHost(){
   if(!document.body.classList.contains("fit"))return;
   const R=document.documentElement;let lo=.6,hi=2.4;
@@ -532,12 +585,19 @@ async function hostSetup(){
 }
 function hostSet(state){HOST.state=state;HOST.N.set("games/"+HOST.code+"/state",state);hostRender()}
 function playersArr(){return Object.entries(HOST.players).map(([id,p])=>({id,...p,score:p.score||0}))}
-function answered(qi){return playersArr().filter(p=>p.a&&p.a[qi]).length}
+function activeArr(){return playersArr().filter(p=>!p.out)}
+function answered(qi){return activeArr().filter(p=>p.a&&p.a[qi]).length}
+function kickIdle(qi){ // anyone with no answer on 3 straight questions is taken out
+  const H=HOST,gone=[];
+  activeArr().forEach(p=>{const ans=Object.entries(p.a||{}).filter(([,x])=>x&&x.c>=0).map(([q])=>+q);
+    const last=Math.max(p.base==null?-1:p.base,...ans);
+    if(qi-last>=3){H.players[p.id]={...H.players[p.id],out:true};H.N.update(`games/${H.code}/players/${p.id}`,{out:true}).catch(()=>{});gone.push(p.name)}});
+  return gone}
 function hostRender(){
   const H=HOST,st=H.state;KEYPICK=null;
   if(st.phase==="lobby"){
     setFit(false);
-    const ps=playersArr();
+    const ps=activeArr();
     app.innerHTML=`<div class="lobby"><div class="join">Go to the accounting site, open <b>Bank Rec Live</b>, and enter</div>
       <div class="code">${H.code}</div>
       <div class="count">${ps.length} player${ps.length===1?"":"s"} joined</div>
@@ -550,7 +610,7 @@ function hostRender(){
     app.innerHTML=`<div class="interstitial"><div class="r">Round ${ORDER.indexOf(sk)+1} of ${ORDER.length}</div><h2>${esc(SKILLS[sk].name)}</h2><p>${esc(SKILLS[sk].desc)} ${secsLabel(sk)}</p><button class="btn main" id="go">Show question</button></div>`;
     KEYNEXT=()=>{KEYNEXT=null;hostSet({phase:"question",qi:st.qi,t:Date.now()})};$("#go").onclick=KEYNEXT;requestAnimationFrame(zoomApp);return;
   }
-  const q=inst(byId[H.ids[st.qi]],H.seed),secs=secsFor(q),total=playersArr().length;
+  const q=inst(byId[H.ids[st.qi]],H.seed),secs=secsFor(q),total=activeArr().length;
   if(st.phase==="question"){
     setFit(true);
     if(H.rq!==st.qi){H.rq=st.qi;H.qStart=performance.now();
@@ -562,30 +622,49 @@ function hostRender(){
       KEYNEXT=()=>hostSet({phase:"reveal",qi:st.qi});
       requestAnimationFrame(fitHost);
     }
-    const a=answered(st.qi);const c=$("#cnt");if(c)c.textContent=`${a} of ${total} answered`;
+    const a=answered(st.qi);const c=$("#cnt");if(c)c.innerHTML=`${a} of ${total} answered${H.kickMsg?`<span class="kick">${esc(H.kickMsg)}</span>`:""}`;
     if(total&&a>=total)hostSet({phase:"reveal",qi:st.qi});
     return;
   }
   if(st.phase==="reveal"){
     stopTick();clearInterval(H.watch);setFit(true);
-    const counts=[0,0,0,0];playersArr().forEach(p=>{const x=p.a&&p.a[st.qi];if(x&&x.c>=0)counts[x.c]++});
+    const counts=[0,0,0,0];activeArr().forEach(p=>{const x=p.a&&p.a[st.qi];if(x&&x.c>=0)counts[x.c]++});
     const mx=Math.max(1,...counts);
     renderQuestion(app,q,{label:SKILLS[q.sk].name,num:`Question ${st.qi+1} of ${H.ids.length}`,timed:false,onAnswer:()=>{}});
     showAnswer(app,q,-2,true,null,"");
     const fb=app.querySelector(".fb");fb.querySelector("b").textContent="Answer: "+optText(q.opts[q.ans]);
-    const top=playersArr().sort((a,b)=>b.score-a.score).slice(0,5);
     const last=st.qi>=H.ids.length-1;
+    // scoreboard: rank now vs. rank before this question, points earned this question
+    const ps=activeArr().map(p=>{const x=p.a&&p.a[st.qi];return {...p,gain:x&&x.pts||0,prev:p.score-(x&&x.pts||0)}});
+    const before={};[...ps].sort((a,b)=>b.prev-a.prev).forEach((p,i)=>before[p.id]=i+1);
+    const now=[...ps].sort((a,b)=>b.score-a.score),top=now.slice(0,5),best=Math.max(1,now[0]?now[0].score:1);
+    const anim=H.sbq!==st.qi;H.sbq=st.qi;
+    const right=counts[q.ans],tot=activeArr().length;
     app.querySelector(".fbbox").insertAdjacentHTML("beforeend",`
-      <div class="dist" style="margin-top:12px">${counts.map((n,i)=>`<div class="${i===q.ans?"":"wrong"}" style="--oc:${COLORS[i]};background:${COLORS[i]};height:${Math.max(18,n/mx*100)}%">${SHAPES[i]} ${n}</div>`).join("")}</div>
-      <div class="lb" style="margin-top:12px">${top.map((p,i)=>`<div><span class="p">${i+1}</span>${esc(p.name)}<span class="s">${p.score.toLocaleString()}</span></div>`).join("")}</div>
-      <div class="row" style="justify-content:flex-end;margin-top:10px"><button class="btn main" id="nx">${last?"Final results":"Next question"}</button></div>`);
+      <div class="dist">${counts.map((n,i)=>`<div class="${i===q.ans?"ok":"wrong"}" style="--oc:${COLORS[i]};--h:${Math.max(14,n/mx*100)}%"><b>${i===q.ans?"✓":SHAPES[i]} ${n}</b></div>`).join("")}</div>`);
+    app.querySelector(".qwrap").insertAdjacentHTML("afterend",`<aside class="sb ${anim?"anim":""}">
+      <div class="sbh"><span>Leaderboard</span><small>${right} of ${tot} got it</small></div>
+      <div class="sbrows">${top.map((p,i)=>{const mv=before[p.id]-(i+1);
+        return `<div class="sbr r${i+1}" style="--d:${i*110}ms">
+          <span class="rk">${i+1}</span>
+          <span class="nm"><b>${esc(p.name)}</b>${mv>0?`<i class="mv up">▲ ${mv}</i>`:mv<0?`<i class="mv dn">▼ ${-mv}</i>`:""}</span>
+          <span class="sc"><b data-from="${anim?p.prev:p.score}" data-to="${p.score}">${(anim?p.prev:p.score).toLocaleString()}</b>${p.gain?`<em>+${p.gain}</em>`:`<em class="z">+0</em>`}</span>
+          <span class="bar"><i style="--w:${Math.max(3,p.score/best*100)}%"></i></span>
+        </div>`}).join("")||'<div class="sbr"><span class="nm"><b>No players yet</b></span></div>'}</div>
+      <button class="btn main" id="nx">${last?"Final results":"Next question"} →</button>
+    </aside>`);
+    document.body.classList.add("host-reveal");
+    if(anim){const t0=performance.now(),els=[...app.querySelectorAll(".sc b[data-to]")];
+      const step=now=>{const k=Math.min(1,(now-t0-500)/1100);if(k<0){requestAnimationFrame(step);return}const e=1-Math.pow(1-k,3);
+        els.forEach(el=>{const a=+el.dataset.from,b=+el.dataset.to;el.textContent=Math.round(a+(b-a)*e).toLocaleString()});if(k<1&&document.body.contains(els[0]||document.body))requestAnimationFrame(step)};
+      requestAnimationFrame(step)}
     KEYNEXT=()=>{KEYNEXT=null;last?hostSet({phase:"end",qi:st.qi}):hostQuestion(st.qi+1)};$("#nx").onclick=KEYNEXT;
     requestAnimationFrame(fitHost);return;
   }
   if(st.phase==="end"){
     setFit(false);stopTick();
     if(H.endShown)return;H.endShown=true;
-    finale(playersArr().sort((a,b)=>b.score-a.score));
+    finale(activeArr().sort((a,b)=>b.score-a.score));
   }
 
 }
@@ -599,7 +678,7 @@ function finale(ps){
   app.innerHTML=`<div class="finale">
     <canvas id="fw"></canvas>
     <div class="rays"></div>
-    <div class="fhead"><div class="kick">Bank Rec Live</div><h2>Top 5</h2></div>
+    <div class="fhead"><img class="lg" src="/logo-214.png" alt="District 214"><div class="kick">Bank Rec Live</div><h2>Top 5</h2></div>
     <div class="podium">${slot(top[1],1,"p2")}${slot(top[0],0,"p1")}${slot(top[2],2,"p3")}</div>
     <div class="rest">${rows}</div>
     <div class="fbar"><button class="btn" id="cr">Class results</button><button class="btn" id="again">Replay</button><button class="btn" id="erase">Erase game</button><button class="btn" id="home3">Done</button></div>
@@ -633,7 +712,7 @@ function stopFireworks(){FIN.forEach(clearTimeout);FIN=[];if(FW){cancelAnimation
 function startFireworks(on){
   const cv=$("#fw");if(!cv)return;const cx=cv.getContext("2d");if(FW)cancelAnimationFrame(FW.raf);
   const dpr=Math.min(2,devicePixelRatio||1);const size=()=>{cv.width=innerWidth*dpr;cv.height=innerHeight*dpr};size();addEventListener("resize",size);
-  const COLS=["#C1102F","#FF4D63","#FFFFFF","#FFC93C","#FFE08A"];
+  const COLS=["#C1102F","#E8193C","#FFFFFF","#FFFFFF","#D9D9D9","#C1102F"];
   const rockets=[],parts=[];const t0=performance.now();let last=t0;
   const launch=()=>{const W=cv.width,Hh=cv.height;rockets.push({x:W*(.12+Math.random()*.76),y:Hh,vx:(Math.random()-.5)*1.2*dpr,vy:-(Hh*.0125+Math.random()*Hh*.004),ty:Hh*(.12+Math.random()*.35),c:COLS[Math.floor(Math.random()*COLS.length)]})};
   const burst=(r)=>{const n=70+Math.floor(Math.random()*40),sp=(2.2+Math.random()*2.2)*dpr,ring=Math.random()<.35;
@@ -653,6 +732,7 @@ function startFireworks(on){
   FW.raf=requestAnimationFrame(frame);
 }
 function hostQuestion(qi){
+  if(qi>0){const g=kickIdle(qi-1);HOST.kickMsg=g.length?`Removed after 3 missed in a row: ${g.join(", ")} (they can rejoin)`:""}
   const prev=qi>0?byId[HOST.ids[qi-1]].sk:null,sk=byId[HOST.ids[qi]].sk;
   hostSet(prev!==sk?{phase:"intro",qi}:{phase:"question",qi,t:Date.now()});
 }
@@ -661,46 +741,92 @@ async function hostErase(){if(!HOST)return home();cleanupHost();try{await HOST.N
 
 /* ============================================================ LIVE: STUDENT */
 let ME=null;
+const SKEY="brlSession";
+const saveSess=o=>{try{localStorage.setItem(SKEY,JSON.stringify(o))}catch(e){}};
+const loadSess=()=>{try{return JSON.parse(localStorage.getItem(SKEY)||"null")}catch(e){return null}};
+const baseFor=st=>!st||st.phase==="lobby"?-1:st.phase==="reveal"||st.phase==="end"?st.qi:st.qi-1;
+function rejoinBtn(){const b=$("#rejoin");if(!b||ROLE==="teacher")return;b.hidden=!((ME&&ME.out)||(!ME&&loadSess()))}
 async function joinForm(){
   const N=await net().catch(()=>null);if(!N)return needSetup();
+  const sv=loadSess();
   app.innerHTML=`${hdr()}<div class="panel" style="margin-top:0"><h2>Join a class game</h2><p>Type the code on the board and your name (first name and last initial).</p>
-    <input class="field code" id="cd" inputmode="numeric" maxlength="4" placeholder="0000" autocomplete="off">
-    <input class="field" id="nm" maxlength="24" placeholder="Jordan M." autocomplete="off">
+    <input class="field code" id="cd" inputmode="numeric" maxlength="4" placeholder="0000" autocomplete="off" value="${sv?esc(sv.code):""}">
+    <input class="field" id="nm" maxlength="24" placeholder="Jordan M." autocomplete="off" value="${sv?esc(sv.name):""}">
     <div class="err" id="er"></div><button class="btn main" id="go">Join</button></div>`;
-  $("#cd").focus();
+  rejoinBtn();sv?$("#go").focus():$("#cd").focus();
   const go=async()=>{
     const code=$("#cd").value.trim(),name=$("#nm").value.trim();
     if(!/^\d{4}$/.test(code)){$("#er").textContent="The code is 4 numbers.";return}
     if(!name){$("#er").textContent="Type your name.";return}
     $("#go").disabled=true;
-    try{
-      const g=await N.get("games/"+code);
-      if(!g){$("#er").textContent="No game with that code. Check the board.";$("#go").disabled=false;return}
-      if(g.state&&g.state.phase!=="lobby"&&g.state.phase!=="intro"&&g.state.qi>0){/* late join is allowed */}
-      const pid="p"+Math.random().toString(36).slice(2,10);
-      await N.set(`games/${code}/players/${pid}`,{name,score:0,joined:Date.now()});
-      ME={N,code,pid,name,seed:g.seed,ids:g.ids,score:0,log:[],answered:{},state:null};timeMult=g.mult||1;
-      $("#who").textContent=name;$("#who").hidden=false;
-      ME.off=N.on(`games/${code}/state`,st=>{if(!st){joinGone();return}ME.state=st;joinRender()});
-    }catch(e){$("#er").textContent="Couldn't connect. Try again.";$("#go").disabled=false}
+    const err=await enterGame(N,code,name,null);
+    if(err){$("#er").textContent=err;$("#go").disabled=false}
   };
   $("#go").onclick=go;$("#nm").onkeydown=e=>{if(e.key==="Enter")go()};
 }
-function joinGone(){stopTick();if(ME&&ME.off)ME.off();const was=ME;ME=null;
+// Join or rejoin. Same code + same name on this device reuses the old seat, so score and answers carry over.
+async function enterGame(N,code,name,forcePid){
+  try{
+    const g=await N.get("games/"+code);
+    if(!g)return "No game with that code. Check the board.";
+    const sv=loadSess();
+    let pid=forcePid||(sv&&sv.code===code&&sv.name.toLowerCase()===name.toLowerCase()?sv.pid:null);
+    const rec=pid&&g.players&&g.players[pid];
+    const base=baseFor(g.state);
+    if(rec){await N.update(`games/${code}/players/${pid}`,{out:false,base,name})}
+    else{pid="p"+Math.random().toString(36).slice(2,10);await N.set(`games/${code}/players/${pid}`,{name,score:0,joined:Date.now(),base})}
+    saveSess({code,pid,name});
+    const answered={},log=[];let last=-1;
+    Object.entries((rec&&rec.a)||{}).sort((x,y)=>+x[0]-+y[0]).forEach(([qi,x])=>{answered[qi]=x;const sk=byId[g.ids[qi]]&&byId[g.ids[qi]].sk;if(sk)log.push({sk,ok:!!x.ok,ms:x.ms||0});if(x.c>=0)last=Math.max(last,+qi)});
+    if(ME&&ME.off)ME.off();
+    ME={N,code,pid,name,seed:g.seed,ids:g.ids,score:(rec&&rec.score)||0,log,answered,state:null,base:Math.max(base,last),out:false};timeMult=g.mult||1;
+    $("#who").textContent=name;$("#who").hidden=false;rejoinBtn();
+    ME.off=N.on(`games/${code}/state`,st=>{if(!ME)return;if(!st){joinGone();return}ME.state=st;joinRender()});
+    return null;
+  }catch(e){return "Couldn't connect. Try again."}
+}
+async function rejoin(){
+  const N=await net().catch(()=>null);if(!N)return needSetup();
+  if(ME&&ME.out){const M=ME;M.out=false;M.base=baseFor(M.state);M.rq=null;
+    try{await M.N.update(`games/${M.code}/players/${M.pid}`,{out:false,base:M.base})}catch(e){}
+    rejoinBtn();joinRender();return}
+  const sv=loadSess();if(!sv)return joinForm();
+  const err=await enterGame(N,sv.code,sv.name,sv.pid);
+  if(err){joinForm().then(()=>{const e=$("#er");if(e)e.textContent=err==="No game with that code. Check the board."?"That game has ended. Join a new one with the code on the board.":err})}
+}
+function joinGone(){stopTick();document.body.classList.remove("stu-live");if(ME&&ME.off)ME.off();const was=ME;ME=null;try{localStorage.removeItem(SKEY)}catch(e){}rejoinBtn();
   if(was&&was.log.length)report(was.name,was.log,was.score,null);else{app.innerHTML=`<div class="wait"><h2>The game has ended</h2><p>Your teacher closed this game.</p><button class="btn main" id="h">OK</button></div>`;$("#h").onclick=home}}
+function kickedScreen(){
+  const M=ME;stopTick();document.body.classList.remove("stu-live");setFit(false);M.rq="out";
+  app.innerHTML=`<div class="wait"><h2>You were removed</h2><p>You missed 3 questions in a row, so you were taken out of the game. Your points are saved.</p><button class="btn main big-rejoin" id="rj">Rejoin the game</button></div>`;
+  $("#rj").onclick=rejoin;rejoinBtn();
+}
 function joinRender(){
-  const M=ME,st=M.state;if(!st)return;if(st.phase!=="question")setFit(false);
+  const M=ME,st=M.state;if(!st)return;
+  if(st.phase!=="question")setFit(false);
+  // three straight misses (no answer) => out
+  const doneQi=st.phase==="reveal"||st.phase==="end"?st.qi:st.qi-1;
+  const lastAns=()=>Math.max(M.base,...Object.entries(M.answered).filter(([,x])=>x.c>=0).map(([q])=>+q));
+  if(!M.out&&st.phase!=="lobby"&&st.phase!=="end"){
+    const pending=st.phase==="reveal"&&!M.answered[st.qi]?st.qi:doneQi;
+    if(pending-lastAns()>=3){M.out=true;M.N.update(`games/${M.code}/players/${M.pid}`,{out:true}).catch(()=>{})}
+  }
+  if(M.out&&st.phase!=="end"){if(M.rq!=="out")kickedScreen();return}
+  const live=st.phase==="question"&&!M.answered[st.qi];
+  if(!live)document.body.classList.remove("stu-live");
   if(st.phase==="lobby"){app.innerHTML=`<div class="wait"><h2>You're in, ${esc(M.name)}!</h2><p>Watch the board. The game starts soon.</p></div>`;return}
-  if(st.phase==="intro"){stopTick();const sk=byId[M.ids[st.qi]].sk;app.innerHTML=`<div class="wait"><div class="r" style="color:var(--accent);font-family:var(--display);letter-spacing:.1em">ROUND ${ORDER.indexOf(sk)+1}</div><h2>${esc(SKILLS[sk].name)}</h2><p>${esc(SKILLS[sk].desc)}</p><div class="big">${M.score.toLocaleString()}</div><p>points so far</p></div>`;return}
+  if(st.phase==="intro"){stopTick();const sk=byId[M.ids[st.qi]].sk;app.innerHTML=`<div class="wait"><div class="r" style="color:var(--accent);font-family:var(--display);letter-spacing:.1em">ROUND ${ORDER.indexOf(sk)+1}</div><h2>${esc(SKILLS[sk].name)}</h2><p>${esc(SKILLS[sk].desc)}</p><div class="big">${M.score.toLocaleString()}</div><p>points so far</p></div>`;M.rq=null;return}
   const q=inst(byId[M.ids[st.qi]],M.seed),secs=secsFor(q);
   if(st.phase==="question"){
     if(M.answered[st.qi]){if(M.rq!==st.qi+"w"){M.rq=st.qi+"w";setFit(false);app.innerHTML=`<div class="wait"><h2>Answer locked in</h2><p>Waiting for everyone else…</p></div>`}return}
     if(M.rq===st.qi)return;M.rq=st.qi;
-    renderQuestion(app,q,{label:SKILLS[q.sk].name,num:`Question ${st.qi+1} of ${M.ids.length}`,score:M.score,timed:true,secs,onAnswer:(c,ms)=>{
-      if(M.answered[st.qi])return;
+    document.body.classList.add("stu-live");
+    renderQuestion(app,q,{label:SKILLS[q.sk].name,num:`Question ${st.qi+1} of ${M.ids.length}`,score:M.score,timed:true,secs,noFit:true,onAnswer:(c,ms)=>{
+      if(M.answered[st.qi]||M.out)return;
+      if(c<0){document.body.classList.remove("stu-live");app.innerHTML=`<div class="wait"><h2>Time's up</h2><p>Waiting for the answer…</p></div>`;M.rq=st.qi+"w";return} // the reveal records the miss
       const ok=c===q.ans,pts=points(ok,ms,secs);M.answered[st.qi]={c,ok,pts,ms};M.score+=pts;M.log.push({sk:q.sk,ok,ms});
       M.N.update(`games/${M.code}/players/${M.pid}`,{score:M.score,["a/"+st.qi]:{c,ok,ms:Math.round(ms),pts}});
-      setFit(false);app.innerHTML=`<div class="wait"><h2>Answer locked in</h2><p>Waiting for everyone else…</p></div>`;M.rq=st.qi+"w";
+      document.body.classList.remove("stu-live");setFit(false);app.innerHTML=`<div class="wait"><h2>Answer locked in</h2><p>Waiting for everyone else…</p></div>`;M.rq=st.qi+"w";
     }});
     return;
   }
@@ -714,11 +840,14 @@ function joinRender(){
   }
   if(st.phase==="end"){
     stopTick();if(M.rq==="end")return;M.rq="end";
-    M.N.get(`games/${M.code}/players`).then(ps=>{const arr=Object.values(ps||{}).map(p=>p.score||0).sort((a,b)=>b-a);const rank=arr.indexOf(M.score)+1;if(M.off)M.off();const keep=M;ME=null;report(keep.name,keep.log,keep.score,rank||null)}).catch(()=>{const keep=M;ME=null;report(keep.name,keep.log,keep.score,null)});
+    const fin=()=>{try{localStorage.removeItem(SKEY)}catch(e){}};
+    M.N.get(`games/${M.code}/players`).then(ps=>{const arr=Object.values(ps||{}).filter(p=>!p.out).map(p=>p.score||0).sort((a,b)=>b-a);const rank=arr.indexOf(M.score)+1;if(M.off)M.off();const keep=M;ME=null;fin();rejoinBtn();report(keep.name,keep.log,keep.score,rank||null)}).catch(()=>{const keep=M;ME=null;fin();rejoinBtn();report(keep.name,keep.log,keep.score,null)});
   }
 }
 
+$("#rejoin").onclick=rejoin;
 home();
+rejoinBtn();
 </script>
 </body>
 </html>
