@@ -1,1 +1,0 @@
-{ "name": "bond-desk", "private": true, "type": "module", "engines": { "node": ">=20" } }

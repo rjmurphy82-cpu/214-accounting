@@ -1,2 +1,0 @@
-{ "cleanUrls": true, "rewrites": [{ "source": "/host", "destination": "/host.html" }],
-  "headers": [{ "source": "/(.*)", "headers": [{ "key": "X-Content-Type-Options", "value": "nosniff" }] }] }
