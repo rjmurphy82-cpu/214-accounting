@@ -152,6 +152,15 @@ kbd{font-family:"Oswald",sans-serif;font-size:13px;border:1.5px solid var(--line
 .rounds{margin-top:14px;display:flex;align-items:center;gap:10px;font-weight:600}
 .rounds select{font:600 17px "Barlow",sans-serif;padding:6px 10px;border-radius:8px;border:2px solid var(--line);background:var(--paper);color:var(--ink)}
 .board{display:grid;grid-template-columns:repeat(8,1fr);gap:8px;margin-top:14px}
+.segs{display:flex;flex-wrap:wrap;gap:6px}
+.segs button{min-width:48px;background:var(--paper);border:2px solid var(--line);border-radius:8px;padding:8px 12px;font:600 20px "Oswald",sans-serif}
+.segs button[aria-pressed="true"]{background:var(--brown);color:var(--cream);border-color:var(--brown)}
+.turnbar .clock{margin-left:auto;margin-right:6px;background:#111;color:#fff;border-radius:10px;padding:0 16px;min-width:2.4em;text-align:center;font-variant-numeric:tabular-nums}
+.turnbar .clock.low{background:var(--bad)}
+.turnbar .clock.steal{background:var(--c);color:#fff}
+.turnbar .clock.paused{background:var(--muted)}
+body.teamplay #tsz{display:none}
+body.teamplay .wrap{padding-bottom:10px}
 .team{background:var(--paper);border:2px solid var(--line);border-top:7px solid var(--c);border-radius:10px;padding:7px 10px 8px;transition:background .12s,color .12s,opacity .2s}
 .team .n{display:block;font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .team b{font-family:"Oswald",sans-serif;font-size:26px;font-weight:600;line-height:1.1}
@@ -213,7 +222,7 @@ kbd{font-family:"Oswald",sans-serif;font-size:13px;border:1.5px solid var(--line
         <div class="modes">
           <button class="mode" data-mode="blitz" aria-pressed="true"><div><strong>Blitz</strong><span>90 seconds. Streaks multiply your points.</span></div><span class="best" id="best-blitz"></span></button>
           <button class="mode" data-mode="practice" aria-pressed="false"><div><strong>Practice</strong><span>No clock. One pass through every card.</span></div><span class="best" id="best-practice"></span></button>
-          <button class="mode" data-mode="teams" aria-pressed="false"><div><strong>8 teams</strong><span>Teams take turns. Miss it and a random team gets to steal.</span></div></button>
+          <button class="mode" data-mode="teams" aria-pressed="false"><div><strong>Class teams</strong><span>2 to 10 teams. A random team gets each card. Miss it and a random team has 5 seconds to steal.</span></div></button>
         </div>
       </div>
       <div>
@@ -222,12 +231,19 @@ kbd{font-family:"Oswald",sans-serif;font-size:13px;border:1.5px solid var(--line
       </div>
     </div>
     <div class="teamsetup" id="teamSetup" hidden>
-      <h2>Team names</h2>
+      <h2>Number of teams</h2>
+      <div class="segs" id="nTeams"></div>
+      <h2 style="margin-top:16px">Team names</h2>
       <div class="tnames" id="teamNames"></div>
       <label class="rounds">Cards per team
         <select id="rounds"><option>2</option><option>3</option><option selected>4</option><option>5</option><option>6</option></select>
         <span class="hint" id="capNote"></span>
       </label>
+      <label class="rounds">Time to answer
+        <select id="timeSel"><option value="1" selected>Recommended</option><option value="1.5">Extra time (+50%)</option><option value="2">Double time</option><option value="0">No clock</option></select>
+        <span class="hint" id="timeNote"></span>
+      </label>
+      <p class="hint" style="margin:10px 0 0">Scoring: first team right +100, wrong or out of time −100. Steal right +200, missed steal −200. Steals are always 5 seconds.</p>
     </div>
     <div class="go">
       <button class="btn" id="startBtn">Start</button>
@@ -246,7 +262,7 @@ kbd{font-family:"Oswald",sans-serif;font-size:13px;border:1.5px solid var(--line
       </div>
       <div class="stat streak"><b><span id="streak">0</span><span class="mult" id="mult" hidden>x2</span></b><small>streak</small></div>
     </div>
-    <div class="turnbar" id="turn" hidden></div>
+    <div class="turnbar" id="turn" hidden><span id="turnText"></span><span class="clock" id="clock" hidden></span></div>
     <div class="table on-B" id="table">
       <div class="side buyer"><h3>Buyer</h3><span class="tag">You're keeping these books</span></div>
       <div class="side seller"><h3>Seller</h3><span class="tag">You're keeping these books</span></div>
@@ -264,7 +280,7 @@ kbd{font-family:"Oswald",sans-serif;font-size:13px;border:1.5px solid var(--line
       <p id="judgeText"></p>
       <div class="judgebtns"><button class="btn" id="judgeYes">They got it</button><button class="btn alt" id="judgeNo">Missed</button></div>
     </div>
-    <button class="quit" id="quitBtn">End game</button>
+    <button class="quit" id="pauseBtn" hidden>Pause clock (P)</button> <button class="quit" id="quitBtn">End game</button>
   </section>
 
   <!-- END -->
@@ -387,16 +403,18 @@ cards.forEach((c,i)=>c.id=i);
 const $=id=>document.getElementById(id);
 const store={get(k){try{return localStorage.getItem(k)}catch(_){return null}},set(k,v){try{localStorage.setItem(k,v)}catch(_){}}};
 const reduce=window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-const TEAM_COLORS=["#2F6FB0","#2E8B57","#8E44AD","#C0392B","#138D90","#B7950B","#D35492","#5D6D7E"];
-const NTEAMS=8,PTS=100,PENALTY=100,BLITZ=90;
+const TEAM_COLORS=["#2F6FB0","#2E8B57","#8E44AD","#C0392B","#138D90","#B7950B","#D35492","#5D6D7E","#E67E22","#34495E"];
+const PTS=100,PENALTY=100,BLITZ=90,MISS=100,STEAL_PTS=200,STEAL_MISS=200,STEAL_SECS=5;
+const TIMES={acct:20,tf:15,calc:40}; // recommended seconds for the first team
+let NTEAMS=Math.min(10,Math.max(2,+(store.get("tb4-nteams")||6)||6));
 let saved=[];try{saved=JSON.parse(store.get("tb4-teams")||"[]")}catch(_){}
-const S={mode:"blitz",topics:new Set(Object.keys(TOPICS)),rounds:4,teams:[],deck:[],limit:0,pos:0,part:0,score:0,streak:0,time:BLITZ,timer:null,paused:false,locked:false,phase:"turn",turn:0,stealer:-1,stats:{},missed:new Map(),answered:0,right:0,last:0,cleared:false};
+const S={tmult:1,order:[],clk:null,mode:"blitz",topics:new Set(Object.keys(TOPICS)),rounds:4,teams:[],deck:[],limit:0,pos:0,part:0,score:0,streak:0,time:BLITZ,timer:null,paused:false,locked:false,phase:"turn",turn:0,stealer:-1,stats:{},missed:new Map(),answered:0,right:0,last:0,cleared:false};
 const esc=t=>String(t).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const pool=()=>cards.filter(c=>S.topics.has(c.t));
 function teamLimit(){const n=pool().length,want=S.rounds*NTEAMS;if(n>=want)return want;return n>=NTEAMS?Math.floor(n/NTEAMS)*NTEAMS:n}
 function updateCap(){
   const n=pool().length,want=S.rounds*NTEAMS,lim=teamLimit();
-  $("capNote").textContent=lim<want?`Only ${n} cards in the rule sets you picked, so this game will be ${lim} cards (${Math.floor(lim/NTEAMS)||"under 1"} per team). Turn on more rule sets for a longer game.`:`${want} cards, no repeats. Right answers +100, wrong answers −100, on a turn or a steal.`;
+  $("capNote").textContent=lim<want?`Only ${n} cards in the rule sets you picked, so this game will be ${lim} cards (${Math.floor(lim/NTEAMS)||"under 1"} per team). Turn on more rule sets for a longer game.`:`${want} cards, no repeats.`;
 }
 
 const chips=$("chips");
@@ -407,11 +425,20 @@ Object.entries(TOPICS).forEach(([k,v])=>{
   l.querySelector("input").addEventListener("change",ev=>{ev.target.checked?S.topics.add(k):S.topics.delete(k);$("startBtn").disabled=!S.topics.size;updateCap()});
   chips.appendChild(l);
 });
-for(let i=0;i<NTEAMS;i++){
-  const l=document.createElement("label");l.className="tname";l.style.setProperty("--c",TEAM_COLORS[i]);
-  const inp=document.createElement("input");inp.type="text";inp.maxLength=18;inp.value=saved[i]||("Team "+(i+1));inp.setAttribute("aria-label","Team "+(i+1)+" name");
-  l.appendChild(inp);$("teamNames").appendChild(l);
+function buildNames(){
+  const box=$("teamNames"),cur=[...box.querySelectorAll("input")].map(x=>x.value);box.innerHTML="";
+  for(let i=0;i<NTEAMS;i++){
+    const l=document.createElement("label");l.className="tname";l.style.setProperty("--c",TEAM_COLORS[i]);
+    const inp=document.createElement("input");inp.type="text";inp.maxLength=18;inp.value=cur[i]||saved[i]||("Team "+(i+1));inp.setAttribute("aria-label","Team "+(i+1)+" name");
+    l.appendChild(inp);box.appendChild(l);
+  }
 }
+for(let n=2;n<=10;n++){const b=document.createElement("button");b.type="button";b.textContent=n;b.setAttribute("aria-pressed",n===NTEAMS);
+  b.addEventListener("click",()=>{NTEAMS=n;store.set("tb4-nteams",n);[...$("nTeams").children].forEach(x=>x.setAttribute("aria-pressed",+x.textContent===n));buildNames();updateCap()});
+  $("nTeams").appendChild(b)}
+buildNames();
+function updateTimeNote(){const m=S.tmult;$("timeNote").textContent=m?`${Math.round(TIMES.acct*m)} sec to pick an account, ${Math.round(TIMES.tf*m)} for true/false, ${Math.round(TIMES.calc*m)} for math. Steals: 5 sec.`:"No clock on the first team. Steals still get 5 seconds."}
+$("timeSel").addEventListener("change",e=>{S.tmult=+e.target.value;updateTimeNote()});updateTimeNote();
 $("rounds").addEventListener("change",e=>{S.rounds=+e.target.value;updateCap()});
 updateCap();
 document.querySelectorAll(".mode").forEach(b=>b.addEventListener("click",()=>{
@@ -432,8 +459,10 @@ function start(){
   if(isTeams()){
     const names=[...document.querySelectorAll("#teamNames input")].map((x,i)=>x.value.trim()||"Team "+(i+1));
     store.set("tb4-teams",JSON.stringify(names));
-    S.teams=names.map((n,i)=>({name:n,color:TEAM_COLORS[i],score:0,steals:0}));
+    S.teams=names.map((n,i)=>({name:n,color:TEAM_COLORS[i],score:0,steals:0,chances:0}));S.order=[];
+    S.bodyZoom=document.body.style.zoom;document.body.style.zoom=1;
   }
+  document.body.classList.toggle("teamplay",isTeams());$("pauseBtn").hidden=!isTeams();stopClock();
   $("play").classList.toggle("teams",isTeams());$("board").hidden=!isTeams();$("turn").hidden=!isTeams();
   $("score").textContent="0";updateStreak();show("play");renderCard();
   clearInterval(S.timer);S.last=performance.now();
@@ -448,33 +477,33 @@ function tick(){
 function updateMeter(){
   const f=$("meterFill"),m=$("meter");m.classList.remove("low");
   if(S.mode==="blitz"){f.style.transform=`scaleX(${S.time/BLITZ})`;m.classList.toggle("low",S.time<15);$("meterLabel").textContent=`${Math.ceil(S.time)} seconds left, ${S.limit-S.pos} cards to go`}
-  else if(isTeams()){f.style.transform=`scaleX(${S.pos/S.limit})`;const rounds=Math.max(1,Math.ceil(S.limit/NTEAMS));$("meterLabel").textContent=`Card ${Math.min(S.pos+1,S.limit)} of ${S.limit}, round ${Math.min(Math.floor(S.pos/NTEAMS)+1,rounds)} of ${rounds}`}
+  else if(isTeams()){f.style.transform=`scaleX(${S.pos/S.limit})`;const nT=S.teams.length,rounds=Math.max(1,Math.ceil(S.limit/nT));$("meterLabel").textContent=`Card ${Math.min(S.pos+1,S.limit)} of ${S.limit}, round ${Math.min(Math.floor(S.pos/nT)+1,rounds)} of ${rounds}`}
   else{f.style.transform=`scaleX(${S.pos/S.limit})`;$("meterLabel").textContent=`Card ${Math.min(S.pos+1,S.limit)} of ${S.limit}`}
 }
 function mult(){return Math.min(4,1+Math.floor(S.streak/5))}
 function updateStreak(){$("streak").textContent=S.streak;const m=mult();$("mult").hidden=m<2;$("mult").textContent="x"+m}
 
 function renderBoard(rollIdx){
-  const b=$("board");b.innerHTML="";
+  const b=$("board");b.innerHTML="";b.style.gridTemplateColumns=`repeat(${S.teams.length},minmax(0,1fr))`;
   S.teams.forEach((t,i)=>{
     const d=document.createElement("div");
     let c="team";
     if(i===S.turn&&S.phase==="turn")c+=" turn";
-    if(i===S.turn&&S.phase!=="turn")c+=" out";
+    if(i===S.turn&&S.phase!=="turn"&&S.phase!=="picking")c+=" out";
     if(i===S.stealer)c+=" steal";
     if(i===rollIdx)c+=" roll";
     d.className=c;d.style.setProperty("--c",t.color);
     d.innerHTML=`<span class="n">${esc(t.name)}</span><b>${t.score.toLocaleString()}</b>`;b.appendChild(d);
   });
 }
-function setBanner(text,color,stealing){const t=$("turn");t.textContent=text;t.style.setProperty("--c",color);t.classList.toggle("stealing",!!stealing)}
+function setBanner(text,color,stealing){const t=$("turn");$("turnText").textContent=text;t.style.setProperty("--c",color);t.classList.toggle("stealing",!!stealing)}
 const cur=()=>S.deck[S.pos];
 const curPart=()=>cur().parts[S.part];
 
 function renderCard(){
   if(S.pos>=S.limit){if(S.mode==="blitz")S.cleared=true;finish();return}
   S.part=0;
-  if(isTeams())S.turn=S.pos%NTEAMS;
+  if(isTeams()){const k=S.pos%S.teams.length;if(k===0||!S.order.length)S.order=shuffle([...Array(S.teams.length).keys()]);S.turn=S.order[k]}
   $("eventText").textContent=cur().ev;
   $("topicTag").textContent=TOPICS[cur().t];
   renderPart();
@@ -482,7 +511,7 @@ function renderCard(){
 function renderPart(){
   const c=cur(),q=curPart();S.locked=false;
   $("rule").hidden=true;$("judge").hidden=true;
-  if(isTeams()){S.phase="turn";S.stealer=-1;renderBoard();const t=S.teams[S.turn];setBanner(t.name+(c.parts.length>1?`, your card (part ${S.part+1} of ${c.parts.length})`:", your card"),t.color,false)}
+  if(isTeams()){S.stealer=-1;stopClock();S.locked=true;S.phase=S.part===0?"picking":"turn";renderBoard();if(S.part===0)setBanner("Picking a team...","#111111",false)}
   $("partTag").hidden=c.parts.length<2;$("partTag").textContent=`Part ${S.part+1} of ${c.parts.length}`;
   $("table").className="table on-"+q.side;
   let p;
@@ -499,9 +528,51 @@ function renderPart(){
     b.innerHTML=`<kbd>${key}</kbd>${esc(lab)}`;b.addEventListener("click",()=>answer(i,b));box.appendChild(b);
   });
   updateMeter();
+  if(isTeams()){fitPlay();if(S.part===0){const all=[...Array(S.teams.length).keys()];spin(all,S.turn,beginTurn)}else beginTurn()}
 }
+/* ---------- team clock, spin, projector fit ---------- */
+function beginTurn(){
+  const c=cur(),q=curPart(),t=S.teams[S.turn];S.phase="turn";S.locked=false;renderBoard();
+  setBanner(t.name+(c.parts.length>1?`, your card (part ${S.part+1} of ${c.parts.length})`:", your card"),t.color,false);
+  const secs=S.tmult?Math.round(TIMES[q.type]*S.tmult):0;
+  if(secs)startClock(secs,"",turnTimeout);
+}
+function turnTimeout(){
+  if(S.phase!=="turn")return;S.locked=true;const q=curPart(),btns=[...$("answers").children];btns.forEach(b=>b.disabled=true);
+  S.answered++;S.stats[cur().t].n++;award(S.turn,null,-MISS);logMiss(q);
+  setBanner(`Time's up. ${S.teams[S.turn].name} −${MISS}`,S.teams[S.turn].color,false);rollSteal(q,btns,true);
+}
+function startClock(secs,cls,cb){
+  stopClock();const el=$("clock");el.hidden=false;el.className="clock "+cls;
+  S.clk={left:secs,last:performance.now(),cb,paused:false,id:setInterval(()=>{
+    const k=S.clk;if(!k)return;const now=performance.now();if(!k.paused)k.left-=(now-k.last)/1000;k.last=now;
+    el.textContent=k.paused?"II":Math.max(0,Math.ceil(k.left));el.classList.toggle("low",!k.paused&&k.left<=5&&cls!=="steal");el.classList.toggle("paused",k.paused);
+    if(k.left<=0){stopClock();cb()}},100)};
+  el.textContent=secs;
+}
+function stopClock(){if(S.clk){clearInterval(S.clk.id);S.clk=null}const el=$("clock");if(el)el.hidden=true}
+function togglePause(){if(S.clk){S.clk.paused=!S.clk.paused;S.clk.last=performance.now()}}
+function spin(cands,pick,done){
+  const seq=[];const n=reduce||cands.length<2?0:16;
+  for(let k=0;k<n;k++){let r;do{r=cands[Math.floor(Math.random()*cands.length)]}while(seq.length&&r===seq[seq.length-1]&&cands.length>1);seq.push(r)}
+  if(seq.length&&seq[seq.length-1]===pick)seq.pop();seq.push(pick);
+  let k=0;const gen=S.gen=(S.gen||0)+1;
+  (function step(){if(gen!==S.gen)return;
+    renderBoard(seq[k]);
+    if(k===seq.length-1){setTimeout(()=>{if(gen===S.gen)done()},reduce?0:450);return}
+    const d=55+Math.pow(k/seq.length,2.2)*300;k++;setTimeout(step,d)})();
+}
+function fitPlay(){
+  if(!isTeams()||$("play").hidden)return;
+  const w=document.querySelector(".wrap"),R=document.documentElement,r=$("rule"),hid=r.hidden;
+  document.body.style.zoom=1;
+  if(hid){const ln=S.teams.reduce((a,t)=>t.name.length>a.length?t.name:a,"");$("ruleHead").textContent=`No steal (−${STEAL_MISS} for ${ln}). Answer: ${correctLabel(curPart())}`;$("ruleText").textContent=curPart().rule;r.style.visibility="hidden";r.hidden=false}
+  let lo=.6,hi=2.6;for(let i=0;i<14;i++){const m=(lo+hi)/2;w.style.zoom=m;(R.scrollHeight<=innerHeight+1&&R.scrollWidth<=innerWidth+1)?lo=m:hi=m}
+  w.style.zoom=lo;if(hid){r.hidden=true;r.style.visibility=""}
+}
+addEventListener("resize",()=>{clearTimeout(fitPlay.t);fitPlay.t=setTimeout(fitPlay,150)});
 function next(){
-  S.paused=false;S.last=performance.now();
+  S.paused=false;S.last=performance.now();stopClock();
   if(S.part<cur().parts.length-1){S.part++;renderPart()}else{S.pos++;renderCard()}
 }
 function correctLabel(q){return q.type==="acct"?ACCTS[q.ans][1]:q.type==="tf"?(q.ans?"False":"True"):q.opts[q.ans]}
@@ -513,6 +584,7 @@ function popAt(btn,pts){
 function showRule(q,ok,head){
   $("rule").classList.toggle("ok",ok);$("ruleHead").textContent=head;$("ruleText").textContent=q.rule;
   $("rule").hidden=false;S.paused=true;$("contBtn").focus({preventScroll:true});
+  if(isTeams()&&document.documentElement.scrollHeight>innerHeight+1)fitPlay();
   $("rule").scrollIntoView({block:"nearest",behavior:reduce?"auto":"smooth"});
 }
 function answer(i,btn){
@@ -534,57 +606,56 @@ function answer(i,btn){
 /* ---------- team play ---------- */
 function award(t,btn,pts=PTS){S.teams[t].score+=pts;renderBoard();popAt(btn,pts)}
 function teamAnswer(i,btn,q,btns){
-  const right=i===q.ans;
+  const right=i===q.ans;stopClock();
   if(S.phase==="turn"){
-    S.answered++;S.stats[cur().t].n++;
-    if(right){S.right++;S.stats[cur().t].r++;btn.classList.add("right");award(S.turn,btn);const tm=S.teams[S.turn];setBanner(tm.name+" got it",tm.color,false);showRule(q,true,`${tm.name} got it. Answer: ${correctLabel(q)}`);return}
-    btn.classList.add("wrong");award(S.turn,btn,-PENALTY);logMiss(q);rollSteal(q,btns);
+    S.answered++;S.stats[cur().t].n++;const tm=S.teams[S.turn];
+    if(right){S.right++;S.stats[cur().t].r++;btn.classList.add("right");award(S.turn,btn,PTS);setBanner(`${tm.name} got it +${PTS}`,tm.color,false);showRule(q,true,`${tm.name} got it (+${PTS}). Answer: ${correctLabel(q)}`);return}
+    btn.classList.add("wrong");award(S.turn,btn,-MISS);logMiss(q);setBanner(`Missed. ${tm.name} −${MISS}`,tm.color,false);rollSteal(q,btns);
   }else if(S.phase==="steal"){
     const t=S.teams[S.stealer];S.phase="done";
-    if(right){btn.classList.add("right");t.steals++;award(S.stealer,btn);setBanner(t.name+" stole it",t.color,true);showRule(q,true,`${t.name} stole it. Answer: ${correctLabel(q)}`)}
-    else{btn.classList.add("wrong");btns[q.ans].classList.add("right");award(S.stealer,btn,-PENALTY);setBanner("No steal",t.color,true);showRule(q,false,`No steal (−${PENALTY} for ${t.name}). Answer: ${correctLabel(q)}`)}
+    if(right){btn.classList.add("right");t.steals++;award(S.stealer,btn,STEAL_PTS);setBanner(`${t.name} stole it +${STEAL_PTS}`,t.color,true);showRule(q,true,`${t.name} stole it (+${STEAL_PTS}). Answer: ${correctLabel(q)}`)}
+    else{btn.classList.add("wrong");btns[q.ans].classList.add("right");award(S.stealer,btn,-STEAL_MISS);setBanner(`No steal. ${t.name} −${STEAL_MISS}`,t.color,true);showRule(q,false,`No steal (−${STEAL_MISS} for ${t.name}). Answer: ${correctLabel(q)}`)}
   }
 }
 function rollSteal(q,btns){
   S.phase="rolling";renderBoard();
-  const others=[...Array(NTEAMS).keys()].filter(x=>x!==S.turn);
-  const pick=others[Math.floor(Math.random()*others.length)];
-  setBanner("Missed. Picking a team to steal...",S.teams[S.turn].color,false);
-  const seq=[];const n=reduce?0:18;
-  for(let k=0;k<n;k++){let r;do{r=others[Math.floor(Math.random()*others.length)]}while(seq.length&&r===seq[seq.length-1]);seq.push(r)}
-  if(seq.length&&seq[seq.length-1]===pick)seq.pop();
-  seq.push(pick);
-  let k=0;
-  (function step(){
-    renderBoard(seq[k]);
-    if(k===seq.length-1){setTimeout(()=>land(q,pick,btns),reduce?0:450);return}
-    const d=55+Math.pow(k/seq.length,2.2)*300;k++;setTimeout(step,d);
-  })();
+  const others=[...Array(S.teams.length).keys()].filter(x=>x!==S.turn);
+  // random, but spread out: only teams with the fewest steal chances so far can be picked
+  const few=Math.min(...others.map(x=>S.teams[x].chances)),pool=others.filter(x=>S.teams[x].chances===few);
+  const pick=pool[Math.floor(Math.random()*pool.length)];S.teams[pick].chances++;
+  setTimeout(()=>{if(S.phase!=="rolling")return;setBanner("Picking a team to steal...",S.teams[S.turn].color,false);spin(pool.length>1?pool:others,pick,()=>land(q,pick,btns))},reduce?0:700);
+}
+function stealTimeout(){
+  if(S.phase!=="steal")return;const q=curPart(),t=S.teams[S.stealer],btns=[...$("answers").children];
+  S.phase="done";S.locked=true;btns.forEach(b=>b.disabled=true);btns[q.ans].classList.add("right");award(S.stealer,null,-STEAL_MISS);
+  setBanner(`Time's up. No steal. ${t.name} −${STEAL_MISS}`,t.color,true);showRule(q,false,`No steal (−${STEAL_MISS} for ${t.name}). Answer: ${correctLabel(q)}`);
 }
 function land(q,pick,btns){
   S.stealer=pick;const t=S.teams[pick];
   if(q.type==="tf"){
-    S.phase="judge";renderBoard();setBanner("Steal: "+t.name,t.color,true);
+    S.phase="judge";renderBoard();setBanner(`${t.name}, steal it! +${STEAL_PTS} or −${STEAL_MISS}`,t.color,true);startClock(STEAL_SECS,"steal",()=>{if(S.phase==="judge")judge(false)});
     btns[q.ans].classList.add("right");
     $("judgeHead").textContent=`${t.name}: to steal, explain it`;
-    $("judgeText").textContent=q.ans===1?"The statement is false. Say what's wrong with it and fix it so it's true.":"The statement is true. Explain the rule behind it.";
+    $("judgeText").textContent=(q.ans===1?"The statement is false. Say what's wrong with it and fix it so it's true.":"The statement is true. Explain the rule behind it.")+" You have 5 seconds.";
     $("judge").hidden=false;S.paused=true;$("judgeYes").focus({preventScroll:true});
     $("judge").scrollIntoView({block:"nearest",behavior:reduce?"auto":"smooth"});
   }else{
-    S.phase="steal";renderBoard();setBanner("Steal: "+t.name,t.color,true);
-    btns.forEach(b=>{if(!b.classList.contains("wrong"))b.disabled=false});S.locked=false;
+    S.phase="steal";renderBoard();setBanner(`${t.name}, steal it! +${STEAL_PTS} or −${STEAL_MISS}`,t.color,true);
+    btns.forEach(b=>{if(!b.classList.contains("wrong"))b.disabled=false});S.locked=false;startClock(STEAL_SECS,"steal",stealTimeout);
   }
 }
 function judge(ok){
-  const q=curPart(),t=S.teams[S.stealer];$("judge").hidden=true;S.phase="done";
-  if(ok){t.steals++;award(S.stealer);setBanner(t.name+" stole it",t.color,true);showRule(q,true,`${t.name} stole it. Answer: ${correctLabel(q)}`)}
-  else{award(S.stealer,null,-PENALTY);setBanner("No steal",t.color,true);showRule(q,false,`No steal (−${PENALTY} for ${t.name}). Answer: ${correctLabel(q)}`)}
+  stopClock();const q=curPart(),t=S.teams[S.stealer];$("judge").hidden=true;S.phase="done";
+  if(ok){t.steals++;award(S.stealer,null,STEAL_PTS);setBanner(`${t.name} stole it +${STEAL_PTS}`,t.color,true);showRule(q,true,`${t.name} stole it (+${STEAL_PTS}). Answer: ${correctLabel(q)}`)}
+  else{award(S.stealer,null,-STEAL_MISS);setBanner(`No steal. ${t.name} −${STEAL_MISS}`,t.color,true);showRule(q,false,`No steal (−${STEAL_MISS} for ${t.name}). Answer: ${correctLabel(q)}`)}
 }
 $("judgeYes").addEventListener("click",()=>judge(true));
 $("judgeNo").addEventListener("click",()=>judge(false));
 
 function finish(){
-  clearInterval(S.timer);show("end");
+  clearInterval(S.timer);stopClock();S.gen=(S.gen||0)+1;
+  if(document.body.classList.contains("teamplay")){document.body.classList.remove("teamplay");document.querySelector(".wrap").style.zoom="";document.body.style.zoom=S.bodyZoom||""}
+  show("end");
   const acc=S.answered?Math.round(100*S.right/S.answered):0;
   const st=$("standings");st.hidden=!isTeams();st.innerHTML="";
   if(isTeams()){
@@ -623,8 +694,10 @@ $("startBtn").addEventListener("click",start);
 $("contBtn").addEventListener("click",next);
 $("againBtn").addEventListener("click",start);
 $("setupBtn").addEventListener("click",()=>{showBest();updateCap();show("start")});
+$("pauseBtn").addEventListener("click",e=>{togglePause();e.target.blur()});
 $("quitBtn").addEventListener("click",finish);
 document.addEventListener("keydown",ev=>{
+  if(!$("play").hidden&&isTeams()&&(ev.key==="p"||ev.key==="P")){togglePause();return}
   if($("play").hidden||!$("judge").hidden)return;
   if(ev.target.tagName==="INPUT")return;
   if(!$("rule").hidden){if(ev.key==="Enter"||ev.key===" "){ev.preventDefault();next()}return}
