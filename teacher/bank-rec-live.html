@@ -2727,6 +2727,7 @@ document.addEventListener("keydown",e=>{
 const CFG=window.LIVE_CONFIG||null;
 const MOCK=/[?&]mock=1/.test(location.search);
 const ROLE=window.BRL_ROLE||"student";
+const GAME="bankrec"; // keeps each live game's codes separate
 const hdr=()=>`<h1 class="title">Bank Rec <span>Live.</span></h1>
   <p class="lede">${ROLE==="teacher"?"Teacher screen. Put this on the projector, create a game, and students join on their devices with the code. Six rounds on bank reconciliations; right answers earn 600 points plus up to 400 for speed, and wrong answers cost a lot (set below), so students should never guess.":"Six quick rounds on bank reconciliations, run by your teacher. Right answers earn 600 points plus up to 400 more for speed. Wrong answers cost a lot of points, so never guess. If you are not sure, let the clock run out and you get 0. At the end you get a report on what to practice, and you can practice it right here."}</p>`;
 function home(){
@@ -2902,7 +2903,7 @@ async function hostSetup(){
     try{
       let code;for(let t=0;t<20;t++){code=String(Math.floor(1000+Math.random()*9000));if(!(await N.get("games/"+code)))break}
       const seed=Math.floor(Math.random()*1e9),ids=buildGame(per,seed);
-      await N.set("games/"+code,{created:Date.now(),seed,ids,mult,pen,state:{phase:"lobby",qi:-1}});
+      await N.set("games/"+code,{created:Date.now(),game:GAME,seed,ids,mult,pen,state:{phase:"lobby",qi:-1}});
       HOST={N,code,seed,ids,mult,pen,players:{},state:{phase:"lobby",qi:-1}};timeMult=mult;
       HOST.off=N.on("games/"+code+"/players",v=>{HOST.players=v||{};hostRender()});
       hostRender();
@@ -3103,7 +3104,7 @@ async function joinForm(){
 async function enterGame(N,code,name,forcePid){
   try{
     const g=await N.get("games/"+code);
-    if(!g)return "No game with that code. Check the board.";
+    if(!g||(g.game||"bankrec")!==GAME)return "No game with that code. Check the board.";
     const sv=loadSess();
     const norm=x=>String(x||"").trim().toLowerCase().replace(/\s+/g," ");
     let pid=forcePid||(sv&&sv.code===code&&norm(sv.name)===norm(name)?sv.pid:null);
