@@ -98,6 +98,16 @@ p{margin:0}
 .howto li::before{content:counter(h);font-family:var(--mono);color:var(--orange-ink);font-weight:600}
 .gapfit{display:inline-block;margin-top:3px;font-family:var(--display);text-transform:uppercase;letter-spacing:.06em;font-size:10.5px;padding:1px 6px;border-radius:2px;background:var(--good-bg);color:var(--good)}
 .mg.low{color:var(--bad)} .mg.hi{color:var(--good)}
+.opts3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+@media (max-width:820px){.opts3{grid-template-columns:1fr}}
+.opt{display:flex;flex-direction:column;gap:6px;text-align:left;background:var(--bg);border:1px solid var(--line);border-radius:4px;padding:12px;line-height:1.35;min-width:0}
+.opt b{font-family:var(--display);font-weight:600;text-transform:uppercase;letter-spacing:.03em;font-size:16px}
+.opt span{font-size:14px}
+.opt .ds{font-size:12.5px;color:var(--muted)}
+.vt{width:100%;border-collapse:collapse;font-size:1.25cqw}.vt td{padding:.45cqw .4cqw;border-bottom:.1cqw solid var(--s-line);vertical-align:top;line-height:1.25}.vt td:first-child{color:var(--s-muted);width:38%}.vt td:last-child{font-weight:600;color:var(--s-brown)}.vt td.n{font-family:var(--mono);text-align:right}.vt tr.t td{border-top:.25cqw solid var(--s-brown);border-bottom:0;font-weight:700;color:var(--s-brown)}
+.opt .eff{font-family:var(--mono);font-size:12px;color:var(--muted);margin-top:auto;padding-top:6px;border-top:1px dashed var(--line)}
+.opt.sel{background:var(--paper);border-color:var(--orange);box-shadow:inset 0 0 0 2px var(--orange)}
+.opt:hover{border-color:var(--orange)}
 .fixbar{position:fixed;left:0;right:0;bottom:0;z-index:20;background:var(--brown);color:var(--onbrown);border-top:3px solid var(--orange);padding-block:10px calc(10px + env(safe-area-inset-bottom,0px));padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
 .fixbar .in{max-width:1180px;margin:0 auto;display:flex;gap:12px;align-items:center;flex-wrap:wrap;font-size:15px}
 .fixbar b{font-family:var(--display);text-transform:uppercase;letter-spacing:.06em;font-weight:500}
@@ -463,6 +473,7 @@ const SERVICES = [
  {id:"software",type:"setup",n:"Accounting system setup",d:"Bank feeds, individual logins, user permissions, approval workflows.",h:12},
  {id:"controls",type:"setup",n:"Controls design + procedures manual",d:"Segregation of duties chart, approval limits, written procedures.",h:20},
  {id:"training",type:"setup",n:"Staff training workshops",d:"Two short sessions so the team can follow the new procedures.",h:6},
+ {id:"checklist",type:"setup",n:"Owner controls checklist",d:"One-page daily and weekly checklist the owner runs personally.",h:6},
  {id:"audit",type:"setup",n:"Annual financial statement audit",d:"Independent audit opinion on the year-end statements.",h:40},
  {id:"monthrec",type:"recur",n:"Monthly bank reconciliation",d:"Every account reconciled, reviewed, and signed off with the owner.",h:4,req:true},
  {id:"bookkeeping",type:"recur",n:"Monthly bookkeeping + statements",d:"Record activity and deliver monthly financial statements.",h:10},
@@ -472,16 +483,82 @@ const SERVICES = [
  {id:"advisory",type:"recur",n:"Owner meeting + KPI review",d:"Monthly partner sit-down on cash, margins, and decisions.",h:2,partner:true}
 ];
 const GAPFIT = {seg:["controls","controlcheck","training"],cash:["controls","controlcheck"],rec:["monthrec","reccatch"],checks:["apreview","controls"],docs:["software","controls"],access:["software"],vendor:["apreview","controls"],personal:["bookkeeping","advisory","cleanup"],inv:["controls","controlcheck"],payroll:["payroll","controls"],vacation:["controls","training"],petty:["controls","controlcheck"]};
-const PHASES = {forensic:[1,2],cleanup:[1,4],reccatch:[3,5],software:[4,6],controls:[6,9],training:[10,11]};
+const PHASES = {forensic:[1,2],cleanup:[1,4],reccatch:[3,5],software:[4,6],controls:[6,9],training:[10,11],checklist:[6,7],audit:[10,12]};
+const DECISIONS = [
+ {id:"d1",n:"Where to start",q:"What do you do first in the first 90 days?",opts:[
+   {id:"a",n:"Find the missing money",d:"Investigate the unexplained bank gap and finish every overdue bank reconciliation. Fast and focused.",svc:["forensic","reccatch"]},
+   {id:"b",n:"Full cleanup",d:"Investigate the gap, finish every overdue reconciliation, and correct the books back to January. Bigger and slower, but the statements come out clean.",svc:["forensic","reccatch","cleanup"]},
+   {id:"c",n:"Bank-ready package",d:"Full cleanup, plus your firm issues an annual audit opinion the client's bank can rely on.",svc:["forensic","reccatch","cleanup","audit"]}]},
+ {id:"d2",n:"Fixing the controls",q:"How will you put the new controls in place?",opts:[
+   {id:"a",n:"Procedures and people",d:"A written procedures manual, a segregation of duties chart, and two training sessions so staff know the new rules.",svc:["controls","training"]},
+   {id:"b",n:"Built into the system",d:"Individual logins, permissions, bank feeds, and approval workflows so the software enforces the rules. Short training only.",svc:["software","training"]},
+   {id:"c",n:"Owner checklist",d:"A one-page daily and weekly checklist the owner runs personally. Cheapest and quickest, but it only works if the owner sticks with it.",svc:["checklist"]}]},
+ {id:"d3",n:"Monthly service",q:"What will you do for them every month?",opts:[
+   {id:"a",n:"Watchdog",d:"Monthly bank reconciliation plus a quarterly controls check and surprise cash count. The client keeps doing their own books.",svc:["monthrec","controlcheck"]},
+   {id:"b",n:"Books handled",d:"Monthly bank reconciliation, full bookkeeping with monthly financial statements, and review of bills and new vendors.",svc:["monthrec","bookkeeping","apreview"]},
+   {id:"c",n:"Full back office",d:"Everything in Books handled, plus payroll review every pay period and a monthly meeting with a partner.",svc:["monthrec","bookkeeping","apreview","payroll","advisory"]}]},
+ {id:"d4",n:"Pricing strategy",q:"How will you price it?",opts:[
+   {id:"a",n:"Premium",d:"Price well above your margin floor. More profit per client, harder to win on price.",m:0.15},
+   {id:"b",n:"Market rate",d:"A fair, typical price with a comfortable margin.",m:0.06},
+   {id:"c",n:"Sharp",d:"Price just above your margin floor to win the deal. Little room for surprises.",m:0.01}]},
+ {id:"d5",n:"Terms",q:"How will the client sign and pay?",opts:[
+   {id:"a",n:"12-month agreement",d:"Setup billed up front, then a monthly fee for 12 months.",t:"12-month agreement"},
+   {id:"b",n:"Month-to-month",d:"Setup billed up front, then monthly with no long commitment. The client can leave any month.",t:"Month-to-month, cancel anytime"},
+   {id:"c",n:"Spread the setup",d:"A 12-month agreement with the setup fee split over the first three months.",t:"12-month agreement, setup split over 3 months"}]}
+];
+const FIT = {
+ bakery:{d1:["a",["b"],"Dana's first worry is cash disappearing. There is no banker waiting on statements, so a full history cleanup matters less."],
+   d2:["a",["c"],"Dana said apps with too many buttons won't get used. Written procedures and training fit her team better than software."],
+   d3:["b",["c"],"Handing off the bookkeeping is what gives Dana her evenings back."],
+   d4:["b",["c"],"A thin-margin café: she wants value, but the lowest price is not her top priority."],
+   d5:["a",["b","c"],"No strong preference in the file."]},
+ auto:{d1:["b",["a"],"The banker wants clean financials by January, so the books must be corrected, not just investigated. The audit option breaks independence."],
+   d2:["b",["c"],"Greg can't spare his crew for training. Controls built into the system stop blank checks and fake vendors with the least disruption."],
+   d3:["b",["c"],"Monthly statements keep the banker happy and catch problems early."],
+   d4:["a",["b"],"Greg wants the money safe and the bank happy. He is not shopping for the cheapest fee."],
+   d5:["a",["b","c"],"No strong preference in the file."]},
+ dental:{d1:["b",["a"],"The bank wants two years of clean statements for the second office."],
+   d2:["b",["a"],"Shared logins on patient and payroll data are the risk. Individual logins and permissions protect privacy."],
+   d3:["c",["b"],"Payroll is the biggest expense and the ghost employee is still being paid. Payroll review every period is the fix."],
+   d4:["a",["b"],"A successful practice that values trust and privacy over a low fee."],
+   d5:["a",["b","c"],"No strong preference in the file."]},
+ gym:{d1:["a",["b"],"Money is tight. Recovering the missing drop-in cash helps the service pay for itself."],
+   d2:["c",["a"],"A small budget and a part-time desk staff that turns over. A simple owner checklist is affordable and quick."],
+   d3:["b",["a"],"Monthly statements show which months make money and end the April tax panic."],
+   d4:["c",["b"],"Jess said whatever they do has to pay for itself. Price matters most here."],
+   d5:["c",["b"],"Cash is tight in slow months. Spreading the setup fee or keeping it month-to-month eases the hit."]},
+ events:{d1:["b",["a"],"Nicole can't tell who has paid what. Only a full cleanup sorts out every client deposit."],
+   d2:["a",["b"],"Nicole wants a person, not another app, and systems that work without her. Procedures plus trained staff fit."],
+   d3:["c",["b"],"Growing 30% a year, she wants a real person to call. A monthly partner meeting delivers that."],
+   d4:["b",["a"],"She values the relationship. A fair price is fine; she is not bargain hunting."],
+   d5:["a",["b","c"],"No strong preference in the file."]}
+};
+const VOTER = {
+ bakery:{persona:"You are Dana Kowalski. You own Sweet Crumb Bakery & Café. You bake at 4 a.m., do the books at 10 p.m., and you think cash is disappearing.",
+   breakers:["Anything so complicated my team won't use it","A price that eats what's left of my thin margins"],
+   listen:["Did they find where my cash is going?","Will this actually give me my evenings back?","Could Marisol and the counter staff follow this tomorrow?"]},
+ auto:{persona:"You are Greg Whitfield, owner of Northline Auto & Tire. Your banker wants clean financials by January or your line of credit is gone.",
+   breakers:["Pulling my mechanics off the floor for days of training","Anything that misses the January deadline"],
+   listen:["Will my banker accept what they produce, and by January?","Do they stop money leaving through checks I never approved?","How much of my crew's time does this take?"]},
+ dental:{persona:"You are Dr. Anita Rao, owner of Brightpath Family Dental. You're opening a second office in 2027 and the bank wants two years of clean statements.",
+   breakers:["Anyone careless with patient data","Missing payroll mistakes again"],
+   listen:["Who checks payroll, and how often?","How do they protect patient and payroll data?","Will the bank trust their numbers for my second office?"]},
+ gym:{persona:"You are Jess Lee, co-owner of Prairie Fit Studio. Money is tight, summer is slow, and every April you panic about taxes.",
+   breakers:["A big bill before the service pays for itself","Paying for extras we don't need"],
+   listen:["Does this pay for itself? How?","Will I finally see which months make money?","Can we afford it in a slow summer?"]},
+ events:{persona:"You are Nicole Barrera, founder of Harbor & Vine Events. You're growing 30% a year and can't tell which couples have paid their deposits.",
+   breakers:["Another app instead of a real person","A system that only works when I'm in the room"],
+   listen:["Will I know every client deposit, every day?","Who do I call when something goes wrong on a Saturday?","Will this still work when we're twice this size?"]}
+};
 
 const STEPS = [
- {n:"Client file",min:8},{n:"Bank rec",min:10},{n:"Walkthrough",min:7},{n:"Fixes",min:5},{n:"Price it",min:10},{n:"Value prop",min:4},{n:"Pitch deck",min:1}
+ {n:"Client file",min:8},{n:"Bank rec",min:10},{n:"Walkthrough",min:7},{n:"Fixes",min:5},{n:"Build offer",min:10},{n:"Value prop",min:4},{n:"Pitch deck",min:1}
 ];
 
 /* ===================== STATE ===================== */
 const ROLE=window.ENG_ROLE||"student";
 const KEY="engagement-sim-v1";
-const fresh=()=>({me:"",secT:{},people:{},joinT:0,code:"",group:null,firm:"",members:["","",""],step:0,rec:{ans:{},tries:0,done:false,showWrong:false},flags:[],flagsDone:false,flagTry:null,fixes:{},sel:{monthrec:true},price:{},prios:[],strengths:[],rivalW:null,headline:"",headEdited:false,maxStep:0});
+const fresh=()=>({dec:{},me:"",secT:{},people:{},joinT:0,code:"",group:null,firm:"",members:["","",""],step:0,rec:{ans:{},tries:0,done:false,showWrong:false},flags:[],flagsDone:false,flagTry:null,fixes:{},sel:{monthrec:true},price:{},prios:[],strengths:[],rivalW:null,headline:"",headEdited:false,maxStep:0});
 let S=fresh();
 try{const raw=localStorage.getItem(KEY); if(raw){S=Object.assign(fresh(),JSON.parse(raw));}}catch(e){}
 let DEV="";try{DEV=localStorage.getItem(KEY+"-dev")||"";if(!DEV){DEV=Math.random().toString(36).slice(2,10);localStorage.setItem(KEY+"-dev",DEV);}}catch(e){DEV=Math.random().toString(36).slice(2,10);}
@@ -490,8 +567,8 @@ function store(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
 function save(sec){if(sec){S.secT=S.secT||{};S.secT[sec]=Date.now();DIRTY.add(sec);} store(); queueSync(); paintMast();}
 let view = ROLE==="teacher"?"teacher":(S.group? "group":"home");
 let teacher={unlocked:ROLE==="teacher",tab:"live",client:0,codes:{},picked:{},session:"",live:{},netOk:null,confirmEnd:false};
-try{const t=JSON.parse(localStorage.getItem(KEY+"-t")||"null"); if(t){teacher.codes=t.codes||{};teacher.picked=t.picked||{};teacher.session=t.session||"";}}catch(e){}
-function saveT(){try{localStorage.setItem(KEY+"-t",JSON.stringify({codes:teacher.codes,picked:teacher.picked,session:teacher.session}));}catch(e){}}
+try{const t=JSON.parse(localStorage.getItem(KEY+"-t")||"null"); if(t){teacher.codes=t.codes||{};teacher.picked=t.picked||{};teacher.session=t.session||"";teacher.votes=t.votes||{};}}catch(e){}
+function saveT(){try{localStorage.setItem(KEY+"-t",JSON.stringify({codes:teacher.codes,picked:teacher.picked,session:teacher.session,votes:teacher.votes}));}catch(e){}}
 
 /* ===================== LIVE SYNC (/api/live, same backend as Bank Rec Live) ===================== */
 async function liveCall(op,path,v){const r=await fetch("/api/live",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({op,path,v})});const j=await r.json().catch(()=>({}));return {status:r.status,ok:r.ok,j};}
@@ -501,7 +578,7 @@ const SECS={
   rec:{get:s=>s.rec,put:(s,v)=>{s.rec=Object.assign({ans:{},tries:0,done:false,showWrong:false},v);}},
   walk:{get:s=>({flags:s.flags,flagsDone:s.flagsDone}),put:(s,v)=>{s.flags=v.flags||[];s.flagsDone=!!v.flagsDone;}},
   fixes:{get:s=>s.fixes,put:(s,v)=>{s.fixes=v||{};}},
-  price:{get:s=>({sel:s.sel,price:s.price}),put:(s,v)=>{s.sel=v.sel||{monthrec:true};s.price=v.price||{};}},
+  price:{get:s=>({sel:s.sel,price:s.price,dec:s.dec}),put:(s,v)=>{s.sel=v.sel||{monthrec:true};s.price=v.price||{};s.dec=v.dec||{};}},
   value:{get:s=>({prios:s.prios,strengths:s.strengths,rivalW:s.rivalW,headline:s.headline,headEdited:s.headEdited}),put:(s,v)=>{s.prios=v.prios||[];s.strengths=v.strengths||[];s.rivalW=v.rivalW||null;s.headline=v.headline||"";s.headEdited=!!v.headEdited;}}
 };
 function peopleList(people){return Object.entries(people||{}).filter(([,p])=>p&&p.name&&p.name.trim()).sort((a,b)=>(a[1].j||0)-(b[1].j||0));}
@@ -612,34 +689,40 @@ function quote(s){
     setupMargin:setupPrice?(setupPrice-setupCost)/setupPrice:0, recurMargin:recurPrice?(recurPrice-recurCost)/recurPrice:0,
     pctRev:(recurPrice*12)/c.fin.rev, fyPctRev:firstYear/c.fin.rev};
 }
+function decOpt(s,did){const d=DECISIONS.find(x=>x.id===did);return d?d.opts.find(o=>o.id===(s.dec||{})[did]):null;}
+function allDecided(s){return DECISIONS.every(d=>!!(s.dec||{})[d.id]);}
+function termsText(s){const o=decOpt(s,"d5");return o?o.t:firmOf(s.group).contract;}
+function applyDec(s){
+  const f=firmOf(s.group),sel={monthrec:true},price={};
+  DECISIONS.forEach(d=>{const o=decOpt(s,d.id);if(o&&o.svc)o.svc.forEach(x=>sel[x]=true);});
+  const m=(decOpt(s,"d4")||{m:0.06}).m;
+  const rec=SERVICES.filter(v=>v.type==="recur"&&sel[v.id]),C=rec.reduce((t,v)=>t+svcCost(s,v),0);
+  SERVICES.forEach(v=>{if(!sel[v.id])return;const c=svcCost(s,v);
+    if(v.type==="setup")price[v.id]=Math.ceil(c/(1-(f.setupFloor+m))/50)*50;
+    else price[v.id]=Math.ceil(c*(1+(C?f.platform/C:0))/(1-(f.recurFloor+m))/10)*10;});
+  s.sel=sel;s.price=price;
+}
 function priceWindow(s){
   const f=firmOf(s.group),q=quote(s),c=clientOf(s.group);
   const needRecur=q.recur.length?q.recurCost/(1-f.recurFloor):0;
-  const low=Math.max(needRecur,f.minMonthly||0),high=c.fin.rev*0.025/12;
-  const needSetup=q.setup.length?q.setupCost/(1-f.setupFloor):0;
-  return {low,high,needRecur,needSetup,q,f,c};
-}
-function priciest(s){
-  const q=quote(s);return q.recur.filter(l=>!l.v.req).sort((a,b)=>b.cost-a.cost)[0];
+  return {low:Math.max(needRecur,f.minMonthly||0),high:c.fin.rev*0.025/12,needRecur,q,f,c};
 }
 function mgmt(s){
   const w=priceWindow(s),f=w.f,q=w.q,out=[];
-  const big=priciest(s);
-  const cut=big?`Uncheck a monthly service, such as ${big.v.n} (costs you ${money(big.cost)} a month).`:"Uncheck a monthly service.";
-  const squeezed=w.low>w.high+0.5;
-  out.push({l:"Monthly bank reconciliation included",ok:!!s.sel.monthrec,fix:"Check Monthly bank reconciliation."});
-  if(q.setup.length) out.push({l:`Setup margin at least ${f.setupFloor*100}%`,ok:q.setupMargin>=f.setupFloor-1e-9,d:"Currently "+pct(q.setupMargin),
-    fix:`Raise setup prices by about ${money(Math.max(0,w.needSetup-q.setupPrice))} in total (setup total of at least ${money(Math.ceil(w.needSetup/50)*50)}).`});
-  out.push({l:`Monthly margin at least ${f.recurFloor*100}%`,ok:q.recur.length>0&&q.recurMargin>=f.recurFloor-1e-9,d:"Currently "+pct(q.recurMargin)+(f.platform?" (after $"+f.platform+" platform cost)":""),
-    fix:squeezed?cut+" Your monthly work costs too much to meet this margin and stay under the client's cap.":`Raise monthly prices by about ${money(Math.max(0,w.needRecur-q.recurPrice))} in total (monthly total of at least ${money(Math.ceil(w.needRecur/10)*10)}).`});
-  if(f.minMonthly) out.push({l:`Monthly fee at least ${money(f.minMonthly)}`,ok:q.recurPrice>=f.minMonthly,d:"Currently "+money(q.recurPrice),
-    fix:`Raise monthly prices or check another monthly service until the monthly total reaches ${money(f.minMonthly)}.`});
-  if(f.maxHours){const over=q.recurHours-f.maxHours;out.push({l:`No more than ${f.maxHours} hours a month`,ok:q.recurHours<=f.maxHours,d:"Currently "+q.recurHours.toFixed(1)+" hours",
-    fix:`Uncheck monthly services to cut ${over.toFixed(1)} hours. Check the Hours/mo column.`});}
-  out.push({l:"No audit for a client we advise (independence)",ok:!s.sel.audit,fix:"Uncheck Annual financial statement audit. A firm cannot audit controls it designed."});
-  out.push({l:"Recurring fees at or below 2.5% of client revenue",ok:q.pctRev<=0.025+1e-9,d:"Currently "+pct(q.pctRev),
-    fix:squeezed?cut:`Lower monthly prices by about ${money(q.recurPrice-w.high)} in total (monthly total of ${money(Math.floor(w.high/10)*10)} or less), or uncheck a monthly service.`});
+  out.push({k:"rec",l:"Monthly bank reconciliation included",ok:!!s.sel.monthrec,fix:"Every Monthly service option includes it."});
+  out.push({k:"audit",l:"No audit for a client we advise (independence)",ok:!s.sel.audit,fix:"In Where to start, pick an option without the audit. A firm cannot audit controls it designed."});
+  if(f.key==="A") out.push({k:"terms",l:"Terms allowed by your firm (12 months)",ok:(s.dec||{}).d5!=="b",fix:"In Terms, pick 12-month agreement or Spread the setup. Your firm does not allow month-to-month."});
+  if(q.setup.length) out.push({k:"sm",l:`Setup margin at least ${f.setupFloor*100}%`,ok:q.setupMargin>=f.setupFloor-1e-9,d:"Currently "+pct(q.setupMargin),fix:"Pick a higher Pricing strategy."});
+  out.push({k:"rm",l:`Monthly margin at least ${f.recurFloor*100}%`,ok:q.recur.length>0&&q.recurMargin>=f.recurFloor-1e-9,d:"Currently "+pct(q.recurMargin)+(f.platform?" (after $"+f.platform+" platform cost)":""),fix:"Pick a higher Pricing strategy."});
+  if(f.minMonthly) out.push({k:"min",l:`Monthly fee at least ${money(f.minMonthly)}`,ok:q.recurPrice>=f.minMonthly,d:"Currently "+money(q.recurPrice),fix:"Pick a bigger Monthly service or a higher Pricing strategy."});
+  if(f.maxHours) out.push({k:"hrs",l:`No more than ${f.maxHours} hours a month`,ok:q.recurHours<=f.maxHours,d:"Currently "+q.recurHours.toFixed(1)+" hours",fix:"Pick a smaller Monthly service. Your team does not have the hours."});
+  out.push({k:"cap",l:"Recurring fees at or below 2.5% of client revenue",ok:q.pctRev<=0.025+1e-9,d:"Currently "+pct(q.pctRev),fix:"Pick a smaller Monthly service or a lower Pricing strategy."});
   return out;
+}
+function fitOf(s){
+  const fx=FIT[clientOf(s.group).id];let pts=0;
+  const rows=DECISIONS.map(d=>{const ch=(s.dec||{})[d.id],[best,ok,why]=fx[d.id];const r=!ch?"none":ch===best?"best":ok.includes(ch)?"ok":"poor";pts+=r==="best"?3:r==="ok"?1.5:0;return {d,ch,r,best,why};});
+  return {pts:Math.round(pts),rows};
 }
 const mgmtOK=s=>mgmt(s).every(x=>x.ok);
 
@@ -655,7 +738,7 @@ function stepDone(s,i){
     case 1:return s.rec.done;
     case 2:return s.flagsDone;
     case 3:return s.flagsDone&&clientOf(s.group).weak.every(k=>s.fixes[k]!=null);
-    case 4:return mgmtOK(s);
+    case 4:return allDecided(s)&&mgmtOK(s);
     case 5:return s.prios.length===3&&s.strengths.length===2&&!!s.rivalW;
     case 6:return false;
   }
@@ -683,8 +766,8 @@ function slideList(s){
   const fixReady=s.flagsDone&&c.weak.every(k=>s.fixes[k]!=null);
   out.push({name:"Our plan",ready:fixReady,html:fixReady?`<div class="s-in"><div class="s-eye">Our recommendations</div><div class="s-h">How we close each gap</div><table class="s-tbl">${c.weak.map(k=>`<tr><td>${esc(W[k].n)}</td><td>${esc(W[k].fix[s.fixes[k]])}</td></tr>`).join("")}</table></div>${foot}`:wait("Choose your Fixes to build this slide")});
   // 6 investment
-  const hasPrice=q.recur.length>0;
-  out.push({name:"Investment",ready:hasPrice,warn:hasPrice&&!mgmtOK(s),html:hasPrice?`<div class="s-in"><div class="s-eye">Your investment</div><div class="s-cards" style="grid-template-columns:1fr 1fr;flex:1"><div class="s-card"><span class="s-lab">One-time setup</span><table class="s-tbl">${q.setup.length?q.setup.map(l=>`<tr><td style="width:auto">${esc(l.v.n)}</td><td class="m">${money(l.price)}</td></tr>`).join(""):`<tr><td>No setup work</td><td class="m">$0</td></tr>`}<tr class="t"><td>Setup total</td><td class="m">${money(q.setupPrice)}</td></tr></table></div><div class="s-card"><span class="s-lab">Monthly service</span><table class="s-tbl">${q.recur.map(l=>`<tr><td style="width:auto">${esc(l.v.n)}</td><td class="m">${money(l.price)}</td></tr>`).join("")}<tr class="t"><td>Per month</td><td class="m">${money(q.recurPrice)}</td></tr></table></div></div><div style="display:flex;gap:3cqw;align-items:flex-end;background:var(--s-brown);color:#FFFFFF;padding:1.6cqw 2cqw;margin:0 -0cqw"><div><div class="s-lab" style="color:#D9D9D9">First-year investment</div><div class="s-big" style="color:#FF8A99">${money(q.firstYear)}</div></div><div class="s-p" style="font-size:1.4cqw">${esc(f.contract)}<br>About ${pct(q.fyPctRev)} of annual revenue in year one</div></div></div>${foot}`:wait("Build your price in Price it")});
+  const hasPrice=allDecided(s)&&q.recur.length>0;
+  out.push({name:"Investment",ready:hasPrice,warn:hasPrice&&!mgmtOK(s),html:hasPrice?`<div class="s-in"><div class="s-eye">Your investment</div><div class="s-cards" style="grid-template-columns:1fr 1fr;flex:1"><div class="s-card"><span class="s-lab">One-time setup</span><table class="s-tbl">${q.setup.length?q.setup.map(l=>`<tr><td style="width:auto">${esc(l.v.n)}</td><td class="m">${money(l.price)}</td></tr>`).join(""):`<tr><td>No setup work</td><td class="m">$0</td></tr>`}<tr class="t"><td>Setup total</td><td class="m">${money(q.setupPrice)}</td></tr></table></div><div class="s-card"><span class="s-lab">Monthly service</span><table class="s-tbl">${q.recur.map(l=>`<tr><td style="width:auto">${esc(l.v.n)}</td><td class="m">${money(l.price)}</td></tr>`).join("")}<tr class="t"><td>Per month</td><td class="m">${money(q.recurPrice)}</td></tr></table></div></div><div style="display:flex;gap:3cqw;align-items:flex-end;background:var(--s-brown);color:#FFFFFF;padding:1.6cqw 2cqw;margin:0 -0cqw"><div><div class="s-lab" style="color:#D9D9D9">First-year investment</div><div class="s-big" style="color:#FF8A99">${money(q.firstYear)}</div></div><div class="s-p" style="font-size:1.4cqw">${esc(termsText(s))}<br>About ${pct(q.fyPctRev)} of annual revenue in year one</div></div></div>${foot}`:wait("Finish Build the offer to build this slide")});
   // 7 why us
   const sts=s.strengths.map(id=>f.strengths.find(x=>x.id===id)).filter(Boolean);
   const rw=rf.weaknesses.find(x=>x.id===s.rivalW);
@@ -692,7 +775,7 @@ function slideList(s){
   out.push({name:"Why us",ready:whyReady,html:whyReady?`<div class="s-in"><div class="s-eye">Why ${esc(name)}</div><div class="s-h" style="font-size:3.3cqw">${esc(s.headline||headlineSuggest(s))}</div><div class="s-cards" style="grid-template-columns:1fr 1fr 1.1fr">${sts.map(x=>`<div class="s-card"><b>${esc(x.t)}</b></div>`).join("")}<div class="s-card" style="border-top-color:var(--s-orange);background:var(--s-cream)"><span class="s-lab">Before you choose any firm, ask</span><b style="font-size:1.75cqw">"${esc(rw.q)}"</b></div></div></div>${foot}`:wait("Finish Value prop to build this slide")});
   // 8 timeline
   const ph=q.setup.filter(l=>PHASES[l.v.id]);
-  out.push({name:"First 90 days",ready:hasPrice,html:hasPrice?`<div class="s-in"><div class="s-eye">First 90 days</div><div class="s-h">What happens after you say yes</div><div class="gantt">${ph.map(l=>{const[a,b]=PHASES[l.v.id];return `<div class="gr"><span>${esc(l.v.n)}</span><div class="track"><div class="bar" style="left:${(a-1)/12*100}%;width:${(b-a+1)/12*100}%"></div></div></div>`}).join("")}<div class="gr"><span><b>Monthly service begins</b></span><div class="track"><div class="bar rec" style="left:${(Math.max(4,...ph.map(l=>PHASES[l.v.id][1]))<=8?4:8)/12*100}%;right:0"></div></div></div><div class="axis"><span></span><div class="ticks">${Array.from({length:12},(_,i)=>`<span>Wk ${i+1}</span>`).join("")}</div></div></div></div>${foot}`:wait("Build your price in Price it")});
+  out.push({name:"First 90 days",ready:hasPrice,html:hasPrice?`<div class="s-in"><div class="s-eye">First 90 days</div><div class="s-h">What happens after you say yes</div><div class="gantt">${ph.map(l=>{const[a,b]=PHASES[l.v.id];return `<div class="gr"><span>${esc(l.v.n)}</span><div class="track"><div class="bar" style="left:${(a-1)/12*100}%;width:${(b-a+1)/12*100}%"></div></div></div>`}).join("")}<div class="gr"><span><b>Monthly service begins</b></span><div class="track"><div class="bar rec" style="left:${(Math.max(4,...ph.map(l=>PHASES[l.v.id][1]))<=8?4:8)/12*100}%;right:0"></div></div></div><div class="axis"><span></span><div class="ticks">${Array.from({length:12},(_,i)=>`<span>Wk ${i+1}</span>`).join("")}</div></div></div></div>${foot}`:wait("Finish Build the offer to build this slide")});
   // 9 close
   out.push({name:"Close",ready:true,html:`<div class="s-title" style="grid-template-columns:1fr"><div class="l" style="justify-content:center;gap:2cqw;padding:6cqw"><div class="s-eye" style="color:#FF8A99">${esc(name)}</div><div style="font-family:var(--display);font-size:6cqw;line-height:1;text-transform:uppercase;font-weight:600">Let's get your books clean.</div><div style="font-size:1.7cqw;opacity:.85">Questions for us, ${esc(first)}?</div><div style="font-size:1.4cqw;opacity:.75">${members.map(esc).join(" · ")}</div></div></div><div class="s-band" style="top:auto;bottom:0"></div>`});
   return out;
@@ -748,7 +831,7 @@ function renderSetup(app){
   ${[0,1,2].map(i=>`<label class="f">Team member ${i+1}${i===2?" (optional)":""}<input type="text" data-mem="${i}" value="${esc(S.members[i])}" placeholder="First and last name"></label>`).join("")}<p class="note">Sharing one device. To work on separate devices, type the class code above.</p>`}</div>
   <div class="panel stack"><h3>Your firm model</h3><p>${esc(f.blurb)}</p><p class="note">${esc(f.pricing)}</p><h3 style="margin-top:6px">Management rules</h3><ul class="clean">${f.rules.map(r=>`<li>${esc(r)}</li>`).join("")}</ul></div></div>
   <div class="panel stack" style="margin-top:16px"><h3>Each on your own device? Split the work</h3><p class="note">Everyone reads the client file first (about 8 minutes). Then divide up. Your choices show up on each other's screens within a couple of seconds.</p>
-  <div class="grid2"><div><b>Three people</b><ul class="clean"><li>Person 1: Bank rec</li><li>Person 2: Walkthrough, then Fixes</li><li>Person 3: Value prop</li><li>All three: Price it together, then rehearse the deck</li></ul></div><div><b>Two people</b><ul class="clean"><li>Person 1: Bank rec, then Value prop</li><li>Person 2: Walkthrough, then Fixes</li><li>Both: Price it together, then rehearse the deck</li></ul></div></div></div>
+  <div class="grid2"><div><b>Three people</b><ul class="clean"><li>Person 1: Bank rec</li><li>Person 2: Walkthrough, then Fixes</li><li>Person 3: Value prop</li><li>All three: Build the offer together, then rehearse the deck</li></ul></div><div><b>Two people</b><ul class="clean"><li>Person 1: Bank rec, then Value prop</li><li>Person 2: Walkthrough, then Fixes</li><li>Both: Build the offer together, then rehearse the deck</li></ul></div></div></div>
   <div class="next"><button class="btn alt" type="button" data-home="1">Change group</button><button class="btn or" type="button" data-go="0">Open the client file</button></div>`;
 }
 function finTable(c){const F=c.fin,gp=F.rev-F.cogs,ni=gp-F.payroll-F.rent-F.other,ta=F.cash+F.ar+F.inv+F.equip,tl=F.ap+F.unearned+F.loan,eq=ta-tl;
@@ -798,48 +881,40 @@ function vFix(app){
 }
 function shuffleFor(seed){let h=0;for(const ch of String(seed))h=(h*31+ch.charCodeAt(0))>>>0;const a=[0,1,2];for(let i=2;i>0;i--){h=(h*1103515245+12345)>>>0;const j=h%(i+1);[a[i],a[j]]=[a[j],a[i]];}return a;}
 
-function fitFor(s,id){
-  const c=clientOf(s.group);const gaps=s.flagsDone?c.weak:s.flags.filter(k=>c.weak.includes(k));
-  const hits=gaps.filter(k=>(GAPFIT[k]||[]).includes(id));
-  if(id==="forensic"&&s.rec.done)return "Explains your unexplained gap";
-  if(id==="audit")return "";
-  return hits.length?"Fixes: "+hits.map(k=>W[k].n.split(";")[0].split(",")[0]).slice(0,2).join(" · "):"";
-}
 function vPrice(app){
   const f=firmOf(S.group),c=clientOf(S.group);
-  const row=v=>{const on=!!S.sel[v.id],rg=svcRange(S,v),p=svcPrice(S,v),cost=svcCost(S,v),m=(p-cost)/p,fl=v.type==="setup"?f.setupFloor:f.recurFloor,fit=fitFor(S,v.id);
-    return `<tr class="${on?"":"off"}" id="row-${v.id}"><td><input type="checkbox" data-sel="${v.id}" ${on?"checked":""} ${v.req?"disabled":""} aria-label="Include ${esc(v.n)}"></td><td><div class="nm">${esc(v.n)} ${v.req?'<span class="tag or">Required</span>':""}${v.id==="audit"?' <span class="tag bad">Check the rules</span>':""}</div><div class="ds">${esc(v.d)}</div>${fit?`<span class="gapfit">${esc(fit)}</span>`:""}</td><td class="num">${svcHours(S,v).toFixed(1)}</td><td class="num">${money(cost)}</td><td><input type="range" data-price="${v.id}" min="${rg.min}" max="${rg.max}" step="${svcStep(v)}" value="${p}" aria-label="Price for ${esc(v.n)}"></td><td class="num"><b id="p-${v.id}">${money(p)}</b></td><td class="num mg ${m>=fl-1e-9?"hi":"low"}" id="m-${v.id}">${pct(m)}</td></tr>`;};
-  const table=(type,label)=>`<div class="pricewrap"><table class="svc"><thead><tr><th></th><th>${label}</th><th style="text-align:right">Hours${type==="recur"?"/mo":""}</th><th style="text-align:right">Our cost</th><th>Set price</th><th style="text-align:right">Price</th><th style="text-align:right">Margin</th></tr></thead><tbody>${SERVICES.filter(v=>v.type===type).map(row).join("")}</tbody></table></div>`;
-  app.innerHTML=head(4,"Build the price","Pick the services this client needs, then set prices your managers will approve and the client can afford. The client never sees your costs or margins.")+
-  `<div class="panel" style="margin-bottom:16px"><h3 style="margin-bottom:8px">How to get approved</h3><ol class="howto">
-   <li><span><b>Check the services that fix this client's problems.</b> Green tags show which gaps a service fixes. You do not need everything.</span></li>
-   <li><span><b>Drag prices until every margin is green.</b> Red margins are below your firm's floor (${f.setupFloor*100}% setup, ${f.recurFloor*100}% monthly).</span></li>
-   <li><span><b>Keep the monthly total inside the green range</b> below. Too many monthly services will not fit. Cut one if you are stuck.</span></li>
-   <li><span><b>Follow the red "do this" lines</b> in the management check until it says Approved.</span></li></ol></div>
-  <div class="coach" id="pricesum"></div>
-  <div class="stack"><h3>One-time setup</h3>${table("setup","Service")}<h3>Monthly service</h3>${table("recur","Service")}${f.platform?`<p class="note">Your firm also pays ${money(f.platform)} a month in software platform costs for any client on monthly service. It is included in your monthly margin.</p>`:""}</div>
+  const optCard=(d,o)=>{
+    const t=JSON.parse(JSON.stringify(S));t.dec=Object.assign({},t.dec,{[d.id]:o.id});applyDec(t);
+    const tq=quote(t),bad=mgmt(t).filter(x=>!x.ok&&(allDecided(t)||["audit","terms","hrs"].includes(x.k)));
+    const on=(S.dec||{})[d.id]===o.id;
+    const inc=o.svc?`<div class="ds" style="margin-top:6px">Includes: ${o.svc.map(id=>esc(SERVICES.find(v=>v.id===id).n)).join(", ")}</div>`:"";
+    const eff=d.id==="d4"?`Monthly ${money(tq.recurPrice)} · Setup ${money(tq.setupPrice)}`:d.id==="d5"?`First year ${money(tq.firstYear)}`:o.svc&&o.svc.some(id=>SERVICES.find(v=>v.id===id).type==="recur")?`Monthly ${money(tq.recurPrice)} · ${tq.recurHours.toFixed(1)} hrs/mo`:`Setup ${money(tq.setupPrice)}`;
+    return `<button type="button" class="opt ${on?"sel":""}" data-dec="${d.id}" data-opt="${o.id}" aria-pressed="${on}"><b>${esc(o.n)}</b><span>${esc(o.d)}</span>${inc}<span class="eff">${eff}</span>${bad.length?`<span class="tag bad" style="align-self:flex-start">Breaks: ${esc(bad.map(x=>x.l.split(" (")[0]).join("; "))}</span>`:""}</button>`;};
+  const n=DECISIONS.filter(d=>(S.dec||{})[d.id]).length;
+  app.innerHTML=head(4,"Build the offer",`Five decisions. Choose the option that fits <b>${esc(c.name)}</b>, using what you learned in the client file, while staying inside your firm's rules. Prices are worked out for you from your choices. The client never sees your costs or margins.`)+
+  `<div class="stack">${DECISIONS.map((d,i)=>`<div class="panel stack decision"><div class="row" style="justify-content:space-between"><h3>${i+1}. ${esc(d.n)}</h3>${(S.dec||{})[d.id]?'<span class="tag good">Decided</span>':'<span class="tag">Choose one</span>'}</div><p class="note">${esc(d.q)}</p><div class="opts3">${d.opts.map(o=>optCard(d,o)).join("")}</div></div>`).join("")}</div>
+  <h3 style="margin:24px 0 10px">Your offer so far</h3><div class="coach" id="pricesum"></div>
+  <div class="pricewrap" id="offerTable"></div>
   <div class="fixbar" id="fixbar" role="status" aria-live="polite"></div>`+nextBar(4,true);
   document.body.classList.add("has-fixbar");
   paintPriceSum();
 }
 function paintPriceSum(){
   const el=$("#pricesum");if(!el)return;
-  const w=priceWindow(S),q=w.q,c=w.c,ni=c.fin.rev-c.fin.cogs-c.fin.payroll-c.fin.rent-c.fin.other,m=mgmt(S),ok=m.every(x=>x.ok);
+  const w=priceWindow(S),q=w.q,c=w.c,ni=c.fin.rev-c.fin.cogs-c.fin.payroll-c.fin.rent-c.fin.other,m=mgmt(S),ok=m.every(x=>x.ok),done=allDecided(S);
   const lo=w.low,hi=w.high,max=Math.max(hi*1.6,lo*1.15,q.recurPrice*1.1,100);
   const L=Math.min(lo,hi)/max*100,R=hi/max*100,Y=Math.min(100,q.recurPrice/max*100);
-  const squeezed=lo>hi+0.5,inWin=!squeezed&&q.recurPrice>=lo-0.5&&q.recurPrice<=hi+0.5;
-  el.innerHTML=`<div class="panel stack"><h3>What the client pays</h3><div class="tot"><span>Setup (one time)</span><b>${money(q.setupPrice)}</b><span>Monthly</span><b>${money(q.recurPrice)}</b><span class="big">First year</span><b class="big">${money(q.firstYear)}</b><span>Share of revenue</span><b>${pct(q.fyPctRev)}</b><span>Share of net income</span><b>${pct(q.firstYear/ni)}</b></div></div>
-  <div class="panel stack"><h3>Monthly total target</h3>
-   ${squeezed?`<p class="no" style="font-size:14px"><b>No price works with these monthly services.</b> They need at least ${money(lo)} a month to meet your margin, but the client's cap is ${money(hi)}. Uncheck a monthly service.</p>`:
-   `<p style="font-size:14px">Land your monthly total between <b>${money(Math.ceil(lo/10)*10)}</b> and <b>${money(Math.floor(hi/10)*10)}</b>.</p>`}
-   <div class="window" aria-hidden="true">${squeezed?"":`<div class="ok" style="left:${L}%;width:${Math.max(1,R-L)}%"></div>`}<div class="you" style="left:calc(${Y}% - 1px)"></div></div>
+  el.innerHTML=`<div class="panel stack"><h3>What the client pays</h3><div class="tot"><span>Setup (one time)</span><b>${money(q.setupPrice)}</b><span>Monthly</span><b>${money(q.recurPrice)}</b><span class="big">First year</span><b class="big">${money(q.firstYear)}</b><span>Share of revenue</span><b>${pct(q.fyPctRev)}</b><span>Share of net income</span><b>${pct(q.firstYear/ni)}</b><span>Terms</span><b style="font-family:var(--body);font-weight:600">${esc(termsText(S))}</b></div></div>
+  <div class="panel stack"><h3>Monthly fee check</h3><p style="font-size:14px">The client's cap is <b>${money(Math.floor(hi/10)*10)}</b> a month (2.5% of revenue).</p>
+   <div class="window" aria-hidden="true"><div class="ok" style="left:${L}%;width:${Math.max(1,R-L)}%"></div><div class="you" style="left:calc(${Y}% - 1px)"></div></div>
    <div class="wlab"><span>$0</span><span>You: ${money(q.recurPrice)}</span></div>
-   <p class="note">${inWin?'<span class="ok">Your monthly total is in range.</span>':"Bottom of the range: your margin floor"+(w.f.minMonthly?" or the "+money(w.f.minMonthly)+" minimum":"")+". Top: 2.5% of the client's revenue."}</p></div>
-  <div class="panel stack"><h3>Management check</h3><ul class="fixlist">${m.map(x=>`<li><span class="ic ${x.ok?"ok":"no"}">${x.ok?"✓":"✕"}</span><span>${esc(x.l)}${x.d?`<small>${esc(x.d)}</small>`:""}${x.ok?"":`<span class="do">Do this: ${esc(x.fix)}</span>`}</span></li>`).join("")}</ul><div class="stamp ${ok?"ok":"no"}">${ok?"Approved by management":"Not approved yet"}</div></div>`;
+   <p class="note">The green band is what management accepts: your margin floor${w.f.minMonthly?" and "+money(w.f.minMonthly)+" minimum":""} at the bottom, the client's cap at the top.</p></div>
+  <div class="panel stack"><h3>Management check</h3>${done?`<ul class="fixlist">${m.map(x=>`<li><span class="ic ${x.ok?"ok":"no"}">${x.ok?"✓":"✕"}</span><span>${esc(x.l)}${x.d?`<small>${esc(x.d)}</small>`:""}${x.ok?"":`<span class="do">Do this: ${esc(x.fix)}</span>`}</span></li>`).join("")}</ul><div class="stamp ${ok?"ok":"no"}">${ok?"Approved by management":"Not approved yet"}</div>`:`<p class="note">Management reviews your offer once all five decisions are made.</p>`}</div>`;
+  const tb=$("#offerTable");
+  if(tb)tb.innerHTML=`<table class="svc"><thead><tr><th>What's included</th><th style="text-align:right">Hours</th><th style="text-align:right">Our cost</th><th style="text-align:right">Client price</th><th style="text-align:right">Margin</th></tr></thead><tbody>${q.lines.map(l=>`<tr><td><div class="nm">${esc(l.v.n)}</div><div class="ds">${l.v.type==="setup"?"One time":"Per month"}</div></td><td class="num">${l.h.toFixed(1)}</td><td class="num">${money(l.cost)}</td><td class="num"><b>${money(l.price)}</b></td><td class="num mg">${pct((l.price-l.cost)/l.price)}</td></tr>`).join("")}</tbody></table>`;
   const fb=$("#fixbar");
-  if(fb){const bad=m.filter(x=>!x.ok);
-    fb.innerHTML=`<div class="in">${ok?`<span class="st ok">Approved</span><span>Management approved this price. Next: Value prop.</span>`:`<span class="st no">${bad.length} to fix</span><span><b>Next:</b> ${esc(bad[0].fix)}</span>`}<span style="margin-left:auto;font-family:var(--mono);font-size:13px;opacity:.85">Monthly ${money(q.recurPrice)} · First year ${money(q.firstYear)}</span></div>`;}
-  SERVICES.forEach(v=>{const e=$("#m-"+v.id);if(!e)return;const fl=v.type==="setup"?w.f.setupFloor:w.f.recurFloor,p=svcPrice(S,v),mm=(p-svcCost(S,v))/p;e.classList.toggle("low",mm<fl-1e-9);e.classList.toggle("hi",mm>=fl-1e-9);});
+  if(fb){const bad=m.filter(x=>!x.ok),nd=DECISIONS.find(d=>!(S.dec||{})[d.id]);
+    fb.innerHTML=`<div class="in">${!done?`<span class="st no">${DECISIONS.filter(d=>!(S.dec||{})[d.id]).length} to decide</span><span><b>Next:</b> ${esc(nd.n)}. ${esc(nd.q)}</span>`:ok?`<span class="st ok">Approved</span><span>Management approved this offer. Next: Value prop.</span>`:`<span class="st no">${bad.length} to fix</span><span><b>Next:</b> ${esc(bad[0].fix)}</span>`}<span style="margin-left:auto;font-family:var(--mono);font-size:13px;opacity:.85">Monthly ${money(q.recurPrice)} · First year ${money(q.firstYear)}</span></div>`;}
   paintMast();paintRail();
 }
 function vValue(app){
@@ -851,15 +926,15 @@ function vValue(app){
   <div class="panel stack"><h3>3. One rival weakness to raise</h3><p class="note">You never name Group ${rivalOf(S.group)}. Your slide gives the client a question to ask any firm, and the honest answer favors you.</p><div class="chips">${rf.weaknesses.map(p=>`<button type="button" data-rw="${p.id}" class="${S.rivalW===p.id?"sel":""}">${esc(p.t)}</button>`).join("")}</div>${S.rivalW?`<p class="note">Question on your slide: <b>"${esc(rf.weaknesses.find(x=>x.id===S.rivalW).q)}"</b></p>`:""}</div>
   <div class="panel stack"><h3>4. Your headline</h3><p class="note">Filled in from your picks. Edit it if you can say it better.</p><input type="text" id="headline" value="${esc(S.headline)}"></div></div>`+nextBar(5,stepDone(S,5),"Next: Pitch deck");
 }
-function encode(s){const o={v:1,g:s.group,f:s.firm,m:s.members,ra:s.rec.ans,rt:s.rec.tries,rd:s.rec.done,fl:s.flags,fd:s.flagsDone,fx:s.fixes,se:s.sel,pr:s.price,pi:s.prios,st:s.strengths,rw:s.rivalW,h:s.headline,he:s.headEdited};
+function encode(s){const o={v:1,g:s.group,f:s.firm,m:s.members,ra:s.rec.ans,rt:s.rec.tries,rd:s.rec.done,fl:s.flags,fd:s.flagsDone,fx:s.fixes,se:s.sel,pr:s.price,dc:s.dec,pi:s.prios,st:s.strengths,rw:s.rivalW,h:s.headline,he:s.headEdited};
   return "ENG1."+btoa(unescape(encodeURIComponent(JSON.stringify(o))));}
 function decode(code){try{code=(code||"").trim();if(!code.startsWith("ENG1."))return null;const o=JSON.parse(decodeURIComponent(escape(atob(code.slice(5)))));
-  const s=fresh();Object.assign(s,{group:o.g,firm:o.f||"",members:o.m||["","",""],rec:{ans:o.ra||{},tries:o.rt||0,done:!!o.rd,showWrong:false},flags:o.fl||[],flagsDone:!!o.fd,fixes:o.fx||{},sel:o.se||{},price:o.pr||{},prios:o.pi||[],strengths:o.st||[],rivalW:o.rw,headline:o.h||"",headEdited:!!o.he,maxStep:6});
+  const s=fresh();Object.assign(s,{group:o.g,firm:o.f||"",members:o.m||["","",""],rec:{ans:o.ra||{},tries:o.rt||0,done:!!o.rd,showWrong:false},flags:o.fl||[],flagsDone:!!o.fd,fixes:o.fx||{},sel:o.se||{},price:o.pr||{},dec:o.dc||{},prios:o.pi||[],strengths:o.st||[],rivalW:o.rw,headline:o.h||"",headEdited:!!o.he,maxStep:6});
   if(!(s.group>=1&&s.group<=10))return null;return s;}catch(e){return null;}}
 function vDeck(app){
   const sl=slideList(S),n=sl.filter(x=>x.ready).length,ok=mgmtOK(S);
   app.innerHTML=head(6,"Your pitch deck",`Built from your decisions. ${n} of ${sl.length} slides are ready. Click any slide to present from it. Plan for about 90 seconds: each team member takes two or three slides.`)+
-  `<div class="row" style="margin-bottom:16px"><button class="btn or" type="button" data-present="0">Present full screen</button>${ok?'<span class="tag good">Price approved by management</span>':'<span class="tag bad">Price not approved by management. Fix it in Price it.</span>'}</div>
+  `<div class="row" style="margin-bottom:16px"><button class="btn or" type="button" data-present="0">Present full screen</button>${ok?'<span class="tag good">Price approved by management</span>':'<span class="tag bad">Price not approved by management. Fix it in Build the offer.</span>'}</div>
   <div class="thumbs">${sl.map((x,i)=>`<div class="thumb"><div class="slide" data-present="${i}" role="button" tabindex="0" aria-label="Present slide ${i+1}">${x.html}</div><div class="cap"><span>${i+1}. ${esc(x.name)}</span>${x.ready?(x.warn?'<span class="tag warn">Check price</span>':'<span class="tag good">Ready</span>'):'<span class="tag">Waiting</span>'}</div></div>`).join("")}</div>
   <div class="panel codebox" style="margin-top:24px"><h3>Send to the projector</h3><p class="note" id="syncMsg">${syncNote()}</p><p class="note">Backup: if your deck is not synced, copy this pitch code and send it to your teacher. It carries your whole deck.</p><textarea id="codeOut" readonly>${encode(S)}</textarea><div class="row"><button class="btn" type="button" id="copyCode">Copy pitch code</button><span class="note" id="copyMsg"></span></div></div>
   <div class="next"><button class="btn alt" type="button" data-go="5">Back</button><span id="resetZone"><button class="btn alt" type="button" id="resetAsk">Start over on this device</button></span></div>`;
@@ -879,15 +954,39 @@ function scoreOf(s,rival){
   const c=clientOf(s.group);
   const rec=s.rec.done?(s.rec.tries<=1?15:s.rec.tries===2?10:6):0;
   const hit=s.flags.filter(k=>c.weak.includes(k)).length,fa=s.flags.length-hit;
-  const gaps=s.flagsDone?Math.max(0,hit*4-fa*2):0;
+  const gaps=s.flagsDone?Math.max(0,Math.min(15,hit*3-fa*2)):0;
   const fixRaw=c.weak.reduce((t,k)=>t+(s.fixes[k]===0?2:s.fixes[k]===1?1:0),0);
-  const fix=Math.round(fixRaw/(c.weak.length*2)*15);
-  const fails=mgmt(s).filter(x=>!x.ok).length;
+  const fix=Math.round(fixRaw/(c.weak.length*2)*10);
+  const offer=fitOf(s).pts;
+  const fails=allDecided(s)?mgmt(s).filter(x=>!x.ok).length:3;
   const mg=Math.max(0,15-fails*5);
   const vp=s.prios.filter(p=>c.truePrios.includes(p)).length*5;
-  const fy=quote(s).firstYear;let price=10;
-  if(rival){const rfy=quote(rival).firstYear; if(fy>0&&rfy>0) price=Math.round(20*Math.min(1,rfy/fy));}
-  return {rec,gaps,fix,mg,vp,price,total:rec+gaps+fix+mg+vp+price,fails,fy};
+  const fy=quote(s).firstYear;let price=8;
+  if(rival){const rfy=quote(rival).firstYear; if(fy>0&&rfy>0) price=Math.round(15*Math.min(1,rfy/fy));}
+  return {rec,gaps,fix,offer,mg,vp,price,total:rec+gaps+fix+offer+mg+vp+price,fails,fy};
+}
+function decLabel(s,did){const o=decOpt(s,did);return o?o.n:"Not chosen";}
+function voterSlides(ci,s1,s2){
+  const c=CLIENTS[ci],V=VOTER[c.id],F=c.fin,g1=ci*2+1,g2=ci*2+2;
+  const first=c.owner.startsWith("Dr.")?c.owner.split(" ").slice(0,2).join(" "):c.owner.split(" ")[0];
+  const needs=c.truePrios.map(id=>c.prios.find(p=>p.id===id));
+  const comfy=Math.floor(F.rev*0.015/12/10)*10,stretch=Math.floor(F.rev*0.025/12/10)*10;
+  const foot=`<div class="s-foot"><span>Client vote</span><span>${esc(c.name)}</span></div><div class="s-band"></div>`;
+  const one=`<div class="s-in"><div class="s-eye">Voters: you are the client</div><div class="s-h" style="font-size:2.3cqw;line-height:1.15">${esc(V.persona)}</div>
+   <div class="s-cards" style="grid-template-columns:1.3fr 1fr 1fr">
+    <div class="s-card"><span class="s-lab">What I need most</span>${needs.map(p=>`<b style="font-size:1.45cqw">${esc(p.t)}</b><i style="font-size:1.3cqw">"${esc(p.q)}"</i>`).join("")}</div>
+    <div class="s-card"><span class="s-lab">What I can afford</span><div class="s-big" style="font-size:3.4cqw">${money(comfy)}</div><span>a month feels comfortable</span><div class="s-big or" style="font-size:3.4cqw">${money(stretch)}</div><span>a month is my absolute limit</span></div>
+    <div class="s-card"><span class="s-lab">Deal breakers</span>${V.breakers.map(b=>`<i style="font-size:1.3cqw">${esc(b)}</i>`).join("")}<span class="s-lab" style="margin-top:.8cqw">Listen for</span>${V.listen.map(b=>`<i style="font-size:1.3cqw">${esc(b)}</i>`).join("")}</div>
+   </div></div>${foot}`;
+  const col=(g,s)=>{if(!s)return `<div class="s-card"><b>Group ${g}</b><span>No offer loaded yet.</span></div>`;const q=quote(s);
+    return `<div class="s-card"><span class="s-lab">Group ${g}</span><b style="font-size:2.1cqw">${esc(firmName(s))}</b><table class="vt">
+     <tr><td>Where to start</td><td>${esc(decLabel(s,"d1"))}</td></tr><tr><td>Controls</td><td>${esc(decLabel(s,"d2"))}</td></tr><tr><td>Every month</td><td>${esc(decLabel(s,"d3"))}</td></tr><tr><td>Pricing</td><td>${esc(decLabel(s,"d4"))}</td></tr><tr><td>Terms</td><td>${esc(termsText(s))}</td></tr>
+     <tr><td>Setup</td><td class="n">${money(q.setupPrice)}</td></tr><tr><td>Monthly</td><td class="n">${money(q.recurPrice)}</td></tr><tr class="t"><td>First year</td><td class="n">${money(q.firstYear)}</td></tr></table></div>`;};
+  const two=`<div class="s-in"><div class="s-eye">The two offers</div><div class="s-h" style="font-size:3cqw">Which firm should ${esc(first)} hire?</div><div class="s-cards" style="grid-template-columns:1fr 1fr">${col(g1,s1)}${col(g2,s2)}</div></div>${foot}`;
+  const three=`<div class="s-in"><div class="s-eye">Vote as ${esc(first)}</div><div class="s-h">Score each firm 1 to 5, then pick one</div><div class="s-cards" style="grid-template-columns:repeat(4,1fr);flex:0 0 auto">
+    ${[["Understands my business","Did they get what my business is and what I said?"],["Fixes my real problems","Do their fixes match the gaps and the missing money?"],["A price I can live with","Is it inside what I can afford, with terms that work?"],["I trust them","Would I hand them my books tomorrow?"]].map(([a,b])=>`<div class="s-card"><b>${a}</b><span>${b}</span></div>`).join("")}</div>
+    <p class="s-p" style="margin-top:2cqw">Remember: vote as ${esc(first)}, not for your friends. Your own group's client is off limits.</p></div>${foot}`;
+  return [{name:"Client profile",html:one},{name:"The two offers",html:two},{name:"Vote",html:three}];
 }
 function renderTeacher(app){
   if(!teacher.unlocked){
@@ -916,13 +1015,13 @@ function renderTeacher(app){
     <tr><td class="m">0:08</td><td>Step 2, Bank rec (10 min). Sort each item to the bank or book side. The gap reveal is the hook for the pitch.</td></tr>
     <tr><td class="m">0:18</td><td>Step 3, Walkthrough (7 min). One submission. Missed gaps are added for them so the deck stays complete.</td></tr>
     <tr><td class="m">0:25</td><td>Step 4, Fixes (5 min).</td></tr>
-    <tr><td class="m">0:30</td><td>Step 5, Price it (10 min). The default prices fail the margin rules on purpose.</td></tr>
+    <tr><td class="m">0:30</td><td>Step 5, Build the offer (10 min). Five decisions with three options each. The best fit depends on the client file, and some options break the firm's rules.</td></tr>
     <tr><td class="m">0:40</td><td>Step 6, Value prop (4 min).</td></tr>
     <tr><td class="m">0:44</td><td>Step 7, Pitch deck (1 min). Groups check their slides. Synced decks are already on your Decision board; any group that is not synced sends you its pitch code.</td></tr>
-    <tr><td class="m">0:45</td><td>Pitches (20 min). Client by client, odd group then even group: 90 seconds each plus one question from you as the owner. Pick a winner on the Decision board.</td></tr>
+    <tr><td class="m">0:45</td><td>Pitches and votes (20 min). Client by client: on the Decision board, Present to the client voters shows the client profile, both pitches follow (90 seconds each), then the two offers side by side and the vote. The other groups vote as the client; tally on the board.</td></tr>
     <tr><td class="m">1:05</td><td>Done. The rest of the period is yours for intro and debrief.</td></tr></table></div>
     <div class="panel"><h3 style="margin-bottom:10px">Pairings</h3><table class="tt"><tr><th>Client</th><th>Summit model</th><th>Kettle model</th></tr>${CLIENTS.map((c,i)=>`<tr><td>${esc(c.name)}</td><td>Group ${i*2+1}</td><td>Group ${i*2+2}</td></tr>`).join("")}</table>
-    <h3 style="margin:18px 0 8px">Data score (100)</h3><table class="tt"><tr><td>Bank rec</td><td class="m">15</td><td>15 first try, 10 second, 6 after</td></tr><tr><td>Control gaps</td><td class="m">20</td><td>4 per real gap found, minus 2 per false flag</td></tr><tr><td>Fixes</td><td class="m">15</td><td>Best fix 2, partial 1, weak 0</td></tr><tr><td>Management rules</td><td class="m">15</td><td>Minus 5 per broken rule</td></tr><tr><td>Value prop</td><td class="m">15</td><td>5 per true client priority picked</td></tr><tr><td>Price</td><td class="m">20</td><td>Lower first-year bid gets 20; the other scales by the ratio</td></tr></table><p class="note" style="margin-top:8px">The score informs your decision. You still pick the winner after the pitch.</p></div></div>`;
+    <h3 style="margin:18px 0 8px">Data score (100)</h3><table class="tt"><tr><td>Bank rec</td><td class="m">15</td><td>15 first try, 10 second, 6 after</td></tr><tr><td>Control gaps</td><td class="m">15</td><td>3 per real gap found, minus 2 per false flag</td></tr><tr><td>Fixes</td><td class="m">10</td><td>Best fix 2, partial 1, weak 0, scaled to 10</td></tr><tr><td>Offer fit</td><td class="m">15</td><td>3 per decision that best fits the client, 1.5 for a reasonable one</td></tr><tr><td>Management rules</td><td class="m">15</td><td>Minus 5 per broken rule</td></tr><tr><td>Value prop</td><td class="m">15</td><td>5 per true client priority picked</td></tr><tr><td>Price</td><td class="m">15</td><td>Lower first-year bid gets 15; the other scales by the ratio</td></tr></table><p class="note" style="margin-top:8px">The score informs your decision. You still pick the winner after the pitch.</p></div></div>`;
   } else if(teacher.tab==="key"){
     body=`<div class="stack">${CLIENTS.map((c,ci)=>{const t=recTruth(c);return `<div class="panel stack"><div class="row" style="justify-content:space-between"><h2>${esc(c.name)}</h2><span class="tag">Groups ${ci*2+1} and ${ci*2+2}</span></div>
      <div class="grid2"><div><h3 style="margin-bottom:6px">Bank reconciliation</h3><table class="tt">${c.rec.items.map(it=>`<tr><td>${esc(it[0])}</td><td class="m">${money(it[1])}</td><td class="m">${SIDES[it[2]]}</td></tr>`).join("")}<tr><td><b>Adjusted bank</b></td><td class="m">${money(t.bank)}</td><td></td></tr><tr><td><b>Adjusted books</b></td><td class="m">${money(t.book)}</td><td></td></tr><tr><td><b>Unexplained gap</b></td><td class="m"><b>${money(t.gap)}</b></td><td></td></tr></table><p class="note" style="margin-top:6px">${esc(c.reveal)}</p></div>
@@ -937,10 +1036,12 @@ function renderTeacher(app){
       else if(s){const sc=scoreOf(s,r&&r.group===rivalOf(g)?r:null),q=quote(s);
         inner=`<div class="row" style="justify-content:space-between"><div><b style="font-family:var(--display);font-size:20px;text-transform:uppercase">${esc(firmName(s))}</b><div class="note">${esc(s.members.filter(Boolean).join(", "))}</div></div><div class="score">${sc.total}</div></div>
         <table class="tt"><tr><td>Setup</td><td class="m">${money(q.setupPrice)}</td></tr><tr><td>Monthly</td><td class="m">${money(q.recurPrice)}</td></tr><tr><td><b>First year</b></td><td class="m"><b>${money(q.firstYear)}</b></td></tr><tr><td>Management rules</td><td class="m">${sc.fails?`<span class="no">${sc.fails} broken</span>`:'<span class="ok">All met</span>'}</td></tr></table>
-        <table class="tt"><tr><td>Bank rec</td><td class="m">${sc.rec}/15</td></tr><tr><td>Control gaps</td><td class="m">${sc.gaps}/20</td></tr><tr><td>Fixes</td><td class="m">${sc.fix}/15</td></tr><tr><td>Management</td><td class="m">${sc.mg}/15</td></tr><tr><td>Value prop</td><td class="m">${sc.vp}/15</td></tr><tr><td>Price</td><td class="m">${sc.price}/20</td></tr></table>
+        <table class="tt"><tr><td>Bank rec</td><td class="m">${sc.rec}/15</td></tr><tr><td>Control gaps</td><td class="m">${sc.gaps}/15</td></tr><tr><td>Fixes</td><td class="m">${sc.fix}/10</td></tr><tr><td>Offer fit</td><td class="m">${sc.offer}/15</td></tr><tr><td>Management</td><td class="m">${sc.mg}/15</td></tr><tr><td>Value prop</td><td class="m">${sc.vp}/15</td></tr><tr><td>Price</td><td class="m">${sc.price}/15</td></tr></table>
+        <details><summary class="note">Offer fit, decision by decision</summary><table class="tt">${fitOf(s).rows.map(r=>`<tr><td><b>${esc(r.d.n)}</b><br><span class="note">${esc(r.why)}</span></td><td>${r.r==="best"?'<span class="tag good">Best fit</span>':r.r==="ok"?'<span class="tag warn">Reasonable</span>':r.r==="poor"?'<span class="tag bad">Poor fit</span>':'<span class="tag">Not chosen</span>'}<br><span class="note">${esc(decLabel(s,r.d.id))}</span></td></tr>`).join("")}</table></details>
+        <div class="row"><span class="note">Client votes</span><button class="btn alt" type="button" data-vote="${g}" data-dv="-1" aria-label="Remove a vote">−</button><b class="score" style="font-size:28px">${(teacher.votes||{})[g]||0}</b><button class="btn alt" type="button" data-vote="${g}" data-dv="1" aria-label="Add a vote">+</button></div>
         <div class="row"><button class="btn" type="button" data-tpresent="${g}">Present deck</button><button class="btn ${teacher.picked[ci]===g?"or":"alt"}" type="button" data-win="${g}">${teacher.picked[ci]===g?"Client chose this firm":"Client chooses this firm"}</button></div>`;}
       return `<div class="panel stack"><div class="row" style="justify-content:space-between"><h3>Group ${g} · ${firmOf(g).defName.split(" ")[0]} model</h3>${teacher.picked[ci]===g?'<span class="tag or">Winner</span>':""}</div>${isLive?`<p class="note"><span class="tag good">Live</span> Synced from Group ${g}'s device.</p>`:""}<details ${isLive?"":"open"}><summary class="note">Paste a pitch code instead</summary><label class="f" style="margin-top:6px">Pitch code<textarea data-code="${g}" placeholder="Paste Group ${g}'s pitch code">${esc(teacher.codes[g]||"")}</textarea></label></details>${inner}</div>`;};
-    body=`<div class="tabs">${CLIENTS.map((x,i)=>`<button type="button" data-tclient="${i}" class="${i===ci?"on":""}">${esc(x.name.split(" ")[0])} ${teacher.picked[i]?"✓":""}</button>`).join("")}</div><p class="lede" style="margin-bottom:14px">${esc(c.name)}: present each deck, then pick the firm the client hires. Synced decks load on their own; paste a pitch code for any group that is not synced.</p><div class="vs">${card(g1,s1,s2)}${card(g2,s2,s1)}</div>`;
+    body=`<div class="tabs">${CLIENTS.map((x,i)=>`<button type="button" data-tclient="${i}" class="${i===ci?"on":""}">${esc(x.name.split(" ")[0])} ${teacher.picked[i]?"✓":""}</button>`).join("")}</div><p class="lede" style="margin-bottom:14px">${esc(c.name)}: present each deck, then pick the firm the client hires. Synced decks load on their own; paste a pitch code for any group that is not synced.</p><div class="row" style="margin-bottom:14px"><button class="btn or" type="button" data-tvoters="${ci}">Present to the client voters</button><span class="note">Client profile, the two offers side by side, then the vote.</span></div><div class="vs">${card(g1,s1,s2)}${card(g2,s2,s1)}</div>`;
   }
   app.innerHTML=`<div class="head"><span class="eyebrow">Teacher only · not linked on the student site</span><h1>The Engagement</h1><p class="lede">Students go to <b>The Engagement</b> on the site, each on their own device. Group members stay in sync through the class code.</p></div><div class="tabs">${tabs.map(([k,v])=>`<button type="button" data-ttab="${k}" class="${teacher.tab===k?"on":""}">${v}</button>`).join("")}</div>${body}`;
 }
@@ -956,6 +1057,7 @@ document.addEventListener("click",e=>{
   if(t.id==="recCheck"){const c=clientOf(S.group);S.rec.tries++;const ok=c.rec.items.every((it,i)=>S.rec.ans[i]===it[2]);if(ok)S.rec.done=true;else if(S.rec.tries>=2)S.rec.showWrong=true;save("rec");return render();}
   if(d.flag){const k=d.flag;S.flags=S.flags.includes(k)?S.flags.filter(x=>x!==k):[...S.flags,k];save("walk");return vWalkKeep();}
   if(t.id==="flagSubmit"){S.flagsDone=true;save("walk");return render();}
+  if(d.dec){S.dec=Object.assign({},S.dec,{[d.dec]:d.opt});applyDec(S);save("price");return keepScroll(()=>vPrice($("#app")));}
   if(d.fix){S.fixes[d.fix]=+d.i;save("fixes");return keepScroll(()=>vFix($("#app")));}
   if(d.prio){const k=d.prio;if(S.prios.includes(k))S.prios=S.prios.filter(x=>x!==k);else if(S.prios.length<3)S.prios=[...S.prios,k];save("value");return keepScroll(()=>vValue($("#app")));}
   if(d.str){const k=d.str;if(S.strengths.includes(k))S.strengths=S.strengths.filter(x=>x!==k);else if(S.strengths.length<2)S.strengths=[...S.strengths,k];save("value");return keepScroll(()=>vValue($("#app")));}
@@ -974,6 +1076,8 @@ document.addEventListener("click",e=>{
   if(t.id==="pinGo"){const v=($("#pin").value||"").trim().toLowerCase();if(v==="husky"){teacher.unlocked=true;render();}else $("#pinMsg").textContent="That PIN is not right.";return;}
   if(d.ttab){teacher.tab=d.ttab;return render();}
   if(d.tclient!=null){teacher.client=+d.tclient;return render();}
+  if(d.tvoters!=null){const ci=+d.tvoters,g1=ci*2+1,g2=ci*2+2,st=g=>teacher.codes[g]?decode(teacher.codes[g]):stateFromRecord(g,teacher.live["g"+g]);document.body.classList.add("presenting");pres={slides:voterSlides(ci,st(g1),st(g2)),i:0};paintPresent();return;}
+  if(d.vote){teacher.votes=teacher.votes||{};const g=+d.vote;teacher.votes[g]=Math.max(0,(teacher.votes[g]||0)+(+d.dv));saveT();return keepScroll(render);}
   if(d.tpresent){const g=+d.tpresent,s=teacher.codes[g]?decode(teacher.codes[g]):stateFromRecord(g,teacher.live["g"+g]);if(s)present(s,0);return;}
   if(d.win){const g=+d.win;teacher.picked[teacher.client]=teacher.picked[teacher.client]===g?null:g;saveT();return keepScroll(render);}
 });
