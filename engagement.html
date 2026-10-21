@@ -304,6 +304,21 @@ body.presenting #tsz{display:none!important}
 .dk .side{display:flex;flex-direction:column;gap:10px;min-width:0}
 .dk .say{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px;font-size:14px;line-height:1.4}
 .dk select{max-width:260px}
+.s-dark{background:#111111;color:#FFFFFF}
+.s-on-dark{color:#FFFFFF}.s-on-dark .s-lab{color:#BBBBBB}.s-on-dark .s-eye{color:#FF8A99}.s-on-dark .s-pair{border-bottom-color:rgba(255,255,255,.18)}.s-on-dark .s-pair .l{color:#CCCCCC}.s-on-dark .s-pair .r{color:#FFFFFF}
+.s-mega{font-family:var(--display);font-weight:700;text-transform:uppercase;line-height:.95;font-variant-numeric:tabular-nums}
+.s-big3{display:grid;grid-template-columns:repeat(3,1fr);gap:2cqw}
+.s-big3 div{display:flex;flex-direction:column;gap:.6cqw}
+.s-row{display:grid;grid-template-columns:5cqw 1fr;gap:2cqw;align-items:baseline;border-top:.15cqw solid rgba(255,255,255,.18);padding-top:1.4cqw}
+.s-row i{font-style:normal;font-family:var(--display);font-size:3.4cqw;color:#FF8A99;line-height:1}
+.s-row b{font-family:var(--display);font-weight:600;text-transform:uppercase;font-size:3.4cqw;line-height:1.05}
+.s-row span{display:block;font-size:1.4cqw;color:#BBBBBB;letter-spacing:.12em;text-transform:uppercase;font-family:var(--display);margin-bottom:.4cqw}
+.s-pair{display:grid;grid-template-columns:1fr 3cqw 1fr;gap:1.4cqw;align-items:center;font-size:2.2cqw;line-height:1.15;padding:1cqw 0;border-bottom:.12cqw solid var(--s-line)}
+.s-pair .ar{color:var(--s-orange);font-family:var(--display);font-size:2.6cqw;text-align:center}
+.s-pair .l{color:var(--s-muted)} .s-pair .r{font-weight:700;color:var(--s-brown)}
+.s-dark .s-pair{border-bottom-color:rgba(255,255,255,.18)} .s-dark .s-pair .l{color:#CCCCCC} .s-dark .s-pair .r{color:#FFFFFF}
+.s-tagrow{display:flex;flex-wrap:wrap;gap:1cqw}
+.s-tagrow span{border:.15cqw solid var(--s-brown);padding:.6cqw 1.2cqw;font-size:1.8cqw;font-weight:600}
 .present{position:fixed;inset:0;z-index:50;background:#0A0A0A;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:env(safe-area-inset-top,0px) env(safe-area-inset-right,0px) env(safe-area-inset-bottom,0px) env(safe-area-inset-left,0px)}
 .present .stage{width:min(100vw,calc((100vh - 56px) * 16 / 9));max-width:100%}
 .present .ctl{display:flex;gap:10px;align-items:center;color:#EEEEEE;font-family:var(--display);letter-spacing:.08em;text-transform:uppercase;font-size:14px}
@@ -507,6 +522,20 @@ const SERVICES = [
 ];
 const GAPFIT = {seg:["controls","controlcheck","training"],cash:["controls","controlcheck"],rec:["monthrec","reccatch"],checks:["apreview","controls"],docs:["software","controls"],access:["software"],vendor:["apreview","controls"],personal:["bookkeeping","advisory","cleanup"],inv:["controls","controlcheck"],payroll:["payroll","controls"],vacation:["controls","training"],petty:["controls","controlcheck"]};
 const PHASES = {forensic:[1,2],cleanup:[1,4],reccatch:[3,5],software:[4,6],controls:[6,9],training:[10,11],checklist:[6,7],audit:[10,12]};
+const WSHORT = {
+ seg:{n:"One person handles all the cash",fix:["Split the cash duties","Owner recounts monthly","Honesty pledge"]},
+ cash:{n:"Cash sits for days",fix:["Deposit every day","Lock the drawer","Deposit weekly"]},
+ rec:{n:"No monthly bank recs",fix:["Monthly recs, owner signs","Yearly recs","Glance at the balance"]},
+ checks:{n:"Pre-signed blank checks",fix:["Owner approves every payment","Lock up blank checks","Fewer blank checks"]},
+ docs:{n:"No numbered receipts",fix:["Numbered receipts, every one counted","Date every receipt","Nicer receipt book"]},
+ access:{n:"Everyone shares one login",fix:["Own logins, limited access","Change the password quarterly","Hide the password"]},
+ vendor:{n:"No vendor approval",fix:["Owner approves new vendors","Yearly vendor review","Manager keeps control"]},
+ personal:{n:"Personal spending mixed in",fix:["Separate cards, receipts required","Tag it at year end","Leave it alone"]},
+ inv:{n:"Stock is never counted",fix:["Lock it, count it monthly","Count once a year","Buy extra"]},
+ payroll:{n:"Payroll is never reviewed",fix:["Owner approves every pay change","Quarterly spot check","Trust experience"]},
+ vacation:{n:"One key person, no backup",fix:["Required vacation, trained backup","Write down the process","Bonus for no days off"]},
+ petty:{n:"Petty cash untracked",fix:["Fixed fund, receipt for every dollar","Count when empty","Pay from the register"]}
+};
 const EVID = {bakery:{cash:0,seg:1,rec:2,docs:3,petty:4},auto:{checks:0,vendor:1,inv:2,access:3,rec:4},dental:{payroll:0,vacation:2,access:3,personal:4,rec:5},gym:{cash:0,rec:1,access:2,vendor:3,personal:4},events:{docs:0,vendor:1,vacation:2,rec:3,inv:4}};
 const PRIO_DEC = {leak:"d1",time:"d3",simple:"d2",lender:"d1",safe:"d2",nodisrupt:"d2",growth:"d1",pay:"d3",privacy:"d2",afford:"d4",flow:"d3",tax:"d3",deposits:"d1",scale:"d2",person:"d3",cheap:"d4"};
 const DECISIONS = [
@@ -779,85 +808,47 @@ function stepDone(s,i){
 
 /* ===================== SLIDES ===================== */
 function slideList(s){
-  const c=clientOf(s.group),f=firmOf(s.group),rf=firmOf(rivalOf(s.group)),name=firmName(s),q=quote(s),F=c.fin;
-  const ni=F.rev-F.cogs-F.payroll-F.rent-F.other;
+  const c=clientOf(s.group),f=firmOf(s.group),rf=firmOf(rivalOf(s.group)),name=firmName(s),q=quote(s);
   const members=s.members.map(m=>m.trim()).filter(Boolean);
-  const foot=`<div class="s-foot"><span>${esc(name)}</span><span>Proposal for ${esc(c.name)}</span></div><div class="s-band"></div>`;
-  const wait=t=>`<div class="s-wait">${esc(t)}</div>`;
   const first=c.owner.startsWith("Dr.")?"Dr. "+c.owner.split(" ").pop():c.owner.split(" ")[0];
   const r=recCalc(c,s.rec.ans),gap=r.gap;
-  const decided=allDecided(s),hasPrice=decided&&q.recur.length>0;
-  const opt=id=>decOpt(s,id);
-  const stat=(lab,val,or)=>`<div class="s-stat"><span class="s-lab">${lab}</span><span class="v ${or?"or":""}">${val}</span></div>`;
-  const out=[];
-
-  // 1 title
-  const recLine=decided?`Our recommendation: ${opt("d1").n}, ${opt("d2").n.toLowerCase()}, and ${opt("d3").n.toLowerCase()} every month.`:"";
-  const strip=[s.rec.done?stat("Unexplained cash gap",money(gap),true):"",s.flagsDone?stat("Control gaps found",String(c.weak.length)):"",hasPrice?stat("First-year investment",money(q.firstYear)):""].filter(Boolean);
-  out.push({name:"Title",ready:members.length>=2,
-    notes:[`Introduce ${name} and say each team member's name.`,`Tell ${first} why you're here: you reviewed the books and the controls at ${c.name}.`,recLine?`Preview the ask in one sentence. ${recLine}`:"Preview your recommendation in one sentence."],
-    html:`<div class="s-title"><div class="l"><div class="s-eye" style="color:#FF8A99">Proposal · October 2026</div><div><div style="font-family:var(--display);font-size:4.6cqw;line-height:1;text-transform:uppercase;font-weight:600">${esc(name)}</div><div style="margin-top:1.4cqw;font-size:1.5cqw;opacity:.85">${esc(f.model)}</div></div><div style="font-size:1.45cqw;line-height:1.5">${members.length?members.map(esc).join("<br>"):"Team members"}</div></div><div class="r" style="gap:1.6cqw"><div class="s-eye">Internal controls + bank reconciliation</div><div class="s-h" style="font-size:4.2cqw">Proposal for ${esc(c.name)}</div><div class="s-p" style="color:var(--s-muted)">Prepared for ${esc(c.owner)}, ${esc(c.role.toLowerCase())} · ${esc(c.town)}</div>${strip.length?`<div class="s-strip" style="grid-template-columns:repeat(${strip.length},1fr)">${strip.join("")}</div>`:""}${recLine?`<div class="s-p" style="font-size:1.45cqw;border-left:.4cqw solid var(--s-orange);padding-left:1.2cqw">${esc(recLine)}</div>`:""}</div></div><div class="s-band" style="top:auto;bottom:0"></div>`});
-
-  // 2 heard
-  const ps=s.prios.map(id=>c.prios.find(p=>p.id===id)).filter(Boolean);
-  const ans=p=>{const o=opt(PRIO_DEC[p.id]||"d3");return o?`<div class="s-ans"><span class="k">How we answer it</span><span class="o">${esc(o.n)}</span></div>`:"";};
-  out.push({name:"What we heard",ready:ps.length===3,
-    notes:ps.length===3?ps.map(p=>{const o=opt(PRIO_DEC[p.id]||"d3");return `${p.t}: ${p.q?`quote ${first} ("${p.q}") and `:""}${o?`connect it to ${o.n}.`:"say how your plan handles it."}`;}).concat([`Show you did your homework: ${c.industry.toLowerCase()}, ${c.staff} employees, ${money(F.rev)} in revenue.`]):[],
-    html:ps.length===3?`<div class="s-in"><div class="s-eye">What we heard</div><div class="s-h">${esc(first)} told us three things matter most</div><div class="s-cards" style="grid-template-columns:repeat(3,1fr)">${ps.map(p=>`<div class="s-card"><b>${esc(p.t)}</b>${p.q?`<i>"${esc(p.q)}"</i>`:`<span>A goal we will plan around.</span>`}${ans(p)}</div>`).join("")}</div>
-    <div class="s-strip" style="grid-template-columns:repeat(4,1fr)">${stat("Industry",esc(c.industry))}${stat("Employees",esc(c.staff.split(" ")[0]))}${stat("Revenue, last 12 months",money(F.rev))}${stat("Net income",money(ni))}</div></div>${foot}`:wait("Finish Value prop to build this slide")});
-
-  // 3 found
-  const side=(lab,start,startLab,pre)=>{const items=c.rec.items.filter(it=>it[2].startsWith(pre));return `<tr class="h"><td colspan="2">${lab}</td></tr><tr><td>${startLab}</td><td class="n">${money(start)}</td></tr>${items.map(it=>`<tr><td>${it[2].endsWith("+")?"Add":"Less"}: ${esc(it[0].split(",")[0].replace(/ was written.*| cleared at.*| was recorded.*/,""))}</td><td class="n">${it[2].endsWith("+")?"":"("}${money(it[1])}${it[2].endsWith("+")?"":")"}</td></tr>`).join("")}<tr class="t"><td>Adjusted ${pre==="bank"?"bank":"book"} balance</td><td class="n">${money(pre==="bank"?r.bank:r.book)}</td></tr>`;};
-  out.push({name:"What we found",ready:s.rec.done,
-    notes:s.rec.done?[`The bank statement said ${money(c.rec.bank)}; the books said ${money(c.rec.book)}.`,`After every reconciling item, the books still show ${money(gap)} more than the bank.`,`Follow-up: ${c.revealShort}`,`If this happens every month, that's about ${money(gap*12)} a year. Pause here: this is your hook.`]:[],
-    html:s.rec.done?`<div class="s-in"><div class="s-eye">What we found · September 30 bank reconciliation</div><div class="s-h" style="font-size:3.3cqw">Your books show ${money(gap)} more cash than the bank can account for</div>
-    <div class="s-cards" style="grid-template-columns:1.45fr 1fr"><div class="s-card" style="gap:0"><table class="s-mini">${side("Bank side",c.rec.bank,"Balance per bank statement","bank")}${side("Book side",c.rec.book,"Balance per books","book")}</table></div>
-    <div class="s-card" style="border-top-color:var(--s-orange)"><span class="s-lab">Unexplained gap</span><div class="s-big or">${money(gap)}</div><i>${esc(c.revealShort)}</i><div class="s-ans"><span class="k">If it happens every month</span><span class="o" style="font-size:2.4cqw">${money(gap*12)} a year</span><span class="d">That is ${pct(gap*12/ni)} of last year's net income.</span></div></div></div></div>${foot}`:wait("Finish the Bank rec to build this slide")});
-
-  // 4 gaps
-  const ev=EVID[c.id]||{};
-  out.push({name:"Control gaps",ready:s.flagsDone,
-    notes:s.flagsDone?c.weak.map(k=>`${W[k].n}: we saw "${c.walk[ev[k]]||""}"`).concat(["Keep it factual. You're describing what you saw, not accusing anyone."]):[],
-    html:s.flagsDone?`<div class="s-in"><div class="s-eye">Control gaps · from our walkthrough</div><div class="s-h">${c.weak.length} gaps put your cash at risk</div><table class="s-mini" style="font-size:1.25cqw"><tr class="h"><td style="width:27%">The gap</td><td style="width:41%">What we saw</td><td>Why it matters</td></tr>${c.weak.map(k=>`<tr><td><b style="color:var(--s-brown)">${esc(W[k].n)}</b></td><td>${esc(c.walk[ev[k]]||"")}</td><td style="color:var(--s-muted)">${esc(W[k].r)}</td></tr>`).join("")}</table></div>${foot}`:wait("Finish the Walkthrough to build this slide")});
-
-  // 5 plan
-  const fixReady=s.flagsDone&&c.weak.every(k=>s.fixes[k]!=null);
-  out.push({name:"Our plan",ready:fixReady,
-    notes:fixReady?["Go gap by gap: name the gap, then the fix, in plain words.",opt("d2")?`Explain how the controls go in: ${opt("d2").n}.`:"Explain how the new controls go in.","Point out who does what after the fix, so no one person controls everything."]:[],
-    html:fixReady?`<div class="s-in"><div class="s-eye">Our recommendations</div><div class="s-h">How we close each gap</div><table class="s-mini" style="font-size:1.3cqw"><tr class="h"><td style="width:30%">Gap</td><td>Our fix</td></tr>${c.weak.map(k=>`<tr><td><b style="color:var(--s-brown)">${esc(W[k].n)}</b></td><td>${esc(W[k].fix[s.fixes[k]])}</td></tr>`).join("")}</table>
-    ${opt("d2")?`<div class="s-p" style="font-size:1.35cqw;border-left:.4cqw solid var(--s-orange);padding-left:1.2cqw"><b>How the controls go in: ${esc(opt("d2").n)}.</b> ${esc(opt("d2").d)}</div>`:""}</div>${foot}`:wait("Choose your Fixes to build this slide")});
-
-  // 6 investment
-  out.push({name:"Investment",ready:hasPrice,warn:false,
-    notes:hasPrice?[`Setup ${money(q.setupPrice)}, then ${money(q.recurPrice)} a month: ${money(q.firstYear)} in the first year.`,`Terms: ${termsText(s)}.`,s.rec.done?`If they push back on price: one month's unexplained gap was ${money(gap)}, or about ${money(gap*12)} a year.`:"If they push back on price, point to what the controls protect.",`The monthly fee is ${pct(q.pctRev)} of their revenue.`]:[],
-    html:hasPrice?`<div class="s-in"><div class="s-eye">Your investment</div><div class="s-cards" style="grid-template-columns:1fr 1fr 0.85fr;flex:1"><div class="s-card"><span class="s-lab">One-time setup</span><table class="s-mini">${q.setup.length?q.setup.map(l=>`<tr><td>${esc(l.v.n)}</td><td class="n">${money(l.price)}</td></tr>`).join(""):`<tr><td>No setup work</td><td class="n">$0</td></tr>`}<tr class="t"><td>Setup total</td><td class="n">${money(q.setupPrice)}</td></tr></table></div><div class="s-card"><span class="s-lab">Every month</span><table class="s-mini">${q.recur.map(l=>`<tr><td>${esc(l.v.n)}</td><td class="n">${money(l.price)}</td></tr>`).join("")}<tr class="t"><td>Per month</td><td class="n">${money(q.recurPrice)}</td></tr></table></div>
-    <div class="s-card" style="border-top-color:var(--s-orange)"><span class="s-lab">What it protects</span>${s.rec.done?`<span>Cash gap found in one month</span><div class="s-big or" style="font-size:2.8cqw">${money(gap)}</div><span>At that pace for a year</span><div class="s-big" style="font-size:2.8cqw">${money(gap*12)}</div>`:""}<span>Monthly fee as a share of revenue</span><div class="s-big" style="font-size:2.4cqw">${pct(q.pctRev)}</div></div></div>
-    <div style="display:flex;gap:3cqw;align-items:flex-end;background:var(--s-brown);color:#FFFFFF;padding:1.4cqw 2cqw"><div><div class="s-lab" style="color:#D9D9D9">First-year investment</div><div class="s-big" style="color:#FF8A99">${money(q.firstYear)}</div></div><div class="s-p" style="font-size:1.4cqw">${esc(termsText(s))}<br>About ${pct(q.fyPctRev)} of annual revenue in year one</div></div></div>${foot}`:wait("Finish Build the offer to build this slide")});
-
-  // 7 why us
+  const decided=allDecided(s),opt=id=>decOpt(s,id);
   const sts=s.strengths.map(id=>f.strengths.find(x=>x.id===id)).filter(Boolean);
-  const rw=rf.weaknesses.find(x=>x.id===s.rivalW);
-  const whyReady=sts.length===2&&!!rw;
-  out.push({name:"Why us",ready:whyReady,
-    notes:whyReady?["Read the headline slowly. It is your one-line pitch.",...sts.map(x=>`Strength: ${x.t}. Tie it to something ${first} said.`),`End by giving ${first} the question to ask any firm: "${rw.q}" Don't name the other firm.`]:[],
-    html:whyReady?`<div class="s-in"><div class="s-eye">Why ${esc(name)}</div><div class="s-h" style="font-size:3cqw">${esc(s.headline||headlineSuggest(s))}</div><div class="s-cards" style="grid-template-columns:1fr 1fr 1.1fr;flex:0 0 auto">${sts.map((x,i)=>`<div class="s-card"><span class="s-lab">Strength ${i+1}</span><b>${esc(x.t)}</b></div>`).join("")}<div class="s-card" style="border-top-color:var(--s-orange);background:var(--s-cream)"><span class="s-lab">Before you choose any firm, ask</span><b style="font-size:1.75cqw">"${esc(rw.q)}"</b></div></div>
-    ${decided?`<div><span class="s-lab">Our offer at a glance</span><div style="margin-top:.8cqw">${DECISIONS.map(d=>`<span class="s-chip"><b>${esc(d.n)}</b>${esc(opt(d.id).n)}</span>`).join("")}</div></div>`:""}</div>${foot}`:wait("Finish Value prop to build this slide")});
-
-  // 8 timeline
-  const ph=q.setup.filter(l=>PHASES[l.v.id]);
-  const lastSetup=Math.max(4,...ph.map(l=>PHASES[l.v.id][1]));
-  const monthlyStart=lastSetup<=8?4:8;
-  const miles=[[2,s.rec.done?`Report on the missing ${money(gap)}`:"Report on the bank gap"],[Math.min(12,lastSetup),"New controls in place"],[monthlyStart,`First monthly close: ${opt("d3")?opt("d3").n:"monthly service"}`],[12,"90-day review with "+first]].sort((a,b)=>a[0]-b[0]);
-  out.push({name:"First 90 days",ready:hasPrice,
-    notes:hasPrice?["Walk the timeline left to right.",...miles.map(m=>`Week ${m[0]}: ${m[1]}.`),`Make clear when ${first} will see results.`]:[],
-    html:hasPrice?`<div class="s-in"><div class="s-eye">First 90 days</div><div class="s-h">What happens after you say yes</div><div class="gantt">${ph.map(l=>{const[a,b]=PHASES[l.v.id];return `<div class="gr"><span>${esc(l.v.n)}</span><div class="track"><div class="bar" style="left:${(a-1)/12*100}%;width:${(b-a+1)/12*100}%"></div></div></div>`}).join("")}<div class="gr"><span><b>Monthly service begins</b></span><div class="track"><div class="bar rec" style="left:${monthlyStart/12*100}%;right:0"></div></div></div><div class="axis"><span></span><div class="ticks">${Array.from({length:12},(_,i)=>`<span>Wk ${i+1}</span>`).join("")}</div></div></div>
-    <div class="s-strip" style="grid-template-columns:repeat(4,1fr);margin-top:auto">${miles.map(m=>`<div class="s-stat"><span class="s-lab">Week ${m[0]}</span><span style="font-size:1.35cqw;line-height:1.3">${esc(m[1])}</span></div>`).join("")}</div></div>${foot}`:wait("Finish Build the offer to build this slide")});
-
-  // 9 close
-  out.push({name:"Close",ready:true,
-    notes:[`Thank ${first} for their time.`,"Restate the three numbers: the gap, the gaps found, the first-year price.","Invite one question, and decide ahead of time who answers it."],
-    html:`<div class="s-title" style="grid-template-columns:55% 45%"><div class="l" style="justify-content:center;gap:2cqw;padding:5cqw"><div class="s-eye" style="color:#FF8A99">${esc(name)}</div><div style="font-family:var(--display);font-size:5.4cqw;line-height:1;text-transform:uppercase;font-weight:600">Let's get your books clean.</div><div style="font-size:1.7cqw;opacity:.85">Questions for us, ${esc(first)}?</div><div style="font-size:1.4cqw;opacity:.75">${members.map(esc).join(" · ")}</div></div>
-    <div class="r" style="background:#1A1A1A;color:#FFFFFF;gap:2cqw"><div class="s-eye" style="color:#FF8A99">Next steps</div><div class="s-steps"><div><i>1</i><span>Sign the ${esc(termsText(s).toLowerCase())}${hasPrice?` (${money(q.firstYear)} in year one)`:""}.</span></div><div><i>2</i><span>Kickoff meeting this week with ${esc(first)} and the team.</span></div><div><i>3</i><span>${s.rec.done?`In two weeks: a full report on the missing ${money(gap)}.`:"In two weeks: a full report on the bank gap."}</span></div></div></div></div><div class="s-band" style="top:auto;bottom:0"></div>`});
+  const rw=rf.weaknesses.find(x=>x.id===s.rivalW),whyReady=sts.length===2&&!!rw;
+  const ps=s.prios.map(id=>c.prios.find(p=>p.id===id)).filter(Boolean);
+  const fixReady=s.flagsDone&&c.weak.every(k=>s.fixes[k]!=null);
+  const headline=s.headline||headlineSuggest(s);
+  const wait=t=>`<div class="s-wait">${esc(t)}</div>`;
+  const footL=`<div class="s-foot"><span>${esc(name)}</span><span>${esc(c.name)}</span></div>`;
+  const footD=`<div class="s-foot" style="color:#888888"><span>${esc(name)}</span><span>${esc(c.name)}</span></div>`;
+  const band=`<div class="s-band"></div>`;
+  const pad=`position:absolute;inset:6cqw 6cqw 5cqw 6cqw;display:flex;flex-direction:column;gap:2.4cqw;justify-content:center`;
+  const out=[];
+  if(s.group%2){
+    // ---------- BY THE NUMBERS (odd groups) ----------
+    out.push({name:"Title",ready:members.length>=1,notes:[`Say your firm name and everyone's name.`,`One line: "We found a problem, and we have a plan."`],
+      html:`<div class="slide-bg s-dark" style="position:absolute;inset:0"></div>${band}<div class="s-on-dark" style="${pad}"><div class="s-eye">${esc(f.model)}</div><div class="s-mega" style="font-size:7.5cqw">${esc(name)}</div><div style="font-size:2.2cqw;color:#CCCCCC">A plan for ${esc(c.name)}</div><div style="font-size:1.5cqw;color:#999999">${members.map(esc).join(" · ")}</div></div>`});
+    out.push({name:"We found",ready:s.rec.done&&s.flagsDone,notes:s.rec.done?[`After reconciling the bank, ${money(gap)} is unexplained.`,`${c.revealShort}`,`Name the ${c.weak.length} gaps that let it happen.`]:[],
+      html:s.rec.done&&s.flagsDone?`${band}<div style="${pad}"><div class="s-eye">We found</div><div class="s-mega" style="font-size:12cqw;color:var(--s-orange)">${money(gap)}</div><div style="font-size:2.3cqw;color:var(--s-muted)">missing from the bank in one month</div><div class="s-tagrow">${c.weak.map(k=>`<span>${esc(WSHORT[k].n)}</span>`).join("")}</div></div>${footL}`:wait("Finish the Bank rec and Walkthrough")});
+    out.push({name:"Our plan",ready:decided,notes:decided?[`Three steps: ${opt("d1").n}, ${opt("d2").n}, then ${opt("d3").n} every month.`,"One sentence on each. Keep moving."]:[],
+      html:decided?`<div class="s-dark" style="position:absolute;inset:0"></div>${band}<div class="s-on-dark" style="${pad}"><div class="s-eye">Our plan</div>${[["First 90 days","d1"],["Fix the controls","d2"],["Every month","d3"]].map(([l,d],i)=>`<div class="s-row"><i>${i+1}</i><div><span>${l}</span><b>${esc(opt(d).n)}</b></div></div>`).join("")}</div>${footD}`:wait("Finish Build the offer")});
+    out.push({name:"Investment",ready:decided,notes:decided?[`Setup ${money(q.setupPrice)}, then ${money(q.recurPrice)} a month.`,`First year: ${money(q.firstYear)}. ${termsText(s)}.`,s.rec.done?`Compare: the gap alone was ${money(gap)} in one month.`:""].filter(Boolean):[],
+      html:decided?`${band}<div style="${pad}"><div class="s-eye">The investment</div><div class="s-big3"><div><span class="s-lab">Setup</span><span class="s-mega" style="font-size:5cqw">${money(q.setupPrice)}</span></div><div><span class="s-lab">Per month</span><span class="s-mega" style="font-size:5cqw">${money(q.recurPrice)}</span></div><div><span class="s-lab">First year</span><span class="s-mega" style="font-size:5cqw;color:var(--s-orange)">${money(q.firstYear)}</span></div></div><div style="font-size:2cqw;color:var(--s-muted)">${esc(termsText(s))}</div></div>${footL}`:wait("Finish Build the offer")});
+    out.push({name:"Why us",ready:whyReady,notes:whyReady?["Read the headline. Pause.",`Leave them with the question: "${rw.q}"`,"Thank them and take one question."]:[],
+      html:whyReady?`<div class="s-dark" style="position:absolute;inset:0"></div>${band}<div class="s-on-dark" style="${pad}"><div class="s-eye">Why ${esc(name)}</div><div class="s-mega" style="font-size:4.6cqw;line-height:1.05">${esc(headline)}</div><div style="font-size:2.1cqw;color:#CCCCCC;border-left:.5cqw solid #FF8A99;padding-left:1.6cqw">Ask any firm: "${esc(rw.q)}"</div></div>${footD}`:wait("Finish Value prop")});
+  } else {
+    // ---------- YOUR STORY (even groups) ----------
+    out.push({name:"Opening question",ready:s.rec.done,notes:s.rec.done?[`Open with the question. Let it hang for a second.`,`Then: "We're ${name}, and we found out." Say everyone's name.`]:[],
+      html:s.rec.done?`<div style="position:absolute;left:0;top:0;bottom:0;width:2cqw;background:var(--s-orange)"></div><div style="${pad}"><div class="s-mega" style="font-size:7cqw;line-height:1">${esc(first)}, where did ${money(gap)} go?</div><div style="font-size:2.2cqw;color:var(--s-muted)">${esc(name)} · ${members.map(esc).join(", ")}</div></div>`:wait("Finish the Bank rec")});
+    out.push({name:"You told us",ready:ps.length===3&&decided,notes:ps.length===3&&decided?ps.map(p=>`${p.t}: our answer is ${(opt(PRIO_DEC[p.id]||"d3")||{}).n}.`):[],
+      html:ps.length===3&&decided?`<div class="s-dark" style="position:absolute;inset:0"></div>${band}<div class="s-on-dark" style="${pad}"><div class="s-eye">You told us · We'll do</div>${ps.map(p=>`<div class="s-pair"><span class="l">${esc(p.t)}</span><span class="ar">→</span><span class="r">${esc((opt(PRIO_DEC[p.id]||"d3")||{}).n||"")}</span></div>`).join("")}</div>${footD}`:wait("Finish Build the offer and Value prop")});
+    out.push({name:"What we'll fix",ready:fixReady,notes:fixReady?["Read each gap and its fix. Fast.",`The fix that matters most here: ${WSHORT[c.weak[0]].fix[s.fixes[c.weak[0]]]}.`]:[],
+      html:fixReady?`${band}<div style="${pad};gap:1cqw"><div class="s-eye">What we'll fix</div>${c.weak.map(k=>`<div class="s-pair" style="font-size:1.9cqw"><span class="l">${esc(WSHORT[k].n)}</span><span class="ar">→</span><span class="r">${esc(WSHORT[k].fix[s.fixes[k]])}</span></div>`).join("")}</div>${footL}`:wait("Choose your Fixes")});
+    out.push({name:"The deal",ready:decided,notes:decided?[`First year: ${money(q.firstYear)}.`,`That's ${money(q.setupPrice)} to set up and ${money(q.recurPrice)} a month. ${termsText(s)}.`]:[],
+      html:decided?`<div class="s-dark" style="position:absolute;inset:0"></div>${band}<div class="s-on-dark" style="${pad};align-items:center;text-align:center"><div class="s-eye">The deal</div><div class="s-mega" style="font-size:11cqw">${money(q.firstYear)}</div><div style="font-size:2.2cqw;color:#CCCCCC">${money(q.setupPrice)} setup · ${money(q.recurPrice)} a month · ${esc(termsText(s))}</div></div>${footD}`:wait("Finish Build the offer")});
+    out.push({name:"Close",ready:whyReady,notes:whyReady?["Say the headline.",`"Before you sign with anyone, ask: ${rw.q}"`,"Thank them and take one question."]:[],
+      html:whyReady?`<div style="position:absolute;left:0;top:0;bottom:0;width:2cqw;background:var(--s-orange)"></div><div style="${pad}"><div class="s-mega" style="font-size:4.6cqw;line-height:1.05">${esc(headline)}</div><div style="font-size:2.1cqw;color:var(--s-muted)">Before you sign with anyone, ask:</div><div style="font-size:2.8cqw;font-weight:700">"${esc(rw.q)}"</div><div class="s-eye" style="margin-top:2cqw">Thank you · ${esc(name)}</div></div>`:wait("Finish Value prop")});
+  }
   return out;
 }
 
@@ -1019,7 +1010,7 @@ function vDeck(app){
   const sl=slideList(S),n=sl.filter(x=>x.ready).length,ok=mgmtOK(S)&&allDecided(S);
   const mem=S.members.map(m=>m.trim()).filter(Boolean);
   const counts={};Object.values(S.pres||{}).forEach(v=>{if(v)counts[v]=(counts[v]||0)+1;});
-  app.innerHTML=head(6,"Your pitch deck",`Built from your decisions. ${n} of ${sl.length} slides are ready. Pick who presents each slide and read the talking points together. Plan for about 90 seconds in total.`)+
+  app.innerHTML=head(6,"Your pitch deck",`Built from your decisions. ${n} of ${sl.length} slides are ready. Five slides, a few words each. Pick who presents each slide and read the talking points together. Aim for about 60 seconds.`)+
   `<div class="row" style="margin-bottom:16px"><button class="btn or" type="button" data-present="0">Present full screen</button>${allDecided(S)?"":'<span class="tag">Finish Build the offer to complete the deck</span>'}${mem.length?`<span class="note">${mem.map(m=>`${esc(m.split(" ")[0])}: ${counts[m]||0} slides`).join(" · ")}</span>`:""}</div>
   <div class="decklist">${sl.map((x,i)=>`<div class="dk"><div class="slide" data-present="${i}" role="button" tabindex="0" aria-label="Present slide ${i+1}">${x.html}</div>
    <div class="side"><div class="row" style="justify-content:space-between"><h3>${i+1}. ${esc(x.name)}</h3>${x.ready?(x.warn?'<span class="tag warn">Check offer</span>':'<span class="tag good">Ready</span>'):'<span class="tag">Waiting</span>'}</div>
