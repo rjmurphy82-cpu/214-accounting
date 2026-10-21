@@ -572,6 +572,7 @@ function saveT(){try{localStorage.setItem(KEY+"-t",JSON.stringify({codes:teacher
 
 /* ===================== LIVE SYNC (/api/live, same backend as Bank Rec Live) ===================== */
 async function liveCall(op,path,v){const r=await fetch("/api/live",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({op,path,v})});const j=await r.json().catch(()=>({}));return {status:r.status,ok:r.ok,j};}
+let gameEnded=false,lastMetaCheck=0;
 let syncState="off",syncT=null,pullT=null,sessionOK={},pendingRender=false,dragging=false;
 const SECS={
   team:{get:s=>({firm:s.firm}),put:(s,v)=>{s.firm=v.firm||"";}},
@@ -604,10 +605,11 @@ async function checkSession(){
   if(sessionOK[c]!==undefined)return sessionOK[c];
   try{const r=await liveCall("get","games/"+c);if(!r.ok){syncState="err";return false;}sessionOK[c]=r.j.v!=null;}catch(e){syncState="err";return false;}
   if(sessionOK[c])Object.keys(S.secT||{}).forEach(k=>{if(S.secT[k])DIRTY.add(k);});
-  if(!sessionOK[c]){syncState="nogame";paintMast();refreshSyncMsg();}
+  if(!sessionOK[c]){syncState="nogame";if(S.joinT&&ROLE!=="teacher"){gameEnded=true;view="group";render();}paintMast();refreshSyncMsg();}
   return sessionOK[c];
 }
 async function pushSync(){
+  if(gameEnded)return;
   if(!(await checkSession()))return;
   if(!S.joinT){S.joinT=Date.now();store();}
   const now=Date.now(),v={kind:"engagement",t:now};
@@ -624,7 +626,11 @@ function busy(){const a=document.activeElement;return dragging||!!(a&&(a.tagName
 async function pullSync(){
   clearTimeout(pullT);
   if(ROLE!=="teacher"&&S.group&&/^\d{4}$/.test((S.code||"").trim())&&!document.hidden){
-    if(await checkSession()){
+    if(!gameEnded&&sessionOK[S.code.trim()]&&Date.now()-lastMetaCheck>8000){
+      lastMetaCheck=Date.now();
+      try{const mr=await liveCall("get","games/"+S.code.trim());if(mr.ok&&mr.j.v==null){sessionOK[S.code.trim()]=false;gameEnded=true;clearTimeout(syncT);DIRTY.clear();if(!pres)render();}}catch(e){}
+    }
+    if(!gameEnded&&await checkSession()){
       try{const r=await liveCall("get",groupPath());
         if(r.ok){const rec=r.j.v||{};let changed=false;
           Object.keys(SECS).forEach(k=>{const rs=rec.sec&&rec.sec[k];if(rs&&rs.t>((S.secT||{})[k]||0)&&!DIRTY.has(k)){SECS[k].put(S,rs.v);S.secT[k]=rs.t;changed=true;}});
@@ -689,6 +695,7 @@ function quote(s){
     setupMargin:setupPrice?(setupPrice-setupCost)/setupPrice:0, recurMargin:recurPrice?(recurPrice-recurCost)/recurPrice:0,
     pctRev:(recurPrice*12)/c.fin.rev, fyPctRev:firstYear/c.fin.rev};
 }
+const WHY={rec:"monthly bank rec missing",audit:"a firm can't audit a client it advises",terms:"your firm requires a 12-month agreement",sm:"setup margin below your floor",rm:"monthly margin below your floor",min:"monthly fee below your firm's minimum",hrs:"more monthly hours than your team has",cap:"monthly fee over the client's 2.5% cap"};
 function decOpt(s,did){const d=DECISIONS.find(x=>x.id===did);return d?d.opts.find(o=>o.id===(s.dec||{})[did]):null;}
 function allDecided(s){return DECISIONS.every(d=>!!(s.dec||{})[d.id]);}
 function termsText(s){const o=decOpt(s,"d5");return o?o.t:firmOf(s.group).contract;}
@@ -809,6 +816,7 @@ function render(){
   paintMast();paintRail();
   const app=$("#app");
   if(view==="teacher") return renderTeacher(app);
+  if(gameEnded&&ROLE!=="teacher") return renderEnded(app);
   if(view==="home"||!S.group) return renderHome(app);
   if(S.step===-1) return renderSetup(app);
   [vClient,vRec,vWalk,vFix,vPrice,vValue,vDeck][S.step](app);
@@ -817,11 +825,16 @@ function render(){
 function head(i,title,lede){return `<div class="head"><span class="eyebrow">Step ${i+1} of 7</span><h1>${title}</h1><p class="lede">${lede}</p><span class="pace"><i></i>Suggested pace: ${STEPS[i].min} minutes</span></div>`;}
 function nextBar(i,okNext=true,label){return `<div class="next"><button class="btn alt" type="button" data-go="${i-1}" ${i===0?"hidden":""}>Back</button><button class="btn or" type="button" data-go="${i+1}" ${okNext?"":"disabled"}>${label||"Next: "+STEPS[i+1].n}</button></div>`;}
 
+function renderEnded(app){
+  $("#rail").hidden=true;
+  app.innerHTML=`<div class="head"><span class="eyebrow">Class code ${esc(S.code)}</span><h1>This game has ended</h1><p class="lede">Your teacher ended this game, so the work for Group ${S.group||""} is closed. Start a new game to join the next one with a new class code.</p></div>
+  <div class="row"><button class="btn or" type="button" data-newgame="1">Start a new game</button><button class="btn alt" type="button" data-present="0">View our deck one last time</button></div>`;
+}
 function renderHome(app){
   app.innerHTML=`<div class="head"><span class="eyebrow">Internal controls + bank reconciliation</span><h1>Win the engagement</h1><p class="lede">Five local businesses have messy books and no internal controls. Two accounting firms are bidding for each one, and your group is one of them. Study the client, reconcile their bank account, find the control gaps, price a plan your bosses will approve, and pitch it. Your pitch deck builds itself as you work.</p></div>
   <h3 style="margin-bottom:12px">Pick your group number</h3>
   <div class="pairs">${CLIENTS.map((c,i)=>`<div class="pair"><div class="ph"><span>Client ${i+1}</span><b>${esc(c.name)}</b><span>${esc(c.industry)} · ${esc(c.town)}</span></div><div class="gb">${[i*2+1,i*2+2].map(g=>`<button type="button" data-pick="${g}"><b>Group ${g}</b><small>${firmOf(g).defName.split(" ")[0]} model</small></button>`).join("")}</div></div>`).join("")}</div>
-  ${S.group?`<p class="note" style="margin-top:16px">This device has saved work for Group ${S.group}. <button class="btn alt" type="button" data-resume="1">Resume Group ${S.group}</button></p>`:""}`;
+  ${S.group?`<p class="note" style="margin-top:16px">This device has saved work for Group ${S.group}. <button class="btn alt" type="button" data-resume="1">Resume Group ${S.group}</button> <button class="btn alt" type="button" data-newgame="1">Start a new game instead</button></p>`:""}`;
 }
 let pendingPick=null;
 function renderSetup(app){
@@ -884,15 +897,17 @@ function shuffleFor(seed){let h=0;for(const ch of String(seed))h=(h*31+ch.charCo
 function vPrice(app){
   const f=firmOf(S.group),c=clientOf(S.group);
   const optCard=(d,o)=>{
-    const t=JSON.parse(JSON.stringify(S));t.dec=Object.assign({},t.dec,{[d.id]:o.id});applyDec(t);
-    const tq=quote(t),bad=mgmt(t).filter(x=>!x.ok&&(allDecided(t)||["audit","terms","hrs"].includes(x.k)));
+    const sim=oid=>{const t=JSON.parse(JSON.stringify(S));t.dec=Object.assign({},t.dec,{[d.id]:oid});applyDec(t);return t;};
+    const t=sim(o.id),tq=quote(t),fails=mgmt(t).filter(x=>!x.ok);
+    const others=d.opts.filter(x=>x.id!==o.id).map(x=>mgmt(sim(x.id)));
+    const bad=fails.filter(x=>others.some(m=>m.find(y=>y.k===x.k&&y.ok)));
     const on=(S.dec||{})[d.id]===o.id;
     const inc=o.svc?`<div class="ds" style="margin-top:6px">Includes: ${o.svc.map(id=>esc(SERVICES.find(v=>v.id===id).n)).join(", ")}</div>`:"";
     const eff=d.id==="d4"?`Monthly ${money(tq.recurPrice)} · Setup ${money(tq.setupPrice)}`:d.id==="d5"?`First year ${money(tq.firstYear)}`:o.svc&&o.svc.some(id=>SERVICES.find(v=>v.id===id).type==="recur")?`Monthly ${money(tq.recurPrice)} · ${tq.recurHours.toFixed(1)} hrs/mo`:`Setup ${money(tq.setupPrice)}`;
-    return `<button type="button" class="opt ${on?"sel":""}" data-dec="${d.id}" data-opt="${o.id}" aria-pressed="${on}"><b>${esc(o.n)}</b><span>${esc(o.d)}</span>${inc}<span class="eff">${eff}</span>${bad.length?`<span class="tag bad" style="align-self:flex-start">Breaks: ${esc(bad.map(x=>x.l.split(" (")[0]).join("; "))}</span>`:""}</button>`;};
+    return `<button type="button" class="opt ${on?"sel":""}" data-dec="${d.id}" data-opt="${o.id}" aria-pressed="${on}"><b>${esc(o.n)}</b><span>${esc(o.d)}</span>${inc}<span class="eff">${eff}</span>${bad.length?`<span class="tag bad" style="align-self:flex-start;text-transform:none;letter-spacing:0;font-size:12px">Management would reject: ${esc(bad.map(x=>WHY[x.k]).join("; "))}</span>`:""}</button>`;};
   const n=DECISIONS.filter(d=>(S.dec||{})[d.id]).length;
   app.innerHTML=head(4,"Build the offer",`Five decisions. Choose the option that fits <b>${esc(c.name)}</b>, using what you learned in the client file, while staying inside your firm's rules. Prices are worked out for you from your choices. The client never sees your costs or margins.`)+
-  `<div class="stack">${DECISIONS.map((d,i)=>`<div class="panel stack decision"><div class="row" style="justify-content:space-between"><h3>${i+1}. ${esc(d.n)}</h3>${(S.dec||{})[d.id]?'<span class="tag good">Decided</span>':'<span class="tag">Choose one</span>'}</div><p class="note">${esc(d.q)}</p><div class="opts3">${d.opts.map(o=>optCard(d,o)).join("")}</div></div>`).join("")}</div>
+  `<div class="stack">${DECISIONS.map((d,i)=>`<div class="panel stack decision"><div class="row" style="justify-content:space-between"><h3>${i+1}. ${esc(d.n)}</h3>${(S.dec||{})[d.id]?'<span class="tag good">Decided</span>':'<span class="tag">Choose one</span>'}</div><p class="note">${esc(d.q)}</p>${i===0?'<p class="note">A red "Management would reject" line means picking that option, with your other choices as they are now, breaks one of your firm\'s rules.</p>':""}<div class="opts3">${d.opts.map(o=>optCard(d,o)).join("")}</div></div>`).join("")}</div>
   <h3 style="margin:24px 0 10px">Your offer so far</h3><div class="coach" id="pricesum"></div>
   <div class="pricewrap" id="offerTable"></div>
   <div class="fixbar" id="fixbar" role="status" aria-live="polite"></div>`+nextBar(4,true);
@@ -999,13 +1014,13 @@ function renderTeacher(app){
     if(teacher.netOk===false){
       body=`<div class="panel stack"><h2>Live sync is not connected</h2><p class="lede">Live sync uses the same Upstash database as Bank Rec Live (Vercel dashboard, Storage, Upstash for Redis, Connect). Until it is connected, groups copy their pitch code from the last step and send it to you, and you paste codes on the Decision board.</p></div>`;
     } else if(!teacher.session){
-      body=`<div class="panel stack" style="max-width:620px"><h2>Start a class session</h2><p class="lede">Creates a 4-digit code for the board. Groups type it when they set up their firm, and every deck then shows up here and on the Decision board as they work. Sessions erase themselves after 4 hours.</p><div class="row"><button class="btn or" type="button" id="tStart" ${teacher.netOk?"":"disabled"}>${teacher.netOk==null?"Checking connection…":"Start session"}</button><span class="note" id="tMsg"></span></div></div>`;
+      body=`<div class="panel stack" style="max-width:620px"><h2>Start a new game</h2><p class="lede">Creates a 4-digit code for the board. Groups type it when they set up their firm, and every deck then shows up here and on the Decision board as they work. Sessions erase themselves after 4 hours.</p><div class="row"><button class="btn or" type="button" id="tStart" ${teacher.netOk?"":"disabled"}>${teacher.netOk==null?"Checking connection…":"Start new game"}</button><span class="note" id="tMsg"></span></div></div>`;
     } else {
       const rows=Array.from({length:10},(_,i)=>{const g=i+1,p=teacher.live["g"+g],s=stateFromRecord(g,p);const ago=p?Math.max(0,Math.round((Date.now()-(p.t||0))/1000)):null;
         const sl=s?slideList(s):[],ready=sl.filter(x=>x.ready).length;
         const who=p&&p.people?peopleList(p.people).map(([,q])=>`${esc(q.name.split(" ")[0])}: ${q.step<0?"Setup":esc((STEPS[q.step]||{}).n||"")}`).join("<br>"):(p&&p.step!=null?(p.step<0?"Setting up":esc((STEPS[p.step]||{}).n||"")):"");
         return `<tr><td class="m">${g}</td><td>${esc(clientOf(g).name)}</td><td>${s?esc(firmName(s))+`<br><span class="note">${esc(s.members.filter(Boolean).join(", "))}</span>`:'<span class="note">Not joined</span>'}</td><td>${who}</td><td class="m">${s?ready+"/"+sl.length:""}</td><td>${s?(mgmtOK(s)?'<span class="tag good">Approved</span>':'<span class="tag bad">Not yet</span>'):""}</td><td class="m">${p?(ago<60?ago+"s":Math.round(ago/60)+"m")+" ago":""}</td></tr>`}).join("");
-      body=`<div class="grid2" style="align-items:start"><div class="panel stack"><span class="eyebrow">Class code</span><div class="bigcode">${esc(teacher.session)}</div><p class="note">Put this on the board. Groups type it on their setup screen.</p><div class="row" id="endZone">${teacher.confirmEnd?`<span class="confirm">Erase every group's synced deck for this session? <button class="btn" type="button" id="tEndYes">Erase</button><button class="btn alt" type="button" id="tEndNo">Keep</button></span>`:`<button class="btn alt" type="button" id="tEnd">End session</button>`}</div></div>
+      body=`<div class="grid2" style="align-items:start"><div class="panel stack"><span class="eyebrow">Class code</span><div class="bigcode">${esc(teacher.session)}</div><p class="note">Put this on the board. Groups type it on their setup screen.</p><div class="row" id="endZone">${teacher.confirmEnd?`<span class="confirm">End this game? Every group's work, the votes, and the winners are erased, and student devices show that the game is over. <button class="btn" type="button" id="tEndYes">End game</button><button class="btn alt" type="button" id="tEndNo">Keep playing</button></span>`:`<button class="btn alt" type="button" id="tEnd">End game</button>`}</div></div>
       <div class="panel" style="overflow-x:auto"><h3 style="margin-bottom:8px">Groups</h3><table class="tt"><tr><th>Grp</th><th>Client</th><th>Firm</th><th>Who is where</th><th>Deck</th><th>Price</th><th>Updated</th></tr>${rows}</table></div></div>`;
     }
   } else if(teacher.tab==="run"){
@@ -1019,7 +1034,7 @@ function renderTeacher(app){
     <tr><td class="m">0:40</td><td>Step 6, Value prop (4 min).</td></tr>
     <tr><td class="m">0:44</td><td>Step 7, Pitch deck (1 min). Groups check their slides. Synced decks are already on your Decision board; any group that is not synced sends you its pitch code.</td></tr>
     <tr><td class="m">0:45</td><td>Pitches and votes (20 min). Client by client: on the Decision board, Present to the client voters shows the client profile, both pitches follow (90 seconds each), then the two offers side by side and the vote. The other groups vote as the client; tally on the board.</td></tr>
-    <tr><td class="m">1:05</td><td>Done. The rest of the period is yours for intro and debrief.</td></tr></table></div>
+    <tr><td class="m">1:05</td><td>Done. On the Live class tab, click End game. Student devices show the game is over, and the next class starts with Start new game and a fresh code.</td></tr></table></div>
     <div class="panel"><h3 style="margin-bottom:10px">Pairings</h3><table class="tt"><tr><th>Client</th><th>Summit model</th><th>Kettle model</th></tr>${CLIENTS.map((c,i)=>`<tr><td>${esc(c.name)}</td><td>Group ${i*2+1}</td><td>Group ${i*2+2}</td></tr>`).join("")}</table>
     <h3 style="margin:18px 0 8px">Data score (100)</h3><table class="tt"><tr><td>Bank rec</td><td class="m">15</td><td>15 first try, 10 second, 6 after</td></tr><tr><td>Control gaps</td><td class="m">15</td><td>3 per real gap found, minus 2 per false flag</td></tr><tr><td>Fixes</td><td class="m">10</td><td>Best fix 2, partial 1, weak 0, scaled to 10</td></tr><tr><td>Offer fit</td><td class="m">15</td><td>3 per decision that best fits the client, 1.5 for a reasonable one</td></tr><tr><td>Management rules</td><td class="m">15</td><td>Minus 5 per broken rule</td></tr><tr><td>Value prop</td><td class="m">15</td><td>5 per true client priority picked</td></tr><tr><td>Price</td><td class="m">15</td><td>Lower first-year bid gets 15; the other scales by the ratio</td></tr></table><p class="note" style="margin-top:8px">The score informs your decision. You still pick the winner after the pitch.</p></div></div>`;
   } else if(teacher.tab==="key"){
@@ -1052,6 +1067,7 @@ document.addEventListener("click",e=>{
   const d=t.dataset;
   if(d.pick){const g=+d.pick; if(S.group&&S.group!==g){const cc=S.code,me=S.me;S=fresh();S.code=cc;S.me=me;} S.group=g; if(S.step===0&&S.maxStep===0)S.step=-1; view="group"; save(); return render();}
   if(d.resume){view="group";return render();}
+  if(d.newgame){const me=S.me;S=fresh();S.me=me;gameEnded=false;sessionOK={};syncState="off";DIRTY.clear();clearTimeout(syncT);view="home";store();return render();}
   if(d.home){view="home";S.step=-1;save();return render();}
   if(d.go!=null){const i=+d.go; if(i<0){S.step=-1;}else if(i>6)return; else S.step=i; S.maxStep=Math.max(S.maxStep,S.step); save(); return render();}
   if(t.id==="recCheck"){const c=clientOf(S.group);S.rec.tries++;const ok=c.rec.items.every((it,i)=>S.rec.ans[i]===it[2]);if(ok)S.rec.done=true;else if(S.rec.tries>=2)S.rec.showWrong=true;save("rec");return render();}
@@ -1072,7 +1088,7 @@ document.addEventListener("click",e=>{
   if(t.id==="tStart"){return startSession();}
   if(t.id==="tEnd"){teacher.confirmEnd=true;return render();}
   if(t.id==="tEndNo"){teacher.confirmEnd=false;return render();}
-  if(t.id==="tEndYes"){const c=teacher.session;liveCall("remove","games/"+c).catch(()=>{});teacher.session="";teacher.live={};teacher.confirmEnd=false;saveT();return render();}
+  if(t.id==="tEndYes"){const c=teacher.session;liveCall("remove","games/"+c).catch(()=>{});teacher.session="";teacher.live={};teacher.codes={};teacher.picked={};teacher.votes={};teacher.confirmEnd=false;teacher.tab="live";lastLive="";saveT();return render();}
   if(t.id==="pinGo"){const v=($("#pin").value||"").trim().toLowerCase();if(v==="husky"){teacher.unlocked=true;render();}else $("#pinMsg").textContent="That PIN is not right.";return;}
   if(d.ttab){teacher.tab=d.ttab;return render();}
   if(d.tclient!=null){teacher.client=+d.tclient;return render();}
