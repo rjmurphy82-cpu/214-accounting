@@ -348,7 +348,62 @@ const BANK=[
  {id:"c5",sk:"concepts",p:"A bank error shows up during the reconciliation. What does the company do?",o:["Tell the bank; no journal entry is needed","Record a journal entry","Ignore it until year end","Close the account"],x:"Bank errors are the bank's to fix. The company's books stay as they are."},
  {id:"c6",sk:"concepts",p:"After the entries are posted, which amount is reported as Cash on the balance sheet?",o:["The adjusted balance","The bank statement balance","The unadjusted book balance","The average of the two"],x:"After posting, the Cash account equals the adjusted balance."},
  {id:"c7",sk:"concepts",p:"On a bank statement, NSF stands for:",o:["Nonsufficient funds","Net settlement fee","No signature found","Non-standard financial"],x:"An NSF check bounced because the customer didn't have enough money in their account."},
- {id:"c8",sk:"concepts",p:"What is an outstanding check?",o:["A check the company wrote and recorded that the bank hasn't paid yet","A check a customer still owes","A check returned for nonsufficient funds","A check the bank paid twice"],x:"The books already took it out, so it's deducted on the bank side."}
+ {id:"c8",sk:"concepts",p:"What is an outstanding check?",o:["A check the company wrote and recorded that the bank hasn't paid yet","A check a customer still owes","A check returned for nonsufficient funds","A check the bank paid twice"],x:"The books already took it out, so it's deducted on the bank side."},
+ // ================= SET 2 (v:2) =================
+ // ---- sort (answer index into SORT)
+ {id:"s9",v:2,sk:"sort",...so("Checks #812 and #815, totaling $640, have not cleared the bank.",1,"Outstanding checks. The books already took them out; the bank hasn't paid them yet.")},
+ {id:"s10",v:2,sk:"sort",...so("A $2,275 deposit was made the evening of June 30 and is not on the June statement.",0,"Deposit in transit. Add it to the bank balance.")},
+ {id:"s11",v:2,sk:"sort",...so("The bank charged $35 for printing new checks.",3,"The bank already took the money. The books find out from the statement.")},
+ {id:"s12",v:2,sk:"sort",...so("A customer paid $1,100 directly into the company's account by EFT. The company didn't know.",2,"The money is already in the account. The books haven't recorded it yet.")},
+ {id:"s13",v:2,sk:"sort",...so("The bank deducted a $25 fee for collecting a note for the company.",3,"A fee the bank already took. Deduct it on the book side.")},
+ {id:"s14",v:2,sk:"sort",...so("The statement shows $18 of interest earned on the account.",2,"The bank already added it. The books don't have it yet.")},
+ {id:"s15",v:2,sk:"sort",...so("A customer's $485 check was returned marked NSF.",3,"The check bounced, so the cash the books recorded never came in.")},
+ {id:"s16",v:2,sk:"sort",...so("The bank recorded our $640 deposit as $460, so the bank balance is $180 too low.",0,"A bank error. Add the $180 to the bank balance and tell the bank.")},
+ // ---- errors
+ {id:"e9",v:2,sk:"errors",p:"Check #522 for supplies was written for $715 but recorded in the books as $751. On the book side you should…",o:["Add $36","Deduct $36","Add $751","Deduct $715"],x:"$751 − $715 = $36. The books took out $36 too much, so add it back."},
+ {id:"e10",v:2,sk:"errors",p:"Check #608 was written for $293 but recorded in the books as $239. On the book side you should…",o:["Deduct $54","Add $54","Deduct $293","Add $239"],x:"$293 − $239 = $54. The books took out $54 too little, so deduct it."},
+ {id:"e11",v:2,sk:"errors",p:"A $2,050 deposit was recorded in the books as $2,500. On the book side you should…",o:["Deduct $450","Add $450","Deduct $2,500","Add $2,050"],x:"The books show $450 more cash than was deposited, so deduct $450."},
+ {id:"e12",v:2,sk:"errors",p:"Cash sales of $3,420 were recorded in the books as $3,240. On the book side you should…",o:["Add $180","Deduct $180","Add $3,420","Deduct $3,240"],x:"The books show $180 too little cash, so add the $180."},
+ {id:"e13",v:2,sk:"errors",p:"The bank recorded our $1,560 deposit as $1,650. What do you do?",o:["Deduct $90 from the bank side","Add $90 to the bank side","Deduct $90 from the book side","Add $90 to the book side"],x:"The bank gave us $90 too much. Deduct it on the bank side and tell the bank."},
+ {id:"e14",v:2,sk:"errors",p:"The bank paid our $925 check as $952. What do you do?",o:["Add $27 to the bank side","Deduct $27 from the bank side","Add $27 to the book side","Deduct $27 from the book side"],x:"The bank took out $27 too much, so its balance is too low. Add $27 on the bank side."},
+ {id:"e15",v:2,sk:"errors",p:"Which reconciling item is fixed by contacting the bank instead of making a journal entry?",o:["A bank error","An NSF check","A service charge","A book error"],x:"Bank errors are the bank's to fix. The company's books are already right."},
+ {id:"e16",v:2,sk:"errors",p:"Check #730 for $410 was accidentally recorded in the books twice. On the book side you should…",o:["Add $410","Deduct $410","Add $820","Deduct $820"],x:"The books took out an extra $410, so add it back."},
+ // ---- entries
+ {id:"n9",v:2,sk:"entries",p:"The bank charged $35 for printing checks. Which adjusting entry?",o:[je("Bank Service Charge Expense","Cash",35),je("Cash","Bank Service Charge Expense",35),je("Supplies","Accounts Payable",35),NOE],x:"An expense goes up (debit) and Cash goes down (credit)."},
+ {id:"n10",v:2,sk:"entries",p:"A customer paid $1,100 on account by EFT straight into the bank. Which adjusting entry?",o:[je("Cash","Accounts Receivable",1100),je("Accounts Receivable","Cash",1100),je("Cash","Sales Revenue",1100),NOE],x:"Cash goes up, and the customer no longer owes the money."},
+ {id:"n11",v:2,sk:"entries",p:"The bank made the company's $310 note payable payment by EFT. Ignore interest. Which adjusting entry?",o:[je("Notes Payable","Cash",310),je("Cash","Notes Payable",310),je("Notes Receivable","Cash",310),NOE],x:"The company owes less (debit Notes Payable) and Cash went down (credit Cash)."},
+ {id:"n12",v:2,sk:"entries",p:"Check #522 for supplies was written for $715 but recorded as $751. Which adjusting entry?",o:[je("Cash","Supplies",36),je("Supplies","Cash",36),je("Cash","Supplies",751),NOE],x:"The books took out $36 too much. Put it back in Cash and lower Supplies by $36."},
+ {id:"n13",v:2,sk:"entries",p:"Check #608 for the utility bill was written for $293 but recorded as $239. Which adjusting entry?",o:[je("Utilities Expense","Cash",54),je("Cash","Utilities Expense",54),je("Utilities Expense","Cash",293),NOE],x:"The books took out $54 too little. Debit the expense and credit Cash for $54."},
+ {id:"n14",v:2,sk:"entries",p:"The bank recorded our $1,560 deposit as $1,650. Which adjusting entry?",o:[NOE,je("Cash","Accounts Receivable",90),je("Accounts Receivable","Cash",90),je("Bank Service Charge Expense","Cash",90)],x:"It's a bank error, so the bank fixes it. No entry on the books."},
+ {id:"n15",v:2,sk:"entries",p:"A customer's $485 check came back NSF, and the bank charged a $20 fee. The company will bill the customer for both. Which adjusting entry?",o:[je("Accounts Receivable","Cash",505),je("Accounts Receivable","Cash",485),je("Cash","Accounts Receivable",505),je("Bank Service Charge Expense","Cash",505)],x:"The customer owes the $485 check plus the $20 fee: $505."},
+ {id:"n16",v:2,sk:"entries",p:"Which reconciling item's entry has a debit to Cash?",o:["A customer's EFT payment","An NSF check","A bank service charge","An outstanding check"],x:"Book-side adds debit Cash. NSF checks and fees are book-side deducts, and outstanding checks get no entry."},
+ // ---- math
+ {id:"m9",v:2,sk:"math",p:"What is the adjusted bank balance?",d:[["Bank statement balance",8450],["Deposit in transit",1725],["Outstanding checks",2960]],o:[7215,9685,13135,3765],x:"$8,450 + $1,725 − $2,960 = $7,215."},
+ {id:"m10",v:2,sk:"math",p:"What is the adjusted book balance?",d:[["Cash balance per books",3980],["Customer EFT payment",1100],["Interest earned",18],["NSF check",485],["Check printing charge",35]],o:[4578,3382,5618,4542],x:"$3,980 + $1,100 + $18 − $485 − $35 = $4,578."},
+ {id:"m11",v:2,sk:"math",p:"What is the adjusted bank balance?",d:[["Bank statement balance",12300],["Deposit in transit",2450],["Outstanding checks",3875],["Bank added another company's deposit to our account",600]],o:[10275,11475,13125,10875],x:"$12,300 + $2,450 − $3,875 − $600 bank error = $10,275."},
+ {id:"m12",v:2,sk:"math",p:"What is the adjusted book balance?",d:[["Cash balance per books",6240],["Check for $715 recorded as $751",36],["Bank service charge",30],["NSF check",260]],o:[5986,5914,6566,5950],x:"$6,240 + $36 − $30 − $260 = $5,986. The check error adds back because the books took out too much."},
+ {id:"m13",v:2,sk:"math",p:"The only book-side item is a service charge. How much is it?",d:[["Bank statement balance",5900],["Deposit in transit",800],["Outstanding checks",1150],["Cash balance per books",5600]],o:[50,350,1150,800],x:"Adjusted bank = $5,900 + $800 − $1,150 = $5,550. The books must drop from $5,600 to $5,550, so the fee is $50."},
+ {id:"m14",v:2,sk:"math",p:"The adjusted bank balance is $7,400. The deposit in transit was $2,100 and outstanding checks were $1,300. What was the bank statement balance?",o:[6600,8200,10800,4000],x:"Work backward: $7,400 − $2,100 + $1,300 = $6,600."},
+ {id:"m15",v:2,sk:"math",p:"Book-side items: a $1,100 customer EFT, a $485 NSF check, and a $35 printing fee. What is the net effect on Cash after posting the entries?",o:["Increase of $580","Decrease of $580","Increase of $1,620","Increase of $650"],x:"+$1,100 − $485 − $35 = +$580."},
+ {id:"m16",v:2,sk:"math",p:"What is the adjusted book balance?",d:[["Cash balance per books",2875],["Note collected by the bank",4000],["Interest on the note",160],["Collection fee",30],["NSF check",390]],o:[6615,7455,6455,6775],x:"$2,875 + $4,000 + $160 − $30 − $390 = $6,615."},
+ // ---- hunt
+ {id:"h9",v:2,sk:"hunt",p:"Adjusted bank balance: $6,210. Adjusted book balance: $6,030. What is the difference?",o:["$180","$90","$12,240","$1,800"],x:"$6,210 − $6,030 = $180. Always start by finding the difference."},
+ {id:"h10",v:2,sk:"hunt",p:"Your balances are $630 apart, and one item seems to have the wrong sign. Which item is it most likely?",o:["A $315 NSF check","A $630 deposit in transit","A $63 service charge","A $1,260 outstanding check"],x:"$630 ÷ 2 = $315. A wrong sign throws you off by twice the item."},
+ {id:"h11",v:2,sk:"hunt",p:"Your balances are $27 apart. Which mistake would cause exactly that?",o:["$352 recorded as $325","$352 recorded as $253","$520 recorded as $502","$27 recorded as $72"],x:"$352 − $325 = $27, a swap of two digits (and 27 ÷ 9 = 3)."},
+ {id:"h12",v:2,sk:"hunt",p:"Which difference points to two swapped digits?",o:["$63","$50","$100","$41"],x:"$63 ÷ 9 = 7. Differences that divide evenly by 9 usually mean a transposition."},
+ {id:"h13",v:2,sk:"hunt",p:"Adjusted bank: $8,940. Adjusted book: $9,700. If one item has the wrong sign, how big is that item?",o:["$380","$760","$76","$1,520"],x:"Difference $760 ÷ 2 = $380."},
+ {id:"h14",v:2,sk:"hunt",p:"A student added $960 of outstanding checks to the bank balance instead of deducting them. How far apart will the balances be?",o:["$1,920","$960","$480","$0"],x:"A wrong sign is off by twice the amount: 2 × $960 = $1,920."},
+ {id:"h15",v:2,sk:"hunt",p:"A student left a $2,450 deposit in transit off the reconciliation. How far apart will the balances be?",o:["$2,450","$4,900","$1,225","$245"],x:"A missing item throws you off by exactly its amount."},
+ {id:"h16",v:2,sk:"hunt",p:"The balances are $720 apart. You find a $360 NSF check that was added on the book side instead of deducted. After you fix it, what's the difference?",o:["$0","$360","$720","$1,080"],x:"Fixing the sign moves the book side by $720, which closes the whole gap."},
+ // ---- concepts
+ {id:"c9",v:2,sk:"concepts",p:"Which reconciling items go on the bank side?",o:["Deposits in transit, outstanding checks, and bank errors","NSF checks and service charges","Interest earned and notes collected","Every item"],x:"Bank-side items are things the bank hasn't caught up on, plus the bank's own mistakes."},
+ {id:"c10",v:2,sk:"concepts",p:"Why does an NSF check go back into Accounts Receivable?",o:["The customer still owes the company the money","The bank owes the money","The company owes the customer","It becomes an expense right away"],x:"The payment bounced, so the customer still owes it."},
+ {id:"c11",v:2,sk:"concepts",p:"When the reconciliation is done, the adjusted bank and adjusted book balances should be:",o:["Equal","As far apart as possible","Different by the outstanding checks","Different by the service charge"],x:"Both sides explain their way to the same true cash balance."},
+ {id:"c12",v:2,sk:"concepts",p:"Why are bank reconciliations done every month?",o:["To catch errors and theft quickly, while they're easy to trace","The IRS requires it monthly","Banks charge a fee if you don't","To calculate payroll"],x:"Monthly reviews are a regular, independent check on cash."},
+ {id:"c13",v:2,sk:"concepts",p:"On a bank statement, EFT stands for:",o:["Electronic funds transfer","Extra fee transaction","Employee fraud test","Estimated financial total"],x:"An EFT moves money electronically, like a direct deposit or an automatic bill payment."},
+ {id:"c14",v:2,sk:"concepts",p:"A debit memo on the bank statement means the bank:",o:["Decreased the company's account balance","Increased the company's account balance","Made an error","Closed the account"],x:"To the bank, your account is a liability, so a debit lowers it. Fees and NSF checks come as debit memos."},
+ {id:"c15",v:2,sk:"concepts",p:"A credit memo on the bank statement means the bank:",o:["Increased the company's account balance","Decreased the company's account balance","Charged a fee","Returned a check"],x:"Credit memos add money, like interest earned or a note the bank collected."},
+ {id:"c16",v:2,sk:"concepts",p:"During a reconciliation, the company compares its Cash account to:",o:["The bank statement","The income statement","The trial balance","A sales invoice"],x:"The rec lines up the company's Cash account with the bank's record of the same account."}
 ];
 BANK.forEach(q=>{if(q.t==="sort"){q.o=[...SORT];q.ans=q.a;}else q.ans=0});
 
@@ -373,9 +428,11 @@ function inst(q,seed){
   const r=rng(hash(q.id+":"+seed));const idx=shuffle([0,1,2,3],r);
   return {...q,opts:idx.map(i=>q.o[i]),ans:idx.indexOf(0)};
 }
-function buildGame(perSkill,seed){
+/* qset: "new" = set 2 only, "orig" = set 1 only, anything else = both sets mixed */
+function buildGame(perSkill,seed,qset){
   const r=rng(seed);const list=[];
-  ORDER.forEach(sk=>{shuffle(BANK.filter(q=>q.sk===sk),r).slice(0,perSkill).forEach(q=>list.push(q.id))});
+  const inSet=q=>qset==="new"?q.v===2:qset==="orig"?!q.v:true;
+  ORDER.forEach(sk=>{shuffle(BANK.filter(q=>q.sk===sk&&inSet(q)),r).slice(0,perSkill).forEach(q=>list.push(q.id))});
   return list;
 }
 const byId=Object.fromEntries(BANK.map(q=>[q.id,q]));
