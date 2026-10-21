@@ -80,6 +80,30 @@ p{margin:0}
 .cols{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:20px;align-items:start}
 @media (max-width:860px){.cols{grid-template-columns:1fr}}
 .sticky{position:sticky;top:90px}
+.coach{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-bottom:20px;align-items:start}
+@media (max-width:900px){.coach{grid-template-columns:1fr}}
+.coach>*{min-width:0}
+.fixlist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px}
+.fixlist li{display:grid;grid-template-columns:22px 1fr;gap:6px;font-size:14px;line-height:1.35}
+.fixlist li .ic{font-weight:700}
+.fixlist li small{display:block;color:var(--muted);font-size:12px}
+.fixlist li .do{display:block;margin-top:3px;font-size:13px;font-weight:600;color:var(--bad)}
+.window{position:relative;height:18px;border-radius:3px;background:var(--chip);margin:10px 0 6px}
+.window .ok{position:absolute;top:0;bottom:0;background:var(--good-bg);border:1px solid var(--good);border-radius:3px}
+.window .you{position:absolute;top:-5px;width:3px;height:28px;background:var(--ink);border-radius:2px}
+.wlab{display:flex;justify-content:space-between;font-family:var(--mono);font-size:12px;color:var(--muted)}
+.howto{counter-reset:h;list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px;font-size:14px}
+.howto li{counter-increment:h;display:grid;grid-template-columns:22px 1fr;gap:6px}
+.howto li::before{content:counter(h);font-family:var(--mono);color:var(--orange-ink);font-weight:600}
+.gapfit{display:inline-block;margin-top:3px;font-family:var(--display);text-transform:uppercase;letter-spacing:.06em;font-size:10.5px;padding:1px 6px;border-radius:2px;background:var(--good-bg);color:var(--good)}
+.mg.low{color:var(--bad)} .mg.hi{color:var(--good)}
+.fixbar{position:fixed;left:0;right:0;bottom:0;z-index:20;background:var(--brown);color:var(--onbrown);border-top:3px solid var(--orange);padding-block:10px calc(10px + env(safe-area-inset-bottom,0px));padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.fixbar .in{max-width:1180px;margin:0 auto;display:flex;gap:12px;align-items:center;flex-wrap:wrap;font-size:15px}
+.fixbar b{font-family:var(--display);text-transform:uppercase;letter-spacing:.06em;font-weight:500}
+.fixbar .st{font-family:var(--display);text-transform:uppercase;letter-spacing:.08em;padding:3px 9px;border-radius:3px;font-size:13px}
+.fixbar .st.no{background:#E0213F;color:#fff}.fixbar .st.ok{background:#2E7A4C;color:#fff}
+body.has-fixbar main{padding-bottom:110px}
+body.has-fixbar #tsz{bottom:78px!important}
 @media (max-width:860px){.sticky{position:static}}
 .btn{border:1px solid var(--brown);background:var(--brown);color:var(--onbrown);border-radius:3px;padding:9px 16px;font-family:var(--display);text-transform:uppercase;letter-spacing:.06em;font-size:15px}
 .btn.alt{background:transparent;color:var(--ink);border-color:var(--line)}
@@ -445,6 +469,7 @@ const SERVICES = [
  {id:"controlcheck",type:"recur",n:"Controls check + surprise cash count",d:"Quarterly visit, billed monthly: test procedures, count cash.",h:2},
  {id:"advisory",type:"recur",n:"Owner meeting + KPI review",d:"Monthly partner sit-down on cash, margins, and decisions.",h:2,partner:true}
 ];
+const GAPFIT = {seg:["controls","controlcheck","training"],cash:["controls","controlcheck"],rec:["monthrec","reccatch"],checks:["apreview","controls"],docs:["software","controls"],access:["software"],vendor:["apreview","controls"],personal:["bookkeeping","advisory","cleanup"],inv:["controls","controlcheck"],payroll:["payroll","controls"],vacation:["controls","training"],petty:["controls","controlcheck"]};
 const PHASES = {forensic:[1,2],cleanup:[1,4],reccatch:[3,5],software:[4,6],controls:[6,9],training:[10,11]};
 
 const STEPS = [
@@ -585,15 +610,33 @@ function quote(s){
     setupMargin:setupPrice?(setupPrice-setupCost)/setupPrice:0, recurMargin:recurPrice?(recurPrice-recurCost)/recurPrice:0,
     pctRev:(recurPrice*12)/c.fin.rev, fyPctRev:firstYear/c.fin.rev};
 }
+function priceWindow(s){
+  const f=firmOf(s.group),q=quote(s),c=clientOf(s.group);
+  const needRecur=q.recur.length?q.recurCost/(1-f.recurFloor):0;
+  const low=Math.max(needRecur,f.minMonthly||0),high=c.fin.rev*0.025/12;
+  const needSetup=q.setup.length?q.setupCost/(1-f.setupFloor):0;
+  return {low,high,needRecur,needSetup,q,f,c};
+}
+function priciest(s){
+  const q=quote(s);return q.recur.filter(l=>!l.v.req).sort((a,b)=>b.cost-a.cost)[0];
+}
 function mgmt(s){
-  const f=firmOf(s.group),q=quote(s),out=[];
-  out.push({l:"Monthly bank reconciliation included",ok:!!s.sel.monthrec});
-  if(q.setup.length) out.push({l:`Setup margin at least ${f.setupFloor*100}%`,ok:q.setupMargin>=f.setupFloor-1e-9,d:"Currently "+pct(q.setupMargin)});
-  out.push({l:`Monthly margin at least ${f.recurFloor*100}%`,ok:q.recur.length>0&&q.recurMargin>=f.recurFloor-1e-9,d:"Currently "+pct(q.recurMargin)+(f.platform?" (after $"+f.platform+" platform cost)":"")});
-  if(f.minMonthly) out.push({l:`Monthly fee at least ${money(f.minMonthly)}`,ok:q.recurPrice>=f.minMonthly,d:"Currently "+money(q.recurPrice)});
-  if(f.maxHours) out.push({l:`No more than ${f.maxHours} hours a month`,ok:q.recurHours<=f.maxHours,d:"Currently "+q.recurHours.toFixed(1)+" hours"});
-  out.push({l:"No audit for a client we advise (independence)",ok:!s.sel.audit});
-  out.push({l:"Recurring fees at or below 2.5% of client revenue",ok:q.pctRev<=0.025+1e-9,d:"Currently "+pct(q.pctRev)});
+  const w=priceWindow(s),f=w.f,q=w.q,out=[];
+  const big=priciest(s);
+  const cut=big?`Uncheck a monthly service, such as ${big.v.n} (costs you ${money(big.cost)} a month).`:"Uncheck a monthly service.";
+  const squeezed=w.low>w.high+0.5;
+  out.push({l:"Monthly bank reconciliation included",ok:!!s.sel.monthrec,fix:"Check Monthly bank reconciliation."});
+  if(q.setup.length) out.push({l:`Setup margin at least ${f.setupFloor*100}%`,ok:q.setupMargin>=f.setupFloor-1e-9,d:"Currently "+pct(q.setupMargin),
+    fix:`Raise setup prices by about ${money(Math.max(0,w.needSetup-q.setupPrice))} in total (setup total of at least ${money(Math.ceil(w.needSetup/50)*50)}).`});
+  out.push({l:`Monthly margin at least ${f.recurFloor*100}%`,ok:q.recur.length>0&&q.recurMargin>=f.recurFloor-1e-9,d:"Currently "+pct(q.recurMargin)+(f.platform?" (after $"+f.platform+" platform cost)":""),
+    fix:squeezed?cut+" Your monthly work costs too much to meet this margin and stay under the client's cap.":`Raise monthly prices by about ${money(Math.max(0,w.needRecur-q.recurPrice))} in total (monthly total of at least ${money(Math.ceil(w.needRecur/10)*10)}).`});
+  if(f.minMonthly) out.push({l:`Monthly fee at least ${money(f.minMonthly)}`,ok:q.recurPrice>=f.minMonthly,d:"Currently "+money(q.recurPrice),
+    fix:`Raise monthly prices or check another monthly service until the monthly total reaches ${money(f.minMonthly)}.`});
+  if(f.maxHours){const over=q.recurHours-f.maxHours;out.push({l:`No more than ${f.maxHours} hours a month`,ok:q.recurHours<=f.maxHours,d:"Currently "+q.recurHours.toFixed(1)+" hours",
+    fix:`Uncheck monthly services to cut ${over.toFixed(1)} hours. Check the Hours/mo column.`});}
+  out.push({l:"No audit for a client we advise (independence)",ok:!s.sel.audit,fix:"Uncheck Annual financial statement audit. A firm cannot audit controls it designed."});
+  out.push({l:"Recurring fees at or below 2.5% of client revenue",ok:q.pctRev<=0.025+1e-9,d:"Currently "+pct(q.pctRev),
+    fix:squeezed?cut:`Lower monthly prices by about ${money(q.recurPrice-w.high)} in total (monthly total of ${money(Math.floor(w.high/10)*10)} or less), or uncheck a monthly service.`});
   return out;
 }
 const mgmtOK=s=>mgmt(s).every(x=>x.ok);
@@ -677,6 +720,7 @@ function canGo(i){ if(i===3)return S.flagsDone; return true; }
 
 /* ===================== VIEWS ===================== */
 function render(){
+  document.body.classList.remove("has-fixbar");
   paintMast();paintRail();
   const app=$("#app");
   if(view==="teacher") return renderTeacher(app);
@@ -752,21 +796,48 @@ function vFix(app){
 }
 function shuffleFor(seed){let h=0;for(const ch of String(seed))h=(h*31+ch.charCodeAt(0))>>>0;const a=[0,1,2];for(let i=2;i>0;i--){h=(h*1103515245+12345)>>>0;const j=h%(i+1);[a[i],a[j]]=[a[j],a[i]];}return a;}
 
+function fitFor(s,id){
+  const c=clientOf(s.group);const gaps=s.flagsDone?c.weak:s.flags.filter(k=>c.weak.includes(k));
+  const hits=gaps.filter(k=>(GAPFIT[k]||[]).includes(id));
+  if(id==="forensic"&&s.rec.done)return "Explains your unexplained gap";
+  if(id==="audit")return "";
+  return hits.length?"Fixes: "+hits.map(k=>W[k].n.split(";")[0].split(",")[0]).slice(0,2).join(" · "):"";
+}
 function vPrice(app){
   const f=firmOf(S.group),c=clientOf(S.group);
-  const row=v=>{const on=!!S.sel[v.id],rg=svcRange(S,v),p=svcPrice(S,v),cost=svcCost(S,v),m=(p-cost)/p;
-    return `<tr class="${on?"":"off"}" id="row-${v.id}"><td><input type="checkbox" data-sel="${v.id}" ${on?"checked":""} ${v.req?"disabled":""} aria-label="Include ${esc(v.n)}"></td><td><div class="nm">${esc(v.n)} ${v.req?'<span class="tag or">Required</span>':""}</div><div class="ds">${esc(v.d)}</div></td><td class="num">${svcHours(S,v).toFixed(1)}</td><td class="num">${money(cost)}</td><td><input type="range" data-price="${v.id}" min="${rg.min}" max="${rg.max}" step="${svcStep(v)}" value="${p}" aria-label="Price for ${esc(v.n)}"></td><td class="num"><b id="p-${v.id}">${money(p)}</b></td><td class="num mg" id="m-${v.id}">${pct(m)}</td></tr>`;};
+  const row=v=>{const on=!!S.sel[v.id],rg=svcRange(S,v),p=svcPrice(S,v),cost=svcCost(S,v),m=(p-cost)/p,fl=v.type==="setup"?f.setupFloor:f.recurFloor,fit=fitFor(S,v.id);
+    return `<tr class="${on?"":"off"}" id="row-${v.id}"><td><input type="checkbox" data-sel="${v.id}" ${on?"checked":""} ${v.req?"disabled":""} aria-label="Include ${esc(v.n)}"></td><td><div class="nm">${esc(v.n)} ${v.req?'<span class="tag or">Required</span>':""}${v.id==="audit"?' <span class="tag bad">Check the rules</span>':""}</div><div class="ds">${esc(v.d)}</div>${fit?`<span class="gapfit">${esc(fit)}</span>`:""}</td><td class="num">${svcHours(S,v).toFixed(1)}</td><td class="num">${money(cost)}</td><td><input type="range" data-price="${v.id}" min="${rg.min}" max="${rg.max}" step="${svcStep(v)}" value="${p}" aria-label="Price for ${esc(v.n)}"></td><td class="num"><b id="p-${v.id}">${money(p)}</b></td><td class="num mg ${m>=fl-1e-9?"hi":"low"}" id="m-${v.id}">${pct(m)}</td></tr>`;};
   const table=(type,label)=>`<div class="pricewrap"><table class="svc"><thead><tr><th></th><th>${label}</th><th style="text-align:right">Hours${type==="recur"?"/mo":""}</th><th style="text-align:right">Our cost</th><th>Set price</th><th style="text-align:right">Price</th><th style="text-align:right">Margin</th></tr></thead><tbody>${SERVICES.filter(v=>v.type===type).map(row).join("")}</tbody></table></div>`;
-  app.innerHTML=head(4,"Build the price","Check the services you will offer and drag each price. Cost is what the work costs your firm in staff time. Management only approves a proposal when every rule on the right is green. The client never sees your costs or margins.")+
-  `<div class="cols"><div class="stack"><h3>One-time setup</h3>${table("setup","Service")}<h3>Monthly service</h3>${table("recur","Service")}${f.platform?`<p class="note">Your firm also pays ${money(f.platform)} a month in software platform costs for any client on monthly service. It is included in your monthly margin.</p>`:""}</div>
-  <div class="stack sticky" id="pricesum"></div></div>`+nextBar(4,true);
+  app.innerHTML=head(4,"Build the price","Pick the services this client needs, then set prices your managers will approve and the client can afford. The client never sees your costs or margins.")+
+  `<div class="panel" style="margin-bottom:16px"><h3 style="margin-bottom:8px">How to get approved</h3><ol class="howto">
+   <li><span><b>Check the services that fix this client's problems.</b> Green tags show which gaps a service fixes. You do not need everything.</span></li>
+   <li><span><b>Drag prices until every margin is green.</b> Red margins are below your firm's floor (${f.setupFloor*100}% setup, ${f.recurFloor*100}% monthly).</span></li>
+   <li><span><b>Keep the monthly total inside the green range</b> below. Too many monthly services will not fit. Cut one if you are stuck.</span></li>
+   <li><span><b>Follow the red "do this" lines</b> in the management check until it says Approved.</span></li></ol></div>
+  <div class="coach" id="pricesum"></div>
+  <div class="stack"><h3>One-time setup</h3>${table("setup","Service")}<h3>Monthly service</h3>${table("recur","Service")}${f.platform?`<p class="note">Your firm also pays ${money(f.platform)} a month in software platform costs for any client on monthly service. It is included in your monthly margin.</p>`:""}</div>
+  <div class="fixbar" id="fixbar" role="status" aria-live="polite"></div>`+nextBar(4,true);
+  document.body.classList.add("has-fixbar");
   paintPriceSum();
 }
 function paintPriceSum(){
   const el=$("#pricesum");if(!el)return;
-  const q=quote(S),c=clientOf(S.group),ni=c.fin.rev-c.fin.cogs-c.fin.payroll-c.fin.rent-c.fin.other,m=mgmt(S),ok=m.every(x=>x.ok);
+  const w=priceWindow(S),q=w.q,c=w.c,ni=c.fin.rev-c.fin.cogs-c.fin.payroll-c.fin.rent-c.fin.other,m=mgmt(S),ok=m.every(x=>x.ok);
+  const lo=w.low,hi=w.high,max=Math.max(hi*1.6,lo*1.15,q.recurPrice*1.1,100);
+  const L=Math.min(lo,hi)/max*100,R=hi/max*100,Y=Math.min(100,q.recurPrice/max*100);
+  const squeezed=lo>hi+0.5,inWin=!squeezed&&q.recurPrice>=lo-0.5&&q.recurPrice<=hi+0.5;
   el.innerHTML=`<div class="panel stack"><h3>What the client pays</h3><div class="tot"><span>Setup (one time)</span><b>${money(q.setupPrice)}</b><span>Monthly</span><b>${money(q.recurPrice)}</b><span class="big">First year</span><b class="big">${money(q.firstYear)}</b><span>Share of revenue</span><b>${pct(q.fyPctRev)}</b><span>Share of net income</span><b>${pct(q.firstYear/ni)}</b></div></div>
-  <div class="panel stack"><h3>Management check</h3><ul class="checks">${m.map(x=>`<li><span class="ic ${x.ok?"ok":"no"}">${x.ok?"✓":"✕"}</span><span>${esc(x.l)}${x.d?`<small>${esc(x.d)}</small>`:""}</span></li>`).join("")}</ul><div class="stamp ${ok?"ok":"no"}">${ok?"Approved by management":"Not approved yet"}</div></div>`;
+  <div class="panel stack"><h3>Monthly total target</h3>
+   ${squeezed?`<p class="no" style="font-size:14px"><b>No price works with these monthly services.</b> They need at least ${money(lo)} a month to meet your margin, but the client's cap is ${money(hi)}. Uncheck a monthly service.</p>`:
+   `<p style="font-size:14px">Land your monthly total between <b>${money(Math.ceil(lo/10)*10)}</b> and <b>${money(Math.floor(hi/10)*10)}</b>.</p>`}
+   <div class="window" aria-hidden="true">${squeezed?"":`<div class="ok" style="left:${L}%;width:${Math.max(1,R-L)}%"></div>`}<div class="you" style="left:calc(${Y}% - 1px)"></div></div>
+   <div class="wlab"><span>$0</span><span>You: ${money(q.recurPrice)}</span></div>
+   <p class="note">${inWin?'<span class="ok">Your monthly total is in range.</span>':"Bottom of the range: your margin floor"+(w.f.minMonthly?" or the "+money(w.f.minMonthly)+" minimum":"")+". Top: 2.5% of the client's revenue."}</p></div>
+  <div class="panel stack"><h3>Management check</h3><ul class="fixlist">${m.map(x=>`<li><span class="ic ${x.ok?"ok":"no"}">${x.ok?"✓":"✕"}</span><span>${esc(x.l)}${x.d?`<small>${esc(x.d)}</small>`:""}${x.ok?"":`<span class="do">Do this: ${esc(x.fix)}</span>`}</span></li>`).join("")}</ul><div class="stamp ${ok?"ok":"no"}">${ok?"Approved by management":"Not approved yet"}</div></div>`;
+  const fb=$("#fixbar");
+  if(fb){const bad=m.filter(x=>!x.ok);
+    fb.innerHTML=`<div class="in">${ok?`<span class="st ok">Approved</span><span>Management approved this price. Next: Value prop.</span>`:`<span class="st no">${bad.length} to fix</span><span><b>Next:</b> ${esc(bad[0].fix)}</span>`}<span style="margin-left:auto;font-family:var(--mono);font-size:13px;opacity:.85">Monthly ${money(q.recurPrice)} · First year ${money(q.firstYear)}</span></div>`;}
+  SERVICES.forEach(v=>{const e=$("#m-"+v.id);if(!e)return;const fl=v.type==="setup"?w.f.setupFloor:w.f.recurFloor,p=svcPrice(S,v),mm=(p-svcCost(S,v))/p;e.classList.toggle("low",mm<fl-1e-9);e.classList.toggle("hi",mm>=fl-1e-9);});
   paintMast();paintRail();
 }
 function vValue(app){
@@ -983,7 +1054,7 @@ if(ROLE==="teacher")initTeacher();else{if(S.code&&S.group)queueSync();pullSync()
   var target=document.querySelector("main")||document.body;
   var i=2;try{var v=parseFloat(localStorage.getItem(KEY));var j=STEPS.indexOf(v);if(j>=0)i=j}catch(e){}
   function apply(){
-    var z=STEPS[i];target.style.zoom=z;
+    var z=STEPS[i];target.style.zoom=z;target.style.maxWidth=Math.min(1180,Math.floor(window.innerWidth/z))+"px";
     box.style.zoom=target===document.body?1/z:1;
     box.children[1].textContent=Math.round(z*100)+"%";
     box.children[0].disabled=i===0;box.children[2].disabled=i===STEPS.length-1;
@@ -995,6 +1066,7 @@ if(ROLE==="teacher")initTeacher();else{if(S.code&&S.group)queueSync();pullSync()
     if(e.metaKey||e.ctrlKey||e.altKey)return;var t=e.target.tagName;if(t==="INPUT"||t==="TEXTAREA"||t==="SELECT")return;
     if(e.key==="+"||e.key==="=")step(1);else if(e.key==="-"||e.key==="_")step(-1);else if(e.key==="0")step(0);
   });
+  window.addEventListener("resize",apply);
   apply();
 })();
 </script>
