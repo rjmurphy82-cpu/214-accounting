@@ -456,40 +456,97 @@ const STEPS = [
 /* ===================== STATE ===================== */
 const ROLE=window.ENG_ROLE||"student";
 const KEY="engagement-sim-v1";
-const fresh=()=>({code:"",group:null,firm:"",members:["","",""],step:0,rec:{ans:{},tries:0,done:false,showWrong:false},flags:[],flagsDone:false,flagTry:null,fixes:{},sel:{monthrec:true},price:{},prios:[],strengths:[],rivalW:null,headline:"",headEdited:false,maxStep:0});
+const fresh=()=>({me:"",secT:{},people:{},joinT:0,code:"",group:null,firm:"",members:["","",""],step:0,rec:{ans:{},tries:0,done:false,showWrong:false},flags:[],flagsDone:false,flagTry:null,fixes:{},sel:{monthrec:true},price:{},prios:[],strengths:[],rivalW:null,headline:"",headEdited:false,maxStep:0});
 let S=fresh();
 try{const raw=localStorage.getItem(KEY); if(raw){S=Object.assign(fresh(),JSON.parse(raw));}}catch(e){}
-function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){} queueSync(); paintMast();}
+let DEV="";try{DEV=localStorage.getItem(KEY+"-dev")||"";if(!DEV){DEV=Math.random().toString(36).slice(2,10);localStorage.setItem(KEY+"-dev",DEV);}}catch(e){DEV=Math.random().toString(36).slice(2,10);}
+const DIRTY=new Set();
+function store(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
+function save(sec){if(sec){S.secT=S.secT||{};S.secT[sec]=Date.now();DIRTY.add(sec);} store(); queueSync(); paintMast();}
 let view = ROLE==="teacher"?"teacher":(S.group? "group":"home");
 let teacher={unlocked:ROLE==="teacher",tab:"live",client:0,codes:{},picked:{},session:"",live:{},netOk:null,confirmEnd:false};
 try{const t=JSON.parse(localStorage.getItem(KEY+"-t")||"null"); if(t){teacher.codes=t.codes||{};teacher.picked=t.picked||{};teacher.session=t.session||"";}}catch(e){}
 function saveT(){try{localStorage.setItem(KEY+"-t",JSON.stringify({codes:teacher.codes,picked:teacher.picked,session:teacher.session}));}catch(e){}}
 
 /* ===================== LIVE SYNC (/api/live, same backend as Bank Rec Live) ===================== */
-let syncState="off",syncT=null;
 async function liveCall(op,path,v){const r=await fetch("/api/live",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({op,path,v})});const j=await r.json().catch(()=>({}));return {status:r.status,ok:r.ok,j};}
+let syncState="off",syncT=null,pullT=null,sessionOK={},pendingRender=false,dragging=false;
+const SECS={
+  team:{get:s=>({firm:s.firm}),put:(s,v)=>{s.firm=v.firm||"";}},
+  rec:{get:s=>s.rec,put:(s,v)=>{s.rec=Object.assign({ans:{},tries:0,done:false,showWrong:false},v);}},
+  walk:{get:s=>({flags:s.flags,flagsDone:s.flagsDone}),put:(s,v)=>{s.flags=v.flags||[];s.flagsDone=!!v.flagsDone;}},
+  fixes:{get:s=>s.fixes,put:(s,v)=>{s.fixes=v||{};}},
+  price:{get:s=>({sel:s.sel,price:s.price}),put:(s,v)=>{s.sel=v.sel||{monthrec:true};s.price=v.price||{};}},
+  value:{get:s=>({prios:s.prios,strengths:s.strengths,rivalW:s.rivalW,headline:s.headline,headEdited:s.headEdited}),put:(s,v)=>{s.prios=v.prios||[];s.strengths=v.strengths||[];s.rivalW=v.rivalW||null;s.headline=v.headline||"";s.headEdited=!!v.headEdited;}}
+};
+function peopleList(people){return Object.entries(people||{}).filter(([,p])=>p&&p.name&&p.name.trim()).sort((a,b)=>(a[1].j||0)-(b[1].j||0));}
+function membersFrom(people){const seen=new Set(),out=[];peopleList(people).forEach(([,p])=>{const n=p.name.trim();if(!seen.has(n.toLowerCase())){seen.add(n.toLowerCase());out.push(n);}});return out;}
+function stateFromRecord(g,rec){
+  if(!rec)return null;
+  if(!rec.sec&&rec.code)return decode(rec.code);
+  const s=fresh();s.group=g;s.maxStep=6;
+  Object.keys(SECS).forEach(k=>{if(rec.sec&&rec.sec[k])SECS[k].put(s,rec.sec[k].v);});
+  s.members=membersFrom(rec.people);s.people=rec.people||{};return s;
+}
+const synced=()=>ROLE!=="teacher"&&!!S.group&&/^\d{4}$/.test((S.code||"").trim())&&sessionOK[S.code.trim()]===true;
+function groupPath(){return `games/${S.code.trim()}/players/g${S.group}`;}
 function queueSync(){
   if(ROLE==="teacher"||!S.group)return;
   const c=(S.code||"").trim();
   if(!c){syncState="off";return;}
   if(!/^\d{4}$/.test(c)){syncState="bad";return;}
-  clearTimeout(syncT);syncT=setTimeout(doSync,1000);
+  clearTimeout(syncT);syncT=setTimeout(pushSync,450);
 }
-async function doSync(){
-  try{
-    const sl=slideList(S);
-    const res=await liveCall("set",`games/${S.code.trim()}/players/g${S.group}`,{kind:"engagement",code:encode(S),step:S.step,ready:sl.filter(x=>x.ready).length,of:sl.length,ok:mgmtOK(S),firm:firmName(S),members:S.members.filter(Boolean),t:Date.now()});
-    syncState=res.ok?"ok":(res.status===404?"nogame":"err");
-  }catch(e){syncState="err";}
-  paintMast();
-  const sm=$("#syncMsg");if(sm)sm.innerHTML=syncNote();
+async function checkSession(){
+  const c=(S.code||"").trim();
+  if(sessionOK[c]!==undefined)return sessionOK[c];
+  try{const r=await liveCall("get","games/"+c);if(!r.ok){syncState="err";return false;}sessionOK[c]=r.j.v!=null;}catch(e){syncState="err";return false;}
+  if(sessionOK[c])Object.keys(S.secT||{}).forEach(k=>{if(S.secT[k])DIRTY.add(k);});
+  if(!sessionOK[c]){syncState="nogame";paintMast();refreshSyncMsg();}
+  return sessionOK[c];
 }
+async function pushSync(){
+  if(!(await checkSession()))return;
+  if(!S.joinT){S.joinT=Date.now();store();}
+  const now=Date.now(),v={kind:"engagement",t:now};
+  v["people/"+DEV]={name:(S.me||"").trim(),step:S.step,t:now,j:S.joinT};
+  const secs=[...DIRTY];DIRTY.clear();
+  secs.forEach(k=>{v["sec/"+k]={v:SECS[k].get(S),t:S.secT[k]||now};});
+  try{const r=await liveCall("update",groupPath(),v);syncState=r.ok?"ok":"err";if(!r.ok)secs.forEach(k=>DIRTY.add(k));}
+  catch(e){syncState="err";secs.forEach(k=>DIRTY.add(k));}
+  paintMast();refreshSyncMsg();
+  if(DIRTY.size){clearTimeout(syncT);syncT=setTimeout(pushSync,3000);}
+}
+function refreshSyncMsg(){const sm=$("#syncMsg");if(sm)sm.innerHTML=syncNote();}
+function busy(){const a=document.activeElement;return dragging||!!(a&&(a.tagName==="TEXTAREA"||(a.tagName==="INPUT"&&a.type!=="checkbox"&&a.type!=="range")));}
+async function pullSync(){
+  clearTimeout(pullT);
+  if(ROLE!=="teacher"&&S.group&&/^\d{4}$/.test((S.code||"").trim())&&!document.hidden){
+    if(await checkSession()){
+      try{const r=await liveCall("get",groupPath());
+        if(r.ok){const rec=r.j.v||{};let changed=false;
+          Object.keys(SECS).forEach(k=>{const rs=rec.sec&&rec.sec[k];if(rs&&rs.t>((S.secT||{})[k]||0)&&!DIRTY.has(k)){SECS[k].put(S,rs.v);S.secT[k]=rs.t;changed=true;}});
+          const pp=JSON.stringify(rec.people||{});if(pp!==JSON.stringify(S.people||{})){S.people=rec.people||{};changed=true;}
+          const mem=membersFrom(S.people);if(mem.length&&JSON.stringify(mem)!==JSON.stringify(S.members)){S.members=mem;changed=true;}
+          syncState="ok";
+          if(changed){store();if(view==="group"&&!pres){if(busy())pendingRender=true;else keepScroll(render);}else paintMast();}
+          else paintMast();
+        }
+      }catch(e){syncState="err";paintMast();}
+    }
+  }
+  pullT=setTimeout(pullSync,1500);
+}
+setInterval(()=>{if(synced())queueSync();},10000);
+document.addEventListener("pointerdown",e=>{if(e.target&&e.target.type==="range")dragging=true;});
+document.addEventListener("pointerup",()=>{if(dragging){dragging=false;if(pendingRender)setTimeout(()=>{if(!busy()&&pendingRender){pendingRender=false;keepScroll(render);}},250);}});
+document.addEventListener("focusout",()=>{if(pendingRender)setTimeout(()=>{if(!busy()&&pendingRender){pendingRender=false;keepScroll(render);}},250);});
 function syncNote(){
-  if(syncState==="ok")return '<span class="ok">Synced. Your teacher can open your deck on the projector.</span>';
+  if(syncState==="ok")return '<span class="ok">Synced. Everyone in your group sees the same work, and your teacher can open your deck on the projector.</span>';
   if(syncState==="nogame")return '<span class="no">No class session with that code. Check the code on the board.</span>';
   if(syncState==="err")return '<span class="no">Not synced right now. Your work is still saved on this device, and the pitch code below is your backup.</span>';
   if(syncState==="bad")return '<span class="no">The class code is 4 digits.</span>';
-  return "Optional. Type the code on the board so your deck shows up on the teacher screen.";
+  return "Type the code on the board. It links everyone in your group, each on their own device, and sends your deck to the teacher screen.";
 }
 
 /* ===================== HELPERS ===================== */
@@ -605,6 +662,10 @@ function paintMast(){
     $("#mGroup").innerHTML=`<span class="mchip">Group ${S.group} · ${esc(clientOf(S.group).name)}</span>`;
     $("#mDeck").innerHTML=`<span class="mchip deck">Deck ${n}/${sl.length} slides ready</span>`;
   } else {$("#mGroup").innerHTML="";$("#mDeck").innerHTML="";}
+  if(view==="group"&&S.group&&synced()){
+    const now=Date.now(),mates=peopleList(S.people).filter(([id,p])=>id!==DEV&&now-(p.t||0)<25000);
+    $("#mGroup").innerHTML+=" "+mates.map(([,p])=>`<span class="mchip">${esc(p.name.split(" ")[0])} · ${p.step<0?"Setup":esc((STEPS[p.step]||{}).n||"")}</span>`).join(" ");
+  }
   const sy=$("#mSync"),SYM={ok:["sync-ok","Synced to class"],nogame:["sync-bad","Class code not found"],err:["sync-bad","Not synced"],bad:["sync-bad","Check class code"]};
   sy.innerHTML=(view==="group"&&S.group&&SYM[syncState])?`<span class="mchip ${SYM[syncState][0]}">${SYM[syncState][1]}</span>`:"";
 }
@@ -614,7 +675,7 @@ function paintRail(){
   r.hidden=false;
   $("#railIn").innerHTML=STEPS.map((st,i)=>`<button type="button" data-go="${i}" class="${i===S.step?"on":""} ${stepDone(S,i)?"done":""}" ${canGo(i)?"":"disabled"}><span class="n">${stepDone(S,i)?"✓":i+1}</span>${st.n}</button>`).join("");
 }
-function canGo(i){ if(i<=1)return true; if(i===3)return S.flagsDone; return S.maxStep>=1; }
+function canGo(i){ if(i===3)return S.flagsDone; return true; }
 
 /* ===================== VIEWS ===================== */
 function render(){
@@ -639,9 +700,11 @@ let pendingPick=null;
 function renderSetup(app){
   const f=firmOf(S.group),c=clientOf(S.group),rv=rivalOf(S.group);
   app.innerHTML=`<div class="head"><span class="eyebrow">Group ${S.group} · Client ${Math.ceil(S.group/2)}</span><h1>Set up your firm</h1><p class="lede">You are a ${f.model.toLowerCase()} bidding on <b>${esc(c.name)}</b>. Group ${rv} is your competitor for this client.</p></div>
-  <div class="grid2"><div class="panel stack"><label class="f">Class code from the board<input type="text" id="classCode" inputmode="numeric" maxlength="4" autocomplete="off" value="${esc(S.code)}" placeholder="4 digits"></label><p class="note" id="syncMsg">${syncNote()}</p><label class="f">Firm name<input type="text" id="firmName" value="${esc(S.firm)}" placeholder="${esc(f.defName)}"></label>
-  ${[0,1,2].map(i=>`<label class="f">Team member ${i+1}${i===2?" (optional)":""}<input type="text" data-mem="${i}" value="${esc(S.members[i])}" placeholder="First and last name"></label>`).join("")}</div>
+  <div class="grid2"><div class="panel stack"><label class="f">Class code from the board<input type="text" id="classCode" inputmode="numeric" maxlength="4" autocomplete="off" value="${esc(S.code)}" placeholder="4 digits"></label><p class="note" id="syncMsg">${syncNote()}</p>${/^\d{4}$/.test(S.code||"")?`<label class="f">Your name<input type="text" id="myName" value="${esc(S.me)}" placeholder="First and last name" autocomplete="off"></label><label class="f">Firm name (shared with your group)<input type="text" id="firmName" value="${esc(S.firm)}" placeholder="${esc(f.defName)}"></label><p class="note">In your group so far: <b>${esc(membersFrom(S.people).join(", ")||"just you")}</b></p>`:`<label class="f">Firm name<input type="text" id="firmName" value="${esc(S.firm)}" placeholder="${esc(f.defName)}"></label>
+  ${[0,1,2].map(i=>`<label class="f">Team member ${i+1}${i===2?" (optional)":""}<input type="text" data-mem="${i}" value="${esc(S.members[i])}" placeholder="First and last name"></label>`).join("")}<p class="note">Sharing one device. To work on separate devices, type the class code above.</p>`}</div>
   <div class="panel stack"><h3>Your firm model</h3><p>${esc(f.blurb)}</p><p class="note">${esc(f.pricing)}</p><h3 style="margin-top:6px">Management rules</h3><ul class="clean">${f.rules.map(r=>`<li>${esc(r)}</li>`).join("")}</ul></div></div>
+  <div class="panel stack" style="margin-top:16px"><h3>Each on your own device? Split the work</h3><p class="note">Everyone reads the client file first (about 8 minutes). Then divide up. Your choices show up on each other's screens within a couple of seconds.</p>
+  <div class="grid2"><div><b>Three people</b><ul class="clean"><li>Person 1: Bank rec</li><li>Person 2: Walkthrough, then Fixes</li><li>Person 3: Value prop</li><li>All three: Price it together, then rehearse the deck</li></ul></div><div><b>Two people</b><ul class="clean"><li>Person 1: Bank rec, then Value prop</li><li>Person 2: Walkthrough, then Fixes</li><li>Both: Price it together, then rehearse the deck</li></ul></div></div></div>
   <div class="next"><button class="btn alt" type="button" data-home="1">Change group</button><button class="btn or" type="button" data-go="0">Open the client file</button></div>`;
 }
 function finTable(c){const F=c.fin,gp=F.rev-F.cogs,ni=gp-F.payroll-F.rent-F.other,ta=F.cash+F.ar+F.inv+F.equip,tl=F.ap+F.unearned+F.loan,eq=ta-tl;
@@ -768,15 +831,17 @@ function renderTeacher(app){
     } else if(!teacher.session){
       body=`<div class="panel stack" style="max-width:620px"><h2>Start a class session</h2><p class="lede">Creates a 4-digit code for the board. Groups type it when they set up their firm, and every deck then shows up here and on the Decision board as they work. Sessions erase themselves after 4 hours.</p><div class="row"><button class="btn or" type="button" id="tStart" ${teacher.netOk?"":"disabled"}>${teacher.netOk==null?"Checking connection…":"Start session"}</button><span class="note" id="tMsg"></span></div></div>`;
     } else {
-      const rows=Array.from({length:10},(_,i)=>{const g=i+1,p=teacher.live["g"+g];const ago=p?Math.max(0,Math.round((Date.now()-p.t)/1000)):null;
-        return `<tr><td class="m">${g}</td><td>${esc(clientOf(g).name)}</td><td>${p?esc(p.firm)+`<br><span class="note">${esc((p.members||[]).join(", "))}</span>`:'<span class="note">Not joined</span>'}</td><td>${p?(p.step<0?"Setting up":esc(STEPS[p.step]?STEPS[p.step].n:"")):""}</td><td class="m">${p?p.ready+"/"+p.of:""}</td><td>${p?(p.ok?'<span class="tag good">Approved</span>':'<span class="tag bad">Not yet</span>'):""}</td><td class="m">${p?(ago<60?ago+"s":Math.round(ago/60)+"m")+" ago":""}</td></tr>`}).join("");
+      const rows=Array.from({length:10},(_,i)=>{const g=i+1,p=teacher.live["g"+g],s=stateFromRecord(g,p);const ago=p?Math.max(0,Math.round((Date.now()-(p.t||0))/1000)):null;
+        const sl=s?slideList(s):[],ready=sl.filter(x=>x.ready).length;
+        const who=p&&p.people?peopleList(p.people).map(([,q])=>`${esc(q.name.split(" ")[0])}: ${q.step<0?"Setup":esc((STEPS[q.step]||{}).n||"")}`).join("<br>"):(p&&p.step!=null?(p.step<0?"Setting up":esc((STEPS[p.step]||{}).n||"")):"");
+        return `<tr><td class="m">${g}</td><td>${esc(clientOf(g).name)}</td><td>${s?esc(firmName(s))+`<br><span class="note">${esc(s.members.filter(Boolean).join(", "))}</span>`:'<span class="note">Not joined</span>'}</td><td>${who}</td><td class="m">${s?ready+"/"+sl.length:""}</td><td>${s?(mgmtOK(s)?'<span class="tag good">Approved</span>':'<span class="tag bad">Not yet</span>'):""}</td><td class="m">${p?(ago<60?ago+"s":Math.round(ago/60)+"m")+" ago":""}</td></tr>`}).join("");
       body=`<div class="grid2" style="align-items:start"><div class="panel stack"><span class="eyebrow">Class code</span><div class="bigcode">${esc(teacher.session)}</div><p class="note">Put this on the board. Groups type it on their setup screen.</p><div class="row" id="endZone">${teacher.confirmEnd?`<span class="confirm">Erase every group's synced deck for this session? <button class="btn" type="button" id="tEndYes">Erase</button><button class="btn alt" type="button" id="tEndNo">Keep</button></span>`:`<button class="btn alt" type="button" id="tEnd">End session</button>`}</div></div>
-      <div class="panel" style="overflow-x:auto"><h3 style="margin-bottom:8px">Groups</h3><table class="tt"><tr><th>Grp</th><th>Client</th><th>Firm</th><th>Step</th><th>Deck</th><th>Price</th><th>Updated</th></tr>${rows}</table></div></div>`;
+      <div class="panel" style="overflow-x:auto"><h3 style="margin-bottom:8px">Groups</h3><table class="tt"><tr><th>Grp</th><th>Client</th><th>Firm</th><th>Who is where</th><th>Deck</th><th>Price</th><th>Updated</th></tr>${rows}</table></div></div>`;
     }
   } else if(teacher.tab==="run"){
     body=`<div class="grid2"><div class="panel"><h3 style="margin-bottom:10px">45 minutes of work, 20 minutes of pitches</h3><table class="tt"><tr><th>Time</th><th>What happens</th></tr>
     <tr><td class="m">Before</td><td>Open the Live class tab and start a session. Put the 4-digit code on the board.</td></tr>
-    <tr><td class="m">0:00</td><td>Launch and Step 1, Client file (8 min). One device per group: pick the group number, type the class code, name the firm, enter members, then read the interview, financials, and competitor intel.</td></tr>
+    <tr><td class="m">0:00</td><td>Launch and Step 1, Client file (8 min). Every student on their own device: pick the group number, type the class code and their name, then read the interview, financials, and competitor intel. After that, groups split up the steps (the setup screen suggests who does what).</td></tr>
     <tr><td class="m">0:08</td><td>Step 2, Bank rec (10 min). Sort each item to the bank or book side. The gap reveal is the hook for the pitch.</td></tr>
     <tr><td class="m">0:18</td><td>Step 3, Walkthrough (7 min). One submission. Missed gaps are added for them so the deck stays complete.</td></tr>
     <tr><td class="m">0:25</td><td>Step 4, Fixes (5 min).</td></tr>
@@ -793,9 +858,9 @@ function renderTeacher(app){
      <div><h3 style="margin-bottom:6px">Control gaps and best fixes</h3><table class="tt">${c.weak.map(k=>`<tr><td><b>${esc(W[k].n)}</b><br><span class="note">${esc(W[k].fix[0])}</span></td></tr>`).join("")}</table><h3 style="margin:12px 0 6px">True priorities</h3><ul class="clean">${c.truePrios.map(id=>`<li>${esc(c.prios.find(p=>p.id===id).t)}</li>`).join("")}</ul></div></div></div>`}).join("")}</div>`;
   } else {
     const ci=teacher.client,c=CLIENTS[ci],g1=ci*2+1,g2=ci*2+2;
-    const codeFor=g=>teacher.codes[g]||(teacher.live["g"+g]&&teacher.live["g"+g].code)||"";
-    const s1=decode(codeFor(g1)),s2=decode(codeFor(g2));
-    const card=(g,s,r)=>{const code=codeFor(g),isLive=!teacher.codes[g]&&!!code;let inner="";
+    const stFor=g=>teacher.codes[g]?decode(teacher.codes[g]):stateFromRecord(g,teacher.live["g"+g]);
+    const s1=stFor(g1),s2=stFor(g2);
+    const card=(g,s,r)=>{const isLive=!teacher.codes[g]&&!!teacher.live["g"+g],code=teacher.codes[g]||(isLive?"live":"");let inner="";
       if(code&&!s) inner=`<p class="no">That code did not load. Ask the group to copy it again.</p>`;
       else if(s&&s.group!==g) inner=`<p class="no">That code belongs to Group ${s.group}, not Group ${g}.</p>`;
       else if(s){const sc=scoreOf(s,r&&r.group===rivalOf(g)?r:null),q=quote(s);
@@ -806,31 +871,31 @@ function renderTeacher(app){
       return `<div class="panel stack"><div class="row" style="justify-content:space-between"><h3>Group ${g} · ${firmOf(g).defName.split(" ")[0]} model</h3>${teacher.picked[ci]===g?'<span class="tag or">Winner</span>':""}</div>${isLive?`<p class="note"><span class="tag good">Live</span> Synced from Group ${g}'s device.</p>`:""}<details ${isLive?"":"open"}><summary class="note">Paste a pitch code instead</summary><label class="f" style="margin-top:6px">Pitch code<textarea data-code="${g}" placeholder="Paste Group ${g}'s pitch code">${esc(teacher.codes[g]||"")}</textarea></label></details>${inner}</div>`;};
     body=`<div class="tabs">${CLIENTS.map((x,i)=>`<button type="button" data-tclient="${i}" class="${i===ci?"on":""}">${esc(x.name.split(" ")[0])} ${teacher.picked[i]?"✓":""}</button>`).join("")}</div><p class="lede" style="margin-bottom:14px">${esc(c.name)}: present each deck, then pick the firm the client hires. Synced decks load on their own; paste a pitch code for any group that is not synced.</p><div class="vs">${card(g1,s1,s2)}${card(g2,s2,s1)}</div>`;
   }
-  app.innerHTML=`<div class="head"><span class="eyebrow">Teacher only · not linked on the student site</span><h1>The Engagement</h1><p class="lede">Students go to <b>The Engagement</b> on the site. Each group uses one device.</p></div><div class="tabs">${tabs.map(([k,v])=>`<button type="button" data-ttab="${k}" class="${teacher.tab===k?"on":""}">${v}</button>`).join("")}</div>${body}`;
+  app.innerHTML=`<div class="head"><span class="eyebrow">Teacher only · not linked on the student site</span><h1>The Engagement</h1><p class="lede">Students go to <b>The Engagement</b> on the site, each on their own device. Group members stay in sync through the class code.</p></div><div class="tabs">${tabs.map(([k,v])=>`<button type="button" data-ttab="${k}" class="${teacher.tab===k?"on":""}">${v}</button>`).join("")}</div>${body}`;
 }
 
 /* ===================== EVENTS ===================== */
 document.addEventListener("click",e=>{
   const t=e.target.closest("button,[data-present],[data-pick]");if(!t)return;
   const d=t.dataset;
-  if(d.pick){const g=+d.pick; if(S.group&&S.group!==g){const cc=S.code;S=fresh();S.code=cc;} S.group=g; if(S.step===0&&S.maxStep===0)S.step=-1; view="group"; save(); return render();}
+  if(d.pick){const g=+d.pick; if(S.group&&S.group!==g){const cc=S.code,me=S.me;S=fresh();S.code=cc;S.me=me;} S.group=g; if(S.step===0&&S.maxStep===0)S.step=-1; view="group"; save(); return render();}
   if(d.resume){view="group";return render();}
   if(d.home){view="home";S.step=-1;save();return render();}
   if(d.go!=null){const i=+d.go; if(i<0){S.step=-1;}else if(i>6)return; else S.step=i; S.maxStep=Math.max(S.maxStep,S.step); save(); return render();}
-  if(t.id==="recCheck"){const c=clientOf(S.group);S.rec.tries++;const ok=c.rec.items.every((it,i)=>S.rec.ans[i]===it[2]);if(ok)S.rec.done=true;else if(S.rec.tries>=2)S.rec.showWrong=true;save();return render();}
-  if(d.flag){const k=d.flag;S.flags=S.flags.includes(k)?S.flags.filter(x=>x!==k):[...S.flags,k];save();return vWalkKeep();}
-  if(t.id==="flagSubmit"){S.flagsDone=true;save();return render();}
-  if(d.fix){S.fixes[d.fix]=+d.i;save();return keepScroll(()=>vFix($("#app")));}
-  if(d.prio){const k=d.prio;if(S.prios.includes(k))S.prios=S.prios.filter(x=>x!==k);else if(S.prios.length<3)S.prios=[...S.prios,k];save();return keepScroll(()=>vValue($("#app")));}
-  if(d.str){const k=d.str;if(S.strengths.includes(k))S.strengths=S.strengths.filter(x=>x!==k);else if(S.strengths.length<2)S.strengths=[...S.strengths,k];save();return keepScroll(()=>vValue($("#app")));}
-  if(d.rw){S.rivalW=S.rivalW===d.rw?null:d.rw;save();return keepScroll(()=>vValue($("#app")));}
+  if(t.id==="recCheck"){const c=clientOf(S.group);S.rec.tries++;const ok=c.rec.items.every((it,i)=>S.rec.ans[i]===it[2]);if(ok)S.rec.done=true;else if(S.rec.tries>=2)S.rec.showWrong=true;save("rec");return render();}
+  if(d.flag){const k=d.flag;S.flags=S.flags.includes(k)?S.flags.filter(x=>x!==k):[...S.flags,k];save("walk");return vWalkKeep();}
+  if(t.id==="flagSubmit"){S.flagsDone=true;save("walk");return render();}
+  if(d.fix){S.fixes[d.fix]=+d.i;save("fixes");return keepScroll(()=>vFix($("#app")));}
+  if(d.prio){const k=d.prio;if(S.prios.includes(k))S.prios=S.prios.filter(x=>x!==k);else if(S.prios.length<3)S.prios=[...S.prios,k];save("value");return keepScroll(()=>vValue($("#app")));}
+  if(d.str){const k=d.str;if(S.strengths.includes(k))S.strengths=S.strengths.filter(x=>x!==k);else if(S.strengths.length<2)S.strengths=[...S.strengths,k];save("value");return keepScroll(()=>vValue($("#app")));}
+  if(d.rw){S.rivalW=S.rivalW===d.rw?null:d.rw;save("value");return keepScroll(()=>vValue($("#app")));}
   if(d.present!=null){return present(S,+d.present);}
   if(d.pnav){pres.i=Math.min(pres.slides.length-1,Math.max(0,pres.i+ +d.pnav));return paintPresent();}
   if(d.pclose){return closePresent();}
   if(t.id==="copyCode"){const ta=$("#codeOut");const msg=$("#copyMsg");try{navigator.clipboard.writeText(ta.value).then(()=>msg.textContent="Copied.",()=>{ta.select();msg.textContent="Selected. Press Ctrl+C to copy.";});}catch(err){ta.select();msg.textContent="Selected. Press Ctrl+C to copy.";}return;}
   if(t.id==="resetAsk"){$("#resetZone").innerHTML=`<span class="confirm">Erase all work for Group ${S.group} on this device? <button class="btn" type="button" id="resetYes">Erase</button><button class="btn alt" type="button" id="resetNo">Keep</button></span>`;return;}
   if(t.id==="resetNo"){return render();}
-  if(t.id==="resetYes"){const cc=S.code;S=fresh();S.code=cc;view="home";save();return render();}
+  if(t.id==="resetYes"){const cc=S.code,me=S.me;S=fresh();S.code=cc;S.me=me;view="home";save();return render();}
   if(t.id==="tStart"){return startSession();}
   if(t.id==="tEnd"){teacher.confirmEnd=true;return render();}
   if(t.id==="tEndNo"){teacher.confirmEnd=false;return render();}
@@ -838,23 +903,24 @@ document.addEventListener("click",e=>{
   if(t.id==="pinGo"){const v=($("#pin").value||"").trim().toLowerCase();if(v==="husky"){teacher.unlocked=true;render();}else $("#pinMsg").textContent="That PIN is not right.";return;}
   if(d.ttab){teacher.tab=d.ttab;return render();}
   if(d.tclient!=null){teacher.client=+d.tclient;return render();}
-  if(d.tpresent){const g=d.tpresent,s=decode(teacher.codes[g]||(teacher.live["g"+g]&&teacher.live["g"+g].code));if(s)present(s,0);return;}
+  if(d.tpresent){const g=+d.tpresent,s=teacher.codes[g]?decode(teacher.codes[g]):stateFromRecord(g,teacher.live["g"+g]);if(s)present(s,0);return;}
   if(d.win){const g=+d.win;teacher.picked[teacher.client]=teacher.picked[teacher.client]===g?null:g;saveT();return keepScroll(render);}
 });
 function keepScroll(fn){const y=window.scrollY;fn();window.scrollTo({top:y});paintMast();paintRail();}
 function vWalkKeep(){keepScroll(()=>vWalk($("#app")));}
 document.addEventListener("change",e=>{
   const t=e.target,d=t.dataset;
-  if(d.rec!=null){S.rec.ans[d.rec]=t.value||undefined;if(!t.value)delete S.rec.ans[d.rec];save();return keepScroll(()=>vRec($("#app")));}
-  if(d.sel){S.sel[d.sel]=t.checked;save();$("#row-"+d.sel).classList.toggle("off",!t.checked);return paintPriceSum();}
+  if(d.rec!=null){S.rec.ans[d.rec]=t.value||undefined;if(!t.value)delete S.rec.ans[d.rec];save("rec");return keepScroll(()=>vRec($("#app")));}
+  if(d.sel){S.sel[d.sel]=t.checked;save("price");$("#row-"+d.sel).classList.toggle("off",!t.checked);return paintPriceSum();}
 });
 document.addEventListener("input",e=>{
   const t=e.target,d=t.dataset;
-  if(t.id==="firmName"){S.firm=t.value;return save();}
-  if(t.id==="classCode"){S.code=t.value.replace(/\D/g,"").slice(0,4);t.value=S.code;save();const sm=$("#syncMsg");if(sm)sm.innerHTML=syncNote();return;}
+  if(t.id==="firmName"){S.firm=t.value;return save("team");}
+  if(t.id==="myName"){S.me=t.value;return save();}
+  if(t.id==="classCode"){const was=/^\d{4}$/.test(S.code||"");S.code=t.value.replace(/\D/g,"").slice(0,4);t.value=S.code;save();const now=/^\d{4}$/.test(S.code);if(was!==now){renderSetup($("#app"));const el=$("#classCode");if(el){el.focus();el.selectionStart=el.selectionEnd=el.value.length;}}refreshSyncMsg();if(now)pullSync();return;}
   if(d.mem!=null){S.members[+d.mem]=t.value;return save();}
-  if(t.id==="headline"){S.headline=t.value;S.headEdited=true;return save();}
-  if(d.price){const v=SERVICES.find(x=>x.id===d.price),p=+t.value;S.price[v.id]=p;const cost=svcCost(S,v);$("#p-"+v.id).textContent=money(p);$("#m-"+v.id).textContent=pct((p-cost)/p);save();return paintPriceSum();}
+  if(t.id==="headline"){S.headline=t.value;S.headEdited=true;return save("value");}
+  if(d.price){const v=SERVICES.find(x=>x.id===d.price),p=+t.value;S.price[v.id]=p;const cost=svcCost(S,v);$("#p-"+v.id).textContent=money(p);$("#m-"+v.id).textContent=pct((p-cost)/p);save("price");return paintPriceSum();}
   if(d.code){teacher.codes[d.code]=t.value;saveT();clearTimeout(window.__ct);window.__ct=setTimeout(()=>{const ae=document.activeElement&&document.activeElement.dataset.code;render();if(ae){const el=document.querySelector(`[data-code="${ae}"]`);if(el){el.focus();el.selectionStart=el.selectionEnd=el.value.length;}}},400);}
 });
 document.addEventListener("keydown",e=>{
@@ -895,7 +961,7 @@ async function initTeacher(){
   render();pollLive();
 }
 render();
-if(ROLE==="teacher")initTeacher();else if(S.code&&S.group)queueSync();
+if(ROLE==="teacher")initTeacher();else{if(S.code&&S.group)queueSync();pullSync();}
 </script>
 <!-- Text size controls: scale the page content, remembered across pages -->
 <style id="tsz-css">
