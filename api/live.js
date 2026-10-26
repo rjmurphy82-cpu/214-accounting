@@ -4,7 +4,6 @@
 const URL_ = process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL;
 const TOKEN = process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN;
 const TTL = 60 * 60 * 4; // games erase themselves after 4 hours
-const LONG_TTL = 60 * 60 * 24 * 14; // The Engagement games last 14 days so a class can continue another day
 
 async function r(cmd) {
   const res = await fetch(URL_, { method: "POST", headers: { Authorization: "Bearer " + TOKEN, "Content-Type": "application/json" }, body: JSON.stringify(cmd) });
@@ -42,10 +41,9 @@ module.exports = async (req, res) => {
     if (b.op === "set") {
       if (!rest.length) {
         const { state, players, ...meta } = b.v || {};
-        const ttl = meta.kind === "engagement" ? LONG_TTL : TTL;
-        const ok = await r(["SET", K.meta, JSON.stringify(meta), "EX", ttl, "NX"]);
+        const ok = await r(["SET", K.meta, JSON.stringify(meta), "EX", TTL, "NX"]);
         if (!ok) return res.status(409).json({ error: "Code in use" });
-        await r(["SET", K.state, JSON.stringify(state || null), "EX", ttl]);
+        await r(["SET", K.state, JSON.stringify(state || null), "EX", TTL]);
         return res.json({ ok: true });
       }
       if (rest[0] === "state") { await r(["SET", K.state, JSON.stringify(b.v), "EX", TTL]); return res.json({ ok: true }); }
@@ -59,14 +57,6 @@ module.exports = async (req, res) => {
       const cur = J(await r(["HGET", K.players, rest[1]])) || {};
       Object.entries(b.v || {}).forEach(([k, v]) => setDeep(cur, k, v));
       await r(["HSET", K.players, rest[1], JSON.stringify(cur)]);
-      const left = await r(["TTL", K.meta]); if (left > 0) await r(["EXPIRE", K.players, left]);
-      return res.json({ ok: true });
-    }
-    if (b.op === "keep" && !rest.length) {
-      const meta = J(await r(["GET", K.meta]));
-      if (!meta) return res.json({ ok: false });
-      if (meta.kind !== "engagement") return res.json({ ok: true });
-      await r(["EXPIRE", K.meta, LONG_TTL]); await r(["EXPIRE", K.state, LONG_TTL]); await r(["EXPIRE", K.players, LONG_TTL]);
       return res.json({ ok: true });
     }
     if (b.op === "remove" && !rest.length) { await r(["DEL", K.meta, K.state, K.players]); return res.json({ ok: true }); }

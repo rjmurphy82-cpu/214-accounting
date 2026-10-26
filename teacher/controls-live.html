@@ -2648,62 +2648,7 @@ const BANK=[
  {id:"x5",sk:"weakness",p:"Nobody has compared the books to the bank statement in six months. Best fix?",o:["Reconcile the bank account every month, done by someone independent","Ask the bank to stop sending statements","Wait until year end","Have the cashier look at it when there's time"],x:"Regular, independent reviews catch errors and theft early."},
  {id:"x6",sk:"weakness",p:"The stockroom of coffee beans is unlocked, and anyone can walk in. Best fix?",o:["Lock the stockroom and record it with a camera","Buy fewer beans","Count the beans once a year","Put a sign on the door"],x:"Physical and technological controls protect inventory."},
  {id:"x7",sk:"weakness",p:"The bookkeeper hasn't taken a day off in two years. Why is that a red flag?",o:["Nobody else ever sees the books, so a scheme can stay hidden","Bookkeepers need more sleep","It means the books are perfect","It breaks a bank rule"],x:"Fraud often surfaces when someone else covers the job, which is why companies require vacations."},
- {id:"x8",sk:"weakness",p:"The cash from Friday through Sunday sits in the register until Monday. Best fix?",o:["Deposit cash receipts every day","Get a register with more space","Count it on Monday morning","Let the closing employee take it home"],x:"Deposit cash right away so less of it is sitting around."},
- // ================= SET 2 (v:2) =================
- // ---- purpose and limits
- {id:"u9",v:2,sk:"purpose",p:"Which of these is one of the purposes of internal control?",o:["Make sure employees follow company policies","Lower the business's taxes","Replace the need for an accountant","Let managers skip reviews"],x:"The four purposes: protect assets, keep records reliable, promote efficient operations, and get employees to follow policies."},
- {id:"u10",v:2,sk:"purpose",p:"A manager tells the bookkeeper to skip the usual approval \"just this once.\" Which limit of internal control is this?",o:["Management override","Human error","Bonding","Cost-benefit"],x:"Controls only work if managers follow them too. A manager going around a control is an override."},
- {id:"u11",v:2,sk:"purpose",p:"A tired cashier hands back $10 too much change, even though the store has strong controls. Which limit is this?",o:["Human error","Collusion","Cost-benefit","Management override"],x:"People make honest mistakes. No control removes human error completely."},
- {id:"u12",v:2,sk:"purpose",p:"Which control mainly protects assets?",o:["Locking the cash in a safe overnight","Hiring another barista","Raising prices","Buying a new espresso machine"],x:"A locked safe keeps cash from being lost or stolen. That's protecting assets."},
- {id:"u13",v:2,sk:"purpose",p:"Why do reliable accounting records matter?",o:["Managers make decisions using those numbers","The bank throws away inaccurate records","Customers read the general ledger","They replace the need for receipts"],x:"Bad numbers lead to bad decisions. Reliable records are one of the purposes of internal control."},
- {id:"u14",v:2,sk:"purpose",p:"The cashier and the bookkeeper team up to steal cash and cover it in the records. Which control does this get around?",o:["Separation of duties","Paying bills by check","A bigger safe","A faster register"],x:"Collusion beats separation of duties, because the two people meant to check each other are working together."},
- {id:"u15",v:2,sk:"purpose",p:"Which statement about internal control is TRUE?",o:["It lowers the risk of errors and theft but can't remove it","It guarantees there will be no theft","Only large companies need it","It is the bank's job"],x:"Good controls reduce risk. Human error, collusion, and cost-benefit mean some risk always remains."},
- {id:"u16",v:2,sk:"purpose",p:"A store pays $8,000 a year for a guard to protect a register that never holds more than $500. Which idea says this isn't worth it?",o:["Cost-benefit","Collusion","Bonding","Rationalization"],x:"The control costs far more than the loss it could prevent."},
- // ---- the 7 principles
- {id:"p9",v:2,sk:"principles",p:"The closing manager signs a log showing they were the one who counted and locked the safe that night.",o:[P1,P7,P2,P4],x:"One named person is responsible, so if something is missing you know who to ask."},
- {id:"p10",v:2,sk:"principles",p:"Every purchase order is numbered in order, and a missing number gets investigated.",o:[P2,P5,P6,P1],x:"Prenumbered documents are adequate records. A gap shows a document is missing."},
- {id:"p11",v:2,sk:"principles",p:"The company insures its building and equipment against fire and theft.",o:[P3,P7,P1,P6],x:"Insuring assets protects the business if they're damaged or stolen."},
- {id:"p12",v:2,sk:"principles",p:"The bookkeeper who records customer payments is never allowed to touch the cash or checks.",o:[P4,P5,P1,P3],x:"Keeping the records apart from the cash means one person can't steal and hide it."},
- {id:"p13",v:2,sk:"principles",p:"One person approves a new supplier, and a different person writes the checks to that supplier.",o:[P5,P4,P2,P7],x:"Approving and paying are related steps, so they're divided between people."},
- {id:"p14",v:2,sk:"principles",p:"The point-of-sale system automatically flags any refund over $50 for review.",o:[P6,P7,P2,P3],x:"Technology watches every transaction and flags the risky ones."},
- {id:"p15",v:2,sk:"principles",p:"An outside accounting firm reviews the company's books every year.",o:[P7,P5,P3,P1],x:"An independent reviewer catches problems the employees could miss or hide."},
- {id:"p16",v:2,sk:"principles",p:"Without telling anyone which day, the owner checks a random day's register tape against the deposit slip.",o:[P7,P2,P6,P4],x:"A surprise check by someone independent is a regular and independent review."},
- // ---- fraud triangle
- {id:"t9",v:2,sk:"triangle",p:"Ava wants to keep up with friends who buy expensive clothes she can't afford.",o:[PRESS,OPP,RAT,COL],x:"Wanting money you don't have is pressure."},
- {id:"t10",v:2,sk:"triangle",p:"\"Everyone takes a little. It's not a big deal.\"",o:[RAT,PRESS,OPP,COL],x:"Telling yourself it's normal is a rationalization."},
- {id:"t11",v:2,sk:"triangle",p:"Jordan notices the manager never looks at the refund log.",o:[OPP,PRESS,RAT,COL],x:"Nobody checking is the opportunity."},
- {id:"t12",v:2,sk:"triangle",p:"\"The owner is rich. They won't even miss it.\"",o:[RAT,OPP,PRESS,COL],x:"An excuse that makes theft feel harmless is a rationalization."},
- {id:"t13",v:2,sk:"triangle",p:"Maya has a gambling debt she's hiding from her family.",o:[PRESS,RAT,OPP,COL],x:"A secret money problem is pressure."},
- {id:"t14",v:2,sk:"triangle",p:"The safe is left open all afternoon while the manager is out.",o:[OPP,PRESS,RAT,COL],x:"An open safe with no one watching is opportunity."},
- {id:"t15",v:2,sk:"triangle",p:"Which side of the fraud triangle is the employee's excuse for stealing?",o:[RAT,PRESS,OPP,COL],x:"The excuse is the rationalization."},
- {id:"t16",v:2,sk:"triangle",p:"A store adds a second person to every cash count. Which side of the triangle does this shrink?",o:[OPP,PRESS,RAT,"All three equally"],x:"A second counter takes away the chance to steal without being noticed."},
- // ---- control of cash
- {id:"k9",v:2,sk:"cash",p:"Which of these is NOT cash?",o:["Office supplies","Coins in the register","A money order from a customer","Money in the checking account"],x:"Supplies are an asset, but not cash. Cash is currency, coins, checks, money orders and bank deposits."},
- {id:"k10",v:2,sk:"cash",p:"Which is an example of a cash equivalent?",o:["A 60-day Treasury bill","A 5-year corporate bond","Inventory","Accounts receivable"],x:"Cash equivalents are very short-term investments, usually 90 days or less to maturity."},
- {id:"k11",v:2,sk:"cash",p:"The basic rules for controlling cash include all of these EXCEPT:",o:["Let one trusted employee handle and record all cash","Separate handling cash from recording it","Deposit receipts promptly","Make payments by check or EFT"],x:"One person handling and recording cash is exactly what the rules are meant to prevent."},
- {id:"k12",v:2,sk:"cash",p:"A supplier asks to be paid $4,500 in cash. Best response?",o:["Pay by check or EFT so there's a record","Pay it from the register","Pay in cash and skip recording it","Split it into nine $500 cash payments"],x:"Large payments go by check or EFT so every payment can be traced on the bank statement."},
- {id:"k13",v:2,sk:"cash",p:"Why should a business keep as little cash on hand as possible?",o:["Less cash lying around means less can be lost or stolen","Cash in a register earns interest","Customers prefer stores with little cash","The law limits how much cash a business may own"],x:"That's why receipts are deposited promptly."},
- {id:"k14",v:2,sk:"cash",p:"The cashier pays a $40 delivery driver out of the day's receipts before depositing them. What's the problem?",o:["The deposit no longer matches the sales, so the records are harder to check","Delivery drivers can't be paid","There is no problem","The bank won't accept the deposit"],x:"Receipts should be deposited intact. Payments should come from a check or petty cash, not the day's sales."},
- {id:"k15",v:2,sk:"cash",p:"Cash receipts should be deposited:",o:["Every day, intact","Once a week","Only when the drawer is full","After paying small bills out of them"],x:"Deposit all of it, every day, so the deposit matches the sales record."},
- {id:"k16",v:2,sk:"cash",p:"Why does the register print a receipt and keep a locked record of every sale?",o:["It creates a record of the sale the cashier can't change","It makes the line move faster","It replaces the bank statement","No one needs to count the drawer anymore"],x:"The locked record can be compared to the cash in the drawer."},
- // ---- who should do it
- {id:"w9",v:2,sk:"who",p:"Who should approve paying a supplier's invoice?",o:["A manager who checks it against the order and the receiving report","The supplier","The clerk who will sign the check","Whoever opens the mail"],x:"The approver confirms the goods were ordered and received before anyone pays."},
- {id:"w10",v:2,sk:"who",p:"Who should have the key to a cash drawer during a shift?",o:["Only the cashier assigned to that drawer","Every employee on shift","Any customer who asks","The bookkeeper"],x:"One person per drawer establishes responsibility."},
- {id:"w11",v:2,sk:"who",p:"Who should record the day's deposit in the accounting records?",o:["The bookkeeper, not the person who took it to the bank","The person who took it to the bank","The cashier","The bank teller"],x:"Custody of cash and recording it are separated."},
- {id:"w12",v:2,sk:"who",p:"Who should compare the receiving report to the supplier's invoice before payment?",o:["Someone in accounting who didn't place the order","The supplier","The employee who ordered and received the goods","Nobody; the invoice is enough"],x:"An independent person catches invoices for goods that never arrived."},
- {id:"w13",v:2,sk:"who",p:"A new supplier needs to be added to the payment system. Who should add it?",o:["Someone who doesn't write the checks","The person who writes the checks","The supplier itself","Any employee with a login"],x:"If the check writer could add suppliers, they could create a fake one and pay themselves."},
- {id:"w14",v:2,sk:"who",p:"Who should review the voided sales on the register each day?",o:["A manager, not the cashier who voided them","The cashier who voided them","A customer","Nobody"],x:"A fake void can hide a stolen sale, so someone else reviews them."},
- {id:"w15",v:2,sk:"who",p:"A customer says their payment was never credited to their account. Who should look into it?",o:["Someone who doesn't handle cash or record customer payments","The cashier who took the payment","The bookkeeper who recorded it","The customer's friend"],x:"The people who touched the payment shouldn't investigate their own work."},
- {id:"w16",v:2,sk:"who",p:"Who should sign checks over $5,000?",o:["Two authorized people","Only the person who prepared the check","Any employee","The person receiving the check"],x:"Two signatures on large checks means one person can't send out a big payment alone."},
- // ---- spot the weakness
- {id:"x9",v:2,sk:"weakness",p:"The safe combination hasn't changed in five years, and former employees know it. Best fix?",o:["Change the combination regularly and limit who knows it","Buy a heavier safe","Leave the safe open","Write the combination on the safe"],x:"Limiting access establishes responsibility and protects the cash."},
- {id:"x10",v:2,sk:"weakness",p:"Any cashier can give a refund with no approval. Best fix?",o:["Require a manager to approve each refund","Stop giving receipts","Give refunds only in cash","Let customers approve their own refunds"],x:"A second person approving refunds stops fake ones."},
- {id:"x11",v:2,sk:"weakness",p:"The cashier counts the drawer alone at closing and writes the total on a sticky note. Best fix?",o:["Count with a second person and record it on a numbered form","Use a bigger sticky note","Count the drawer only on Fridays","Let the cashier take the drawer home"],x:"A second counter plus a real record is an independent check and adequate records."},
- {id:"x12",v:2,sk:"weakness",p:"One employee adds new suppliers to the system and also approves their invoices. Best fix?",o:["Split adding suppliers and approving invoices between two people","Have that employee double-check","Pay suppliers in cash","Add fewer suppliers"],x:"Divide responsibility for related transactions so no one can create and pay a fake supplier."},
- {id:"x13",v:2,sk:"weakness",p:"The register lets cashiers delete a sale after ringing it up. Best fix?",o:["Set the register so sales can only be voided with manager approval","Train cashiers to delete fewer sales","Turn the register off at night","Hire faster cashiers"],x:"Use the technology to lock in sales, and add a second person for voids."},
- {id:"x14",v:2,sk:"weakness",p:"The bookkeeper writes the checks, receives the bank statement, and does the reconciliation. Best fix?",o:["Have someone who doesn't write checks receive the statement and reconcile it","Have the bank email the statement instead","Reconcile once a year","Stop getting statements"],x:"The reconciliation only works as a check if it's done by someone independent."},
- {id:"x15",v:2,sk:"weakness",p:"Gift cards sit in an unlocked box at the counter, and nobody counts them. Best fix?",o:["Lock them up and count them against a log every day","Sell fewer gift cards","Put them on a higher shelf","Count them once a year"],x:"Gift cards are as good as cash. They need physical protection and a regular count."},
- {id:"x16",v:2,sk:"weakness",p:"The employees who carry the deposit bag aren't covered by any theft insurance. Best fix?",o:["Bond the employees who handle cash","Have them carry less money","Fire them","Deposit only once a month"],x:"Bonding insures the business against theft by employees who handle cash."}
+ {id:"x8",sk:"weakness",p:"The cash from Friday through Sunday sits in the register until Monday. Best fix?",o:["Deposit cash receipts every day","Get a register with more space","Count it on Monday morning","Let the closing employee take it home"],x:"Deposit cash right away so less of it is sitting around."}
 ];
 BANK.forEach(q=>{q.ans=0});
 
@@ -2728,11 +2673,9 @@ function inst(q,seed){
   const r=rng(hash(q.id+":"+seed));const idx=shuffle([0,1,2,3],r);
   return {...q,opts:idx.map(i=>q.o[i]),ans:idx.indexOf(0)};
 }
-/* qset: "new" = set 2 only, "orig" = set 1 only, anything else = both sets mixed */
-function buildGame(perSkill,seed,qset){
+function buildGame(perSkill,seed){
   const r=rng(seed);const list=[];
-  const inSet=q=>qset==="new"?q.v===2:qset==="orig"?!q.v:true;
-  ORDER.forEach(sk=>{shuffle(BANK.filter(q=>q.sk===sk&&inSet(q)),r).slice(0,perSkill).forEach(q=>list.push(q.id))});
+  ORDER.forEach(sk=>{shuffle(BANK.filter(q=>q.sk===sk),r).slice(0,perSkill).forEach(q=>list.push(q.id))});
   return list;
 }
 const byId=Object.fromEntries(BANK.map(q=>[q.id,q]));
@@ -2944,9 +2887,8 @@ function fitHost(){
 window.addEventListener("resize",()=>{clearTimeout(fitHost.t);fitHost.t=setTimeout(()=>{ZOOM?zoomApp():fitHost()},120)});
 async function hostSetup(){
   const N=await net().catch(()=>null);if(!N)return needSetup();
-  let per=3,mult=1,pen=1000,qset="new";
+  let per=3,mult=1,pen=1000;
   app.innerHTML=`${hdr()}<div class="panel" style="margin-top:0"><h2>Host a class game</h2>
-    <p>Question set:</p><div class="seg" id="qs"><button data-v="new" aria-pressed="true">New questions</button><button data-v="orig">Original questions</button><button data-v="mix">Mix of both</button></div>
     <p>Questions per round (6 rounds):</p><div class="seg" id="sp"><button data-v="2">2 (12 total)</button><button data-v="3" aria-pressed="true">3 (18 total)</button><button data-v="4">4 (24 total)</button></div>
     <p>Wrong answer:</p><div class="seg" id="pn"><button data-v="0">No penalty</button><button data-v="500">−500</button><button data-v="1000" aria-pressed="true">−1,000</button><button data-v="1500">−1,500</button></div>
     <p>Time:</p><div class="seg" id="st"><button data-v="1" aria-pressed="true">Standard</button><button data-v="1.5">Extra time (+50%)</button><button data-v="2">Double time</button></div>
@@ -2954,13 +2896,12 @@ async function hostSetup(){
     <div class="err" id="er"></div><button class="btn main" id="go">Create game</button></div>`;
   const seg=(id,set)=>$(id).onclick=e=>{const b=e.target.closest("button");if(!b)return;[...$(id).children].forEach(x=>x.setAttribute("aria-pressed",x===b));set(+b.dataset.v)};
   seg("#sp",v=>per=v);seg("#st",v=>mult=v);seg("#pn",v=>pen=v);
-  $("#qs").onclick=e=>{const b=e.target.closest("button");if(!b)return;[...$("#qs").children].forEach(x=>x.setAttribute("aria-pressed",x===b));qset=b.dataset.v};
   $("#go").onclick=async()=>{
     $("#go").disabled=true;
     try{
       let code;for(let t=0;t<20;t++){code=String(Math.floor(1000+Math.random()*9000));if(!(await N.get("games/"+code)))break}
-      const seed=Math.floor(Math.random()*1e9),ids=buildGame(per,seed,qset);
-      await N.set("games/"+code,{created:Date.now(),game:GAME,qset,seed,ids,mult,pen,state:{phase:"lobby",qi:-1}});
+      const seed=Math.floor(Math.random()*1e9),ids=buildGame(per,seed);
+      await N.set("games/"+code,{created:Date.now(),game:GAME,seed,ids,mult,pen,state:{phase:"lobby",qi:-1}});
       HOST={N,code,seed,ids,mult,pen,players:{},state:{phase:"lobby",qi:-1}};timeMult=mult;
       HOST.off=N.on("games/"+code+"/players",v=>{HOST.players=v||{};hostRender()});
       hostRender();
