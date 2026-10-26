@@ -1,0 +1,3189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Teacher | The Credit Desk</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="description" content="Receivables class game for District 214 Accounting: teams run a credit desk, approve customers, estimate bad debts with an aging schedule, and live with the write-offs.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F2F2F2;--paper:#FFFFFF;--ink:#111111;--muted:#5C5C5C;--line:rgba(17,17,17,.14);--soft:#F4F4F4;--dark:#111111;
+  --red:#C1102F;--good:#1E7A3C;--goodsoft:#E7F4EB;--bad:#C1102F;--badsoft:#FBE7EA;--warn:#9A6700;--warnsoft:#FFF4D6;
+  --display:"Oswald","Arial Narrow",Impact,sans-serif;--body:"Barlow",system-ui,-apple-system,"Segoe UI",sans-serif;
+  color-scheme:light;
+}
+*,*::before,*::after{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:18px/1.45 var(--body);-webkit-tap-highlight-color:transparent}
+[hidden]{display:none!important}
+button{font:inherit;color:inherit;cursor:pointer}
+.wrap{max-width:1180px;margin:0 auto;padding:12px 18px 28px}
+.top{display:flex;align-items:center;gap:12px;flex-wrap:wrap;color:var(--muted);font-size:15px;font-weight:600}
+.top img{height:34px;width:auto;border-radius:3px;display:block}
+.top a{color:inherit;text-decoration:none}
+.sp{flex:1}
+.pill{background:var(--dark);color:#fff;border-radius:999px;padding:3px 12px;font-size:14px;font-weight:700}
+.rejoin{background:var(--red);color:#fff;border:0;border-radius:999px;padding:7px 16px;font:700 16px var(--body);box-shadow:0 2px 0 rgba(0,0,0,.2)}
+.zm{display:inline-flex;gap:4px}
+.zm button{background:var(--paper);border:2px solid var(--line);border-radius:8px;padding:2px 10px;font-weight:700;font-size:15px}
+h1.title{font-family:var(--display);font-weight:700;font-size:clamp(40px,6.5vw,72px);line-height:.98;margin:18px 0 6px}
+h1.title span{color:var(--red)}
+.lede{max-width:66ch;color:var(--muted);margin:0 0 18px}
+.btn{background:var(--paper);border:2px solid var(--line);border-radius:10px;padding:8px 16px;font-weight:700;font-size:17px}
+.btn.main{background:var(--red);border-color:var(--red);color:#fff;font-family:var(--display);font-weight:600;font-size:24px;padding:10px 30px}
+.btn.dark{background:var(--dark);border-color:var(--dark);color:#fff}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.panel{background:var(--paper);border:2px solid var(--line);border-radius:14px;padding:22px;max-width:680px;margin:10px auto 0}
+.panel h2{font-family:var(--display);font-weight:600;font-size:32px;margin:0 0 6px}
+.panel ol{padding-left:22px;margin:6px 0 10px}.panel li{margin:3px 0}
+.field{display:block;width:100%;font-size:26px;font-weight:600;padding:12px 14px;border:2px solid var(--line);border-radius:10px;background:var(--soft);margin:6px 0 14px;font-family:var(--body);color:var(--ink)}
+.field.code{letter-spacing:.3em;text-align:center;font-family:var(--display);font-size:40px}
+.err{color:var(--bad);font-weight:700;min-height:1.4em}
+.note{font-size:15px;color:var(--muted)}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.wait{text-align:center;padding:40px 10px}
+.wait h2{font-family:var(--display);font-size:clamp(32px,6vw,54px);margin:0 0 8px;line-height:1.05}
+.wait p{color:var(--muted);font-size:20px;max-width:46ch;margin:6px auto}
+.num{font-variant-numeric:tabular-nums}
+
+/* lobby */
+.lobby{text-align:center}
+.lobtop{display:flex;align-items:center;justify-content:center;gap:clamp(20px,4vw,60px);flex-wrap:wrap}
+.lobleft{max-width:700px;flex:1 1 420px}
+.lobby .join{font-size:clamp(20px,2.4vw,30px);color:var(--muted);font-weight:600}
+.lobby .code{font-family:var(--display);font-weight:700;font-size:clamp(80px,14vw,170px);line-height:1;letter-spacing:.12em;margin:6px 0}
+.lobby .url{font-weight:700;color:var(--muted);font-size:clamp(14px,1.4vw,20px);word-break:break-all}
+.qr{display:flex;flex-direction:column;align-items:center;gap:6px;background:#fff;border-radius:16px;padding:12px;box-shadow:0 10px 30px rgba(0,0,0,.12);border:2px solid var(--line)}
+.qr svg{width:clamp(180px,22vw,320px);height:auto;display:block}
+.qr span{font-family:var(--display);font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#111;font-size:clamp(14px,1.4vw,20px)}
+.names{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin:18px 0}
+.names span{background:var(--paper);border:2px solid var(--line);border-left:8px solid var(--c,#111);border-radius:999px;padding:6px 16px;font-weight:700;font-size:22px}
+.count{font-family:var(--display);font-size:24px;font-weight:600}
+
+/* projector stage */
+.rhead{display:flex;align-items:baseline;gap:14px;margin:6px 0 10px;flex-wrap:wrap}
+.rtag{font-family:var(--display);font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--red);font-size:22px}
+.rname{font-family:var(--display);font-weight:600;font-size:22px;color:var(--muted)}
+.yr{margin-left:auto;background:var(--dark);color:#fff;border-radius:8px;padding:2px 12px;font-family:var(--display);font-weight:600;font-size:20px;letter-spacing:.06em}
+.scard{background:var(--paper);border:2px solid var(--line);border-left:12px solid var(--red);border-radius:14px;padding:18px 24px;box-shadow:0 10px 30px rgba(0,0,0,.08)}
+.stitle{font-family:var(--display);font-weight:700;font-size:40px;line-height:1.05;margin:0 0 8px}
+.story{font-size:27px;line-height:1.35;margin:0}
+.lesson{margin-top:12px;background:var(--goodsoft);border-left:8px solid var(--good);border-radius:10px;padding:12px 18px;font-size:22px}
+.lesson b{font-family:var(--display);font-weight:600;font-size:24px}
+.ask{font-family:var(--display);font-size:28px;font-weight:600;margin:14px 0 4px;text-align:center}
+.board{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px;margin-top:14px}
+.tile{position:relative;background:var(--paper);border:2px solid var(--line);border-top:8px solid var(--c);border-radius:12px;padding:8px 12px 10px;min-height:96px}
+.tile .tn{font-weight:700;font-size:19px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-right:34px}
+.tile .rk{position:absolute;top:6px;right:10px;font-family:var(--display);font-weight:700;color:var(--muted);font-size:18px}
+.tile .lbl{font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-top:2px}
+.tile .cash{font-family:var(--display);font-weight:700;font-size:36px;line-height:1.05;font-variant-numeric:tabular-nums}
+.tile .st{font-weight:700;font-size:16px;line-height:1.25}
+.tile.ok{background:var(--goodsoft);border-color:var(--good);border-top-color:var(--c)}
+.tile.no{background:var(--badsoft);border-color:var(--bad);border-top-color:var(--c)}
+.tile.mid{background:var(--warnsoft);border-color:var(--warn);border-top-color:var(--c)}
+.stamp{display:inline-block;border-radius:6px;padding:1px 8px;font-family:var(--display);font-weight:700;font-size:18px;letter-spacing:.04em;color:#fff;margin-right:6px;background:var(--dark)}
+.tile.ok .stamp{background:var(--good)} .tile.no .stamp{background:var(--bad)} .tile.mid .stamp{background:var(--warn)}
+.tile.wait .st{color:var(--muted)} .tile.done .st{color:var(--good)}
+.tile.anim{animation:tin .45s cubic-bezier(.2,1.3,.4,1) both;animation-delay:var(--d,0ms)}
+@keyframes tin{from{opacity:0;transform:translateY(16px) scale(.96)}}
+.bar2{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:14px;flex-wrap:wrap}
+.bar2 .row{margin-left:auto}
+.applist{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:8px;margin-top:12px}
+.appchip{background:var(--soft);border:2px solid var(--line);border-radius:10px;padding:6px 12px;font-size:19px;display:flex;justify-content:space-between;gap:10px}
+.appchip b{font-family:var(--display);font-weight:600}
+.arows{display:grid;gap:6px;margin-top:10px}
+.arow{display:grid;grid-template-columns:minmax(0,1.4fr) auto minmax(0,1fr) auto;gap:14px;align-items:center;background:var(--paper);border:2px solid var(--line);border-radius:12px;padding:8px 16px;font-size:21px}
+.arow b{font-family:var(--display);font-weight:600;font-size:23px}
+.arow .b{height:14px;background:var(--soft);border-radius:999px;overflow:hidden}.arow .b i{display:block;height:100%;background:var(--red)}
+.arow.anim{animation:tin .45s both;animation-delay:var(--d,0ms)}
+.pct{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin-top:12px}
+.pct div{background:var(--soft);border:2px solid var(--line);border-radius:10px;padding:8px;text-align:center;font-size:17px;font-weight:600;line-height:1.2}
+.pct b{display:block;font-family:var(--display);font-size:34px;color:var(--red)}
+.news{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:10px;margin-top:12px}
+.newsc{background:var(--paper);border:2px solid var(--line);border-top:8px solid var(--bad);border-radius:12px;padding:12px 16px}
+.newsc.good{border-top-color:var(--good)} .newsc.mix{border-top-color:var(--warn)}
+.newsc b{font-family:var(--display);font-weight:600;font-size:26px;display:block;line-height:1.1}
+.newsc p{margin:4px 0 0;font-size:20px}
+.newsc.anim{animation:tin .45s both;animation-delay:var(--d,0ms)}
+.jrn{display:inline-grid;grid-template-columns:auto auto auto;gap:0 22px;text-align:left;background:var(--paper);border:2px solid var(--line);border-radius:10px;padding:8px 16px;font-size:21px;margin:6px 10px 0 0;vertical-align:top;font-variant-numeric:tabular-nums}
+.jrn>span{white-space:nowrap}.jrn .ci{padding-left:34px}.jrn .d{text-align:right;min-width:4ch}
+.huddle .btn{color:var(--ink)}
+.jrn .h{grid-column:1/-1;font-family:var(--display);font-weight:600;font-size:18px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
+.opt{display:flex;gap:14px;align-items:flex-start;text-align:left;background:var(--paper);border:3px solid var(--line);border-radius:14px;padding:14px 16px;font-size:22px;line-height:1.3}
+.opt .sh{flex:none;width:42px;height:42px;border-radius:10px;display:grid;place-items:center;background:var(--dark);color:#fff;font-family:var(--display);font-weight:700;font-size:24px}
+.opt .ent{display:block;font-variant-numeric:tabular-nums}
+.opt .ent .c{padding-left:28px;display:block}
+.opt[aria-pressed="true"]{border-color:var(--ink);background:var(--soft);box-shadow:inset 0 0 0 2px var(--ink)}
+.opt.right{border-color:var(--good);background:var(--goodsoft)} .opt.right .sh{background:var(--good)}
+.opt.wrong{border-color:var(--bad);background:var(--badsoft)} .opt.wrong .sh{background:var(--bad)}
+.opt .tally{margin-left:auto;font-family:var(--display);font-weight:700;font-size:26px;white-space:nowrap}
+.timer{font-family:var(--display);font-weight:700;font-size:64px;line-height:1;font-variant-numeric:tabular-nums}
+.timer.done{color:var(--red);animation:blink 1s steps(2) infinite}
+@keyframes blink{50%{opacity:.35}}
+.huddle{background:var(--dark);color:#fff;border-radius:16px;padding:22px 28px;display:grid;grid-template-columns:1fr auto;gap:20px;align-items:center}
+.huddle .kick{font-family:var(--display);letter-spacing:.2em;text-transform:uppercase;color:#FF4D63;font-size:20px}
+.huddle h2{font-family:var(--display);font-weight:700;font-size:48px;line-height:1.05;margin:2px 0 8px}
+.huddle p{font-size:28px;line-height:1.35;margin:0}
+.huddle .hint{font-size:21px;color:#ccc;margin-top:10px}
+.answers{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:12px;margin-top:14px}
+.ans{position:relative;background:var(--paper);border:2px solid var(--line);border-left:10px solid var(--c);border-radius:12px;padding:12px 16px 12px;text-align:left;font-size:20px;line-height:1.35}
+.ans .who{font-family:var(--display);font-weight:600;font-size:20px;color:var(--muted);display:flex;justify-content:space-between;gap:8px;align-items:center}
+.ans .txt{margin:4px 0 8px;white-space:pre-wrap;overflow-wrap:anywhere}
+.ans .acts{display:flex;gap:8px}
+.ans .acts button{font-size:15px;padding:4px 12px}
+.ans.star{border-color:var(--good);background:var(--goodsoft)}
+.ans.anim{animation:tin .45s both;animation-delay:var(--d,0ms)}
+.ans .medal{background:var(--good);color:#fff;border-radius:6px;padding:0 8px;font-size:16px}
+.spot{position:fixed;inset:0;z-index:60;background:rgba(10,10,10,.92);display:grid;place-items:center;padding:4vh 6vw;cursor:pointer}
+.spot div{background:var(--paper);border-radius:20px;border-left:16px solid var(--c);padding:4vh 4vw;max-width:1400px}
+.spot b{font-family:var(--display);font-weight:600;font-size:clamp(24px,4vh,44px);color:var(--muted);display:block}
+.spot p{font-size:clamp(30px,5.4vh,66px);line-height:1.25;margin:1vh 0 0;white-space:pre-wrap;overflow-wrap:anywhere}
+
+/* team device (iPad) */
+.tbar{position:sticky;top:0;z-index:5;background:var(--bg);padding:8px 0 10px;border-bottom:2px solid var(--line);margin-bottom:12px}
+.mtext{display:flex;justify-content:space-between;gap:12px;font-weight:700;font-size:20px;flex-wrap:wrap}
+.apps{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:12px}
+.appc{background:var(--paper);border:3px solid var(--line);border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;gap:6px}
+.appc.yes{border-color:var(--good);background:var(--goodsoft)} .appc.noo{border-color:var(--bad);background:var(--badsoft)}
+.appc .hd{display:flex;justify-content:space-between;gap:10px;align-items:baseline}
+.appc .hd b{font-family:var(--display);font-weight:600;font-size:25px;line-height:1.1}
+.appc .amt{font-family:var(--display);font-weight:700;font-size:26px;white-space:nowrap}
+.appc .what{color:var(--muted);font-size:17px;margin-top:-4px}
+.facts{display:grid;grid-template-columns:auto 1fr;gap:2px 12px;font-size:17px;margin:2px 0}
+.facts dt{color:var(--muted);font-weight:600}.facts dd{margin:0;font-weight:700}
+.quote{font-size:17px;font-style:italic;background:var(--soft);border-radius:8px;padding:6px 10px}
+.yn{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:auto;padding-top:4px}
+.yn button{border:3px solid var(--line);background:var(--paper);border-radius:10px;padding:10px;font-family:var(--display);font-weight:600;font-size:22px}
+.yn .y[aria-pressed="true"]{background:var(--good);border-color:var(--good);color:#fff}
+.yn .n[aria-pressed="true"]{background:var(--bad);border-color:var(--bad);color:#fff}
+.lock{position:sticky;bottom:0;background:var(--bg);padding:12px 0;margin-top:12px;border-top:2px solid var(--line);display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}
+.chips span{background:var(--paper);border:2px solid var(--line);border-radius:999px;padding:4px 12px;font-weight:700;font-size:16px}
+.chips .g{border-color:var(--good);background:var(--goodsoft)} .chips .r{border-color:var(--bad);background:var(--badsoft)} .chips .y{border-color:var(--warn);background:var(--warnsoft)}
+.verdict{border-radius:16px;padding:20px;text-align:center;margin:10px auto;max-width:760px}
+.verdict.ok{background:var(--goodsoft);border:3px solid var(--good)} .verdict.no{background:var(--badsoft);border:3px solid var(--bad)} .verdict.mid{background:var(--warnsoft);border:3px solid var(--warn)} .verdict.neu{background:var(--paper);border:3px solid var(--line)}
+.verdict h2{font-family:var(--display);font-size:clamp(36px,7vw,64px);margin:0;line-height:1.05}
+.verdict.ok h2{color:var(--good)} .verdict.no h2{color:var(--bad)} .verdict.mid h2{color:var(--warn)}
+.verdict p{font-size:20px;margin:8px 0 0}
+.box{background:var(--paper);border:2px solid var(--line);border-radius:12px;padding:14px 18px;margin:10px auto;max-width:760px}
+.box h3{font-family:var(--display);font-weight:600;font-size:24px;margin:0 0 6px}
+.cashline{display:flex;justify-content:center;gap:22px;flex-wrap:wrap;margin-top:12px;font-weight:700;font-size:20px}
+.cashline b{font-family:var(--display);font-size:40px;display:block;line-height:1}
+table.t{width:100%;border-collapse:collapse;font-size:18px;font-variant-numeric:tabular-nums}
+table.t th{text-align:left;font-size:14px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);border-bottom:2px solid var(--line);padding:4px 6px}
+table.t td{border-bottom:1px solid var(--line);padding:6px}
+table.t td.r,table.t th.r{text-align:right}
+table.t tr.tot td{border-top:2px solid var(--ink);font-weight:700}
+.inp{width:100%;min-width:90px;font:600 20px var(--body);padding:6px 8px;border:2px solid var(--line);border-radius:8px;background:var(--soft);text-align:right;color:var(--ink)}
+.inp.big{font-size:28px;padding:10px 12px}
+.taccount{display:grid;grid-template-columns:1fr 1fr;border-top:3px solid var(--ink);margin-top:6px;font-size:18px;font-variant-numeric:tabular-nums}
+.taccount>div{padding:4px 10px}.taccount>div:first-child{border-right:3px solid var(--ink)}
+.taccount .ln{display:flex;justify-content:space-between;gap:10px;padding:2px 0}
+.taccount .hd{font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.ans2{display:grid;grid-template-columns:1fr 220px;gap:10px 14px;align-items:center;margin-top:8px;font-size:19px;font-weight:600}
+.rule{background:var(--dark);color:#fff;border-radius:12px;padding:10px 16px;margin-bottom:12px;font-size:18px}
+.rule b{font-family:var(--display);font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#FF8A9A;font-size:15px;display:block}
+textarea.field{font-size:22px;min-height:170px;resize:vertical;line-height:1.35}
+.bs{display:grid;grid-template-columns:1fr auto auto;gap:2px 18px;font-size:19px;font-variant-numeric:tabular-nums}
+.bs .u{border-bottom:2px solid var(--ink)} .bs .tot{font-weight:700}
+.rep h2{font-family:var(--display);font-weight:700;font-size:clamp(34px,5vw,54px);margin:6px 0;line-height:1.05}
+.leak{background:var(--paper);border:2px solid var(--line);border-left:8px solid var(--bad);border-radius:12px;padding:10px 16px;margin:8px 0;font-size:18px}
+.leak b{font-family:var(--display);font-weight:600;font-size:21px;display:block}
+.leak.okk{border-left-color:var(--good)} .leak.mid{border-left-color:var(--warn)}
+.cr{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) 1fr auto;gap:12px;align-items:center;padding:6px 0;border-bottom:1px solid var(--line);font-size:19px}
+.cr .b{height:12px;background:var(--soft);border-radius:999px;overflow:hidden}.cr .b i{display:block;height:100%;background:var(--red)}
+.tag{display:inline-block;border-radius:6px;padding:0 8px;font-weight:700;font-size:15px;color:#fff;background:var(--good)}
+.tag.r{background:var(--bad)}.tag.y{background:var(--warn)}.tag.k{background:var(--dark)}
+@media (max-width:760px){.apps{grid-template-columns:1fr}.opts{grid-template-columns:1fr}.arow{grid-template-columns:1fr auto}.pct{grid-template-columns:repeat(2,1fr)}.ans2{grid-template-columns:1fr}.huddle{grid-template-columns:1fr}}
+
+/* finale */
+body.finale-on{overflow:hidden}
+body.finale-on .top{visibility:hidden}
+.finale{position:fixed;inset:0;z-index:50;background:radial-gradient(120% 80% at 50% 110%,#5a0614 0%,#1a0207 45%,#070707 100%);color:#fff;display:grid;grid-template-rows:auto 1fr auto auto;justify-items:center;padding:2.2vh 3vw 2vh;overflow:hidden}
+.finale canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:1}
+.finale .rays{position:absolute;left:50%;top:62%;width:160vmax;height:160vmax;transform:translate(-50%,-50%);background:repeating-conic-gradient(from 0deg,rgba(255,255,255,.05) 0deg 8deg,transparent 8deg 22deg);animation:spin 60s linear infinite;z-index:0;mask:radial-gradient(circle,#000 0%,transparent 55%);-webkit-mask:radial-gradient(circle,#000 0%,transparent 55%)}
+@keyframes spin{to{transform:translate(-50%,-50%) rotate(360deg)}}
+.fhead{position:relative;z-index:2;text-align:center}
+.fhead .lg{height:clamp(34px,6vh,64px);display:block;margin:0 auto 1vh;border-radius:4px}
+.fhead .kick{font-family:var(--display);letter-spacing:.3em;text-transform:uppercase;color:#FF4D63;font-size:clamp(14px,2.2vh,26px)}
+.fhead h2{font-family:var(--display);font-weight:700;font-size:clamp(48px,10vh,130px);line-height:.95;margin:0;background:linear-gradient(180deg,#fff 45%,#F4B6C0);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 4px 18px rgba(193,16,47,.6))}
+.podium{position:relative;z-index:2;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));align-items:end;gap:1.6vw;width:min(92vw,1500px);align-self:end}
+.pod{display:flex;flex-direction:column;align-items:center;opacity:0;transform:translateY(40px) scale(.9);transition:opacity .5s, transform .7s cubic-bezier(.2,1.6,.4,1)}
+.pod.in{opacity:1;transform:none}
+.pod.empty{visibility:hidden}
+.pod .who{text-align:center;margin-bottom:1.2vh;max-width:100%}
+.pod .medal{width:clamp(44px,8vh,96px);height:clamp(44px,8vh,96px);border-radius:50%;display:grid;place-items:center;margin:0 auto .8vh;font-family:var(--display);font-weight:700;font-size:clamp(24px,4.6vh,56px);color:#3b2600;box-shadow:inset 0 -6px 0 rgba(0,0,0,.18),0 6px 24px rgba(0,0,0,.4)}
+.p1 .medal{background:radial-gradient(circle at 35% 30%,#FFF3B0,#FFC93C 55%,#C98A00)}
+.p2 .medal{background:radial-gradient(circle at 35% 30%,#FFFFFF,#CFD6DD 55%,#8C98A3)}
+.p3 .medal{background:radial-gradient(circle at 35% 30%,#FFD9B8,#D88B4A 55%,#8E4F1C);color:#2b1300}
+.pod .nm{font-family:var(--display);font-weight:600;font-size:clamp(26px,5.4vh,72px);line-height:1.05;overflow-wrap:anywhere}
+.p1 .nm{font-size:clamp(32px,7vh,96px);color:#fff;text-shadow:0 0 24px rgba(232,25,60,.8)}
+.pod .pts{font-weight:700;font-size:clamp(18px,3.2vh,40px);opacity:.85}
+.pod .block{width:100%;border-radius:12px 12px 0 0;display:grid;place-items:start center;padding-top:1.4vh;font-family:var(--display);font-weight:700;font-size:clamp(28px,6vh,80px);color:rgba(255,255,255,.92);background:linear-gradient(180deg,#E0213F,#8F0A20);box-shadow:inset 0 3px 0 rgba(255,255,255,.25),0 -10px 40px rgba(193,16,47,.35)}
+.p1 .block{height:26vh;background:linear-gradient(180deg,#F23A55,#A90C26)}
+.p2 .block{height:18vh}
+.p3 .block{height:13vh}
+.p1.in .who{animation:pop 1.2s ease-out .2s 2}
+@keyframes pop{50%{transform:scale(1.08)}}
+.rest{position:relative;z-index:2;display:grid;grid-template-columns:1fr 1fr;gap:1.4vw;width:min(92vw,1500px);margin-top:1.6vh}
+.row45{display:flex;align-items:center;gap:1.2vw;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);border-radius:12px;padding:1vh 1.4vw;font-size:clamp(20px,3.6vh,44px);font-weight:700;opacity:0;transform:translateX(-30px);transition:opacity .5s, transform .5s}
+.row45.in{opacity:1;transform:none}
+.row45 .r{font-family:var(--display);color:#FF4D63;min-width:1.4em}
+.row45 .n{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.row45 .s{opacity:.8}
+.fbar{position:relative;z-index:4;display:flex;gap:10px;margin-top:1.6vh;opacity:.55;transition:opacity .2s}
+.fbar:hover{opacity:1}
+.fbar .btn{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.25);color:#fff;font-size:15px;padding:6px 14px}
+@media (max-width:700px){.rest{grid-template-columns:1fr}}
+@media (prefers-reduced-motion: reduce){.finale .rays{animation:none}.pod,.row45{transition:none}.p1.in .who{animation:none}.timer.done{animation:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top"><img src="/logo-214.png" alt="District 214"><a href="/">District 214 Accounting</a> | <a href="/teacher">Teacher</a> | Chapter 7: The Credit Desk<span class="sp"></span><span class="zm" id="zm" hidden><button id="zo" aria-label="Smaller text">A−</button><button id="zi" aria-label="Bigger text">A+</button></span><span class="pill" id="who" hidden></span><button class="rejoin" id="rejoin" hidden>↻ Rejoin</button></div>
+  <main id="app"></main>
+</div>
+<script>window.CD_ROLE="teacher"</script>
+<script>/* qrcode-generator, MIT License, Copyright (c) 2009 Kazuhiko Arase */
+//---------------------------------------------------------------------
+//
+// QR Code Generator for JavaScript
+//
+// Copyright (c) 2009 Kazuhiko Arase
+//
+// URL: http://www.d-project.com/
+//
+// Licensed under the MIT license:
+//  http://www.opensource.org/licenses/mit-license.php
+//
+// The word 'QR Code' is registered trademark of
+// DENSO WAVE INCORPORATED
+//  http://www.denso-wave.com/qrcode/faqpatent-e.html
+//
+//---------------------------------------------------------------------
+
+var qrcode = function() {
+
+  //---------------------------------------------------------------------
+  // qrcode
+  //---------------------------------------------------------------------
+
+  /**
+   * qrcode
+   * @param typeNumber 1 to 40
+   * @param errorCorrectionLevel 'L','M','Q','H'
+   */
+  var qrcode = function(typeNumber, errorCorrectionLevel) {
+
+    var PAD0 = 0xEC;
+    var PAD1 = 0x11;
+
+    var _typeNumber = typeNumber;
+    var _errorCorrectionLevel = QRErrorCorrectionLevel[errorCorrectionLevel];
+    var _modules = null;
+    var _moduleCount = 0;
+    var _dataCache = null;
+    var _dataList = [];
+
+    var _this = {};
+
+    var makeImpl = function(test, maskPattern) {
+
+      _moduleCount = _typeNumber * 4 + 17;
+      _modules = function(moduleCount) {
+        var modules = new Array(moduleCount);
+        for (var row = 0; row < moduleCount; row += 1) {
+          modules[row] = new Array(moduleCount);
+          for (var col = 0; col < moduleCount; col += 1) {
+            modules[row][col] = null;
+          }
+        }
+        return modules;
+      }(_moduleCount);
+
+      setupPositionProbePattern(0, 0);
+      setupPositionProbePattern(_moduleCount - 7, 0);
+      setupPositionProbePattern(0, _moduleCount - 7);
+      setupPositionAdjustPattern();
+      setupTimingPattern();
+      setupTypeInfo(test, maskPattern);
+
+      if (_typeNumber >= 7) {
+        setupTypeNumber(test);
+      }
+
+      if (_dataCache == null) {
+        _dataCache = createData(_typeNumber, _errorCorrectionLevel, _dataList);
+      }
+
+      mapData(_dataCache, maskPattern);
+    };
+
+    var setupPositionProbePattern = function(row, col) {
+
+      for (var r = -1; r <= 7; r += 1) {
+
+        if (row + r <= -1 || _moduleCount <= row + r) continue;
+
+        for (var c = -1; c <= 7; c += 1) {
+
+          if (col + c <= -1 || _moduleCount <= col + c) continue;
+
+          if ( (0 <= r && r <= 6 && (c == 0 || c == 6) )
+              || (0 <= c && c <= 6 && (r == 0 || r == 6) )
+              || (2 <= r && r <= 4 && 2 <= c && c <= 4) ) {
+            _modules[row + r][col + c] = true;
+          } else {
+            _modules[row + r][col + c] = false;
+          }
+        }
+      }
+    };
+
+    var getBestMaskPattern = function() {
+
+      var minLostPoint = 0;
+      var pattern = 0;
+
+      for (var i = 0; i < 8; i += 1) {
+
+        makeImpl(true, i);
+
+        var lostPoint = QRUtil.getLostPoint(_this);
+
+        if (i == 0 || minLostPoint > lostPoint) {
+          minLostPoint = lostPoint;
+          pattern = i;
+        }
+      }
+
+      return pattern;
+    };
+
+    var setupTimingPattern = function() {
+
+      for (var r = 8; r < _moduleCount - 8; r += 1) {
+        if (_modules[r][6] != null) {
+          continue;
+        }
+        _modules[r][6] = (r % 2 == 0);
+      }
+
+      for (var c = 8; c < _moduleCount - 8; c += 1) {
+        if (_modules[6][c] != null) {
+          continue;
+        }
+        _modules[6][c] = (c % 2 == 0);
+      }
+    };
+
+    var setupPositionAdjustPattern = function() {
+
+      var pos = QRUtil.getPatternPosition(_typeNumber);
+
+      for (var i = 0; i < pos.length; i += 1) {
+
+        for (var j = 0; j < pos.length; j += 1) {
+
+          var row = pos[i];
+          var col = pos[j];
+
+          if (_modules[row][col] != null) {
+            continue;
+          }
+
+          for (var r = -2; r <= 2; r += 1) {
+
+            for (var c = -2; c <= 2; c += 1) {
+
+              if (r == -2 || r == 2 || c == -2 || c == 2
+                  || (r == 0 && c == 0) ) {
+                _modules[row + r][col + c] = true;
+              } else {
+                _modules[row + r][col + c] = false;
+              }
+            }
+          }
+        }
+      }
+    };
+
+    var setupTypeNumber = function(test) {
+
+      var bits = QRUtil.getBCHTypeNumber(_typeNumber);
+
+      for (var i = 0; i < 18; i += 1) {
+        var mod = (!test && ( (bits >> i) & 1) == 1);
+        _modules[Math.floor(i / 3)][i % 3 + _moduleCount - 8 - 3] = mod;
+      }
+
+      for (var i = 0; i < 18; i += 1) {
+        var mod = (!test && ( (bits >> i) & 1) == 1);
+        _modules[i % 3 + _moduleCount - 8 - 3][Math.floor(i / 3)] = mod;
+      }
+    };
+
+    var setupTypeInfo = function(test, maskPattern) {
+
+      var data = (_errorCorrectionLevel << 3) | maskPattern;
+      var bits = QRUtil.getBCHTypeInfo(data);
+
+      // vertical
+      for (var i = 0; i < 15; i += 1) {
+
+        var mod = (!test && ( (bits >> i) & 1) == 1);
+
+        if (i < 6) {
+          _modules[i][8] = mod;
+        } else if (i < 8) {
+          _modules[i + 1][8] = mod;
+        } else {
+          _modules[_moduleCount - 15 + i][8] = mod;
+        }
+      }
+
+      // horizontal
+      for (var i = 0; i < 15; i += 1) {
+
+        var mod = (!test && ( (bits >> i) & 1) == 1);
+
+        if (i < 8) {
+          _modules[8][_moduleCount - i - 1] = mod;
+        } else if (i < 9) {
+          _modules[8][15 - i - 1 + 1] = mod;
+        } else {
+          _modules[8][15 - i - 1] = mod;
+        }
+      }
+
+      // fixed module
+      _modules[_moduleCount - 8][8] = (!test);
+    };
+
+    var mapData = function(data, maskPattern) {
+
+      var inc = -1;
+      var row = _moduleCount - 1;
+      var bitIndex = 7;
+      var byteIndex = 0;
+      var maskFunc = QRUtil.getMaskFunction(maskPattern);
+
+      for (var col = _moduleCount - 1; col > 0; col -= 2) {
+
+        if (col == 6) col -= 1;
+
+        while (true) {
+
+          for (var c = 0; c < 2; c += 1) {
+
+            if (_modules[row][col - c] == null) {
+
+              var dark = false;
+
+              if (byteIndex < data.length) {
+                dark = ( ( (data[byteIndex] >>> bitIndex) & 1) == 1);
+              }
+
+              var mask = maskFunc(row, col - c);
+
+              if (mask) {
+                dark = !dark;
+              }
+
+              _modules[row][col - c] = dark;
+              bitIndex -= 1;
+
+              if (bitIndex == -1) {
+                byteIndex += 1;
+                bitIndex = 7;
+              }
+            }
+          }
+
+          row += inc;
+
+          if (row < 0 || _moduleCount <= row) {
+            row -= inc;
+            inc = -inc;
+            break;
+          }
+        }
+      }
+    };
+
+    var createBytes = function(buffer, rsBlocks) {
+
+      var offset = 0;
+
+      var maxDcCount = 0;
+      var maxEcCount = 0;
+
+      var dcdata = new Array(rsBlocks.length);
+      var ecdata = new Array(rsBlocks.length);
+
+      for (var r = 0; r < rsBlocks.length; r += 1) {
+
+        var dcCount = rsBlocks[r].dataCount;
+        var ecCount = rsBlocks[r].totalCount - dcCount;
+
+        maxDcCount = Math.max(maxDcCount, dcCount);
+        maxEcCount = Math.max(maxEcCount, ecCount);
+
+        dcdata[r] = new Array(dcCount);
+
+        for (var i = 0; i < dcdata[r].length; i += 1) {
+          dcdata[r][i] = 0xff & buffer.getBuffer()[i + offset];
+        }
+        offset += dcCount;
+
+        var rsPoly = QRUtil.getErrorCorrectPolynomial(ecCount);
+        var rawPoly = qrPolynomial(dcdata[r], rsPoly.getLength() - 1);
+
+        var modPoly = rawPoly.mod(rsPoly);
+        ecdata[r] = new Array(rsPoly.getLength() - 1);
+        for (var i = 0; i < ecdata[r].length; i += 1) {
+          var modIndex = i + modPoly.getLength() - ecdata[r].length;
+          ecdata[r][i] = (modIndex >= 0)? modPoly.getAt(modIndex) : 0;
+        }
+      }
+
+      var totalCodeCount = 0;
+      for (var i = 0; i < rsBlocks.length; i += 1) {
+        totalCodeCount += rsBlocks[i].totalCount;
+      }
+
+      var data = new Array(totalCodeCount);
+      var index = 0;
+
+      for (var i = 0; i < maxDcCount; i += 1) {
+        for (var r = 0; r < rsBlocks.length; r += 1) {
+          if (i < dcdata[r].length) {
+            data[index] = dcdata[r][i];
+            index += 1;
+          }
+        }
+      }
+
+      for (var i = 0; i < maxEcCount; i += 1) {
+        for (var r = 0; r < rsBlocks.length; r += 1) {
+          if (i < ecdata[r].length) {
+            data[index] = ecdata[r][i];
+            index += 1;
+          }
+        }
+      }
+
+      return data;
+    };
+
+    var createData = function(typeNumber, errorCorrectionLevel, dataList) {
+
+      var rsBlocks = QRRSBlock.getRSBlocks(typeNumber, errorCorrectionLevel);
+
+      var buffer = qrBitBuffer();
+
+      for (var i = 0; i < dataList.length; i += 1) {
+        var data = dataList[i];
+        buffer.put(data.getMode(), 4);
+        buffer.put(data.getLength(), QRUtil.getLengthInBits(data.getMode(), typeNumber) );
+        data.write(buffer);
+      }
+
+      // calc num max data.
+      var totalDataCount = 0;
+      for (var i = 0; i < rsBlocks.length; i += 1) {
+        totalDataCount += rsBlocks[i].dataCount;
+      }
+
+      if (buffer.getLengthInBits() > totalDataCount * 8) {
+        throw 'code length overflow. ('
+          + buffer.getLengthInBits()
+          + '>'
+          + totalDataCount * 8
+          + ')';
+      }
+
+      // end code
+      if (buffer.getLengthInBits() + 4 <= totalDataCount * 8) {
+        buffer.put(0, 4);
+      }
+
+      // padding
+      while (buffer.getLengthInBits() % 8 != 0) {
+        buffer.putBit(false);
+      }
+
+      // padding
+      while (true) {
+
+        if (buffer.getLengthInBits() >= totalDataCount * 8) {
+          break;
+        }
+        buffer.put(PAD0, 8);
+
+        if (buffer.getLengthInBits() >= totalDataCount * 8) {
+          break;
+        }
+        buffer.put(PAD1, 8);
+      }
+
+      return createBytes(buffer, rsBlocks);
+    };
+
+    _this.addData = function(data, mode) {
+
+      mode = mode || 'Byte';
+
+      var newData = null;
+
+      switch(mode) {
+      case 'Numeric' :
+        newData = qrNumber(data);
+        break;
+      case 'Alphanumeric' :
+        newData = qrAlphaNum(data);
+        break;
+      case 'Byte' :
+        newData = qr8BitByte(data);
+        break;
+      case 'Kanji' :
+        newData = qrKanji(data);
+        break;
+      default :
+        throw 'mode:' + mode;
+      }
+
+      _dataList.push(newData);
+      _dataCache = null;
+    };
+
+    _this.isDark = function(row, col) {
+      if (row < 0 || _moduleCount <= row || col < 0 || _moduleCount <= col) {
+        throw row + ',' + col;
+      }
+      return _modules[row][col];
+    };
+
+    _this.getModuleCount = function() {
+      return _moduleCount;
+    };
+
+    _this.make = function() {
+      if (_typeNumber < 1) {
+        var typeNumber = 1;
+
+        for (; typeNumber < 40; typeNumber++) {
+          var rsBlocks = QRRSBlock.getRSBlocks(typeNumber, _errorCorrectionLevel);
+          var buffer = qrBitBuffer();
+
+          for (var i = 0; i < _dataList.length; i++) {
+            var data = _dataList[i];
+            buffer.put(data.getMode(), 4);
+            buffer.put(data.getLength(), QRUtil.getLengthInBits(data.getMode(), typeNumber) );
+            data.write(buffer);
+          }
+
+          var totalDataCount = 0;
+          for (var i = 0; i < rsBlocks.length; i++) {
+            totalDataCount += rsBlocks[i].dataCount;
+          }
+
+          if (buffer.getLengthInBits() <= totalDataCount * 8) {
+            break;
+          }
+        }
+
+        _typeNumber = typeNumber;
+      }
+
+      makeImpl(false, getBestMaskPattern() );
+    };
+
+    _this.createTableTag = function(cellSize, margin) {
+
+      cellSize = cellSize || 2;
+      margin = (typeof margin == 'undefined')? cellSize * 4 : margin;
+
+      var qrHtml = '';
+
+      qrHtml += '<table style="';
+      qrHtml += ' border-width: 0px; border-style: none;';
+      qrHtml += ' border-collapse: collapse;';
+      qrHtml += ' padding: 0px; margin: ' + margin + 'px;';
+      qrHtml += '">';
+      qrHtml += '<tbody>';
+
+      for (var r = 0; r < _this.getModuleCount(); r += 1) {
+
+        qrHtml += '<tr>';
+
+        for (var c = 0; c < _this.getModuleCount(); c += 1) {
+          qrHtml += '<td style="';
+          qrHtml += ' border-width: 0px; border-style: none;';
+          qrHtml += ' border-collapse: collapse;';
+          qrHtml += ' padding: 0px; margin: 0px;';
+          qrHtml += ' width: ' + cellSize + 'px;';
+          qrHtml += ' height: ' + cellSize + 'px;';
+          qrHtml += ' background-color: ';
+          qrHtml += _this.isDark(r, c)? '#000000' : '#ffffff';
+          qrHtml += ';';
+          qrHtml += '"/>';
+        }
+
+        qrHtml += '</tr>';
+      }
+
+      qrHtml += '</tbody>';
+      qrHtml += '</table>';
+
+      return qrHtml;
+    };
+
+    _this.createSvgTag = function(cellSize, margin, alt, title) {
+
+      var opts = {};
+      if (typeof arguments[0] == 'object') {
+        // Called by options.
+        opts = arguments[0];
+        // overwrite cellSize and margin.
+        cellSize = opts.cellSize;
+        margin = opts.margin;
+        alt = opts.alt;
+        title = opts.title;
+      }
+
+      cellSize = cellSize || 2;
+      margin = (typeof margin == 'undefined')? cellSize * 4 : margin;
+
+      // Compose alt property surrogate
+      alt = (typeof alt === 'string') ? {text: alt} : alt || {};
+      alt.text = alt.text || null;
+      alt.id = (alt.text) ? alt.id || 'qrcode-description' : null;
+
+      // Compose title property surrogate
+      title = (typeof title === 'string') ? {text: title} : title || {};
+      title.text = title.text || null;
+      title.id = (title.text) ? title.id || 'qrcode-title' : null;
+
+      var size = _this.getModuleCount() * cellSize + margin * 2;
+      var c, mc, r, mr, qrSvg='', rect;
+
+      rect = 'l' + cellSize + ',0 0,' + cellSize +
+        ' -' + cellSize + ',0 0,-' + cellSize + 'z ';
+
+      qrSvg += '<svg version="1.1" xmlns="http://www.w3.org/2000/svg"';
+      qrSvg += !opts.scalable ? ' width="' + size + 'px" height="' + size + 'px"' : '';
+      qrSvg += ' viewBox="0 0 ' + size + ' ' + size + '" ';
+      qrSvg += ' preserveAspectRatio="xMinYMin meet"';
+      qrSvg += (title.text || alt.text) ? ' role="img" aria-labelledby="' +
+          escapeXml([title.id, alt.id].join(' ').trim() ) + '"' : '';
+      qrSvg += '>';
+      qrSvg += (title.text) ? '<title id="' + escapeXml(title.id) + '">' +
+          escapeXml(title.text) + '</title>' : '';
+      qrSvg += (alt.text) ? '<description id="' + escapeXml(alt.id) + '">' +
+          escapeXml(alt.text) + '</description>' : '';
+      qrSvg += '<rect width="100%" height="100%" fill="white" cx="0" cy="0"/>';
+      qrSvg += '<path d="';
+
+      for (r = 0; r < _this.getModuleCount(); r += 1) {
+        mr = r * cellSize + margin;
+        for (c = 0; c < _this.getModuleCount(); c += 1) {
+          if (_this.isDark(r, c) ) {
+            mc = c*cellSize+margin;
+            qrSvg += 'M' + mc + ',' + mr + rect;
+          }
+        }
+      }
+
+      qrSvg += '" stroke="transparent" fill="black"/>';
+      qrSvg += '</svg>';
+
+      return qrSvg;
+    };
+
+    _this.createDataURL = function(cellSize, margin) {
+
+      cellSize = cellSize || 2;
+      margin = (typeof margin == 'undefined')? cellSize * 4 : margin;
+
+      var size = _this.getModuleCount() * cellSize + margin * 2;
+      var min = margin;
+      var max = size - margin;
+
+      return createDataURL(size, size, function(x, y) {
+        if (min <= x && x < max && min <= y && y < max) {
+          var c = Math.floor( (x - min) / cellSize);
+          var r = Math.floor( (y - min) / cellSize);
+          return _this.isDark(r, c)? 0 : 1;
+        } else {
+          return 1;
+        }
+      } );
+    };
+
+    _this.createImgTag = function(cellSize, margin, alt) {
+
+      cellSize = cellSize || 2;
+      margin = (typeof margin == 'undefined')? cellSize * 4 : margin;
+
+      var size = _this.getModuleCount() * cellSize + margin * 2;
+
+      var img = '';
+      img += '<img';
+      img += '\u0020src="';
+      img += _this.createDataURL(cellSize, margin);
+      img += '"';
+      img += '\u0020width="';
+      img += size;
+      img += '"';
+      img += '\u0020height="';
+      img += size;
+      img += '"';
+      if (alt) {
+        img += '\u0020alt="';
+        img += escapeXml(alt);
+        img += '"';
+      }
+      img += '/>';
+
+      return img;
+    };
+
+    var escapeXml = function(s) {
+      var escaped = '';
+      for (var i = 0; i < s.length; i += 1) {
+        var c = s.charAt(i);
+        switch(c) {
+        case '<': escaped += '&lt;'; break;
+        case '>': escaped += '&gt;'; break;
+        case '&': escaped += '&amp;'; break;
+        case '"': escaped += '&quot;'; break;
+        default : escaped += c; break;
+        }
+      }
+      return escaped;
+    };
+
+    var _createHalfASCII = function(margin) {
+      var cellSize = 1;
+      margin = (typeof margin == 'undefined')? cellSize * 2 : margin;
+
+      var size = _this.getModuleCount() * cellSize + margin * 2;
+      var min = margin;
+      var max = size - margin;
+
+      var y, x, r1, r2, p;
+
+      var blocks = {
+        '██': '█',
+        '█ ': '▀',
+        ' █': '▄',
+        '  ': ' '
+      };
+
+      var blocksLastLineNoMargin = {
+        '██': '▀',
+        '█ ': '▀',
+        ' █': ' ',
+        '  ': ' '
+      };
+
+      var ascii = '';
+      for (y = 0; y < size; y += 2) {
+        r1 = Math.floor((y - min) / cellSize);
+        r2 = Math.floor((y + 1 - min) / cellSize);
+        for (x = 0; x < size; x += 1) {
+          p = '█';
+
+          if (min <= x && x < max && min <= y && y < max && _this.isDark(r1, Math.floor((x - min) / cellSize))) {
+            p = ' ';
+          }
+
+          if (min <= x && x < max && min <= y+1 && y+1 < max && _this.isDark(r2, Math.floor((x - min) / cellSize))) {
+            p += ' ';
+          }
+          else {
+            p += '█';
+          }
+
+          // Output 2 characters per pixel, to create full square. 1 character per pixels gives only half width of square.
+          ascii += (margin < 1 && y+1 >= max) ? blocksLastLineNoMargin[p] : blocks[p];
+        }
+
+        ascii += '\n';
+      }
+
+      if (size % 2 && margin > 0) {
+        return ascii.substring(0, ascii.length - size - 1) + Array(size+1).join('▀');
+      }
+
+      return ascii.substring(0, ascii.length-1);
+    };
+
+    _this.createASCII = function(cellSize, margin) {
+      cellSize = cellSize || 1;
+
+      if (cellSize < 2) {
+        return _createHalfASCII(margin);
+      }
+
+      cellSize -= 1;
+      margin = (typeof margin == 'undefined')? cellSize * 2 : margin;
+
+      var size = _this.getModuleCount() * cellSize + margin * 2;
+      var min = margin;
+      var max = size - margin;
+
+      var y, x, r, p;
+
+      var white = Array(cellSize+1).join('██');
+      var black = Array(cellSize+1).join('  ');
+
+      var ascii = '';
+      var line = '';
+      for (y = 0; y < size; y += 1) {
+        r = Math.floor( (y - min) / cellSize);
+        line = '';
+        for (x = 0; x < size; x += 1) {
+          p = 1;
+
+          if (min <= x && x < max && min <= y && y < max && _this.isDark(r, Math.floor((x - min) / cellSize))) {
+            p = 0;
+          }
+
+          // Output 2 characters per pixel, to create full square. 1 character per pixels gives only half width of square.
+          line += p ? white : black;
+        }
+
+        for (r = 0; r < cellSize; r += 1) {
+          ascii += line + '\n';
+        }
+      }
+
+      return ascii.substring(0, ascii.length-1);
+    };
+
+    _this.renderTo2dContext = function(context, cellSize) {
+      cellSize = cellSize || 2;
+      var length = _this.getModuleCount();
+      for (var row = 0; row < length; row++) {
+        for (var col = 0; col < length; col++) {
+          context.fillStyle = _this.isDark(row, col) ? 'black' : 'white';
+          context.fillRect(col * cellSize, row * cellSize, cellSize, cellSize);
+        }
+      }
+    }
+
+    return _this;
+  };
+
+  //---------------------------------------------------------------------
+  // qrcode.stringToBytes
+  //---------------------------------------------------------------------
+
+  qrcode.stringToBytesFuncs = {
+    'default' : function(s) {
+      var bytes = [];
+      for (var i = 0; i < s.length; i += 1) {
+        var c = s.charCodeAt(i);
+        bytes.push(c & 0xff);
+      }
+      return bytes;
+    }
+  };
+
+  qrcode.stringToBytes = qrcode.stringToBytesFuncs['default'];
+
+  //---------------------------------------------------------------------
+  // qrcode.createStringToBytes
+  //---------------------------------------------------------------------
+
+  /**
+   * @param unicodeData base64 string of byte array.
+   * [16bit Unicode],[16bit Bytes], ...
+   * @param numChars
+   */
+  qrcode.createStringToBytes = function(unicodeData, numChars) {
+
+    // create conversion map.
+
+    var unicodeMap = function() {
+
+      var bin = base64DecodeInputStream(unicodeData);
+      var read = function() {
+        var b = bin.read();
+        if (b == -1) throw 'eof';
+        return b;
+      };
+
+      var count = 0;
+      var unicodeMap = {};
+      while (true) {
+        var b0 = bin.read();
+        if (b0 == -1) break;
+        var b1 = read();
+        var b2 = read();
+        var b3 = read();
+        var k = String.fromCharCode( (b0 << 8) | b1);
+        var v = (b2 << 8) | b3;
+        unicodeMap[k] = v;
+        count += 1;
+      }
+      if (count != numChars) {
+        throw count + ' != ' + numChars;
+      }
+
+      return unicodeMap;
+    }();
+
+    var unknownChar = '?'.charCodeAt(0);
+
+    return function(s) {
+      var bytes = [];
+      for (var i = 0; i < s.length; i += 1) {
+        var c = s.charCodeAt(i);
+        if (c < 128) {
+          bytes.push(c);
+        } else {
+          var b = unicodeMap[s.charAt(i)];
+          if (typeof b == 'number') {
+            if ( (b & 0xff) == b) {
+              // 1byte
+              bytes.push(b);
+            } else {
+              // 2bytes
+              bytes.push(b >>> 8);
+              bytes.push(b & 0xff);
+            }
+          } else {
+            bytes.push(unknownChar);
+          }
+        }
+      }
+      return bytes;
+    };
+  };
+
+  //---------------------------------------------------------------------
+  // QRMode
+  //---------------------------------------------------------------------
+
+  var QRMode = {
+    MODE_NUMBER :    1 << 0,
+    MODE_ALPHA_NUM : 1 << 1,
+    MODE_8BIT_BYTE : 1 << 2,
+    MODE_KANJI :     1 << 3
+  };
+
+  //---------------------------------------------------------------------
+  // QRErrorCorrectionLevel
+  //---------------------------------------------------------------------
+
+  var QRErrorCorrectionLevel = {
+    L : 1,
+    M : 0,
+    Q : 3,
+    H : 2
+  };
+
+  //---------------------------------------------------------------------
+  // QRMaskPattern
+  //---------------------------------------------------------------------
+
+  var QRMaskPattern = {
+    PATTERN000 : 0,
+    PATTERN001 : 1,
+    PATTERN010 : 2,
+    PATTERN011 : 3,
+    PATTERN100 : 4,
+    PATTERN101 : 5,
+    PATTERN110 : 6,
+    PATTERN111 : 7
+  };
+
+  //---------------------------------------------------------------------
+  // QRUtil
+  //---------------------------------------------------------------------
+
+  var QRUtil = function() {
+
+    var PATTERN_POSITION_TABLE = [
+      [],
+      [6, 18],
+      [6, 22],
+      [6, 26],
+      [6, 30],
+      [6, 34],
+      [6, 22, 38],
+      [6, 24, 42],
+      [6, 26, 46],
+      [6, 28, 50],
+      [6, 30, 54],
+      [6, 32, 58],
+      [6, 34, 62],
+      [6, 26, 46, 66],
+      [6, 26, 48, 70],
+      [6, 26, 50, 74],
+      [6, 30, 54, 78],
+      [6, 30, 56, 82],
+      [6, 30, 58, 86],
+      [6, 34, 62, 90],
+      [6, 28, 50, 72, 94],
+      [6, 26, 50, 74, 98],
+      [6, 30, 54, 78, 102],
+      [6, 28, 54, 80, 106],
+      [6, 32, 58, 84, 110],
+      [6, 30, 58, 86, 114],
+      [6, 34, 62, 90, 118],
+      [6, 26, 50, 74, 98, 122],
+      [6, 30, 54, 78, 102, 126],
+      [6, 26, 52, 78, 104, 130],
+      [6, 30, 56, 82, 108, 134],
+      [6, 34, 60, 86, 112, 138],
+      [6, 30, 58, 86, 114, 142],
+      [6, 34, 62, 90, 118, 146],
+      [6, 30, 54, 78, 102, 126, 150],
+      [6, 24, 50, 76, 102, 128, 154],
+      [6, 28, 54, 80, 106, 132, 158],
+      [6, 32, 58, 84, 110, 136, 162],
+      [6, 26, 54, 82, 110, 138, 166],
+      [6, 30, 58, 86, 114, 142, 170]
+    ];
+    var G15 = (1 << 10) | (1 << 8) | (1 << 5) | (1 << 4) | (1 << 2) | (1 << 1) | (1 << 0);
+    var G18 = (1 << 12) | (1 << 11) | (1 << 10) | (1 << 9) | (1 << 8) | (1 << 5) | (1 << 2) | (1 << 0);
+    var G15_MASK = (1 << 14) | (1 << 12) | (1 << 10) | (1 << 4) | (1 << 1);
+
+    var _this = {};
+
+    var getBCHDigit = function(data) {
+      var digit = 0;
+      while (data != 0) {
+        digit += 1;
+        data >>>= 1;
+      }
+      return digit;
+    };
+
+    _this.getBCHTypeInfo = function(data) {
+      var d = data << 10;
+      while (getBCHDigit(d) - getBCHDigit(G15) >= 0) {
+        d ^= (G15 << (getBCHDigit(d) - getBCHDigit(G15) ) );
+      }
+      return ( (data << 10) | d) ^ G15_MASK;
+    };
+
+    _this.getBCHTypeNumber = function(data) {
+      var d = data << 12;
+      while (getBCHDigit(d) - getBCHDigit(G18) >= 0) {
+        d ^= (G18 << (getBCHDigit(d) - getBCHDigit(G18) ) );
+      }
+      return (data << 12) | d;
+    };
+
+    _this.getPatternPosition = function(typeNumber) {
+      return PATTERN_POSITION_TABLE[typeNumber - 1];
+    };
+
+    _this.getMaskFunction = function(maskPattern) {
+
+      switch (maskPattern) {
+
+      case QRMaskPattern.PATTERN000 :
+        return function(i, j) { return (i + j) % 2 == 0; };
+      case QRMaskPattern.PATTERN001 :
+        return function(i, j) { return i % 2 == 0; };
+      case QRMaskPattern.PATTERN010 :
+        return function(i, j) { return j % 3 == 0; };
+      case QRMaskPattern.PATTERN011 :
+        return function(i, j) { return (i + j) % 3 == 0; };
+      case QRMaskPattern.PATTERN100 :
+        return function(i, j) { return (Math.floor(i / 2) + Math.floor(j / 3) ) % 2 == 0; };
+      case QRMaskPattern.PATTERN101 :
+        return function(i, j) { return (i * j) % 2 + (i * j) % 3 == 0; };
+      case QRMaskPattern.PATTERN110 :
+        return function(i, j) { return ( (i * j) % 2 + (i * j) % 3) % 2 == 0; };
+      case QRMaskPattern.PATTERN111 :
+        return function(i, j) { return ( (i * j) % 3 + (i + j) % 2) % 2 == 0; };
+
+      default :
+        throw 'bad maskPattern:' + maskPattern;
+      }
+    };
+
+    _this.getErrorCorrectPolynomial = function(errorCorrectLength) {
+      var a = qrPolynomial([1], 0);
+      for (var i = 0; i < errorCorrectLength; i += 1) {
+        a = a.multiply(qrPolynomial([1, QRMath.gexp(i)], 0) );
+      }
+      return a;
+    };
+
+    _this.getLengthInBits = function(mode, type) {
+
+      if (1 <= type && type < 10) {
+
+        // 1 - 9
+
+        switch(mode) {
+        case QRMode.MODE_NUMBER    : return 10;
+        case QRMode.MODE_ALPHA_NUM : return 9;
+        case QRMode.MODE_8BIT_BYTE : return 8;
+        case QRMode.MODE_KANJI     : return 8;
+        default :
+          throw 'mode:' + mode;
+        }
+
+      } else if (type < 27) {
+
+        // 10 - 26
+
+        switch(mode) {
+        case QRMode.MODE_NUMBER    : return 12;
+        case QRMode.MODE_ALPHA_NUM : return 11;
+        case QRMode.MODE_8BIT_BYTE : return 16;
+        case QRMode.MODE_KANJI     : return 10;
+        default :
+          throw 'mode:' + mode;
+        }
+
+      } else if (type < 41) {
+
+        // 27 - 40
+
+        switch(mode) {
+        case QRMode.MODE_NUMBER    : return 14;
+        case QRMode.MODE_ALPHA_NUM : return 13;
+        case QRMode.MODE_8BIT_BYTE : return 16;
+        case QRMode.MODE_KANJI     : return 12;
+        default :
+          throw 'mode:' + mode;
+        }
+
+      } else {
+        throw 'type:' + type;
+      }
+    };
+
+    _this.getLostPoint = function(qrcode) {
+
+      var moduleCount = qrcode.getModuleCount();
+
+      var lostPoint = 0;
+
+      // LEVEL1
+
+      for (var row = 0; row < moduleCount; row += 1) {
+        for (var col = 0; col < moduleCount; col += 1) {
+
+          var sameCount = 0;
+          var dark = qrcode.isDark(row, col);
+
+          for (var r = -1; r <= 1; r += 1) {
+
+            if (row + r < 0 || moduleCount <= row + r) {
+              continue;
+            }
+
+            for (var c = -1; c <= 1; c += 1) {
+
+              if (col + c < 0 || moduleCount <= col + c) {
+                continue;
+              }
+
+              if (r == 0 && c == 0) {
+                continue;
+              }
+
+              if (dark == qrcode.isDark(row + r, col + c) ) {
+                sameCount += 1;
+              }
+            }
+          }
+
+          if (sameCount > 5) {
+            lostPoint += (3 + sameCount - 5);
+          }
+        }
+      };
+
+      // LEVEL2
+
+      for (var row = 0; row < moduleCount - 1; row += 1) {
+        for (var col = 0; col < moduleCount - 1; col += 1) {
+          var count = 0;
+          if (qrcode.isDark(row, col) ) count += 1;
+          if (qrcode.isDark(row + 1, col) ) count += 1;
+          if (qrcode.isDark(row, col + 1) ) count += 1;
+          if (qrcode.isDark(row + 1, col + 1) ) count += 1;
+          if (count == 0 || count == 4) {
+            lostPoint += 3;
+          }
+        }
+      }
+
+      // LEVEL3
+
+      for (var row = 0; row < moduleCount; row += 1) {
+        for (var col = 0; col < moduleCount - 6; col += 1) {
+          if (qrcode.isDark(row, col)
+              && !qrcode.isDark(row, col + 1)
+              &&  qrcode.isDark(row, col + 2)
+              &&  qrcode.isDark(row, col + 3)
+              &&  qrcode.isDark(row, col + 4)
+              && !qrcode.isDark(row, col + 5)
+              &&  qrcode.isDark(row, col + 6) ) {
+            lostPoint += 40;
+          }
+        }
+      }
+
+      for (var col = 0; col < moduleCount; col += 1) {
+        for (var row = 0; row < moduleCount - 6; row += 1) {
+          if (qrcode.isDark(row, col)
+              && !qrcode.isDark(row + 1, col)
+              &&  qrcode.isDark(row + 2, col)
+              &&  qrcode.isDark(row + 3, col)
+              &&  qrcode.isDark(row + 4, col)
+              && !qrcode.isDark(row + 5, col)
+              &&  qrcode.isDark(row + 6, col) ) {
+            lostPoint += 40;
+          }
+        }
+      }
+
+      // LEVEL4
+
+      var darkCount = 0;
+
+      for (var col = 0; col < moduleCount; col += 1) {
+        for (var row = 0; row < moduleCount; row += 1) {
+          if (qrcode.isDark(row, col) ) {
+            darkCount += 1;
+          }
+        }
+      }
+
+      var ratio = Math.abs(100 * darkCount / moduleCount / moduleCount - 50) / 5;
+      lostPoint += ratio * 10;
+
+      return lostPoint;
+    };
+
+    return _this;
+  }();
+
+  //---------------------------------------------------------------------
+  // QRMath
+  //---------------------------------------------------------------------
+
+  var QRMath = function() {
+
+    var EXP_TABLE = new Array(256);
+    var LOG_TABLE = new Array(256);
+
+    // initialize tables
+    for (var i = 0; i < 8; i += 1) {
+      EXP_TABLE[i] = 1 << i;
+    }
+    for (var i = 8; i < 256; i += 1) {
+      EXP_TABLE[i] = EXP_TABLE[i - 4]
+        ^ EXP_TABLE[i - 5]
+        ^ EXP_TABLE[i - 6]
+        ^ EXP_TABLE[i - 8];
+    }
+    for (var i = 0; i < 255; i += 1) {
+      LOG_TABLE[EXP_TABLE[i] ] = i;
+    }
+
+    var _this = {};
+
+    _this.glog = function(n) {
+
+      if (n < 1) {
+        throw 'glog(' + n + ')';
+      }
+
+      return LOG_TABLE[n];
+    };
+
+    _this.gexp = function(n) {
+
+      while (n < 0) {
+        n += 255;
+      }
+
+      while (n >= 256) {
+        n -= 255;
+      }
+
+      return EXP_TABLE[n];
+    };
+
+    return _this;
+  }();
+
+  //---------------------------------------------------------------------
+  // qrPolynomial
+  //---------------------------------------------------------------------
+
+  function qrPolynomial(num, shift) {
+
+    if (typeof num.length == 'undefined') {
+      throw num.length + '/' + shift;
+    }
+
+    var _num = function() {
+      var offset = 0;
+      while (offset < num.length && num[offset] == 0) {
+        offset += 1;
+      }
+      var _num = new Array(num.length - offset + shift);
+      for (var i = 0; i < num.length - offset; i += 1) {
+        _num[i] = num[i + offset];
+      }
+      return _num;
+    }();
+
+    var _this = {};
+
+    _this.getAt = function(index) {
+      return _num[index];
+    };
+
+    _this.getLength = function() {
+      return _num.length;
+    };
+
+    _this.multiply = function(e) {
+
+      var num = new Array(_this.getLength() + e.getLength() - 1);
+
+      for (var i = 0; i < _this.getLength(); i += 1) {
+        for (var j = 0; j < e.getLength(); j += 1) {
+          num[i + j] ^= QRMath.gexp(QRMath.glog(_this.getAt(i) ) + QRMath.glog(e.getAt(j) ) );
+        }
+      }
+
+      return qrPolynomial(num, 0);
+    };
+
+    _this.mod = function(e) {
+
+      if (_this.getLength() - e.getLength() < 0) {
+        return _this;
+      }
+
+      var ratio = QRMath.glog(_this.getAt(0) ) - QRMath.glog(e.getAt(0) );
+
+      var num = new Array(_this.getLength() );
+      for (var i = 0; i < _this.getLength(); i += 1) {
+        num[i] = _this.getAt(i);
+      }
+
+      for (var i = 0; i < e.getLength(); i += 1) {
+        num[i] ^= QRMath.gexp(QRMath.glog(e.getAt(i) ) + ratio);
+      }
+
+      // recursive call
+      return qrPolynomial(num, 0).mod(e);
+    };
+
+    return _this;
+  };
+
+  //---------------------------------------------------------------------
+  // QRRSBlock
+  //---------------------------------------------------------------------
+
+  var QRRSBlock = function() {
+
+    var RS_BLOCK_TABLE = [
+
+      // L
+      // M
+      // Q
+      // H
+
+      // 1
+      [1, 26, 19],
+      [1, 26, 16],
+      [1, 26, 13],
+      [1, 26, 9],
+
+      // 2
+      [1, 44, 34],
+      [1, 44, 28],
+      [1, 44, 22],
+      [1, 44, 16],
+
+      // 3
+      [1, 70, 55],
+      [1, 70, 44],
+      [2, 35, 17],
+      [2, 35, 13],
+
+      // 4
+      [1, 100, 80],
+      [2, 50, 32],
+      [2, 50, 24],
+      [4, 25, 9],
+
+      // 5
+      [1, 134, 108],
+      [2, 67, 43],
+      [2, 33, 15, 2, 34, 16],
+      [2, 33, 11, 2, 34, 12],
+
+      // 6
+      [2, 86, 68],
+      [4, 43, 27],
+      [4, 43, 19],
+      [4, 43, 15],
+
+      // 7
+      [2, 98, 78],
+      [4, 49, 31],
+      [2, 32, 14, 4, 33, 15],
+      [4, 39, 13, 1, 40, 14],
+
+      // 8
+      [2, 121, 97],
+      [2, 60, 38, 2, 61, 39],
+      [4, 40, 18, 2, 41, 19],
+      [4, 40, 14, 2, 41, 15],
+
+      // 9
+      [2, 146, 116],
+      [3, 58, 36, 2, 59, 37],
+      [4, 36, 16, 4, 37, 17],
+      [4, 36, 12, 4, 37, 13],
+
+      // 10
+      [2, 86, 68, 2, 87, 69],
+      [4, 69, 43, 1, 70, 44],
+      [6, 43, 19, 2, 44, 20],
+      [6, 43, 15, 2, 44, 16],
+
+      // 11
+      [4, 101, 81],
+      [1, 80, 50, 4, 81, 51],
+      [4, 50, 22, 4, 51, 23],
+      [3, 36, 12, 8, 37, 13],
+
+      // 12
+      [2, 116, 92, 2, 117, 93],
+      [6, 58, 36, 2, 59, 37],
+      [4, 46, 20, 6, 47, 21],
+      [7, 42, 14, 4, 43, 15],
+
+      // 13
+      [4, 133, 107],
+      [8, 59, 37, 1, 60, 38],
+      [8, 44, 20, 4, 45, 21],
+      [12, 33, 11, 4, 34, 12],
+
+      // 14
+      [3, 145, 115, 1, 146, 116],
+      [4, 64, 40, 5, 65, 41],
+      [11, 36, 16, 5, 37, 17],
+      [11, 36, 12, 5, 37, 13],
+
+      // 15
+      [5, 109, 87, 1, 110, 88],
+      [5, 65, 41, 5, 66, 42],
+      [5, 54, 24, 7, 55, 25],
+      [11, 36, 12, 7, 37, 13],
+
+      // 16
+      [5, 122, 98, 1, 123, 99],
+      [7, 73, 45, 3, 74, 46],
+      [15, 43, 19, 2, 44, 20],
+      [3, 45, 15, 13, 46, 16],
+
+      // 17
+      [1, 135, 107, 5, 136, 108],
+      [10, 74, 46, 1, 75, 47],
+      [1, 50, 22, 15, 51, 23],
+      [2, 42, 14, 17, 43, 15],
+
+      // 18
+      [5, 150, 120, 1, 151, 121],
+      [9, 69, 43, 4, 70, 44],
+      [17, 50, 22, 1, 51, 23],
+      [2, 42, 14, 19, 43, 15],
+
+      // 19
+      [3, 141, 113, 4, 142, 114],
+      [3, 70, 44, 11, 71, 45],
+      [17, 47, 21, 4, 48, 22],
+      [9, 39, 13, 16, 40, 14],
+
+      // 20
+      [3, 135, 107, 5, 136, 108],
+      [3, 67, 41, 13, 68, 42],
+      [15, 54, 24, 5, 55, 25],
+      [15, 43, 15, 10, 44, 16],
+
+      // 21
+      [4, 144, 116, 4, 145, 117],
+      [17, 68, 42],
+      [17, 50, 22, 6, 51, 23],
+      [19, 46, 16, 6, 47, 17],
+
+      // 22
+      [2, 139, 111, 7, 140, 112],
+      [17, 74, 46],
+      [7, 54, 24, 16, 55, 25],
+      [34, 37, 13],
+
+      // 23
+      [4, 151, 121, 5, 152, 122],
+      [4, 75, 47, 14, 76, 48],
+      [11, 54, 24, 14, 55, 25],
+      [16, 45, 15, 14, 46, 16],
+
+      // 24
+      [6, 147, 117, 4, 148, 118],
+      [6, 73, 45, 14, 74, 46],
+      [11, 54, 24, 16, 55, 25],
+      [30, 46, 16, 2, 47, 17],
+
+      // 25
+      [8, 132, 106, 4, 133, 107],
+      [8, 75, 47, 13, 76, 48],
+      [7, 54, 24, 22, 55, 25],
+      [22, 45, 15, 13, 46, 16],
+
+      // 26
+      [10, 142, 114, 2, 143, 115],
+      [19, 74, 46, 4, 75, 47],
+      [28, 50, 22, 6, 51, 23],
+      [33, 46, 16, 4, 47, 17],
+
+      // 27
+      [8, 152, 122, 4, 153, 123],
+      [22, 73, 45, 3, 74, 46],
+      [8, 53, 23, 26, 54, 24],
+      [12, 45, 15, 28, 46, 16],
+
+      // 28
+      [3, 147, 117, 10, 148, 118],
+      [3, 73, 45, 23, 74, 46],
+      [4, 54, 24, 31, 55, 25],
+      [11, 45, 15, 31, 46, 16],
+
+      // 29
+      [7, 146, 116, 7, 147, 117],
+      [21, 73, 45, 7, 74, 46],
+      [1, 53, 23, 37, 54, 24],
+      [19, 45, 15, 26, 46, 16],
+
+      // 30
+      [5, 145, 115, 10, 146, 116],
+      [19, 75, 47, 10, 76, 48],
+      [15, 54, 24, 25, 55, 25],
+      [23, 45, 15, 25, 46, 16],
+
+      // 31
+      [13, 145, 115, 3, 146, 116],
+      [2, 74, 46, 29, 75, 47],
+      [42, 54, 24, 1, 55, 25],
+      [23, 45, 15, 28, 46, 16],
+
+      // 32
+      [17, 145, 115],
+      [10, 74, 46, 23, 75, 47],
+      [10, 54, 24, 35, 55, 25],
+      [19, 45, 15, 35, 46, 16],
+
+      // 33
+      [17, 145, 115, 1, 146, 116],
+      [14, 74, 46, 21, 75, 47],
+      [29, 54, 24, 19, 55, 25],
+      [11, 45, 15, 46, 46, 16],
+
+      // 34
+      [13, 145, 115, 6, 146, 116],
+      [14, 74, 46, 23, 75, 47],
+      [44, 54, 24, 7, 55, 25],
+      [59, 46, 16, 1, 47, 17],
+
+      // 35
+      [12, 151, 121, 7, 152, 122],
+      [12, 75, 47, 26, 76, 48],
+      [39, 54, 24, 14, 55, 25],
+      [22, 45, 15, 41, 46, 16],
+
+      // 36
+      [6, 151, 121, 14, 152, 122],
+      [6, 75, 47, 34, 76, 48],
+      [46, 54, 24, 10, 55, 25],
+      [2, 45, 15, 64, 46, 16],
+
+      // 37
+      [17, 152, 122, 4, 153, 123],
+      [29, 74, 46, 14, 75, 47],
+      [49, 54, 24, 10, 55, 25],
+      [24, 45, 15, 46, 46, 16],
+
+      // 38
+      [4, 152, 122, 18, 153, 123],
+      [13, 74, 46, 32, 75, 47],
+      [48, 54, 24, 14, 55, 25],
+      [42, 45, 15, 32, 46, 16],
+
+      // 39
+      [20, 147, 117, 4, 148, 118],
+      [40, 75, 47, 7, 76, 48],
+      [43, 54, 24, 22, 55, 25],
+      [10, 45, 15, 67, 46, 16],
+
+      // 40
+      [19, 148, 118, 6, 149, 119],
+      [18, 75, 47, 31, 76, 48],
+      [34, 54, 24, 34, 55, 25],
+      [20, 45, 15, 61, 46, 16]
+    ];
+
+    var qrRSBlock = function(totalCount, dataCount) {
+      var _this = {};
+      _this.totalCount = totalCount;
+      _this.dataCount = dataCount;
+      return _this;
+    };
+
+    var _this = {};
+
+    var getRsBlockTable = function(typeNumber, errorCorrectionLevel) {
+
+      switch(errorCorrectionLevel) {
+      case QRErrorCorrectionLevel.L :
+        return RS_BLOCK_TABLE[(typeNumber - 1) * 4 + 0];
+      case QRErrorCorrectionLevel.M :
+        return RS_BLOCK_TABLE[(typeNumber - 1) * 4 + 1];
+      case QRErrorCorrectionLevel.Q :
+        return RS_BLOCK_TABLE[(typeNumber - 1) * 4 + 2];
+      case QRErrorCorrectionLevel.H :
+        return RS_BLOCK_TABLE[(typeNumber - 1) * 4 + 3];
+      default :
+        return undefined;
+      }
+    };
+
+    _this.getRSBlocks = function(typeNumber, errorCorrectionLevel) {
+
+      var rsBlock = getRsBlockTable(typeNumber, errorCorrectionLevel);
+
+      if (typeof rsBlock == 'undefined') {
+        throw 'bad rs block @ typeNumber:' + typeNumber +
+            '/errorCorrectionLevel:' + errorCorrectionLevel;
+      }
+
+      var length = rsBlock.length / 3;
+
+      var list = [];
+
+      for (var i = 0; i < length; i += 1) {
+
+        var count = rsBlock[i * 3 + 0];
+        var totalCount = rsBlock[i * 3 + 1];
+        var dataCount = rsBlock[i * 3 + 2];
+
+        for (var j = 0; j < count; j += 1) {
+          list.push(qrRSBlock(totalCount, dataCount) );
+        }
+      }
+
+      return list;
+    };
+
+    return _this;
+  }();
+
+  //---------------------------------------------------------------------
+  // qrBitBuffer
+  //---------------------------------------------------------------------
+
+  var qrBitBuffer = function() {
+
+    var _buffer = [];
+    var _length = 0;
+
+    var _this = {};
+
+    _this.getBuffer = function() {
+      return _buffer;
+    };
+
+    _this.getAt = function(index) {
+      var bufIndex = Math.floor(index / 8);
+      return ( (_buffer[bufIndex] >>> (7 - index % 8) ) & 1) == 1;
+    };
+
+    _this.put = function(num, length) {
+      for (var i = 0; i < length; i += 1) {
+        _this.putBit( ( (num >>> (length - i - 1) ) & 1) == 1);
+      }
+    };
+
+    _this.getLengthInBits = function() {
+      return _length;
+    };
+
+    _this.putBit = function(bit) {
+
+      var bufIndex = Math.floor(_length / 8);
+      if (_buffer.length <= bufIndex) {
+        _buffer.push(0);
+      }
+
+      if (bit) {
+        _buffer[bufIndex] |= (0x80 >>> (_length % 8) );
+      }
+
+      _length += 1;
+    };
+
+    return _this;
+  };
+
+  //---------------------------------------------------------------------
+  // qrNumber
+  //---------------------------------------------------------------------
+
+  var qrNumber = function(data) {
+
+    var _mode = QRMode.MODE_NUMBER;
+    var _data = data;
+
+    var _this = {};
+
+    _this.getMode = function() {
+      return _mode;
+    };
+
+    _this.getLength = function(buffer) {
+      return _data.length;
+    };
+
+    _this.write = function(buffer) {
+
+      var data = _data;
+
+      var i = 0;
+
+      while (i + 2 < data.length) {
+        buffer.put(strToNum(data.substring(i, i + 3) ), 10);
+        i += 3;
+      }
+
+      if (i < data.length) {
+        if (data.length - i == 1) {
+          buffer.put(strToNum(data.substring(i, i + 1) ), 4);
+        } else if (data.length - i == 2) {
+          buffer.put(strToNum(data.substring(i, i + 2) ), 7);
+        }
+      }
+    };
+
+    var strToNum = function(s) {
+      var num = 0;
+      for (var i = 0; i < s.length; i += 1) {
+        num = num * 10 + chatToNum(s.charAt(i) );
+      }
+      return num;
+    };
+
+    var chatToNum = function(c) {
+      if ('0' <= c && c <= '9') {
+        return c.charCodeAt(0) - '0'.charCodeAt(0);
+      }
+      throw 'illegal char :' + c;
+    };
+
+    return _this;
+  };
+
+  //---------------------------------------------------------------------
+  // qrAlphaNum
+  //---------------------------------------------------------------------
+
+  var qrAlphaNum = function(data) {
+
+    var _mode = QRMode.MODE_ALPHA_NUM;
+    var _data = data;
+
+    var _this = {};
+
+    _this.getMode = function() {
+      return _mode;
+    };
+
+    _this.getLength = function(buffer) {
+      return _data.length;
+    };
+
+    _this.write = function(buffer) {
+
+      var s = _data;
+
+      var i = 0;
+
+      while (i + 1 < s.length) {
+        buffer.put(
+          getCode(s.charAt(i) ) * 45 +
+          getCode(s.charAt(i + 1) ), 11);
+        i += 2;
+      }
+
+      if (i < s.length) {
+        buffer.put(getCode(s.charAt(i) ), 6);
+      }
+    };
+
+    var getCode = function(c) {
+
+      if ('0' <= c && c <= '9') {
+        return c.charCodeAt(0) - '0'.charCodeAt(0);
+      } else if ('A' <= c && c <= 'Z') {
+        return c.charCodeAt(0) - 'A'.charCodeAt(0) + 10;
+      } else {
+        switch (c) {
+        case ' ' : return 36;
+        case '$' : return 37;
+        case '%' : return 38;
+        case '*' : return 39;
+        case '+' : return 40;
+        case '-' : return 41;
+        case '.' : return 42;
+        case '/' : return 43;
+        case ':' : return 44;
+        default :
+          throw 'illegal char :' + c;
+        }
+      }
+    };
+
+    return _this;
+  };
+
+  //---------------------------------------------------------------------
+  // qr8BitByte
+  //---------------------------------------------------------------------
+
+  var qr8BitByte = function(data) {
+
+    var _mode = QRMode.MODE_8BIT_BYTE;
+    var _data = data;
+    var _bytes = qrcode.stringToBytes(data);
+
+    var _this = {};
+
+    _this.getMode = function() {
+      return _mode;
+    };
+
+    _this.getLength = function(buffer) {
+      return _bytes.length;
+    };
+
+    _this.write = function(buffer) {
+      for (var i = 0; i < _bytes.length; i += 1) {
+        buffer.put(_bytes[i], 8);
+      }
+    };
+
+    return _this;
+  };
+
+  //---------------------------------------------------------------------
+  // qrKanji
+  //---------------------------------------------------------------------
+
+  var qrKanji = function(data) {
+
+    var _mode = QRMode.MODE_KANJI;
+    var _data = data;
+
+    var stringToBytes = qrcode.stringToBytesFuncs['SJIS'];
+    if (!stringToBytes) {
+      throw 'sjis not supported.';
+    }
+    !function(c, code) {
+      // self test for sjis support.
+      var test = stringToBytes(c);
+      if (test.length != 2 || ( (test[0] << 8) | test[1]) != code) {
+        throw 'sjis not supported.';
+      }
+    }('\u53cb', 0x9746);
+
+    var _bytes = stringToBytes(data);
+
+    var _this = {};
+
+    _this.getMode = function() {
+      return _mode;
+    };
+
+    _this.getLength = function(buffer) {
+      return ~~(_bytes.length / 2);
+    };
+
+    _this.write = function(buffer) {
+
+      var data = _bytes;
+
+      var i = 0;
+
+      while (i + 1 < data.length) {
+
+        var c = ( (0xff & data[i]) << 8) | (0xff & data[i + 1]);
+
+        if (0x8140 <= c && c <= 0x9FFC) {
+          c -= 0x8140;
+        } else if (0xE040 <= c && c <= 0xEBBF) {
+          c -= 0xC140;
+        } else {
+          throw 'illegal char at ' + (i + 1) + '/' + c;
+        }
+
+        c = ( (c >>> 8) & 0xff) * 0xC0 + (c & 0xff);
+
+        buffer.put(c, 13);
+
+        i += 2;
+      }
+
+      if (i < data.length) {
+        throw 'illegal char at ' + (i + 1);
+      }
+    };
+
+    return _this;
+  };
+
+  //=====================================================================
+  // GIF Support etc.
+  //
+
+  //---------------------------------------------------------------------
+  // byteArrayOutputStream
+  //---------------------------------------------------------------------
+
+  var byteArrayOutputStream = function() {
+
+    var _bytes = [];
+
+    var _this = {};
+
+    _this.writeByte = function(b) {
+      _bytes.push(b & 0xff);
+    };
+
+    _this.writeShort = function(i) {
+      _this.writeByte(i);
+      _this.writeByte(i >>> 8);
+    };
+
+    _this.writeBytes = function(b, off, len) {
+      off = off || 0;
+      len = len || b.length;
+      for (var i = 0; i < len; i += 1) {
+        _this.writeByte(b[i + off]);
+      }
+    };
+
+    _this.writeString = function(s) {
+      for (var i = 0; i < s.length; i += 1) {
+        _this.writeByte(s.charCodeAt(i) );
+      }
+    };
+
+    _this.toByteArray = function() {
+      return _bytes;
+    };
+
+    _this.toString = function() {
+      var s = '';
+      s += '[';
+      for (var i = 0; i < _bytes.length; i += 1) {
+        if (i > 0) {
+          s += ',';
+        }
+        s += _bytes[i];
+      }
+      s += ']';
+      return s;
+    };
+
+    return _this;
+  };
+
+  //---------------------------------------------------------------------
+  // base64EncodeOutputStream
+  //---------------------------------------------------------------------
+
+  var base64EncodeOutputStream = function() {
+
+    var _buffer = 0;
+    var _buflen = 0;
+    var _length = 0;
+    var _base64 = '';
+
+    var _this = {};
+
+    var writeEncoded = function(b) {
+      _base64 += String.fromCharCode(encode(b & 0x3f) );
+    };
+
+    var encode = function(n) {
+      if (n < 0) {
+        // error.
+      } else if (n < 26) {
+        return 0x41 + n;
+      } else if (n < 52) {
+        return 0x61 + (n - 26);
+      } else if (n < 62) {
+        return 0x30 + (n - 52);
+      } else if (n == 62) {
+        return 0x2b;
+      } else if (n == 63) {
+        return 0x2f;
+      }
+      throw 'n:' + n;
+    };
+
+    _this.writeByte = function(n) {
+
+      _buffer = (_buffer << 8) | (n & 0xff);
+      _buflen += 8;
+      _length += 1;
+
+      while (_buflen >= 6) {
+        writeEncoded(_buffer >>> (_buflen - 6) );
+        _buflen -= 6;
+      }
+    };
+
+    _this.flush = function() {
+
+      if (_buflen > 0) {
+        writeEncoded(_buffer << (6 - _buflen) );
+        _buffer = 0;
+        _buflen = 0;
+      }
+
+      if (_length % 3 != 0) {
+        // padding
+        var padlen = 3 - _length % 3;
+        for (var i = 0; i < padlen; i += 1) {
+          _base64 += '=';
+        }
+      }
+    };
+
+    _this.toString = function() {
+      return _base64;
+    };
+
+    return _this;
+  };
+
+  //---------------------------------------------------------------------
+  // base64DecodeInputStream
+  //---------------------------------------------------------------------
+
+  var base64DecodeInputStream = function(str) {
+
+    var _str = str;
+    var _pos = 0;
+    var _buffer = 0;
+    var _buflen = 0;
+
+    var _this = {};
+
+    _this.read = function() {
+
+      while (_buflen < 8) {
+
+        if (_pos >= _str.length) {
+          if (_buflen == 0) {
+            return -1;
+          }
+          throw 'unexpected end of file./' + _buflen;
+        }
+
+        var c = _str.charAt(_pos);
+        _pos += 1;
+
+        if (c == '=') {
+          _buflen = 0;
+          return -1;
+        } else if (c.match(/^\s$/) ) {
+          // ignore if whitespace.
+          continue;
+        }
+
+        _buffer = (_buffer << 6) | decode(c.charCodeAt(0) );
+        _buflen += 6;
+      }
+
+      var n = (_buffer >>> (_buflen - 8) ) & 0xff;
+      _buflen -= 8;
+      return n;
+    };
+
+    var decode = function(c) {
+      if (0x41 <= c && c <= 0x5a) {
+        return c - 0x41;
+      } else if (0x61 <= c && c <= 0x7a) {
+        return c - 0x61 + 26;
+      } else if (0x30 <= c && c <= 0x39) {
+        return c - 0x30 + 52;
+      } else if (c == 0x2b) {
+        return 62;
+      } else if (c == 0x2f) {
+        return 63;
+      } else {
+        throw 'c:' + c;
+      }
+    };
+
+    return _this;
+  };
+
+  //---------------------------------------------------------------------
+  // gifImage (B/W)
+  //---------------------------------------------------------------------
+
+  var gifImage = function(width, height) {
+
+    var _width = width;
+    var _height = height;
+    var _data = new Array(width * height);
+
+    var _this = {};
+
+    _this.setPixel = function(x, y, pixel) {
+      _data[y * _width + x] = pixel;
+    };
+
+    _this.write = function(out) {
+
+      //---------------------------------
+      // GIF Signature
+
+      out.writeString('GIF87a');
+
+      //---------------------------------
+      // Screen Descriptor
+
+      out.writeShort(_width);
+      out.writeShort(_height);
+
+      out.writeByte(0x80); // 2bit
+      out.writeByte(0);
+      out.writeByte(0);
+
+      //---------------------------------
+      // Global Color Map
+
+      // black
+      out.writeByte(0x00);
+      out.writeByte(0x00);
+      out.writeByte(0x00);
+
+      // white
+      out.writeByte(0xff);
+      out.writeByte(0xff);
+      out.writeByte(0xff);
+
+      //---------------------------------
+      // Image Descriptor
+
+      out.writeString(',');
+      out.writeShort(0);
+      out.writeShort(0);
+      out.writeShort(_width);
+      out.writeShort(_height);
+      out.writeByte(0);
+
+      //---------------------------------
+      // Local Color Map
+
+      //---------------------------------
+      // Raster Data
+
+      var lzwMinCodeSize = 2;
+      var raster = getLZWRaster(lzwMinCodeSize);
+
+      out.writeByte(lzwMinCodeSize);
+
+      var offset = 0;
+
+      while (raster.length - offset > 255) {
+        out.writeByte(255);
+        out.writeBytes(raster, offset, 255);
+        offset += 255;
+      }
+
+      out.writeByte(raster.length - offset);
+      out.writeBytes(raster, offset, raster.length - offset);
+      out.writeByte(0x00);
+
+      //---------------------------------
+      // GIF Terminator
+      out.writeString(';');
+    };
+
+    var bitOutputStream = function(out) {
+
+      var _out = out;
+      var _bitLength = 0;
+      var _bitBuffer = 0;
+
+      var _this = {};
+
+      _this.write = function(data, length) {
+
+        if ( (data >>> length) != 0) {
+          throw 'length over';
+        }
+
+        while (_bitLength + length >= 8) {
+          _out.writeByte(0xff & ( (data << _bitLength) | _bitBuffer) );
+          length -= (8 - _bitLength);
+          data >>>= (8 - _bitLength);
+          _bitBuffer = 0;
+          _bitLength = 0;
+        }
+
+        _bitBuffer = (data << _bitLength) | _bitBuffer;
+        _bitLength = _bitLength + length;
+      };
+
+      _this.flush = function() {
+        if (_bitLength > 0) {
+          _out.writeByte(_bitBuffer);
+        }
+      };
+
+      return _this;
+    };
+
+    var getLZWRaster = function(lzwMinCodeSize) {
+
+      var clearCode = 1 << lzwMinCodeSize;
+      var endCode = (1 << lzwMinCodeSize) + 1;
+      var bitLength = lzwMinCodeSize + 1;
+
+      // Setup LZWTable
+      var table = lzwTable();
+
+      for (var i = 0; i < clearCode; i += 1) {
+        table.add(String.fromCharCode(i) );
+      }
+      table.add(String.fromCharCode(clearCode) );
+      table.add(String.fromCharCode(endCode) );
+
+      var byteOut = byteArrayOutputStream();
+      var bitOut = bitOutputStream(byteOut);
+
+      // clear code
+      bitOut.write(clearCode, bitLength);
+
+      var dataIndex = 0;
+
+      var s = String.fromCharCode(_data[dataIndex]);
+      dataIndex += 1;
+
+      while (dataIndex < _data.length) {
+
+        var c = String.fromCharCode(_data[dataIndex]);
+        dataIndex += 1;
+
+        if (table.contains(s + c) ) {
+
+          s = s + c;
+
+        } else {
+
+          bitOut.write(table.indexOf(s), bitLength);
+
+          if (table.size() < 0xfff) {
+
+            if (table.size() == (1 << bitLength) ) {
+              bitLength += 1;
+            }
+
+            table.add(s + c);
+          }
+
+          s = c;
+        }
+      }
+
+      bitOut.write(table.indexOf(s), bitLength);
+
+      // end code
+      bitOut.write(endCode, bitLength);
+
+      bitOut.flush();
+
+      return byteOut.toByteArray();
+    };
+
+    var lzwTable = function() {
+
+      var _map = {};
+      var _size = 0;
+
+      var _this = {};
+
+      _this.add = function(key) {
+        if (_this.contains(key) ) {
+          throw 'dup key:' + key;
+        }
+        _map[key] = _size;
+        _size += 1;
+      };
+
+      _this.size = function() {
+        return _size;
+      };
+
+      _this.indexOf = function(key) {
+        return _map[key];
+      };
+
+      _this.contains = function(key) {
+        return typeof _map[key] != 'undefined';
+      };
+
+      return _this;
+    };
+
+    return _this;
+  };
+
+  var createDataURL = function(width, height, getPixel) {
+    var gif = gifImage(width, height);
+    for (var y = 0; y < height; y += 1) {
+      for (var x = 0; x < width; x += 1) {
+        gif.setPixel(x, y, getPixel(x, y) );
+      }
+    }
+
+    var b = byteArrayOutputStream();
+    gif.write(b);
+
+    var base64 = base64EncodeOutputStream();
+    var bytes = b.toByteArray();
+    for (var i = 0; i < bytes.length; i += 1) {
+      base64.writeByte(bytes[i]);
+    }
+    base64.flush();
+
+    return 'data:image/gif;base64,' + base64;
+  };
+
+  //---------------------------------------------------------------------
+  // returns qrcode function.
+
+  return qrcode;
+}();
+
+// multibyte support
+!function() {
+
+  qrcode.stringToBytesFuncs['UTF-8'] = function(s) {
+    // http://stackoverflow.com/questions/18729405/how-to-convert-utf8-string-to-byte-array
+    function toUTF8Array(str) {
+      var utf8 = [];
+      for (var i=0; i < str.length; i++) {
+        var charcode = str.charCodeAt(i);
+        if (charcode < 0x80) utf8.push(charcode);
+        else if (charcode < 0x800) {
+          utf8.push(0xc0 | (charcode >> 6),
+              0x80 | (charcode & 0x3f));
+        }
+        else if (charcode < 0xd800 || charcode >= 0xe000) {
+          utf8.push(0xe0 | (charcode >> 12),
+              0x80 | ((charcode>>6) & 0x3f),
+              0x80 | (charcode & 0x3f));
+        }
+        // surrogate pair
+        else {
+          i++;
+          // UTF-16 encodes 0x10000-0x10FFFF by
+          // subtracting 0x10000 and splitting the
+          // 20 bits of 0x0-0xFFFFF into two halves
+          charcode = 0x10000 + (((charcode & 0x3ff)<<10)
+            | (str.charCodeAt(i) & 0x3ff));
+          utf8.push(0xf0 | (charcode >>18),
+              0x80 | ((charcode>>12) & 0x3f),
+              0x80 | ((charcode>>6) & 0x3f),
+              0x80 | (charcode & 0x3f));
+        }
+      }
+      return utf8;
+    }
+    return toUTF8Array(s);
+  };
+
+}();
+
+(function (factory) {
+  if (typeof define === 'function' && define.amd) {
+      define([], factory);
+  } else if (typeof exports === 'object') {
+      module.exports = factory();
+  }
+}(function () {
+    return qrcode;
+}));
+
+</script>
+<script>
+"use strict";
+/* ============================================================ GAME CONTENT */
+const CO="Northwest Team Supply";
+const GP=0.40,FEE=500,CFEE=250,AWARD=500,HUDDLE_SECS=120;
+const BK=[
+ {id:"nyd",name:"Not yet due",short:"Not yet due",pct:.01,lo:0,hi:0},
+ {id:"b1",name:"1 to 30 days past due",short:"1 to 30",pct:.03,lo:1,hi:30},
+ {id:"b2",name:"31 to 60 days past due",short:"31 to 60",pct:.07,lo:31,hi:60},
+ {id:"b3",name:"61 to 90 days past due",short:"61 to 90",pct:.40,lo:61,hi:90},
+ {id:"b4",name:"Over 90 days past due",short:"Over 90",pct:.60,lo:91,hi:1e9}
+];
+const bucketOf=d=>BK.find(b=>d>=b.lo&&d<=b.hi);
+// end: "paid" (collected before Dec 31) or days past due at Dec 31 (0 = not yet due)
+// y2 (Year 1 customers only): what happens in Year 2. paid | wo (written off) | rec (written off, then paid)
+const CUST=[
+ {id:"maple",b:"A",name:"Maple Grove Park District",what:"Youth league uniforms for the spring season",amt:9000,
+  facts:[["In business","Local government, since 1958"],["Credit rating","A"],["Pays suppliers in","25 days on average"]],
+  note:"The park board approved this purchase at its last meeting.",end:"paid",y2:null},
+ {id:"swim",b:"A",name:"Northwest Swim Club",what:"Team suits and warm-ups",amt:6000,
+  facts:[["In business","8 years"],["Credit rating","B"],["Pays suppliers in","35 days on average"]],
+  note:"Other suppliers say: usually a little late, never missed a payment.",end:18,y2:"paid"},
+ {id:"kicks",b:"A",name:"Fresh Kicks Pop-Up",what:"Limited-edition sneakers for the holiday rush",amt:12000,
+  facts:[["In business","4 months"],["Credit rating","None yet (too new)"],["Pays suppliers in","No history"]],
+  note:"Owner: \"We sold out our first shipment in one weekend. This order will pay for itself. Can we pay after the holidays?\"",end:74,y2:"wo"},
+ {id:"elevate",b:"A",name:"Elevate Volleyball Club",what:"Tournament jerseys",amt:4500,
+  facts:[["In business","12 years"],["Credit rating","A"],["Pays suppliers in","20 days on average"]],
+  note:"Has bought from other suppliers for years. Always on time. Order ships in mid-December.",end:0,y2:"paid"},
+ {id:"hills",b:"A",name:"Rolling Hills Fitness",what:"Weights and mats for a new studio room",amt:8000,
+  facts:[["In business","3 years"],["Credit rating","C"],["Pays suppliers in","60+ days on average"]],
+  note:"Two suppliers report late payments. Membership is down 30% this year.",end:104,y2:"wo"},
+ {id:"prairie",b:"A",name:"Prairie Tennis Academy",what:"Ball machines and court gear",amt:5000,
+  facts:[["In business","6 years"],["Credit rating","B−"],["Pays suppliers in","45 days on average"]],
+  note:"One payment was 90 days late last year, but it was paid in full.",end:46,y2:"rec"},
+ {id:"oaks",b:"A",name:"Twin Oaks Little League",what:"Bats, helmets and catcher's gear",amt:3000,
+  facts:[["In business","30 years (volunteer run)"],["Credit rating","None (small nonprofit)"],["Pays suppliers in","Paid its last supplier in full, on time"]],
+  note:"The league treasurer is a retired accountant.",end:"paid",y2:null},
+ {id:"max",b:"A",name:"Max's Bat & Glove Outlet",what:"Bats and gloves to resell",amt:7000,
+  facts:[["In business","2 years"],["Credit rating","C−"],["Pays suppliers in","75 days on average"]],
+  note:"A check to another supplier bounced in May. Max: \"Don't worry, the check is in the mail.\"",end:121,y2:"wo"},
+
+ {id:"maple2",b:"B",name:"Maple Grove Park District",what:"Summer camp shirts",amt:10000,
+  facts:[["In business","Local government, since 1958"],["Credit rating","A"],["Pays suppliers in","25 days on average"]],
+  note:"Paid every supplier in full last year. Order ships in mid-December.",end:0},
+ {id:"kicklab",b:"B",name:"Kick Lab",what:"Sneakers for a new online store",amt:10000,
+  facts:[["In business","2 months"],["Credit rating","None yet (too new)"],["Owner","Devin Reyes"]],
+  note:"Devin ran Fresh Kicks Pop-Up last year. \"New name, fresh start. This time it's online.\"",end:97},
+ {id:"pickle",b:"B",name:"Windy City Pickleball Co.",what:"Paddles and nets for 3 new courts",amt:6000,
+  facts:[["In business","1 year"],["Credit rating","B"],["Pays suppliers in","30 days on average"]],
+  note:"Growing fast. Two suppliers give strong references.",end:12},
+ {id:"willow",b:"B",name:"Willow Creek Golf Club",what:"Pro shop apparel",amt:8000,
+  facts:[["In business","40 years"],["Credit rating","A"],["Pays suppliers in","20 days on average"]],
+  note:"The club was just sold. The new owners haven't set up their bill paying yet.",end:39},
+ {id:"river",b:"B",name:"Riverside Rec Center",what:"Gym equipment",amt:4000,
+  facts:[["In business","Village owned, since 1971"],["Credit rating","A"],["Pays suppliers in","15 days on average"]],
+  note:"Pays every invoice by direct deposit.",end:"paid"},
+ {id:"grid",b:"B",name:"Gridiron Gear Resale",what:"Used football gear to resell",amt:9000,
+  facts:[["In business","1 year"],["Credit rating","D"],["Pays suppliers in","90+ days on average"]],
+  note:"The owner's last store closed still owing money to two suppliers.",end:66}
+];
+const CU=Object.fromEntries(CUST.map(c=>[c.id,c]));
+const NEWS=[
+ {id:"kicks",cls:"",title:"Fresh Kicks shuts down",story:"The pop-up closes in February and the owner stops answering calls. Northwest writes off the $12,000 balance."},
+ {id:"hills",cls:"",title:"Rolling Hills Fitness closes",story:"The gym loses its lease in April and closes its doors. Northwest writes off the $8,000 balance."},
+ {id:"max",cls:"",title:"Max's goes bankrupt",story:"Max's files for bankruptcy in May. There's nothing left to collect. Northwest writes off the $7,000 balance."},
+ {id:"prairie",cls:"mix",title:"Prairie Tennis: written off, then paid",story:"Northwest gives up and writes off the $5,000 in March. In August the academy's new owner pays the full $5,000."},
+ {id:"rest",cls:"good",title:"Everyone else pays",story:"Northwest Swim Club and Elevate Volleyball pay their December balances in full in January."}
+];
+const CHECKS={
+ sale:{q:"Northwest ships $9,000 of uniforms to Maple Grove Park District on account. Which entry records the sale?",
+  opts:[["Accounts Receivable","Sales"],["Cash","Sales"],["Sales","Accounts Receivable"],["Accounts Receivable","Allowance for Doubtful Accounts"]],amt:"9,000",ans:0,
+  why:"Selling on account creates a receivable. Cash doesn't change until the customer pays."},
+ wo:{q:"Fresh Kicks shuts down. Northwest uses the allowance method and writes off the $12,000 balance. Which entry?",
+  opts:[["Allowance for Doubtful Accounts","Accounts Receivable"],["Bad Debts Expense","Accounts Receivable"],["Bad Debts Expense","Allowance for Doubtful Accounts"],["Accounts Receivable","Allowance for Doubtful Accounts"]],amt:"12,000",ans:0,
+  why:"The expense was already recorded last year with the estimate. The write-off just uses up the allowance. Debiting Bad Debts Expense here is the direct write-off method."},
+ nrv:{q:"Before the write-off: Accounts Receivable $42,500 and Allowance $14,375 (credit). After writing off $12,000, what is net realizable value (A/R minus allowance)?",
+  opts:["$28,125","$16,125","$40,125","$30,500"],ans:0,
+  why:"Before: 42,500 − 14,375 = 28,125. After: 30,500 − 2,375 = 28,125. A/R and the allowance both drop by $12,000, so the net amount stays the same."}
+};
+const HUDDLES={
+ h1:{title:"Why now?",prompt:"Not one of your customers has refused to pay yet. So why did you just record Bad Debts Expense this year, instead of waiting until a customer really doesn't pay?",
+  hint:"Talk it over, then type one answer for your team. Use the words matching and sales."},
+ h2:{title:"The owner is upset",prompt:"The owner sees the write-offs and says, \"That must have wrecked our profit this year!\" But net income didn't change at all. Explain to the owner why, in two or three sentences.",
+  hint:"Where did the expense for these customers show up? What did the write-off entry actually change?"},
+ h3:{title:"Write your credit policy",prompt:"Look back at Year 1. Which applicant fooled your team, or almost did? What clue should you weigh more from now on? Write one rule for your credit policy.",
+  hint:"Your rule will show on your iPad while you review the Year 2 applications."}
+};
+const ROUNDS=["Open for business","Year 1 closes","Year 2: the bad news","Year 2: new customers","Year 2 closes"];
+const STEPS=[
+ {k:"apps",r:1,b:"A",yr:1},
+ {k:"check",r:1,id:"sale",yr:1},
+ {k:"aging",r:2,b:"A",yr:1},
+ {k:"huddle",r:2,id:"h1",yr:1},
+ {k:"events",r:3,yr:2},
+ {k:"check",r:3,id:"wo",yr:2},
+ {k:"check",r:3,id:"nrv",yr:2},
+ {k:"huddle",r:3,id:"h2",yr:2},
+ {k:"huddle",r:4,id:"h3",yr:2},
+ {k:"apps",r:4,b:"B",yr:2},
+ {k:"aging",r:5,b:"B",yr:2}
+];
+const COLORS=["#C1102F","#1F5FAD","#1E7A3C","#9A6700","#6F3FA8","#0F7C80","#C2410C","#BE185D","#3F3F46","#4D7C0F"];
+
+/* ============================================================ HELPERS */
+const $=s=>document.querySelector(s);
+const app=$("#app");
+const money=n=>(n<0?"−$":"$")+Math.abs(Math.round(n)).toLocaleString("en-US");
+const plain=n=>Math.abs(Math.round(n)).toLocaleString("en-US");
+const signed=n=>(n>0?"+":n<0?"−":"±")+"$"+Math.abs(Math.round(n)).toLocaleString("en-US");
+const esc=s=>String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const ord=n=>n+(n%100>=11&&n%100<=13?"th":["th","st","nd","rd"][n%10]||"th");
+const sum=a=>a.reduce((t,x)=>t+x,0);
+const balTxt=v=>v===0?"$0":money(Math.abs(v))+(v>0?" credit":" debit");
+function num(s){if(s==null)return NaN;let t=String(s).trim().replace(/[$,\s]/g,"").replace(/[−–]/g,"-");if(/^\(.*\)$/.test(t))t="-"+t.slice(1,-1);if(!/^-?\d+(\.\d+)?$/.test(t))return NaN;return Math.round(+t)}
+function shuffle(arr){const a=arr.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function beep(f,d){try{const c=beep.c||(beep.c=new (window.AudioContext||window.webkitAudioContext)());const o=c.createOscillator(),g=c.createGain();o.frequency.value=f;g.gain.value=.06;o.connect(g);g.connect(c.destination);const t=c.currentTime;g.gain.exponentialRampToValueAtTime(.0001,t+d);o.start(t);o.stop(t+d)}catch(e){}}
+const ROLE=window.CD_ROLE||"team";
+const MOCK=/[?&]mock=1/.test(location.search);
+const jrn=(dr,cr,amt,h)=>`<span class="jrn">${h?`<span class="h">${esc(h)}</span>`:""}<span>${esc(dr)}</span><span class="d">${amt}</span><span></span><span class="ci">${esc(cr)}</span><span></span><span class="d">${amt}</span></span>`;
+const outcomeOf=c=>c.b==="A"?(c.end==="paid"?{t:"Paid in Year 1",cls:"g"}:c.y2==="paid"?{t:"Paid in Year 2",cls:"g"}:c.y2==="rec"?{t:"Written off, then paid",cls:"y"}:{t:"Written off",cls:"r"})
+  :(c.end==="paid"?{t:"Paid",cls:"g"}:c.end===0?{t:"Not yet due",cls:"g"}:{t:c.end+" days past due",cls:c.end>60?"r":"y"});
+
+/* ---------- backend (same database as the other live games) ---------- */
+function mockNet(){
+  const KEY="bankRecLiveMock",bc=("BroadcastChannel" in window)?new BroadcastChannel(KEY):null,subs=[];
+  const read=()=>{try{return JSON.parse(localStorage.getItem(KEY)||"{}")}catch(e){return{}}};
+  const write=t=>{localStorage.setItem(KEY,JSON.stringify(t));fire();if(bc)bc.postMessage(1)};
+  const at=(t,p)=>p.split("/").filter(Boolean).reduce((o,k)=>o==null?undefined:o[k],t);
+  const put=(t,p,v)=>{const ks=p.split("/").filter(Boolean);let o=t;ks.slice(0,-1).forEach(k=>{if(typeof o[k]!=="object"||o[k]===null)o[k]={};o=o[k]});if(v===null)delete o[ks[ks.length-1]];else o[ks[ks.length-1]]=v};
+  const fire=()=>{const t=read();subs.forEach(s=>{const v=JSON.stringify(at(t,s.p)??null);if(v!==s.last){s.last=v;s.cb(JSON.parse(v))}})};
+  if(bc)bc.onmessage=fire;window.addEventListener("storage",e=>{if(e.key===KEY)fire()});
+  return{
+    kind:"mock",
+    get:async p=>at(read(),p)??null,
+    set:async(p,v)=>{const t=read();put(t,p,v);write(t)},
+    update:async(p,o)=>{const t=read();Object.entries(o).forEach(([k,v])=>put(t,p+"/"+k,v));write(t)},
+    remove:async p=>{const t=read();put(t,p,null);write(t)},
+    on:(p,cb)=>{const s={p,cb,last:undefined};subs.push(s);setTimeout(fire,0);return()=>{const i=subs.indexOf(s);if(i>=0)subs.splice(i,1)}}
+  };
+}
+async function vercelNet(){
+  const call=async(op,path,v)=>{const r=await fetch("/api/live",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({op,path,v})});
+    const j=await r.json().catch(()=>({}));if(!r.ok)throw new Error(j.error||r.status);return j};
+  try{const p=await call("ping");if(!p.ok)return null}catch(e){return null}
+  return{kind:"vercel",
+    get:async p=>(await call("get",p)).v??null,
+    set:(p,v)=>call("set",p,v),
+    update:(p,o)=>call("update",p,o),
+    remove:p=>call("remove",p),
+    on:(p,cb)=>{let last,stop=false,t;
+      const tick=async()=>{if(stop)return;
+        if(!document.hidden){try{const v=(await call("get",p)).v??null,s=JSON.stringify(v);if(s!==last){last=s;cb(v)}}catch(e){}}
+        if(!stop)t=setTimeout(tick,1200)};
+      tick();return()=>{stop=true;clearTimeout(t)}}};
+}
+let NET=null;
+async function net(){if(NET)return NET;NET=MOCK?mockNet():await vercelNet();return NET}
+function needSetup(){app.innerHTML=`<div class="panel"><h2>${ROLE==="teacher"?"Class games need a one-time setup":"The game isn't open yet"}</h2><p>${ROLE==="teacher"?"Connect Upstash for Redis to this Vercel project (Storage tab), then redeploy.":"Wait for your teacher to start it, then reload this page."}</p><button class="btn main" id="b">Reload</button></div>`;$("#b").onclick=()=>location.reload()}
+
+/* ---------- fit to screen (projector) ---------- */
+function zoomApp(){if(ROLE!=="teacher")return;const a=app;a.style.zoom="";const R=document.documentElement;let lo=.55,hi=2.4;
+  for(let i=0;i<14;i++){const m=(lo+hi)/2;a.style.zoom=m.toFixed(3);(R.scrollHeight<=innerHeight+1&&R.scrollWidth<=innerWidth+1)?lo=m:hi=m}
+  a.style.zoom=lo.toFixed(3)}
+addEventListener("resize",()=>{clearTimeout(zoomApp.t);zoomApp.t=setTimeout(()=>{if(!document.body.classList.contains("finale-on"))zoomApp()},150)});
+
+/* ---------- timer (huddles) ---------- */
+let TIMER_END=0,TIMER_BEEPED=false;
+function timerText(){if(!TIMER_END)return "2:00";const s=Math.max(0,Math.ceil((TIMER_END-Date.now())/1000));return Math.floor(s/60)+":"+String(s%60).padStart(2,"0")}
+setInterval(()=>{const els=document.querySelectorAll("[data-timer]");if(!els.length)return;const t=timerText(),done=TIMER_END&&Date.now()>=TIMER_END;
+  els.forEach(e=>{e.textContent=t;e.classList.toggle("done",!!done)});
+  if(done&&!TIMER_BEEPED&&ROLE==="teacher"){TIMER_BEEPED=true;beep(880,.25);setTimeout(()=>beep(660,.35),280)}},250);
+
+/* ============================================================ THE BOOKS: one source of truth for every team */
+const approvedIds=(p,b)=>(p&&p["lock"+b])?CUST.filter(c=>c.b===b&&(p["apps"+b]||{})[c.id]===true).map(c=>c.id):[];
+function agingRows(p,b){return approvedIds(p,b).map(id=>CU[id]).filter(c=>c.end!=="paid").map(c=>{const bk=bucketOf(c.end);return{c,bk,est:Math.round(c.amt*bk.pct)}})}
+function books(p,through,awards){
+  const b={gp:0,bde:0,fees:0,bonus:0,sales:0,ar:0,allow:0,wo:0,rec:0,col:[],feeLog:[],ag:{},ev:null,allowLog:[]};
+  for(let j=0;j<=through&&j<STEPS.length;j++){const S=STEPS[j];
+    if(S.k==="apps"){const ids=approvedIds(p,S.b),amt=sum(ids.map(id=>CU[id].amt));b.sales+=amt;b.gp+=Math.round(amt*GP);b.ar+=amt;b["sales"+S.b]=amt}
+    else if(S.k==="check"){if(p["chk_"+S.id]!==CHECKS[S.id].ans){b.fees+=CFEE;b.feeLog.push({k:S.id,amt:CFEE})}}
+    else if(S.k==="aging"){
+      const paid=approvedIds(p,S.b).map(id=>CU[id]).filter(c=>c.end==="paid");paid.forEach(c=>b.ar-=c.amt);
+      const rows=agingRows(p,S.b),req=sum(rows.map(r=>r.est)),before=b.allow,adj=req-before;
+      b.allow=req;b.bde+=adj;b.allowLog.push({t:"Dec 31, Year "+S.yr+" adjusting entry",amt:adj});
+      const a=p["ag"+S.b]||{},okReq=num(a.req)===req,okAdj=num(a.adj)===adj,fee=(okReq?0:FEE)+(okAdj?0:FEE);
+      b.fees+=fee;if(fee)b.feeLog.push({k:"ag"+S.b,amt:fee});
+      b.ag[S.b]={req,adj,before,ar:b.ar,paid,rows,okReq,okAdj,fee,yourReq:a.req,yourAdj:a.adj,locked:!!p["lockag"+S.b]};
+    }
+    else if(S.k==="events"){const ev={paid:[],wo:[],rec:[]};
+      approvedIds(p,"A").map(id=>CU[id]).filter(c=>c.end!=="paid").forEach(c=>{
+        if(c.y2==="paid"){b.ar-=c.amt;ev.paid.push(c)}
+        else if(c.y2==="wo"){b.ar-=c.amt;b.allow-=c.amt;b.wo+=c.amt;ev.wo.push(c);b.allowLog.push({t:"Wrote off "+c.name,amt:-c.amt})}
+        else if(c.y2==="rec"){b.ar-=c.amt;b.wo+=c.amt;b.rec+=c.amt;ev.rec.push(c);b.allowLog.push({t:"Wrote off "+c.name,amt:-c.amt});b.allowLog.push({t:"Reinstated "+c.name,amt:c.amt})}});
+      b.ev=ev}
+    else if(S.k==="huddle"){if(awards&&(awards[S.id]||[]).includes(p.id))b.bonus+=AWARD}
+  }
+  b.ni=b.gp-b.bde-b.fees+b.bonus;b.nrv=b.ar-b.allow;return b;
+}
+function ranks(val){const ids=Object.keys(val).sort((a,b)=>val[b]-val[a]);const r={};let k=0,prev=null;ids.forEach((id,i)=>{if(val[id]!==prev){k=i+1;prev=val[id]}r[id]=k});return r}
+const isLocked=(S,p)=>S.k==="apps"?!!p["lock"+S.b]:S.k==="check"?p["chk_"+S.id]!=null:S.k==="aging"?!!p["lockag"+S.b]:S.k==="events"?p.pred!=null:S.k==="huddle"?!!String(p["hud_"+S.id]||"").trim():false;
+
+/* ============================================================ TEACHER (projector) */
+let H=null;
+function hdr(){return `<h1 class="title">The Credit <span>Desk.</span></h1>
+  <p class="lede">${ROLE==="teacher"?`Teacher screen. Each team joins on one iPad and runs the credit desk at ${CO}, a wholesaler that sells team gear to clubs, park districts and stores on account. Over two years they approve customers, estimate bad debts, live with the write-offs, and talk it through in three team huddles.`:`Your team runs the credit desk at ${CO}. Every sale on account earns profit, but customers who never pay cost you the whole sale. Approve the right customers, estimate your bad debts, and finish with the most net income.`}</p>`}
+async function hostSetup(){
+  const N=await net().catch(()=>null);if(!N)return needSetup();
+  app.innerHTML=`${hdr()}<div class="panel" style="margin-top:0"><h2>Start a game</h2>
+    <p>One iPad per team. Plan on about 50 minutes. The money board shows each team's <b>net income</b>.</p>
+    <ol><li><b>Open for business:</b> 8 credit applications, then a quick entry check.</li>
+    <li><b>Year 1 closes:</b> teams age their receivables and book the allowance. Huddle: why now?</li>
+    <li><b>The bad news:</b> write-offs and a recovery, two quick checks. Huddle: why didn't profit drop?</li>
+    <li><b>New customers:</b> huddle on a credit policy first, then 6 new applications.</li>
+    <li><b>Year 2 closes:</b> aging again, now with each team's own leftover allowance balance.</li></ol>
+    <p class="note">Scoring: gross profit is 40% of every sale they approve. Bad Debts Expense comes off. Each wrong aging answer costs a ${money(FEE)} audit fee and each wrong entry check costs ${money(CFEE)}. During huddles you can award ${money(AWARD)} bonuses to the best answers.</p>
+    <div class="err" id="er"></div><button class="btn main" id="go">Create game</button></div>`;
+  $("#go").onclick=async()=>{$("#go").disabled=true;
+    try{let code;for(let t=0;t<20;t++){code=String(Math.floor(1000+Math.random()*9000));if(!(await N.get("games/"+code)))break}
+      await N.set("games/"+code,{created:Date.now(),game:"creditdesk",seed:1,ids:[],state:{phase:"lobby"}});
+      H={N,code,players:{},state:{phase:"lobby"},awards:{},hideNames:false};
+      H.off=N.on("games/"+code+"/players",v=>{H.players=v||{};hostRender(true)});
+      hostRender()}catch(e){$("#er").textContent="Couldn't reach the game database.";$("#go").disabled=false}};
+}
+function teamsArr(){return Object.entries(H.players).map(([id,p])=>({id,...p})).filter(p=>p&&p.name).sort((a,b)=>(a.joined||0)-(b.joined||0))}
+const colorOf=(teams,id)=>COLORS[Math.max(0,teams.findIndex(t=>t.id===id))%COLORS.length];
+function curThrough(st){if(st.phase==="end")return STEPS.length-1;if(st.phase!=="play")return -1;return (st.sub==="reveal"||st.sub==="share")?st.i:st.i-1}
+function hostSet(st){H.state=st;H.N.set("games/"+H.code+"/state",st).catch(()=>{});hostRender()}
+function pushState(st){
+  const teams=teamsArr(),th=curThrough(st);st.awards=H.awards;
+  st.ni={};teams.forEach(p=>st.ni[p.id]=books(p,th,H.awards).ni);st.rank=ranks(st.ni);
+  st.names=Object.fromEntries(teams.map(t=>[t.id,t.name]));
+  if(st.timer){TIMER_END=st.timer}else{TIMER_END=0;TIMER_BEEPED=false}
+  hostSet(st)}
+function tileFor(S,p,teams,th,anim,i,mode){
+  const now=books(p,th,H.awards),prev=books(p,th-1,H.awards),d=now.ni-prev.ni,rk=H.rank[p.id];let cls="tile",st="";
+  if(mode==="lock"){const done=isLocked(S,p);cls+=done?" done":" wait";
+    st=done?("✓ "+(S.k==="apps"?`${approvedIds(p,S.b).length} approved`:S.k==="huddle"?"Answer in":S.k==="events"?"Prediction in":S.k==="check"?"Answered":"Locked in")):(S.k==="huddle"?"Talking…":"Deciding…")}
+  else if(S.k==="apps"){const n=approvedIds(p,S.b).length;cls+=n?" ok":"";st=`<span class="stamp">${signed(d)}</span>${n} approved`}
+  else if(S.k==="check"){const ok=p["chk_"+S.id]===CHECKS[S.id].ans;cls+=ok?" ok":" no";st=ok?`<span class="stamp">✓</span>Correct`:`<span class="stamp">−${money(CFEE)}</span>audit fee`}
+  else if(S.k==="aging"){const g=now.ag[S.b];const both=g.okReq&&g.okAdj;cls+=both?" ok":(g.okReq||g.okAdj)?" mid":" no";
+    st=`Expense ${money(g.adj)}<br>${both?`<span class="stamp">✓</span>Books right`:`<span class="stamp">−${money(g.fee)}</span>audit fee`}`}
+  else if(S.k==="events"){cls+=" mid";st=`<span class="stamp">${signed(d)}</span>net income change<br>Allowance ${balTxt(now.allow)}`}
+  return `<div class="${cls}${anim?" anim":""}" style="--c:${colorOf(teams,p.id)};--d:${i*70}ms"><div class="tn">${esc(p.name)}</div><span class="rk">${rk?ord(rk):""}</span>
+    <div class="lbl">Net income</div><div class="cash" data-to="${now.ni}" data-from="${anim&&mode!=="lock"?prev.ni:now.ni}">${money(anim&&mode!=="lock"?prev.ni:now.ni)}</div><div class="st">${st}</div></div>`}
+function boardHTML(S,teams,th,anim,mode){
+  const val={};teams.forEach(p=>val[p.id]=books(p,th,H.awards).ni);H.rank=ranks(val);
+  const order=[...teams].sort((a,b)=>val[b.id]-val[a.id]);
+  return `<div class="board">${order.map((p,i)=>tileFor(S,p,teams,th,anim,i,mode)).join("")}</div>`}
+function countUp(){const els=[...app.querySelectorAll(".cash[data-to]")].filter(e=>e.dataset.from!==e.dataset.to);if(!els.length)return;const t0=performance.now();
+  const f=now=>{const k=Math.min(1,(now-t0-350)/1000);if(k<0){requestAnimationFrame(f);return}const e=1-Math.pow(1-k,3);
+    els.forEach(el=>{const a=+el.dataset.from,b=+el.dataset.to;el.textContent=money(a+(b-a)*e)});if(k<1)requestAnimationFrame(f)};requestAnimationFrame(f)}
+function pctHTML(){return `<div class="pct">${BK.map(b=>`<div>${esc(b.short)}${b.id==="nyd"?"":" days"}<b>${Math.round(b.pct*100)}%</b></div>`).join("")}</div>`}
+function optHTML(c,k){const o=c.opts[k];return typeof o==="string"?`<span class="ent">${esc(o)}</span>`:`<span class="ent">${esc(o[0])} ${c.amt}<span class="c">${esc(o[1])} ${c.amt}</span></span>`}
+function hostRender(fromPoll){
+  const st=H.state,teams=teamsArr();
+  const key=st.phase+"|"+st.i+"|"+st.sub;
+  const lockScreen=st.phase==="lobby"||(st.phase==="play"&&(st.sub==="open"));
+  if(fromPoll&&!lockScreen)return;
+  const fresh=H.key!==key;H.key=key;
+  if(st.phase==="lobby"){
+    const url=location.origin+"/credit-desk?code="+H.code;if(!H.qr)H.qr=window.qrcode?qrSvg(url):"";
+    app.innerHTML=`<div class="lobby"><div class="lobtop"><div class="lobleft"><div class="join">One iPad per team. Scan the code, or go to <b>The Credit Desk</b> on the accounting site and enter</div>
+      <div class="code">${H.code}</div><div class="url">${esc(url.replace(/^https?:\/\//,""))}</div></div>${H.qr?`<div class="qr">${H.qr}<span>Scan to join</span></div>`:""}</div>
+      <div class="count">${teams.length} team${teams.length===1?"":"s"} joined</div>
+      <div class="names">${teams.map(t=>`<span style="--c:${colorOf(teams,t.id)}">${esc(t.name)}</span>`).join("")||'<span style="opacity:.5">Waiting for teams…</span>'}</div>
+      <button class="btn main" id="nx" ${teams.length>=1?"":"disabled"}>Open the credit desk →</button> <button class="btn" id="end">Cancel</button></div>`;
+    $("#nx").onclick=()=>goStep(0);$("#end").onclick=hostErase;requestAnimationFrame(zoomApp);return}
+  if(st.phase==="end"){if(fresh)finale(teams);return}
+  const S=STEPS[st.i],last=st.i===STEPS.length-1,open=st.sub==="open";
+  const n=teams.filter(p=>isLocked(S,p)).length;
+  const head=`<div class="rhead"><span class="rtag">Round ${S.r} of 5</span><span class="rname">${ROUNDS[S.r-1]}</span><span class="yr">Year ${S.yr}</span></div>`;
+  const next=()=>last?pushState({phase:"end"}):goStep(st.i+1);
+  const th=curThrough(st);
+  const warn=(verb)=>n<teams.length?confirm(`${teams.length-n} team(s) haven't ${verb}. Continue anyway?`):true;
+  if(S.k==="apps"){
+    const apps=CUST.filter(c=>c.b===S.b);
+    if(open){
+      app.innerHTML=`${head}<div class="scard"><div class="stitle">${S.b==="A"?"Credit applications":"New applications for Year 2"}</div>
+        <p class="story">${S.b==="A"?`${CO} sells on account, Net 30. Read each application with your team and approve or deny it. Every approved sale earns 40% gross profit. A customer who never pays costs you the whole sale.`:`Six new customers want credit. Check your team's credit policy on your iPad before you decide.`}</p>
+        <div class="applist">${apps.map(c=>`<div class="appchip"><b>${esc(c.name)}</b><span class="num">${money(c.amt)}</span></div>`).join("")}</div></div>
+        ${boardHTML(S,teams,th,false,"lock")}
+        <div class="bar2"><span class="count">${n} of ${teams.length} locked in</span><button class="btn main" id="nx">Reveal decisions</button></div>`;
+      $("#nx").onclick=()=>{if(!warn("locked in"))return;beep(660,.12);pushState({...st,sub:"reveal"})};
+      requestAnimationFrame(zoomApp);return}
+    const N=Math.max(1,teams.length);
+    app.innerHTML=`${head}<div class="stitle" style="margin:0">Who got credit?</div>
+      <div class="arows">${apps.map((c,i)=>{const k=teams.filter(p=>approvedIds(p,S.b).includes(c.id)).length;return `<div class="arow anim" style="--d:${i*90}ms"><b>${esc(c.name)}</b><span class="num">${money(c.amt)}</span><span class="b"><i style="width:${k/N*100}%"></i></span><span>${k} of ${teams.length} approved</span></div>`}).join("")}</div>
+      <div class="lesson"><b>Each approved sale:</b> ${jrn("Accounts Receivable","Sales","9,000","Example: Maple Grove")} Gross profit is booked now. Whether they pay, nobody knows yet.</div>
+      ${boardHTML(S,teams,th,fresh)}
+      <div class="bar2"><span></span><button class="btn main" id="nx">Next →</button></div>`;
+    $("#nx").onclick=next;if(fresh)countUp();requestAnimationFrame(zoomApp);return}
+  if(S.k==="check"){
+    const c=CHECKS[S.id],tally=c.opts.map((_,k)=>teams.filter(p=>p["chk_"+S.id]===k).length);
+    app.innerHTML=`${head}<div class="scard"><div class="stitle">Entry check</div><p class="story">${esc(c.q)}</p>
+      ${open?"":`<div class="lesson"><b>Answer ${"ABCD"[c.ans]}.</b> ${esc(c.why)}</div>`}</div>
+      <div class="opts">${c.opts.map((o,k)=>`<div class="opt ${open?"":k===c.ans?"right":tally[k]?"wrong":""}"><span class="sh">${"ABCD"[k]}</span>${optHTML(c,k)}${open?"":`<span class="tally">${tally[k]}</span>`}</div>`).join("")}</div>
+      ${boardHTML(S,teams,th,!open&&fresh,open?"lock":null)}
+      <div class="bar2"><span class="count">${open?`${n} of ${teams.length} answered · wrong answers cost a ${money(CFEE)} audit fee`:`${tally[c.ans]} of ${teams.length} correct`}</span><button class="btn main" id="nx">${open?"Reveal answer":"Next →"}</button></div>`;
+    $("#nx").onclick=()=>open?(warn("answered")&&(beep(660,.12),pushState({...st,sub:"reveal"}))):next();
+    if(!open&&fresh)countUp();requestAnimationFrame(zoomApp);return}
+  if(S.k==="aging"){
+    const y=S.yr;
+    if(open){
+      app.innerHTML=`${head}<div class="scard"><div class="stitle">December 31, Year ${y}: age your receivables</div>
+        <p class="story">${y===1?"On your iPad, sort each customer who still owes you by how far past due they are. Multiply by the percent for that group. That total is the balance the allowance needs. It's your first year, so the allowance starts at $0.":"Age your receivables again. This time the allowance already has a balance from Year 1's estimate and this year's write-offs. Check your T-account before you book the entry."}</p>
+        ${pctHTML()}</div>
+      ${boardHTML(S,teams,th,false,"lock")}
+      <div class="bar2"><span class="count">${n} of ${teams.length} locked in · each wrong answer costs a ${money(FEE)} audit fee</span><button class="btn main" id="nx">Reveal</button></div>`;
+      $("#nx").onclick=()=>{if(!warn("locked in"))return;beep(660,.12);pushState({...st,sub:"reveal"})};
+      requestAnimationFrame(zoomApp);return}
+    const ok=teams.filter(p=>{const g=books(p,th,H.awards).ag[S.b];return g.okReq&&g.okAdj}).length;
+    app.innerHTML=`${head}<div class="scard"><div class="stitle">The year-end adjusting entry</div>
+      <div class="lesson"><b>Required balance − what's already in the allowance = the adjusting entry.</b> ${y===1?"First year, so the allowance started at $0 and the entry equals the required balance.":"A debit balance (you wrote off more than you estimated) makes the entry bigger. A credit balance left over makes it smaller."}<br>
+      ${jrn("Bad Debts Expense","Allowance for Doubtful Accounts","","Dec 31, Year "+y)}
+      <div class="note" style="margin-top:8px">${ok} of ${teams.length} teams got both answers right.</div></div></div>
+      ${boardHTML(S,teams,th,fresh)}
+      <div class="bar2"><span></span><button class="btn main" id="nx">${last?"Final results →":"Next →"}</button></div>`;
+    $("#nx").onclick=next;if(fresh){countUp();setTimeout(()=>ok>teams.length/2?beep(990,.15):beep(220,.3),400)}requestAnimationFrame(zoomApp);return}
+  if(S.k==="events"){
+    if(open){
+      app.innerHTML=`${head}<div class="scard"><div class="stitle">Year 2 begins. Here's the news.</div><p class="story" style="font-size:23px">Only teams that sold to these customers are affected. Your iPad shows which ones are yours.</p></div>
+        <div class="news">${NEWS.map((x,i)=>`<div class="newsc ${x.cls}${fresh?" anim":""}" style="--d:${i*250}ms"><b>${esc(x.title)}</b><p>${esc(x.story)}</p></div>`).join("")}</div>
+        <div class="ask">Predict on your iPad: what happens to your net income?</div>
+        ${boardHTML(S,teams,th,false,"lock")}
+        <div class="bar2"><span class="count">${n} of ${teams.length} predictions in</span><button class="btn main" id="nx">Reveal</button></div>`;
+      $("#nx").onclick=()=>{beep(660,.12);pushState({...st,sub:"reveal"})};
+      requestAnimationFrame(zoomApp);return}
+    const said=k=>teams.filter(p=>p.pred===k).length;
+    app.innerHTML=`${head}<div class="scard"><div class="stitle">Net income change: $0</div>
+      <p class="story" style="font-size:23px">${said("down")} of ${teams.length} teams predicted it would go down. The expense for these customers was already recorded last December, when you made the estimate. A write-off just uses up the allowance.</p>
+      <div class="lesson">${jrn("Allowance for Doubtful Accounts","Accounts Receivable","12,000","Write off Fresh Kicks")} ${jrn("Accounts Receivable","Allowance for Doubtful Accounts","5,000","Reinstate Prairie")} ${jrn("Cash","Accounts Receivable","5,000","Collect")}</div></div>
+      ${boardHTML(S,teams,th,fresh)}
+      <div class="bar2"><span class="count">Write off more than you estimated, and the allowance ends up with a <b>debit</b> balance.</span><button class="btn main" id="nx">Next →</button></div>`;
+    $("#nx").onclick=next;requestAnimationFrame(zoomApp);return}
+  if(S.k==="huddle"){
+    const h=HUDDLES[S.id];TIMER_END=st.timer||0;
+    if(open){
+      app.innerHTML=`${head}<div class="huddle"><div><div class="kick">Team huddle</div><h2>${esc(h.title)}</h2><p>${esc(h.prompt)}</p><div class="hint">${esc(h.hint)}</div></div>
+        <div style="text-align:center"><div class="timer" data-timer>${timerText()}</div><div class="row" style="justify-content:center;margin-top:10px">${st.timer?`<button class="btn" id="t1">+1 min</button>`:`<button class="btn" id="t0">Start timer</button>`}</div></div></div>
+        ${boardHTML(S,teams,th,false,"lock")}
+        <div class="bar2"><span class="count">${n} of ${teams.length} answers in</span><div class="row"><button class="btn" id="sk">Skip huddle</button><button class="btn main" id="nx">Show answers</button></div></div>`;
+      const t0=$("#t0"),t1=$("#t1");
+      if(t0)t0.onclick=()=>{TIMER_BEEPED=false;pushState({...st,timer:Date.now()+HUDDLE_SECS*1000})};
+      if(t1)t1.onclick=()=>{TIMER_BEEPED=false;pushState({...st,timer:Math.max(Date.now(),st.timer)+60000})};
+      $("#sk").onclick=()=>{if(confirm("Skip this huddle? No answers or bonuses."))next()};
+      $("#nx").onclick=()=>{if(!warn("sent an answer"))return;beep(660,.12);pushState({...st,sub:"share",timer:0})};
+      requestAnimationFrame(zoomApp);return}
+    const aw=H.awards[S.id]||[];
+    const ans=teams.filter(p=>String(p["hud_"+S.id]||"").trim());
+    app.innerHTML=`${head}<div class="huddle" style="grid-template-columns:1fr"><div><div class="kick">Team huddle · answers</div><h2 style="font-size:36px">${esc(h.title)}</h2><p style="font-size:22px">${esc(h.prompt)}</p></div></div>
+      <div class="answers">${ans.map((p,i)=>`<div class="ans ${aw.includes(p.id)?"star":""}${fresh?" anim":""}" style="--c:${colorOf(teams,p.id)};--d:${i*80}ms" data-id="${p.id}">
+        <div class="who"><span>${H.hideNames?"Team "+(i+1):esc(p.name)}</span>${aw.includes(p.id)?`<span class="medal">+${money(AWARD)}</span>`:""}</div>
+        <div class="txt">${esc(p["hud_"+S.id])}</div>
+        <div class="acts"><button class="btn sp1">Spotlight</button><button class="btn aw">${aw.includes(p.id)?"Remove bonus":"+"+money(AWARD)+" bonus"}</button></div></div>`).join("")||`<p class="note">No answers came in.</p>`}</div>
+      <div class="bar2"><button class="btn" id="hn">${H.hideNames?"Show team names":"Hide team names"}</button><button class="btn main" id="nx">Next →</button></div>`;
+    app.querySelectorAll(".ans").forEach((el,i)=>{const id=el.dataset.id,p=ans[i];
+      el.querySelector(".sp1").onclick=()=>spotlight(H.hideNames?"Team "+(i+1):p.name,p["hud_"+S.id],colorOf(teams,id));
+      el.querySelector(".aw").onclick=()=>{const a=H.awards[S.id]=H.awards[S.id]||[];const k=a.indexOf(id);k>=0?a.splice(k,1):(a.push(id),beep(990,.15));H.key=null;pushState({...H.state})}});
+    $("#hn").onclick=()=>{H.hideNames=!H.hideNames;H.key=null;hostRender()};
+    $("#nx").onclick=next;requestAnimationFrame(zoomApp);return}
+}
+function spotlight(name,txt,c){const d=document.createElement("div");d.className="spot";d.innerHTML=`<div style="--c:${c}"><b>${esc(name)}</b><p>${esc(txt)}</p></div>`;d.onclick=()=>d.remove();document.body.appendChild(d)}
+function goStep(i){pushState({phase:"play",i,sub:"open"})}
+async function hostErase(){if(!H)return hostSetup();try{H.off&&H.off();await H.N.remove("games/"+H.code)}catch(e){}H=null;stopFireworks();hostSetup()}
+
+/* ---------- finale ---------- */
+function qrSvg(text){
+  try{if(!window.qrcode)return "";const q=qrcode(0,"M");q.addData(text);q.make();const n=q.getModuleCount(),m=2;let d="";
+    for(let r=0;r<n;r++)for(let c=0;c<n;c++)if(q.isDark(r,c))d+=`M${c+m} ${r+m}h1v1h-1z`;
+    return `<svg viewBox="0 0 ${n+2*m} ${n+2*m}" shape-rendering="crispEdges" xmlns="http://www.w3.org/2000/svg"><rect width="100%" height="100%" fill="#fff"/><path d="${d}" fill="#111"/></svg>`}catch(e){return ""}}
+function fanfare(){[[523,0],[659,.12],[784,.24],[1047,.4]].forEach(([f,t])=>setTimeout(()=>beep(f,.35),t*1000))}
+let FW=null,FIN=[];
+function stopFireworks(){FIN.forEach(clearTimeout);FIN=[];if(FW){cancelAnimationFrame(FW.raf);FW=null}document.body.classList.remove("finale-on")}
+function startFireworks(on){
+  const cv=$("#fw");if(!cv)return;const cx=cv.getContext("2d");if(FW)cancelAnimationFrame(FW.raf);
+  const dpr=Math.min(2,devicePixelRatio||1);const size=()=>{cv.width=innerWidth*dpr;cv.height=innerHeight*dpr};size();addEventListener("resize",size);
+  const COLS=["#C1102F","#E8193C","#FFFFFF","#FFFFFF","#D9D9D9","#C1102F"];
+  const rockets=[],parts=[];const t0=performance.now();
+  const launch=()=>{const W=cv.width,Hh=cv.height;rockets.push({x:W*(.12+Math.random()*.76),y:Hh,vx:(Math.random()-.5)*1.2*dpr,vy:-(Hh*.0125+Math.random()*Hh*.004),ty:Hh*(.12+Math.random()*.35),c:COLS[Math.floor(Math.random()*COLS.length)]})};
+  const burst=(r)=>{const n=70+Math.floor(Math.random()*40),sp=(2.2+Math.random()*2.2)*dpr,ring=Math.random()<.35;
+    for(let k=0;k<n;k++){const a=Math.PI*2*k/n+Math.random()*.1,v=ring?sp:sp*(.35+Math.random()*.75);parts.push({x:r.x,y:r.y,vx:Math.cos(a)*v,vy:Math.sin(a)*v,life:1,d:.008+Math.random()*.01,c:Math.random()<.25?"#FFFFFF":r.c,s:(1.6+Math.random()*1.4)*dpr})}};
+  FW={raf:0};
+  const frame=(now)=>{if(!FW)return;const el=now-t0;
+    const rate=el<7000?260:el<20000?900:1800;
+    if(on&&now-(FW.lastL||0)>rate){FW.lastL=now;launch();if(el<7000&&Math.random()<.5)launch()}
+    cx.globalCompositeOperation="destination-out";cx.fillStyle="rgba(0,0,0,.22)";cx.fillRect(0,0,cv.width,cv.height);cx.globalCompositeOperation="lighter";
+    for(let i=rockets.length-1;i>=0;i--){const r=rockets[i];r.x+=r.vx;r.y+=r.vy;r.vy+=.09*dpr;cx.fillStyle=r.c;cx.beginPath();cx.arc(r.x,r.y,2.2*dpr,0,7);cx.fill();if(r.y<=r.ty||r.vy>=0){burst(r);rockets.splice(i,1)}}
+    for(let i=parts.length-1;i>=0;i--){const p=parts[i];p.x+=p.vx;p.y+=p.vy;p.vx*=.985;p.vy=p.vy*.985+.045*dpr;p.life-=p.d;if(p.life<=0){parts.splice(i,1);continue}
+      cx.globalAlpha=Math.max(0,p.life);cx.fillStyle=p.c;cx.beginPath();cx.arc(p.x,p.y,p.s,0,7);cx.fill()}
+    cx.globalAlpha=1;FW.raf=requestAnimationFrame(frame)};
+  if(!on){[0,1,2].forEach(()=>{launch()});rockets.forEach(r=>{r.y=r.ty;burst(r)});rockets.length=0;parts.forEach(p=>{p.x+=p.vx*25;p.y+=p.vy*25});
+    cx.globalCompositeOperation="lighter";parts.forEach(p=>{cx.fillStyle=p.c;cx.beginPath();cx.arc(p.x,p.y,p.s,0,7);cx.fill()});return}
+  FW.raf=requestAnimationFrame(frame);
+}
+function finale(teams){
+  const th=STEPS.length-1,val={};teams.forEach(p=>val[p.id]=books(p,th,H.awards).ni);
+  const order=[...teams].sort((a,b)=>val[b.id]-val[a.id]),rk=ranks(val),top=order.slice(0,5);
+  const slot=(p,i,cls)=>p?`<div class="pod ${cls}" data-i="${i}"><div class="who"><div class="medal">${rk[p.id]}</div><div class="nm">${esc(p.name)}</div><div class="pts">${money(val[p.id])}</div></div><div class="block"><span>${["1st","2nd","3rd"][i]}</span></div></div>`:`<div class="pod ${cls} empty"></div>`;
+  const rows=top.slice(3).map((p,k)=>`<div class="row45" data-i="${k+3}"><span class="r">${rk[p.id]}</span><span class="n">${esc(p.name)}</span><span class="s">${money(val[p.id])}</span></div>`).join("");
+  document.body.classList.add("finale-on");app.style.zoom="";
+  app.innerHTML=`<div class="finale"><canvas id="fw"></canvas><div class="rays"></div>
+    <div class="fhead"><img class="lg" src="/logo-214.png" alt="District 214"><div class="kick">The Credit Desk · Two-year net income</div><h2>Final standings</h2></div>
+    <div class="podium">${slot(order[1],1,"p2")}${slot(order[0],0,"p1")}${slot(order[2],2,"p3")}</div><div class="rest">${rows}</div>
+    <div class="fbar"><button class="btn" id="cr">Class results</button><button class="btn" id="again">Replay</button><button class="btn" id="erase">Erase game</button></div></div>`;
+  $("#cr").onclick=()=>{stopFireworks();classResults(teams)};$("#again").onclick=()=>{stopFireworks();finale(teams)};$("#erase").onclick=()=>{stopFireworks();hostErase()};
+  const ord5=[4,3,2,1,0].filter(i=>order[i]),at=[900,1900,3100,4400,6200];
+  const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
+  FIN.forEach(clearTimeout);FIN=ord5.map((i,n)=>setTimeout(()=>{const el=app.querySelector(`.finale [data-i="${i}"]`);if(!el)return;el.classList.add("in");if(i===0){fanfare();startFireworks(!reduce)}else beep(i<3?660:520,.12)},at[n+(5-ord5.length)]||at[n]));
+}
+function classResults(teams){
+  document.body.classList.remove("finale-on");
+  const n=Math.max(1,teams.length),th=STEPS.length-1;
+  const row=c=>{const k=teams.filter(p=>approvedIds(p,c.b).includes(c.id)).length,o=outcomeOf(c);return `<div class="cr"><span><b>${esc(c.name)}</b> <span class="note">${money(c.amt)}</span></span><span><span class="tag ${o.cls==="g"?"":o.cls}">${esc(o.t)}</span></span><span class="b"><i style="width:${k/n*100}%"></i></span><span>${k} of ${teams.length}</span></div>`};
+  const pct=f=>Math.round(teams.filter(f).length/n*100)+"%";
+  const ag=b=>p=>{const g=books(p,th,H.awards).ag[b];return g&&g.okReq&&g.okAdj};
+  const stars=Object.entries(H.awards).flatMap(([h,ids])=>ids.map(id=>({h,p:teams.find(t=>t.id===id)}))).filter(x=>x.p);
+  app.innerHTML=`<div class="rep"><h2>Class results</h2>
+    <div style="display:grid;grid-template-columns:1.3fr 1fr;gap:28px">
+    <div><h3 style="font-family:var(--display);font-size:26px;margin:6px 0">Year 1 applicants · teams that approved</h3>${CUST.filter(c=>c.b==="A").map(row).join("")}
+      <h3 style="font-family:var(--display);font-size:26px;margin:16px 0 6px">Year 2 applicants · status at year end</h3>${CUST.filter(c=>c.b==="B").map(row).join("")}</div>
+    <div><h3 style="font-family:var(--display);font-size:26px;margin:6px 0">How the books went</h3>
+      <div class="leak okk"><b>Sale entry check: ${pct(p=>p.chk_sale===0)} correct</b>Dr Accounts Receivable, Cr Sales.</div>
+      <div class="leak okk"><b>Year 1 aging: ${pct(ag("A"))} fully right</b>Allowance started at $0.</div>
+      <div class="leak okk"><b>Write-off entry: ${pct(p=>p.chk_wo===0)} correct</b>Dr Allowance, Cr Accounts Receivable. No expense.</div>
+      <div class="leak okk"><b>NRV after a write-off: ${pct(p=>p.chk_nrv===0)} correct</b>It doesn't change.</div>
+      <div class="leak okk"><b>Year 2 aging: ${pct(ag("B"))} fully right</b>Required balance minus what's already in the allowance.</div>
+      ${stars.length?`<h3 style="font-family:var(--display);font-size:26px;margin:16px 0 6px">Huddle bonuses</h3>${stars.map(s=>`<div class="leak mid"><b>${esc(s.p.name)} · ${esc(HUDDLES[s.h].title)}</b>${esc(s.p["hud_"+s.h]||"")}</div>`).join("")}`:""}
+    </div></div>
+    <div class="row" style="justify-content:center;margin-top:16px"><button class="btn main" id="pod">Back to standings</button> <button class="btn" id="erase">Erase game</button></div></div>`;
+  $("#pod").onclick=()=>finale(teams);$("#erase").onclick=hostErase;requestAnimationFrame(zoomApp);
+}
+
+/* ============================================================ TEAM (iPad) */
+let ME=null;const SKEY="cdSession",ZKEY="cdZoom";
+const saveSess=o=>{try{localStorage.setItem(SKEY,JSON.stringify(o))}catch(e){}};
+const loadSess=()=>{try{return JSON.parse(localStorage.getItem(SKEY)||"null")}catch(e){return null}};
+function rejoinBtn(){const b=$("#rejoin");if(b)b.hidden=ROLE==="teacher"}
+function teamZoom(d){let z=1;try{z=+localStorage.getItem(ZKEY)||1}catch(e){}if(d)z=Math.min(1.6,Math.max(.8,Math.round((z+d)*10)/10));try{localStorage.setItem(ZKEY,z)}catch(e){}app.style.zoom=z===1?"":z}
+async function joinForm(){
+  const N=await net().catch(()=>null);if(!N)return needSetup();
+  const sv=loadSess(),qcode=(location.search.match(/[?&]code=(\d{4})/)||[])[1];
+  app.innerHTML=`${hdr()}<div class="panel" style="margin-top:0"><h2>Join with your team</h2><p>${qcode?"Code filled in. ":""}One iPad per team. Type your team name. Lost connection? Join again with the same team name.</p>
+    <input class="field code" id="cd" inputmode="numeric" maxlength="4" placeholder="0000" autocomplete="off" value="${qcode||(sv?esc(sv.code):"")}">
+    <input class="field" id="nm" maxlength="22" placeholder="Team name" autocomplete="off" value="${sv&&(!qcode||sv.code===qcode)?esc(sv.name):""}">
+    <div class="err" id="er"></div><button class="btn main" id="go">Join</button></div>`;
+  rejoinBtn();
+  const go=async()=>{const code=$("#cd").value.trim(),name=$("#nm").value.trim();
+    if(!/^\d{4}$/.test(code)){$("#er").textContent="The code is 4 numbers.";return}
+    if(!name){$("#er").textContent="Type your team name.";return}
+    $("#go").disabled=true;const err=await enterGame(N,code,name);if(err){$("#er").textContent=err;$("#go").disabled=false}};
+  $("#go").onclick=go;$("#nm").onkeydown=e=>{if(e.key==="Enter")go()};
+}
+async function enterGame(N,code,name,forcePid){
+  try{const g=await N.get("games/"+code);
+    if(!g||g.game!=="creditdesk")return "No Credit Desk game with that code. Check the board.";
+    const sv=loadSess(),norm=x=>String(x||"").trim().toLowerCase().replace(/\s+/g," ");
+    let pid=forcePid||(sv&&sv.code===code&&norm(sv.name)===norm(name)?sv.pid:null);
+    if(!pid&&g.players){const hit=Object.entries(g.players).find(([,p])=>norm(p.name)===norm(name));if(hit)pid=hit[0]}
+    let rec=pid&&g.players&&g.players[pid];
+    if(!rec){if(g.state&&g.state.phase!=="lobby"&&!(g.state.phase==="play"&&g.state.i===0&&g.state.sub==="open"))return "This game already started. Ask your teacher.";
+      pid="t"+Math.random().toString(36).slice(2,10);rec={name,joined:Date.now()};await N.set(`games/${code}/players/${pid}`,rec)}
+    name=rec.name||name;saveSess({code,pid,name});
+    if(ME&&ME.off)ME.off();
+    ME={N,code,pid,name,rec,state:null,key:null,draft:{}};
+    $("#who").textContent=name;$("#who").hidden=false;$("#zm").hidden=false;teamZoom(0);
+    ME.off=N.on(`games/${code}/state`,st=>{if(!ME)return;if(!st){app.innerHTML=`<div class="wait"><h2>The game has ended</h2><p>Your teacher closed this game.</p></div>`;return}ME.state=st;teamRender()});
+    return null}catch(e){return "Couldn't connect. Try again."}
+}
+async function rejoin(){const N=await net().catch(()=>null);if(!N)return needSetup();
+  if(ME){ME.key=null;try{const r=await ME.N.get(`games/${ME.code}/players/${ME.pid}`);if(r)ME.rec=r;const st=await ME.N.get(`games/${ME.code}/state`);if(st)ME.state=st}catch(e){}teamRender();return}
+  const sv=loadSess();if(!sv)return joinForm();const err=await enterGame(N,sv.code,sv.name,sv.pid);if(err)joinForm()}
+async function save(patch){const M=ME;Object.assign(M.rec,patch);try{await M.N.update(`games/${M.code}/players/${M.pid}`,patch)}catch(e){}}
+const meP=()=>({id:ME.pid,...ME.rec});
+function myLine(st){const M=ME;if(!st.ni||st.ni[M.pid]==null)return "";const n=Object.keys(st.ni).length;
+  return `<div class="cashline"><span><b>${money(st.ni[M.pid])}</b>net income</span><span><b>${ord(st.rank[M.pid])}</b>of ${n}</span></div>`}
+function teamRender(){
+  const M=ME,st=M.state;if(!st)return;rejoinBtn();
+  const S=st.phase==="play"?STEPS[st.i]:null;
+  const lk=S?isLocked(S,meP()):false;
+  const key=JSON.stringify([st.phase,st.i,st.sub,lk,st.ni&&st.ni[M.pid],S&&S.k==="huddle"&&st.sub==="share"?(st.awards||{})[S.id]:0,S&&S.k==="huddle"?!!st.timer:0]);
+  TIMER_END=st.timer||0;
+  if(key===M.key)return;M.key=key;
+  if(st.phase==="lobby"){app.innerHTML=`<div class="wait"><h2>You're in, ${esc(M.name)}!</h2></div>
+    <div class="box"><h3>How ${CO} makes money</h3><p style="margin:0">You sell team gear on account (Net 30). Every sale you approve earns <b>40% gross profit</b>. But a customer who never pays costs you the <b>whole sale</b>, so one bad customer wipes out the profit from about two good ones.</p>
+    <p>At each year end you estimate bad debts with an aging schedule. Mistakes cost audit fees. Your teacher may give bonuses for great huddle answers.</p><p class="note" style="margin:0">Team with the most net income after two years wins.</p></div>`;return}
+  if(st.phase==="end"){teamReport(st);return}
+  const head=`<div class="rtag" style="text-align:center;margin-top:10px">Round ${S.r} of 5 · ${ROUNDS[S.r-1]} · Year ${S.yr}</div>`;
+  const b=books(meP(),st.sub==="reveal"||st.sub==="share"?st.i:st.i-1,st.awards);
+  if(S.k==="apps")return teamApps(S,st,head,b);
+  if(S.k==="check")return teamCheck(S,st,head);
+  if(S.k==="aging")return teamAging(S,st,head,b);
+  if(S.k==="events")return teamEvents(S,st,head,b);
+  if(S.k==="huddle")return teamHuddle(S,st,head,b);
+}
+function teamApps(S,st,head,b){
+  const M=ME,apps=CUST.filter(c=>c.b===S.b);
+  if(st.sub==="open"&&!M.rec["lock"+S.b]){
+    const sel=M.draft["apps"+S.b]=M.draft["apps"+S.b]||{...(M.rec["apps"+S.b]||{})};
+    const draw=()=>{const dec=apps.filter(c=>sel[c.id]!=null).length,yes=apps.filter(c=>sel[c.id]===true),tot=sum(yes.map(c=>c.amt));const y=scrollY;
+      const rule=String(M.rec.hud_h3||"").trim();
+      app.innerHTML=`${head}<div class="tbar"><div class="mtext"><span>${S.b==="A"?"Credit applications":"Year 2 applications"}</span><span>${dec} of ${apps.length} decided · ${money(tot)} approved</span></div>
+        <div class="note">Approved sales earn ${money(Math.round(tot*GP))} gross profit if every one of them pays.</div></div>
+        ${S.b==="B"&&rule?`<div class="rule"><b>Your credit policy</b>${esc(rule)}</div>`:""}
+        <div class="apps">${apps.map(c=>`<div class="appc ${sel[c.id]===true?"yes":sel[c.id]===false?"noo":""}">
+          <div class="hd"><b>${esc(c.name)}</b><span class="amt">${money(c.amt)}</span></div><div class="what">${esc(c.what)}</div>
+          <dl class="facts">${c.facts.map(([k,v])=>`<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join("")}</dl>
+          <div class="quote">${esc(c.note)}</div>
+          <div class="yn"><button class="y" data-id="${c.id}" data-v="1" aria-pressed="${sel[c.id]===true}">Approve</button><button class="n" data-id="${c.id}" data-v="0" aria-pressed="${sel[c.id]===false}">Deny</button></div></div>`).join("")}</div>
+        <div class="lock"><button class="btn main" id="lk" ${dec<apps.length?"disabled":""}>Lock in ${yes.length} approval${yes.length===1?"":"s"}</button><span class="note">${dec<apps.length?"Decide on every application first.":"You can't change it after you lock in."}</span></div>`;
+      app.querySelectorAll(".yn button").forEach(x=>x.onclick=()=>{sel[x.dataset.id]=x.dataset.v==="1";draw()});
+      $("#lk").onclick=async()=>{if(!confirm(`Lock in ${yes.length} approval${yes.length===1?"":"s"} for ${money(tot)}?`))return;await save({["apps"+S.b]:{...sel},["lock"+S.b]:true});M.key=null;teamRender()};
+      scrollTo(0,y)};
+    draw();return}
+  const yes=approvedIds(meP(),S.b).map(id=>CU[id]),tot=sum(yes.map(c=>c.amt));
+  if(st.sub==="open"){app.innerHTML=`${head}<div class="wait"><h2>Locked in</h2><p>${yes.length} approved for ${money(tot)}.</p><div class="chips" style="justify-content:center">${yes.map(c=>`<span>${esc(c.name)}</span>`).join("")||"<span>None</span>"}</div><p>Watch the board.</p></div>`;return}
+  app.innerHTML=`${head}<div class="verdict ${tot?"ok":"neu"}"><h2>${tot?"Booked "+money(tot):"No sales booked"}</h2><p>${tot?`Gross profit +${money(Math.round(tot*GP))}. Nobody has paid yet. These customers now owe you.`:"No receivables, no risk, and no profit."}</p></div>
+    ${tot?`<div class="box"><h3>The entry for your credit sales</h3>${jrn("Accounts Receivable","Sales",plain(tot))}<div class="chips">${yes.map(c=>`<span>${esc(c.name)} ${money(c.amt)}</span>`).join("")}</div></div>`:""}${myLine(st)}`;
+}
+function teamCheck(S,st,head){
+  const M=ME,c=CHECKS[S.id],mine=M.rec["chk_"+S.id];
+  if(st.sub==="open"){
+    app.innerHTML=`${head}<div class="box" style="max-width:none"><h3>Entry check</h3><p style="font-size:22px;margin:0">${esc(c.q)}</p></div>
+      <div class="opts">${c.opts.map((o,k)=>`<button class="opt" data-k="${k}" aria-pressed="${mine===k}"><span class="sh">${"ABCD"[k]}</span>${optHTML(c,k)}</button>`).join("")}</div>
+      <p class="note" style="text-align:center">${mine!=null?"Answer saved. You can change it until your teacher reveals it.":`Agree as a team, then tap one. A wrong answer costs a ${money(CFEE)} audit fee.`}</p>`;
+    app.querySelectorAll(".opt").forEach(x=>x.onclick=async()=>{await save({["chk_"+S.id]:+x.dataset.k});M.key=null;teamRender()});return}
+  const ok=mine===c.ans;
+  app.innerHTML=`${head}<div class="verdict ${ok?"ok":"no"}"><h2>${ok?"Correct!":mine==null?"No answer":"Not quite"}</h2><p>${ok?"No audit fee.":`Audit fee: −${money(CFEE)}.`}</p></div>
+    <div class="box"><h3>Answer ${"ABCD"[c.ans]}</h3><div class="opt right" style="border-width:2px"><span class="sh">${"ABCD"[c.ans]}</span>${optHTML(c,c.ans)}</div><p style="margin:10px 0 0">${esc(c.why)}</p></div>${myLine(st)}`;
+}
+function tAccount(log,before){
+  const dr=log.filter(x=>x.amt<0),cr=log.filter(x=>x.amt>0);
+  return `<div class="taccount"><div><div class="hd">Debit</div>${dr.map(x=>`<div class="ln"><span>${esc(x.t)}</span><b>${plain(x.amt)}</b></div>`).join("")||`<div class="ln note">none</div>`}</div>
+    <div><div class="hd">Credit</div>${cr.map(x=>`<div class="ln"><span>${esc(x.t)}</span><b>${plain(x.amt)}</b></div>`).join("")||`<div class="ln note">none</div>`}</div></div>`}
+function teamAging(S,st,head,b){
+  const M=ME,y=S.yr,p=meP();
+  const paid=approvedIds(p,S.b).map(id=>CU[id]).filter(c=>c.end==="paid");
+  const owe=approvedIds(p,S.b).map(id=>CU[id]).filter(c=>c.end!=="paid");
+  if(st.sub==="open"&&!M.rec["lockag"+S.b]){
+    const d=M.draft["ag"+S.b]=M.draft["ag"+S.b]||{req:"",adj:"",w:{}};
+    app.innerHTML=`${head}
+      <div class="box" style="max-width:none"><h3>December 31, Year ${y}</h3>
+      ${paid.length?`<p style="margin:0 0 6px">Collected before year end (no longer receivables): ${paid.map(c=>`<b>${esc(c.name)}</b> ${money(c.amt)}`).join(", ")}.</p>`:""}
+      ${owe.length?`<table class="t"><thead><tr><th>Customer who still owes you</th><th class="r">Balance</th><th class="r">Days past due</th></tr></thead><tbody>
+        ${owe.map(c=>`<tr><td>${esc(c.name)}</td><td class="r">${money(c.amt)}</td><td class="r">${c.end===0?"Not yet due":c.end}</td></tr>`).join("")}
+        <tr class="tot"><td>Accounts Receivable</td><td class="r">${money(sum(owe.map(c=>c.amt)))}</td><td></td></tr></tbody></table>`:`<p style="margin:0"><b>Nobody owes you anything at year end.</b> Your accounts receivable is $0.</p>`}</div>
+      <div class="box" style="max-width:none"><h3>Aging worksheet</h3><p class="note" style="margin:0 0 6px">Scratch work, not graded. Put each balance in its group and multiply.</p>
+      <table class="t"><thead><tr><th>Group</th><th class="r">Percent</th><th class="r">A/R in group</th><th class="r">Estimated uncollectible</th></tr></thead><tbody>
+      ${BK.map(k=>`<tr><td>${esc(k.name)}</td><td class="r">${Math.round(k.pct*100)}%</td><td><input class="inp" inputmode="numeric" data-w="${k.id}a" value="${esc(d.w[k.id+"a"]||"")}"></td><td><input class="inp" inputmode="numeric" data-w="${k.id}e" value="${esc(d.w[k.id+"e"]||"")}"></td></tr>`).join("")}
+      <tr class="tot"><td colspan="3">Total estimated uncollectible</td><td class="r" id="wt">$0</td></tr></tbody></table></div>
+      <div class="box" style="max-width:none"><h3>Allowance for Doubtful Accounts</h3>
+      ${y===1?`<p style="margin:0">First year in business. The allowance has a <b>$0</b> balance before this entry.</p>`:`<p class="note" style="margin:0">Everything that hit the allowance so far. Figure out its balance before you adjust.</p>${tAccount(b.allowLog)}`}</div>
+      <div class="box" style="max-width:none"><h3>Your answers</h3>
+      <div class="ans2"><label for="rq">Required balance in the allowance (your aging total)</label><input class="inp big" id="rq" inputmode="numeric" placeholder="$0" value="${esc(d.req)}">
+      <label for="aj">Adjusting entry: Bad Debts Expense / Allowance${y===2?'<br><span class="note">If the allowance already has more than you need, type a negative number.</span>':""}</label><input class="inp big" id="aj" inputmode="numeric" placeholder="$0" value="${esc(d.adj)}"></div></div>
+      <div class="lock"><button class="btn main" id="lk">Lock in</button><span class="note">Each wrong answer costs a ${money(FEE)} audit fee.</span></div>`;
+    const tot=()=>{let t=0;BK.forEach(k=>{const v=num(d.w[k.id+"e"]);if(!isNaN(v))t+=v});$("#wt").textContent=money(t)};tot();
+    app.querySelectorAll("[data-w]").forEach(x=>x.oninput=()=>{d.w[x.dataset.w]=x.value;tot()});
+    $("#rq").oninput=e=>d.req=e.target.value;$("#aj").oninput=e=>d.adj=e.target.value;
+    $("#lk").onclick=async()=>{const r=num(d.req),a=num(d.adj);if(isNaN(r)||isNaN(a)){alert("Type a number in both answer boxes. Use 0 if the answer is zero.");return}
+      if(!confirm(`Lock in: required balance ${money(r)}, adjusting entry ${money(a)}?`))return;
+      await save({["ag"+S.b]:{req:String(r),adj:String(a)},["lockag"+S.b]:true});M.key=null;teamRender()};
+    return}
+  if(st.sub==="open"){app.innerHTML=`${head}<div class="wait"><h2>Locked in</h2><p>Required balance ${money(num((M.rec["ag"+S.b]||{}).req))}. Adjusting entry ${money(num((M.rec["ag"+S.b]||{}).adj))}.</p><p>Watch the board.</p></div>`;return}
+  const g=b.ag[S.b],both=g.okReq&&g.okAdj;
+  app.innerHTML=`${head}<div class="verdict ${both?"ok":g.okReq||g.okAdj?"mid":"no"}"><h2>${both?"Books are right!":"Audit fee: −"+money(g.fee)}</h2>
+      <p>Required balance: ${money(g.req)} ${g.okReq?"✓":`(you said ${isNaN(num(g.yourReq))?"nothing":money(num(g.yourReq))})`}<br>Adjusting entry: ${money(g.adj)} ${g.okAdj?"✓":`(you said ${isNaN(num(g.yourAdj))?"nothing":money(num(g.yourAdj))})`}</p></div>
+    <div class="box"><h3>The aging</h3>${g.rows.length?`<table class="t"><tbody>${g.rows.map(r=>`<tr><td>${esc(r.c.name)}</td><td>${esc(r.bk.short)}${r.bk.id==="nyd"?"":" days"}</td><td class="r">${money(r.c.amt)} × ${Math.round(r.bk.pct*100)}%</td><td class="r">${money(r.est)}</td></tr>`).join("")}<tr class="tot"><td colspan="3">Required balance</td><td class="r">${money(g.req)}</td></tr></tbody></table>`:"<p style='margin:0'>No receivables, so the allowance needs $0.</p>"}
+      <p style="margin:10px 0 0">Required ${money(g.req)} − allowance before adjusting ${balTxt(g.before)}${g.before<0?" (a debit counts as negative)":""} = <b>${money(g.adj)}</b></p>
+      ${g.adj?jrn(g.adj>0?"Bad Debts Expense":"Allowance for Doubtful Accounts",g.adj>0?"Allowance for Doubtful Accounts":"Bad Debts Expense",plain(g.adj),"Dec 31, Year "+y):""}</div>
+    <div class="box"><h3>Partial balance sheet, Dec 31, Year ${y}</h3><div class="bs"><span>Accounts receivable</span><span>${money(g.ar)}</span><span></span><span>Less: Allowance for doubtful accounts</span><span class="u">${plain(g.req)}</span><span></span><span class="tot">Net realizable value</span><span></span><span class="tot">${money(g.ar-g.req)}</span></div></div>${myLine(st)}`;
+}
+function teamEvents(S,st,head,b){
+  const M=ME,ev=b.ev||books(meP(),st.i,st.awards).ev,mine=[...ev.wo,...ev.rec,...ev.paid];
+  const line=c=>{const o=outcomeOf(c);return `<span class="${o.cls}">${esc(c.name)} ${money(c.amt)}: ${esc(o.t)}</span>`};
+  if(st.sub==="open"){
+    const pr=M.rec.pred;
+    app.innerHTML=`${head}<div class="box"><h3>Your Year 1 customers in Year 2</h3>${mine.length?`<div class="chips">${mine.map(line).join("")}</div>`:"<p style='margin:0'>Nobody owed you anything going into Year 2, so none of this news touches you.</p>"}</div>
+      <div class="box"><h3>Predict as a team</h3><p style="margin:0 0 10px">When you record these write-offs, what happens to your net income?</p>
+      <div class="opts" style="grid-template-columns:1fr 1fr 1fr">${[["down","It goes down"],["same","No change"],["up","It goes up"]].map(([k,t])=>`<button class="opt" data-k="${k}" aria-pressed="${pr===k}" style="justify-content:center;font-family:var(--display);font-weight:600;font-size:26px">${t}</button>`).join("")}</div>
+      <p class="note">${pr?"Saved. You can change it until the reveal.":"Not graded. Just commit to a guess."}</p></div>`;
+    app.querySelectorAll(".opt").forEach(x=>x.onclick=async()=>{await save({pred:x.dataset.k});M.key=null;teamRender()});return}
+  const pr=M.rec.pred;
+  app.innerHTML=`${head}<div class="verdict ${pr==="same"?"ok":"mid"}"><h2>Net income change: $0</h2><p>${pr==="same"?"You called it.":pr?"Not what you predicted.":""} The expense was already recorded last December with your estimate.</p></div>
+    <div class="box"><h3>Your entries this year</h3>
+      ${ev.wo.map(c=>jrn("Allowance for Doubtful Accounts","Accounts Receivable",plain(c.amt),"Write off "+c.name)).join("")}
+      ${ev.rec.map(c=>jrn("Allowance for Doubtful Accounts","Accounts Receivable",plain(c.amt),"March: write off "+c.name)+jrn("Accounts Receivable","Allowance for Doubtful Accounts",plain(c.amt),"August: reinstate")+jrn("Cash","Accounts Receivable",plain(c.amt),"August: collect")).join("")}
+      ${ev.paid.map(c=>jrn("Cash","Accounts Receivable",plain(c.amt),"Collect "+c.name)).join("")}
+      ${mine.length?"":"<p style='margin:0'>No entries. You had no receivables going into Year 2.</p>"}</div>
+    <div class="box"><h3>Allowance for Doubtful Accounts</h3>${tAccount(b.allowLog)}<p style="margin:8px 0 0">Balance now: <b>${balTxt(b.allow)}</b>${b.allow<0?". You wrote off more than you estimated. A debit balance means next year's adjusting entry has to be bigger.":b.allow>0?". Some of your estimate is left over, so next year's entry can be smaller.":""}</p></div>${myLine(st)}`;
+}
+function teamHuddle(S,st,head,b){
+  const M=ME,h=HUDDLES[S.id],k="hud_"+S.id,mine=String(M.rec[k]||"");
+  let ctx="";
+  if(S.id==="h1")ctx=`Your Year 1 Bad Debts Expense: <b>${money((b.ag.A||{}).adj||0)}</b>. Not one of those customers has refused to pay yet.`;
+  if(S.id==="h2")ctx=b.wo?`You wrote off <b>${money(b.wo)}</b> of customer accounts. Your net income change: <b>$0</b>.`:`You had no write-offs, but other teams wrote off as much as $32,000. Explain it for them.`;
+  if(S.id==="h3"){const all=CUST.filter(c=>c.b==="A"),yes=approvedIds(meP(),"A");ctx=`<div class="chips">${all.map(c=>{const o=outcomeOf(c);return `<span class="${o.cls}">${yes.includes(c.id)?"✓ Approved":"✗ Denied"} · ${esc(c.name)}: ${esc(o.t)}</span>`}).join("")}</div>`}
+  if(st.sub==="open"){
+    const dv=M.draft[k]!=null?M.draft[k]:mine;
+    app.innerHTML=`${head}<div class="huddle" style="margin-top:8px"><div><div class="kick">Team huddle</div><h2 style="font-size:36px">${esc(h.title)}</h2><p style="font-size:22px">${esc(h.prompt)}</p><div class="hint" style="font-size:17px">${esc(h.hint)}</div></div>${st.timer?`<div class="timer" data-timer style="font-size:44px">${timerText()}</div>`:""}</div>
+      ${ctx?`<div class="box" style="max-width:none">${ctx}</div>`:""}
+      <textarea class="field" id="tx" maxlength="400" placeholder="Talk it over first. Then type one answer for your team.">${esc(dv)}</textarea>
+      <div class="row"><button class="btn main" id="sv">${mine?"Update answer":"Send answer"}</button><span class="note" id="sn">${mine?"Sent. You can still edit until your teacher shows the answers.":"Your answer may go up on the board."}</span></div>`;
+    $("#tx").oninput=e=>M.draft[k]=e.target.value;
+    $("#sv").onclick=async()=>{const v=$("#tx").value.trim();if(!v){$("#sn").textContent="Type something first.";return}
+      M.draft[k]=v;await save({[k]:v});$("#sv").textContent="Update answer";$("#sn").textContent="Sent. You can still edit until your teacher shows the answers.";M.key=JSON.stringify([st.phase,st.i,st.sub,true,st.ni&&st.ni[M.pid],0,!!st.timer])};
+    return}
+  const won=((st.awards||{})[S.id]||[]).includes(M.pid);
+  app.innerHTML=`${head}<div class="verdict ${won?"ok":"neu"}"><h2>${won?"Bonus! +"+money(AWARD):"Answers are up"}</h2><p>${won?"Your teacher picked your answer.":"Look at the board."}</p></div>
+    ${mine?`<div class="box"><h3>Your team said</h3><p style="margin:0;white-space:pre-wrap">${esc(mine)}</p></div>`:""}${myLine(st)}`;
+}
+function teamReport(st){
+  const M=ME,p=meP(),b=books(p,STEPS.length-1,st.awards),n=st.ni?Object.keys(st.ni).length:0;
+  const g1=b.ag.A||{adj:0},g2=b.ag.B||{adj:0,req:0,ar:0};
+  const dec=bb=>CUST.filter(c=>c.b===bb).map(c=>{const yes=approvedIds(p,bb).includes(c.id),o=outcomeOf(c);
+    const bad=o.cls==="r",cls=yes?(bad?"":o.cls==="y"?"mid":"okk"):(bad?"okk":"mid");
+    return `<div class="leak ${cls}"><b>${yes?"Approved":"Denied"} · ${esc(c.name)} ${money(c.amt)}</b>${esc(o.t)}.${!yes&&!bad?" You passed on "+money(Math.round(c.amt*GP))+" of gross profit.":""}${yes&&bad?" This one cost you.":""}${!yes&&bad?" Good call.":""}</div>`}).join("");
+  app.innerHTML=`<div class="rep"><h2>${esc(M.name)}: ${money(b.ni)}</h2><p style="font-size:22px;margin:0">${st.rank?ord(st.rank[M.pid])+" of "+n:""} · two-year net income</p>
+    <div class="box" style="max-width:none"><h3>Your two years</h3><table class="t"><tbody>
+      <tr><td>Credit sales (${money(b.sales)}) × 40% gross profit</td><td class="r">${money(b.gp)}</td></tr>
+      <tr><td>Bad Debts Expense, Year 1</td><td class="r">−${plain(g1.adj)}</td></tr>
+      <tr><td>Bad Debts Expense, Year 2</td><td class="r">${g2.adj<0?"+"+plain(-g2.adj):"−"+plain(g2.adj)}</td></tr>
+      <tr><td>Audit fees</td><td class="r">−${plain(b.fees)}</td></tr>
+      <tr><td>Huddle bonuses</td><td class="r">+${plain(b.bonus)}</td></tr>
+      <tr class="tot"><td>Net income</td><td class="r">${money(b.ni)}</td></tr></tbody></table>
+      <p class="note">End of Year 2: Accounts receivable ${money(g2.ar)}, allowance ${money(g2.req)}, net realizable value ${money(g2.ar-g2.req)}. Total written off: ${money(b.wo)}${b.rec?`, ${money(b.rec)} of it recovered`:""}.</p></div>
+    <h3 style="font-family:var(--display);font-size:26px;margin:16px 0 4px">Year 1 decisions</h3>${dec("A")}
+    <h3 style="font-family:var(--display);font-size:26px;margin:16px 0 4px">Year 2 decisions</h3>${dec("B")}
+    ${String(M.rec.hud_h3||"").trim()?`<p class="note" style="margin-top:14px">Your credit policy: ${esc(M.rec.hud_h3)}</p>`:""}</div>`;
+  try{localStorage.removeItem(SKEY)}catch(e){}
+}
+
+/* ============================================================ START */
+$("#rejoin").onclick=rejoin;
+$("#zo").onclick=()=>teamZoom(-.1);$("#zi").onclick=()=>teamZoom(.1);
+ROLE==="teacher"?hostSetup():joinForm();
+</script>
+</body>
+</html>
