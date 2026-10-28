@@ -200,6 +200,11 @@ textarea.field{font-size:22px;min-height:170px;resize:vertical;line-height:1.35}
 .tag{display:inline-block;border-radius:6px;padding:0 8px;font-weight:700;font-size:15px;color:#fff;background:var(--good)}
 .tag.r{background:var(--bad)}.tag.y{background:var(--warn)}.tag.k{background:var(--dark)}
 
+.modes{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:6px 0 12px}
+.mode{display:flex;flex-direction:column;gap:4px;text-align:left;background:var(--paper);border:3px solid var(--line);border-radius:12px;padding:12px 14px}
+.mode b{font-family:var(--display);font-weight:600;font-size:22px}
+.mode span{font-size:15px;color:var(--muted);line-height:1.3}
+.mode[aria-pressed="true"]{border-color:var(--red);background:#FBE7EA}
 .appwrap{display:grid;grid-template-columns:minmax(0,1fr) 270px;gap:14px;align-items:start}
 .rkey{position:sticky;top:96px;max-height:calc(100vh - 110px);max-height:calc(100dvh - 110px);overflow:auto;background:var(--paper);border:3px solid var(--ink);border-radius:14px;padding:12px 14px}
 .rkey h3{font-family:var(--display);font-weight:600;font-size:22px;margin:0 0 2px;line-height:1.1}
@@ -2604,22 +2609,22 @@ const CUST=[
 
  {id:"maple2",b:"B",name:"Maple Grove Park District",what:"Summer camp shirts",amt:10000,
   facts:[["In business","Local government, since 1958"],["Credit rating","A"],["Pays suppliers in","25 days on average"]],
-  note:"Paid every supplier in full last year. Order ships in mid-December.",end:0},
+  note:"Paid every supplier in full last year. Order ships in mid-December.",end:0,fin:"paid"},
  {id:"kicklab",b:"B",name:"Kick Lab",what:"Sneakers for a new online store",amt:10000,
   facts:[["In business","2 months"],["Credit rating","None yet (too new)"],["Owner","Devin Reyes"]],
-  note:"Devin ran Fresh Kicks Pop-Up last year. \"New name, fresh start. This time it's online.\"",end:97},
+  note:"Devin ran Fresh Kicks Pop-Up last year. \"New name, fresh start. This time it's online.\"",end:97,fin:"never"},
  {id:"pickle",b:"B",name:"Windy City Pickleball Co.",what:"Paddles and nets for 3 new courts",amt:6000,
   facts:[["In business","1 year"],["Credit rating","B"],["Pays suppliers in","30 days on average"]],
-  note:"Growing fast. Two suppliers give strong references.",end:12},
+  note:"Growing fast. Two suppliers give strong references.",end:12,fin:"paid"},
  {id:"willow",b:"B",name:"Willow Creek Golf Club",what:"Pro shop apparel",amt:8000,
   facts:[["In business","40 years"],["Credit rating","A"],["Pays suppliers in","20 days on average"]],
-  note:"The club was just sold. The new owners haven't set up their bill paying yet.",end:39},
+  note:"The club was just sold. The new owners haven't set up their bill paying yet.",end:39,fin:"late"},
  {id:"river",b:"B",name:"Riverside Rec Center",what:"Gym equipment",amt:4000,
   facts:[["In business","Village owned, since 1971"],["Credit rating","A"],["Pays suppliers in","15 days on average"]],
-  note:"Pays every invoice by direct deposit.",end:"paid"},
+  note:"Pays every invoice by direct deposit.",end:"paid",fin:"paid"},
  {id:"grid",b:"B",name:"Gridiron Gear Resale",what:"Used football gear to resell",amt:9000,
   facts:[["In business","1 year"],["Credit rating","D"],["Pays suppliers in","90+ days on average"]],
-  note:"The owner's last store closed still owing money to two suppliers.",end:66}
+  note:"The owner's last store closed still owing money to two suppliers.",end:66,fin:"never"}
 ];
 const CU=Object.fromEntries(CUST.map(c=>[c.id,c]));
 const NEWS=[
@@ -2629,6 +2634,17 @@ const NEWS=[
  {id:"prairie",cls:"mix",title:"Prairie Tennis: written off, then paid",story:"Northwest gives up and writes off the $5,000 in March. In August the academy's new owner pays the full $5,000."},
  {id:"rest",cls:"good",title:"Everyone else pays",story:"Northwest Swim Club and Elevate Volleyball pay their December balances in full in January."}
 ];
+const NEWS_S={
+ A:[{cls:"",title:"Fresh Kicks shuts down",story:"The pop-up closes in February and the owner stops answering calls. The $12,000 is never paid."},
+  {cls:"",title:"Rolling Hills Fitness closes",story:"The gym loses its lease in April. The $8,000 is never paid."},
+  {cls:"",title:"Max's goes bankrupt",story:"Max's files for bankruptcy in May. There's nothing left. The $7,000 is never paid."},
+  {cls:"mix",title:"Prairie Tennis pays late",story:"Months of reminders. In August the academy finally pays the full $5,000."},
+  {cls:"good",title:"Everyone else pays",story:"Maple Grove, Northwest Swim Club, Elevate Volleyball and Twin Oaks all pay in full."}],
+ B:[{cls:"",title:"Kick Lab vanishes",story:"The website goes dark in March and Devin Reyes stops answering. The $10,000 is never paid."},
+  {cls:"",title:"Gridiron Gear Resale closes",story:"The store shuts down owing money to five suppliers. The $9,000 is never paid."},
+  {cls:"mix",title:"Willow Creek pays late",story:"The new owners finally set up their bill paying and pay the $8,000 in full."},
+  {cls:"good",title:"Everyone else pays",story:"Maple Grove, Windy City Pickleball and Riverside Rec all pay in full."}]
+};
 const CHECKS={
  sale:{q:"Northwest ships $9,000 of uniforms to Maple Grove Park District on account. Which entry records the sale?",
   opts:[["Accounts Receivable","Sales"],["Cash","Sales"],["Sales","Accounts Receivable"],["Accounts Receivable","Allowance for Doubtful Accounts"]],amt:"9,000",ans:0,
@@ -2645,11 +2661,15 @@ const HUDDLES={
   hint:"Talk it over, then type one answer for your team. Use the words matching and sales."},
  h2:{title:"The owner is upset",prompt:"The owner sees the write-offs and says, \"That must have wrecked our profit this year!\" But net income didn't change at all. Explain to the owner why, in two or three sentences.",
   hint:"Where did the expense for these customers show up? What did the write-off entry actually change?"},
+ s1:{title:"Defend a decision",prompt:"Pick the application your team argued about the most. What did you decide, and what was the one clue that settled it?",
+  hint:"Talk it over, then type one answer for your team. Your answer may go up on the board."},
+ s3:{title:"Where's the line?",prompt:"Deny everyone and you earn $0. Approve everyone and you get burned. If this were your real business, how would you decide who gets credit? What does it cost to be too strict, and what does it cost to be too loose?",
+  hint:"Use your own numbers on your iPad: what you lost, and the profit you passed up."},
  h3:{title:"Write your credit policy",prompt:"Look back at Year 1. Which applicant fooled your team, or almost did? What clue should you weigh more from now on? Write one rule for your credit policy.",
   hint:"Your rule will show on your iPad while you review the Year 2 applications."}
 };
-const ROUNDS=["Open for business","Year 1 closes","Year 2: the bad news","Year 2: new customers","Year 2 closes"];
-const STEPS=[
+const ROUNDS_FULL=["Open for business","Year 1 closes","Year 2: the bad news","Year 2: new customers","Year 2 closes"];
+const STEPS_FULL=[
  {k:"apps",r:1,b:"A",yr:1},
  {k:"check",r:1,id:"sale",yr:1},
  {k:"aging",r:2,b:"A",yr:1},
@@ -2662,6 +2682,20 @@ const STEPS=[
  {k:"apps",r:4,b:"B",yr:2},
  {k:"aging",r:5,b:"B",yr:2}
 ];
+const ROUNDS_SIMPLE=["Open for business","Year 1: who paid?","Year 2: new customers","Year 2: who paid?"];
+const STEPS_SIMPLE=[
+ {k:"apps",r:1,b:"A",yr:1},
+ {k:"check",r:1,id:"sale",yr:1},
+ {k:"huddle",r:1,id:"s1",yr:1},
+ {k:"results",r:2,b:"A",yr:1},
+ {k:"huddle",r:2,id:"h3",yr:1},
+ {k:"apps",r:3,b:"B",yr:2},
+ {k:"results",r:4,b:"B",yr:2},
+ {k:"huddle",r:4,id:"s3",yr:2}
+];
+let MODE="simple",STEPS=STEPS_SIMPLE,ROUNDS=ROUNDS_SIMPLE;
+function setMode(m){MODE=m==="full"?"full":"simple";STEPS=MODE==="full"?STEPS_FULL:STEPS_SIMPLE;ROUNDS=MODE==="full"?ROUNDS_FULL:ROUNDS_SIMPLE}
+const finalOf=c=>c.b==="A"?(c.end==="paid"||c.y2==="paid"?"paid":c.y2==="wo"?"never":"late"):c.fin;
 const COLORS=["#C1102F","#1F5FAD","#1E7A3C","#9A6700","#6F3FA8","#0F7C80","#C2410C","#BE185D","#3F3F46","#4D7C0F"];
 
 /* ============================================================ HELPERS */
@@ -2696,7 +2730,7 @@ const RATINGS=[
 const ratingKey=()=>`<aside class="rkey"><h3>Credit ratings</h3><p class="sub">Best at the top, worst at the bottom.</p>
   <div class="list">${RATINGS.map(([g,t,d,c],i)=>`${i===0?'<div class="tier">Safe</div>':i===3?'<div class="tier">Some risk</div>':i===6?'<div class="tier">Danger</div>':i===10?'<div class="tier">Unknown</div>':""}<div class="rk" style="--c:${c}"><b>${g}</b><span><strong>${t}</strong>${d}</span></div>`).join("")}</div>
   <p class="pm">A <b>+</b> or <b>−</b> means a little better or worse within that grade. B− is just below B.</p></aside>`;
-const outcomeOf=c=>c.b==="A"?(c.end==="paid"?{t:"Paid in Year 1",cls:"g"}:c.y2==="paid"?{t:"Paid in Year 2",cls:"g"}:c.y2==="rec"?{t:"Written off, then paid",cls:"y"}:{t:"Written off",cls:"r"})
+const outcomeOf=c=>MODE==="simple"?({paid:{t:"Paid",cls:"g"},late:{t:"Paid late",cls:"y"},never:{t:"Never paid",cls:"r"}})[finalOf(c)]:c.b==="A"?(c.end==="paid"?{t:"Paid in Year 1",cls:"g"}:c.y2==="paid"?{t:"Paid in Year 2",cls:"g"}:c.y2==="rec"?{t:"Written off, then paid",cls:"y"}:{t:"Written off",cls:"r"})
   :(c.end==="paid"?{t:"Paid",cls:"g"}:c.end===0?{t:"Not yet due",cls:"g"}:{t:c.end+" days past due",cls:c.end>60?"r":"y"});
 
 /* ---------- backend (same database as the other live games) ---------- */
@@ -2753,7 +2787,7 @@ setInterval(()=>{const els=document.querySelectorAll("[data-timer]");if(!els.len
 const approvedIds=(p,b)=>(p&&p["lock"+b])?CUST.filter(c=>c.b===b&&(p["apps"+b]||{})[c.id]===true).map(c=>c.id):[];
 function agingRows(p,b){return approvedIds(p,b).map(id=>CU[id]).filter(c=>c.end!=="paid").map(c=>{const bk=bucketOf(c.end);return{c,bk,est:Math.round(c.amt*bk.pct)}})}
 function books(p,through,awards){
-  const b={gp:0,bde:0,fees:0,bonus:0,sales:0,ar:0,allow:0,wo:0,rec:0,col:[],feeLog:[],ag:{},ev:null,allowLog:[]};
+  const b={lost:0,res:{},gp:0,bde:0,fees:0,bonus:0,sales:0,ar:0,allow:0,wo:0,rec:0,col:[],feeLog:[],ag:{},ev:null,allowLog:[]};
   for(let j=0;j<=through&&j<STEPS.length;j++){const S=STEPS[j];
     if(S.k==="apps"){const ids=approvedIds(p,S.b),amt=sum(ids.map(id=>CU[id].amt));b.sales+=amt;b.gp+=Math.round(amt*GP);b.ar+=amt;b["sales"+S.b]=amt}
     else if(S.k==="check"){if(p["chk_"+S.id]!==CHECKS[S.id].ans){b.fees+=CFEE;b.feeLog.push({k:S.id,amt:CFEE})}}
@@ -2771,32 +2805,42 @@ function books(p,through,awards){
         else if(c.y2==="wo"){b.ar-=c.amt;b.allow-=c.amt;b.wo+=c.amt;ev.wo.push(c);b.allowLog.push({t:"Wrote off "+c.name,amt:-c.amt})}
         else if(c.y2==="rec"){b.ar-=c.amt;b.wo+=c.amt;b.rec+=c.amt;ev.rec.push(c);b.allowLog.push({t:"Wrote off "+c.name,amt:-c.amt});b.allowLog.push({t:"Reinstated "+c.name,amt:c.amt})}});
       b.ev=ev}
+    else if(S.k==="results"){const cs=approvedIds(p,S.b).map(id=>CU[id]),r={never:cs.filter(c=>finalOf(c)==="never"),late:cs.filter(c=>finalOf(c)==="late"),paid:cs.filter(c=>finalOf(c)==="paid")};
+      r.lost=sum(r.never.map(c=>c.amt));r.missed=sum(CUST.filter(c=>c.b===S.b&&!cs.includes(c)&&finalOf(c)!=="never").map(c=>Math.round(c.amt*GP)));b.lost+=r.lost;b.res[S.b]=r}
     else if(S.k==="huddle"){if(awards&&(awards[S.id]||[]).includes(p.id))b.bonus+=AWARD}
   }
-  b.ni=b.gp-b.bde-b.fees+b.bonus;b.nrv=b.ar-b.allow;return b;
+  b.ni=b.gp-b.bde-b.lost-b.fees+b.bonus;b.nrv=b.ar-b.allow;return b;
 }
 function ranks(val){const ids=Object.keys(val).sort((a,b)=>val[b]-val[a]);const r={};let k=0,prev=null;ids.forEach((id,i)=>{if(val[id]!==prev){k=i+1;prev=val[id]}r[id]=k});return r}
-const isLocked=(S,p)=>S.k==="apps"?!!p["lock"+S.b]:S.k==="check"?p["chk_"+S.id]!=null:S.k==="aging"?!!p["lockag"+S.b]:S.k==="events"?p.pred!=null:S.k==="huddle"?!!String(p["hud_"+S.id]||"").trim():false;
+const isLocked=(S,p)=>S.k==="apps"?!!p["lock"+S.b]:S.k==="check"?p["chk_"+S.id]!=null:S.k==="aging"?!!p["lockag"+S.b]:S.k==="events"?p.pred!=null:S.k==="huddle"?!!String(p["hud_"+S.id]||"").trim():S.k==="results"?true:false;
 
 /* ============================================================ TEACHER (projector) */
 let H=null;
 function hdr(){return `<h1 class="title">The Credit <span>Desk.</span></h1>
-  <p class="lede">${ROLE==="teacher"?`Teacher screen. Each team joins on one iPad and runs the credit desk at ${CO}, a wholesaler that sells team gear to clubs, park districts and stores on account. Over two years they approve customers, estimate bad debts, live with the write-offs, and talk it through in three team huddles.`:`Your team runs the credit desk at ${CO}. Every sale on account earns profit, but customers who never pay cost you the whole sale. Approve the right customers, estimate your bad debts, and finish with the most net income.`}</p>`}
+  <p class="lede">${ROLE==="teacher"?`Teacher screen. Each team joins on one iPad and runs the credit desk at ${CO}, a wholesaler that sells team gear to clubs, park districts and stores on account. Over two years they approve customers${MODE==="full"?", estimate bad debts, live with the write-offs,":", find out who pays,"} and talk it through in three team huddles.`:`Your team runs the credit desk at ${CO}. Every sale on account earns profit, but customers who never pay cost you the whole sale. Approve the right customers${MODE==="full"?", estimate your bad debts,":""} and finish with the most net income.`}</p>`}
 async function hostSetup(){
   const N=await net().catch(()=>null);if(!N)return needSetup();
-  app.innerHTML=`${hdr()}<div class="panel" style="margin-top:0"><h2>Start a game</h2>
-    <p>One iPad per team. Plan on about 50 minutes. The money board shows each team's <b>net income</b>.</p>
-    <ol><li><b>Open for business:</b> 8 credit applications, then a quick entry check.</li>
+  const full=MODE==="full";
+  app.innerHTML=`${hdr()}<div class="panel" style="margin-top:0;max-width:760px"><h2>Start a game</h2>
+    <div class="modes"><button class="mode" data-m="simple" aria-pressed="${!full}"><b>Credit decisions</b><span>Approve or deny, then find out who pays. No allowance or adjusting entries. About 35 minutes.</span></button>
+      <button class="mode" data-m="full" aria-pressed="${full}"><b>Full game</b><span>Adds the aging schedule, the allowance and write-offs. About 50 minutes.</span></button></div>
+    ${full?`<ol><li><b>Open for business:</b> 8 credit applications, then a quick entry check.</li>
     <li><b>Year 1 closes:</b> teams age their receivables and book the allowance. Huddle: why now?</li>
     <li><b>The bad news:</b> write-offs and a recovery, two quick checks. Huddle: why didn't profit drop?</li>
     <li><b>New customers:</b> huddle on a credit policy first, then 6 new applications.</li>
     <li><b>Year 2 closes:</b> aging again, now with each team's own leftover allowance balance.</li></ol>
-    <p class="note">Scoring: gross profit is 40% of every sale they approve. Bad Debts Expense comes off. Each wrong aging answer costs a ${money(FEE)} audit fee and each wrong entry check costs ${money(CFEE)}. During huddles you can award ${money(AWARD)} bonuses to the best answers.</p>
+    <p class="note">Scoring: gross profit is 40% of every sale they approve. Bad Debts Expense comes off. Each wrong aging answer costs a ${money(FEE)} audit fee and each wrong entry check costs ${money(CFEE)}. During huddles you can award ${money(AWARD)} bonuses to the best answers.</p>`
+    :`<ol><li><b>Open for business:</b> 8 credit applications and a quick entry check. Huddle: defend a decision.</li>
+    <li><b>Year 1: who paid?</b> The news comes in. Huddle: write your credit policy.</li>
+    <li><b>Year 2: new customers:</b> 6 new applications, with each team's policy on its iPad.</li>
+    <li><b>Year 2: who paid?</b> Final news. Huddle: where's the line?</li></ol>
+    <p class="note">Scoring: gross profit is 40% of every sale they approve. A customer who never pays costs the whole sale. A wrong entry check costs a ${money(CFEE)} audit fee. During huddles you can award ${money(AWARD)} bonuses to the best answers.</p>`}
     <div class="err" id="er"></div><button class="btn main" id="go">Create game</button></div>`;
+  app.querySelectorAll(".mode").forEach(x=>x.onclick=()=>{setMode(x.dataset.m);hostSetup()});
   $("#go").onclick=async()=>{$("#go").disabled=true;
     try{let code;for(let t=0;t<20;t++){code=String(Math.floor(1000+Math.random()*9000));if(!(await N.get("games/"+code)))break}
-      await N.set("games/"+code,{created:Date.now(),game:"creditdesk",seed:1,ids:[],state:{phase:"lobby"}});
-      H={N,code,players:{},state:{phase:"lobby"},awards:{},hideNames:false};
+      await N.set("games/"+code,{created:Date.now(),game:"creditdesk",mode:MODE,seed:1,ids:[],state:{phase:"lobby",mode:MODE}});
+      H={N,code,players:{},state:{phase:"lobby",mode:MODE},awards:{},hideNames:false};
       H.off=N.on("games/"+code+"/players",v=>{H.players=v||{};hostRender(true)});
       hostRender()}catch(e){$("#er").textContent="Couldn't reach the game database.";$("#go").disabled=false}};
 }
@@ -2805,7 +2849,7 @@ const colorOf=(teams,id)=>COLORS[Math.max(0,teams.findIndex(t=>t.id===id))%COLOR
 function curThrough(st){if(st.phase==="end")return STEPS.length-1;if(st.phase!=="play")return -1;return (st.sub==="reveal"||st.sub==="share")?st.i:st.i-1}
 function hostSet(st){H.state=st;H.N.set("games/"+H.code+"/state",st).catch(()=>{});hostRender()}
 function pushState(st){
-  const teams=teamsArr(),th=curThrough(st);st.awards=H.awards;
+  const teams=teamsArr(),th=curThrough(st);st.awards=H.awards;st.mode=MODE;
   st.ni={};teams.forEach(p=>st.ni[p.id]=books(p,th,H.awards).ni);st.rank=ranks(st.ni);
   st.names=Object.fromEntries(teams.map(t=>[t.id,t.name]));
   if(st.timer){TIMER_END=st.timer}else{TIMER_END=0;TIMER_BEEPED=false}
@@ -2818,6 +2862,8 @@ function tileFor(S,p,teams,th,anim,i,mode){
   else if(S.k==="check"){const ok=p["chk_"+S.id]===CHECKS[S.id].ans;cls+=ok?" ok":" no";st=ok?`<span class="stamp">✓</span>Correct`:`<span class="stamp">−${money(CFEE)}</span>audit fee`}
   else if(S.k==="aging"){const g=now.ag[S.b];const both=g.okReq&&g.okAdj;cls+=both?" ok":(g.okReq||g.okAdj)?" mid":" no";
     st=`Expense ${money(g.adj)}<br>${both?`<span class="stamp">✓</span>Books right`:`<span class="stamp">−${money(g.fee)}</span>audit fee`}`}
+  else if(S.k==="results"&&!now.res[S.b]){st="Waiting for the news"}
+  else if(S.k==="results"){const r=now.res[S.b];cls+=r.lost?" no":" ok";st=r.lost?`<span class="stamp">−${money(r.lost)}</span>${r.never.length} never paid`:(r.paid.length+r.late.length?`<span class="stamp">✓</span>Everyone paid`:`No customers`)}
   else if(S.k==="events"){cls+=" mid";st=`<span class="stamp">${signed(d)}</span>net income change<br>Allowance ${balTxt(now.allow)}`}
   return `<div class="${cls}${anim?" anim":""}" style="--c:${colorOf(teams,p.id)};--d:${i*70}ms"><div class="tn">${esc(p.name)}</div><span class="rk">${rk?ord(rk):""}</span>
     <div class="lbl">Net income</div><div class="cash" data-to="${now.ni}" data-from="${anim&&mode!=="lock"?prev.ni:now.ni}">${money(anim&&mode!=="lock"?prev.ni:now.ni)}</div><div class="st">${st}</div></div>`}
@@ -2847,7 +2893,7 @@ function hostRender(fromPoll){
   if(st.phase==="end"){if(fresh)finale(teams);return}
   const S=STEPS[st.i],last=st.i===STEPS.length-1,open=st.sub==="open";
   const n=teams.filter(p=>isLocked(S,p)).length;
-  const head=`<div class="rhead"><span class="rtag">Round ${S.r} of 5</span><span class="rname">${ROUNDS[S.r-1]}</span><span class="yr">Year ${S.yr}</span></div>`;
+  const head=`<div class="rhead"><span class="rtag">Round ${S.r} of ${ROUNDS.length}</span><span class="rname">${ROUNDS[S.r-1]}</span><span class="yr">Year ${S.yr}</span></div>`;
   const next=()=>last?pushState({phase:"end"}):goStep(st.i+1);
   const th=curThrough(st);
   const warn=(verb)=>n<teams.length?confirm(`${teams.length-n} team(s) haven't ${verb}. Continue anyway?`):true;
@@ -2911,6 +2957,21 @@ function hostRender(fromPoll){
       ${boardHTML(S,teams,th,fresh)}
       <div class="bar2"><span class="count">Write off more than you estimated, and the allowance ends up with a <b>debit</b> balance.</span><button class="btn main" id="nx">Next →</button></div>`;
     $("#nx").onclick=next;requestAnimationFrame(zoomApp);return}
+  if(S.k==="results"){
+    const news=NEWS_S[S.b];
+    if(open){
+      app.innerHTML=`${head}<div class="scard"><div class="stitle">${S.b==="A"?"Year 1":"Year 2"}: who paid?</div><p class="story" style="font-size:23px">Only teams that approved these customers are affected. Your iPad shows which ones are yours.</p></div>
+        <div class="news">${news.map((x,i)=>`<div class="newsc ${x.cls}${fresh?" anim":""}" style="--d:${i*250}ms"><b>${esc(x.title)}</b><p>${esc(x.story)}</p></div>`).join("")}</div>
+        ${boardHTML(S,teams,th,false)}
+        <div class="bar2"><span class="count">Net income before the news</span><button class="btn main" id="nx">Reveal the damage</button></div>`;
+      $("#nx").onclick=()=>{beep(660,.12);pushState({...st,sub:"reveal"})};
+      requestAnimationFrame(zoomApp);return}
+    const burned=teams.filter(p=>books(p,th,H.awards).res[S.b].lost>0).length;
+    app.innerHTML=`${head}<div class="scard"><div class="stitle">${burned} of ${teams.length} teams got burned</div>
+      <div class="lesson"><b>A customer who never pays costs the whole sale.</b> At 40% gross profit, one bad $10,000 customer wipes out the profit from $25,000 of good sales.</div></div>
+      ${boardHTML(S,teams,th,fresh)}
+      <div class="bar2"><span></span><button class="btn main" id="nx">${last?"Final results →":"Next →"}</button></div>`;
+    $("#nx").onclick=next;if(fresh){countUp();setTimeout(()=>burned>teams.length/2?beep(220,.3):beep(990,.15),400)}requestAnimationFrame(zoomApp);return}
   if(S.k==="huddle"){
     const h=HUDDLES[S.id];TIMER_END=st.timer||0;
     if(open){
@@ -2992,17 +3053,20 @@ function classResults(teams){
   const row=c=>{const k=teams.filter(p=>approvedIds(p,c.b).includes(c.id)).length,o=outcomeOf(c);return `<div class="cr"><span><b>${esc(c.name)}</b> <span class="note">${money(c.amt)}</span></span><span><span class="tag ${o.cls==="g"?"":o.cls}">${esc(o.t)}</span></span><span class="b"><i style="width:${k/n*100}%"></i></span><span>${k} of ${teams.length}</span></div>`};
   const pct=f=>Math.round(teams.filter(f).length/n*100)+"%";
   const ag=b=>p=>{const g=books(p,th,H.awards).ag[b];return g&&g.okReq&&g.okAdj};
+  const burnt=bb=>teams.filter(p=>(books(p,th,H.awards).res[bb]||{}).lost>0).length;
   const stars=Object.entries(H.awards).flatMap(([h,ids])=>ids.map(id=>({h,p:teams.find(t=>t.id===id)}))).filter(x=>x.p);
   app.innerHTML=`<div class="rep"><h2>Class results</h2>
     <div style="display:grid;grid-template-columns:1.3fr 1fr;gap:28px">
     <div><h3 style="font-family:var(--display);font-size:26px;margin:6px 0">Year 1 applicants · teams that approved</h3>${CUST.filter(c=>c.b==="A").map(row).join("")}
-      <h3 style="font-family:var(--display);font-size:26px;margin:16px 0 6px">Year 2 applicants · status at year end</h3>${CUST.filter(c=>c.b==="B").map(row).join("")}</div>
+      <h3 style="font-family:var(--display);font-size:26px;margin:16px 0 6px">Year 2 applicants · ${MODE==="full"?"status at year end":"teams that approved"}</h3>${CUST.filter(c=>c.b==="B").map(row).join("")}</div>
     <div><h3 style="font-family:var(--display);font-size:26px;margin:6px 0">How the books went</h3>
       <div class="leak okk"><b>Sale entry check: ${pct(p=>p.chk_sale===0)} correct</b>Dr Accounts Receivable, Cr Sales.</div>
-      <div class="leak okk"><b>Year 1 aging: ${pct(ag("A"))} fully right</b>Allowance started at $0.</div>
+      ${MODE==="full"?`<div class="leak okk"><b>Year 1 aging: ${pct(ag("A"))} fully right</b>Allowance started at $0.</div>
       <div class="leak okk"><b>Write-off entry: ${pct(p=>p.chk_wo===0)} correct</b>Dr Allowance, Cr Accounts Receivable. No expense.</div>
       <div class="leak okk"><b>NRV after a write-off: ${pct(p=>p.chk_nrv===0)} correct</b>It doesn't change.</div>
-      <div class="leak okk"><b>Year 2 aging: ${pct(ag("B"))} fully right</b>Required balance minus what's already in the allowance.</div>
+      <div class="leak okk"><b>Year 2 aging: ${pct(ag("B"))} fully right</b>Required balance minus what's already in the allowance.</div>`
+      :`<div class="leak mid"><b>Year 1: ${burnt("A")} of ${teams.length} teams approved a customer who never paid</b>Fresh Kicks, Rolling Hills and Max's never paid.</div>
+      <div class="leak mid"><b>Year 2: ${burnt("B")} of ${teams.length} teams got burned again</b>Kick Lab and Gridiron Gear never paid.</div>`}
       ${stars.length?`<h3 style="font-family:var(--display);font-size:26px;margin:16px 0 6px">Huddle bonuses</h3>${stars.map(s=>`<div class="leak mid"><b>${esc(s.p.name)} · ${esc(HUDDLES[s.h].title)}</b>${esc(s.p["hud_"+s.h]||"")}</div>`).join("")}`:""}
     </div></div>
     <div class="row" style="justify-content:center;margin-top:16px"><button class="btn main" id="pod">Back to standings</button> <button class="btn" id="erase">Erase game</button></div></div>`;
@@ -3032,6 +3096,7 @@ async function joinForm(){
 async function enterGame(N,code,name,forcePid){
   try{const g=await N.get("games/"+code);
     if(!g||g.game!=="creditdesk")return "No Credit Desk game with that code. Check the board.";
+    setMode(g.mode||"full");
     const sv=loadSess(),norm=x=>String(x||"").trim().toLowerCase().replace(/\s+/g," ");
     let pid=forcePid||(sv&&sv.code===code&&norm(sv.name)===norm(name)?sv.pid:null);
     if(!pid&&g.players){const hit=Object.entries(g.players).find(([,p])=>norm(p.name)===norm(name));if(hit)pid=hit[0]}
@@ -3042,7 +3107,7 @@ async function enterGame(N,code,name,forcePid){
     if(ME&&ME.off)ME.off();
     ME={N,code,pid,name,rec,state:null,key:null,draft:{}};
     $("#who").textContent=name;$("#who").hidden=false;$("#zm").hidden=false;teamZoom(0);
-    ME.off=N.on(`games/${code}/state`,st=>{if(!ME)return;if(!st){app.innerHTML=`<div class="wait"><h2>The game has ended</h2><p>Your teacher closed this game.</p></div>`;return}ME.state=st;teamRender()});
+    ME.off=N.on(`games/${code}/state`,st=>{if(!ME)return;if(!st){app.innerHTML=`<div class="wait"><h2>The game has ended</h2><p>Your teacher closed this game.</p></div>`;return}if(st.mode)setMode(st.mode);ME.state=st;teamRender()});
     return null}catch(e){return "Couldn't connect. Try again."}
 }
 async function rejoin(){const N=await net().catch(()=>null);if(!N)return needSetup();
@@ -3061,15 +3126,27 @@ function teamRender(){
   if(key===M.key)return;M.key=key;
   if(st.phase==="lobby"){app.innerHTML=`<div class="wait"><h2>You're in, ${esc(M.name)}!</h2></div>
     <div class="box"><h3>How ${CO} makes money</h3><p style="margin:0">You sell team gear on account (Net 30). Every sale you approve earns <b>40% gross profit</b>. But a customer who never pays costs you the <b>whole sale</b>, so one bad customer wipes out the profit from about two good ones.</p>
-    <p>At each year end you estimate bad debts with an aging schedule. Mistakes cost audit fees. Your teacher may give bonuses for great huddle answers.</p><p class="note" style="margin:0">Team with the most net income after two years wins.</p></div>`;return}
+    <p>${MODE==="full"?"At each year end you estimate bad debts with an aging schedule. Mistakes cost audit fees.":"Read every application. Check the credit rating key on the right."} Your teacher may give bonuses for great huddle answers.</p><p class="note" style="margin:0">Team with the most net income after two years wins.</p></div>`;return}
   if(st.phase==="end"){teamReport(st);return}
-  const head=`<div class="rtag" style="text-align:center;margin-top:10px">Round ${S.r} of 5 · ${ROUNDS[S.r-1]} · Year ${S.yr}</div>`;
+  const head=`<div class="rtag" style="text-align:center;margin-top:10px">Round ${S.r} of ${ROUNDS.length} · ${ROUNDS[S.r-1]} · Year ${S.yr}</div>`;
   const b=books(meP(),st.sub==="reveal"||st.sub==="share"?st.i:st.i-1,st.awards);
   if(S.k==="apps")return teamApps(S,st,head,b);
   if(S.k==="check")return teamCheck(S,st,head);
   if(S.k==="aging")return teamAging(S,st,head,b);
   if(S.k==="events")return teamEvents(S,st,head,b);
   if(S.k==="huddle")return teamHuddle(S,st,head,b);
+  if(S.k==="results")return teamResults(S,st,head,b);
+}
+function teamResults(S,st,head,b){
+  const M=ME,yes=approvedIds(meP(),S.b).map(id=>CU[id]);
+  const chips=yes.map(c=>{const o=outcomeOf(c);return `<span class="${o.cls}">${esc(c.name)} ${money(c.amt)}: ${esc(o.t)}</span>`}).join("");
+  if(st.sub==="open"){app.innerHTML=`${head}<div class="box"><h3>Your ${S.b==="A"?"Year 1":"Year 2"} customers</h3>${yes.length?`<div class="chips">${yes.map(c=>`<span>${esc(c.name)} ${money(c.amt)}</span>`).join("")}</div>`:"<p style='margin:0'>You didn't approve anyone, so none of this news touches you.</p>"}</div><div class="wait" style="padding-top:10px"><p>The news is on the board. Did any of yours get hit?</p></div>${myLine(st)}`;return}
+  const r=b.res[S.b]||{lost:0,never:[],missed:0};
+  app.innerHTML=`${head}<div class="verdict ${r.lost?"no":yes.length?"ok":"neu"}"><h2>${r.lost?"Lost "+money(r.lost):yes.length?"Everyone paid!":"No customers"}</h2>
+    <p>${r.lost?`${(n=>n.length<3?n.join(" and "):n.slice(0,-1).join(", ")+" and "+n[n.length-1])(r.never.map(c=>esc(c.name)))} never paid. You lose the whole sale.`:yes.length?"Every customer you approved paid in full.":"No risk, but no profit either."}</p></div>
+    ${yes.length?`<div class="box"><h3>Your customers</h3><div class="chips">${chips}</div></div>`:""}
+    ${r.missed?`<div class="box"><h3>Profit you passed up</h3><p style="margin:0">You denied customers who paid. That cost you <b>${money(r.missed)}</b> of gross profit.</p></div>`:""}${myLine(st)}`;
+  r.lost?beep(220,.3):beep(990,.15);
 }
 function teamApps(S,st,head,b){
   const M=ME,apps=CUST.filter(c=>c.b===S.b);
@@ -3170,6 +3247,8 @@ function teamEvents(S,st,head,b){
 function teamHuddle(S,st,head,b){
   const M=ME,h=HUDDLES[S.id],k="hud_"+S.id,mine=String(M.rec[k]||"");
   let ctx="";
+  if(S.id==="s1"){const all=CUST.filter(c=>c.b==="A"),yes=approvedIds(meP(),"A");ctx=`<div class="chips">${all.map(c=>`<span class="${yes.includes(c.id)?"g":"r"}">${yes.includes(c.id)?"✓ Approved":"✗ Denied"} · ${esc(c.name)}</span>`).join("")}</div>`}
+  if(S.id==="s3"){const lost=b.lost,miss=sum(Object.values(b.res).map(r=>r.missed||0));ctx=`Over two years you lost <b>${money(lost)}</b> to customers who never paid, and passed up <b>${money(miss)}</b> of profit from customers you denied who would have paid.`}
   if(S.id==="h1")ctx=`Your Year 1 Bad Debts Expense: <b>${money((b.ag.A||{}).adj||0)}</b>. Not one of those customers has refused to pay yet.`;
   if(S.id==="h2")ctx=b.wo?`You wrote off <b>${money(b.wo)}</b> of customer accounts. Your net income change: <b>$0</b>.`:`You had no write-offs, but other teams wrote off as much as $32,000. Explain it for them.`;
   if(S.id==="h3"){const all=CUST.filter(c=>c.b==="A"),yes=approvedIds(meP(),"A");ctx=`<div class="chips">${all.map(c=>{const o=outcomeOf(c);return `<span class="${o.cls}">${yes.includes(c.id)?"✓ Approved":"✗ Denied"} · ${esc(c.name)}: ${esc(o.t)}</span>`}).join("")}</div>`}
@@ -3196,12 +3275,12 @@ function teamReport(st){
   app.innerHTML=`<div class="rep"><h2>${esc(M.name)}: ${money(b.ni)}</h2><p style="font-size:22px;margin:0">${st.rank?ord(st.rank[M.pid])+" of "+n:""} · two-year net income</p>
     <div class="box" style="max-width:none"><h3>Your two years</h3><table class="t"><tbody>
       <tr><td>Credit sales (${money(b.sales)}) × 40% gross profit</td><td class="r">${money(b.gp)}</td></tr>
-      <tr><td>Bad Debts Expense, Year 1</td><td class="r">−${plain(g1.adj)}</td></tr>
-      <tr><td>Bad Debts Expense, Year 2</td><td class="r">${g2.adj<0?"+"+plain(-g2.adj):"−"+plain(g2.adj)}</td></tr>
+      ${MODE==="full"?`<tr><td>Bad Debts Expense, Year 1</td><td class="r">−${plain(g1.adj)}</td></tr>
+      <tr><td>Bad Debts Expense, Year 2</td><td class="r">${g2.adj<0?"+"+plain(-g2.adj):"−"+plain(g2.adj)}</td></tr>`:`<tr><td>Customers who never paid</td><td class="r">−${plain(b.lost)}</td></tr>`}
       <tr><td>Audit fees</td><td class="r">−${plain(b.fees)}</td></tr>
       <tr><td>Huddle bonuses</td><td class="r">+${plain(b.bonus)}</td></tr>
       <tr class="tot"><td>Net income</td><td class="r">${money(b.ni)}</td></tr></tbody></table>
-      <p class="note">End of Year 2: Accounts receivable ${money(g2.ar)}, allowance ${money(g2.req)}, net realizable value ${money(g2.ar-g2.req)}. Total written off: ${money(b.wo)}${b.rec?`, ${money(b.rec)} of it recovered`:""}.</p></div>
+      ${MODE==="full"?"":"<!--"}<p class="note">End of Year 2: Accounts receivable ${money(g2.ar)}, allowance ${money(g2.req)}, net realizable value ${money(g2.ar-g2.req)}. Total written off: ${money(b.wo)}${b.rec?`, ${money(b.rec)} of it recovered`:""}.</p>${MODE==="full"?"":"-->"}</div>
     <h3 style="font-family:var(--display);font-size:26px;margin:16px 0 4px">Year 1 decisions</h3>${dec("A")}
     <h3 style="font-family:var(--display);font-size:26px;margin:16px 0 4px">Year 2 decisions</h3>${dec("B")}
     ${String(M.rec.hud_h3||"").trim()?`<p class="note" style="margin-top:14px">Your credit policy: ${esc(M.rec.hud_h3)}</p>`:""}</div>`;
