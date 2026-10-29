@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Receivables Simulation | District 214 Accounting</title>
+<meta name="description" content="Chapter 7 guided simulation: two and a half years of receivables at Prairie Peak Outfitters, with live T-accounts.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* Layout: logo bar, deck title, numbered problem strip, one problem card with click-to-reveal steps */
+:root{
+  --bg:#F4F3F3; --paper:#FFFFFF; --ink:#111111; --muted:#5C5C5C; --line:rgba(17,17,17,.14);
+  --red:#C1102F; --redtext:#B00E2A; --redsoft:#FBE7EA; --black:#111111; --onblack:#FFFFFF;
+  --display:"Oswald","Arial Narrow",Impact,sans-serif;
+  --body:"Barlow",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --scale:1;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){--bg:#121212; --paper:#1E1E1E; --ink:#F2F2F2; --muted:#A8A8A8; --line:rgba(242,242,242,.14); --redtext:#FF5C70; --redsoft:#3A1219; --black:#2B2B2B; color-scheme:dark}
+}
+:root[data-theme="dark"]{--bg:#121212; --paper:#1E1E1E; --ink:#F2F2F2; --muted:#A8A8A8; --line:rgba(242,242,242,.14); --redtext:#FF5C70; --redsoft:#3A1219; --black:#2B2B2B; color-scheme:dark}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;min-height:100%;background:var(--bg);color:var(--ink);font:calc(18px * var(--scale))/1.5 var(--body)}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,a:focus-visible{outline:3px solid var(--red);outline-offset:2px}
+[hidden]{display:none!important}
+/* App shell: fixed dark sidebar on the left with every game and practice, main content on the right */
+:root{--side:#111111; --sidehover:#202020; --sidetext:#E9E9E9; --sidemuted:#8E8E8E; --sidechip:#2A2A2A}
+html,body{height:100%}
+.shell{display:grid;grid-template-columns:272px minmax(0,1fr);min-height:100%}
+.side{position:sticky;top:0;height:100vh;overflow-y:auto;background:var(--side);color:var(--sidetext);padding:24px 16px 20px;display:flex;flex-direction:column;scrollbar-width:thin;scrollbar-color:#333 transparent}
+.side .brandlink img{height:50px;width:auto;display:block;border-radius:3px}
+.side .sitename{font-family:var(--display);font-weight:600;font-size:18px;letter-spacing:.14em;text-transform:uppercase;margin:12px 0 10px 2px;color:#fff}
+.side nav{display:flex;flex-direction:column;gap:2px}
+.side .ng{font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--sidemuted);margin:18px 0 6px 10px}
+.side .nch{font-size:12px;font-weight:600;color:var(--sidemuted);margin:8px 0 2px 10px}
+.side nav a{display:flex;gap:10px;align-items:center;color:var(--sidetext);text-decoration:none;padding:7px 10px;border-radius:6px;font-weight:600;font-size:15px;line-height:1.25}
+.side nav a:hover{background:var(--sidehover)}
+.side nav a:focus-visible{outline:2px solid var(--red);outline-offset:1px}
+.side nav a[aria-current="page"]{background:var(--red);color:#fff}
+.side .ch{flex:0 0 auto;width:24px;height:24px;border-radius:4px;background:var(--sidechip);font-family:var(--display);font-weight:600;font-size:13px;display:grid;place-items:center}
+.side nav a[aria-current="page"] .ch{background:rgba(0,0,0,.28)}
+.side .home .ch{background:transparent;font-size:16px}
+.side .sidefoot{margin-top:auto;padding:18px 10px 0;font-size:12px;color:var(--sidemuted)}
+.mbar{display:none}
+.scrim{display:none}
+.main{min-width:0;padding-block:30px 60px;padding-inline:clamp(20px,4vw,52px)}
+.inner{max-width:1120px}
+@media (max-width:900px){
+  .shell{grid-template-columns:1fr}
+  .side{position:fixed;left:0;top:0;bottom:0;height:auto;width:min(300px,86vw);z-index:30;transform:translateX(-102%);transition:transform .22s ease;padding-top:calc(20px + env(safe-area-inset-top,0px))}
+  .side.open{transform:none;box-shadow:0 0 40px rgba(0,0,0,.5)}
+  .scrim.on{display:block;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:25}
+  .mbar{display:flex;align-items:center;justify-content:space-between;gap:12px;position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--side);padding:10px 16px}
+  .mbar img{height:36px;width:auto;display:block;border-radius:3px}
+  .mbar button{background:transparent;color:#fff;border:2px solid #444;border-radius:8px;padding:6px 14px;font-family:var(--display);font-weight:600;font-size:16px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer}
+  .main{padding-block:22px 48px}
+}
+@media (prefers-reduced-motion: reduce){.side{transition:none}}
+
+.inner{max-width:1080px}
+.top{display:flex;align-items:center;gap:14px;flex-wrap:wrap;font-size:15px;font-weight:600;color:var(--muted)}
+.top a{color:inherit}
+.top .sp{flex:1}
+.size{display:flex;gap:6px}
+.size button{background:var(--paper);border:2px solid var(--line);border-radius:8px;padding:2px 10px;font-weight:700;font-size:15px}
+h1{font-family:var(--display);font-weight:700;font-size:clamp(32px,5vw,52px);line-height:1;margin:20px 0 6px;text-wrap:balance}
+.sub{color:var(--muted);margin:0 0 18px;font-size:calc(17px * var(--scale))}
+.strip{display:flex;gap:6px;overflow-x:auto;padding:4px 2px 10px;scrollbar-width:thin}
+.strip button{flex:0 0 auto;min-width:40px;height:40px;border-radius:8px;border:2px solid var(--line);background:var(--paper);font-family:var(--display);font-weight:600;font-size:17px}
+.strip button.seen{border-color:color-mix(in srgb,var(--red) 40%,var(--line))}
+.strip button[aria-current="true"]{background:var(--red);border-color:var(--red);color:#fff}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:14px;overflow:hidden;margin-top:6px}
+.head{background:var(--black);color:var(--onblack);padding:16px 24px 14px;display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 14px}
+.head .label{font-family:var(--display);font-weight:600;font-size:calc(26px * var(--scale));line-height:1.1}
+.head .tag{background:var(--red);color:#fff;border-radius:999px;padding:2px 12px;font-size:14px;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+.head .date{margin-left:auto;font-weight:600;font-size:15px;letter-spacing:.06em;text-transform:uppercase;opacity:.85}
+.head .section{width:100%;font-size:13px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#FF8A99}
+.body{padding:20px 24px 24px;display:grid;gap:16px}
+.body h2{font-family:var(--display);font-weight:600;font-size:calc(24px * var(--scale));margin:0;line-height:1.15}
+.body p{margin:0;max-width:72ch}
+.body ul{margin:0;padding-left:1.2em}
+.q{font-weight:700;font-size:calc(20px * var(--scale))}
+.tw{overflow-x:auto;min-width:0}
+table{border-collapse:collapse;font-variant-numeric:tabular-nums;font-size:calc(17px * var(--scale));min-width:100%}
+th,td{border:1px solid var(--line);padding:6px 12px;text-align:left;vertical-align:top}
+th{background:var(--black);color:var(--onblack);font-family:var(--display);font-weight:500;letter-spacing:.02em}
+td.s{text-decoration:line-through;text-decoration-color:var(--red);text-decoration-thickness:2px;color:var(--muted)}
+.tnote{font-size:15px;color:var(--muted);margin-top:4px}
+.reveals{display:grid;gap:12px}
+.rv{border-left:6px solid var(--red);background:color-mix(in srgb,var(--redsoft) 55%,var(--paper));border-radius:0 10px 10px 0;padding:12px 18px 14px;display:grid;gap:10px;animation:in .25s ease-out}
+@keyframes in{from{opacity:.2;transform:translateY(6px)}to{opacity:1;transform:none}}
+.rv .rl{font-size:14px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--redtext)}
+.lines{display:grid;gap:2px;font-variant-numeric:tabular-nums;font-size:calc(19px * var(--scale));font-weight:500}
+.answer{justify-self:start;background:var(--red);color:#fff;font-family:var(--display);font-weight:600;font-size:calc(28px * var(--scale));line-height:1.15;padding:6px 18px;border-radius:8px}
+.jt{font-size:15px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+table.journal{min-width:min(100%,560px);background:var(--paper)}
+table.journal td.acct{min-width:16em}
+table.journal td.cr{padding-left:3em}
+table.journal td.n{text-align:right;width:8em}
+.controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center;padding:0 24px 22px}
+.btn{background:var(--red);color:#fff;border:0;border-radius:10px;padding:12px 22px;font-family:var(--display);font-weight:600;font-size:20px}
+.btn.ghost{background:transparent;color:var(--ink);border:2px solid var(--line);padding:10px 18px;font-size:17px}
+.btn:disabled{opacity:.4;cursor:default}
+.left{color:var(--muted);font-size:15px;font-weight:600}
+.nav{display:flex;justify-content:space-between;gap:10px;margin-top:16px;flex-wrap:wrap}
+.hint{color:var(--muted);font-size:14px;margin-top:14px}
+kbd{font-family:var(--display);font-size:13px;border:1.5px solid var(--line);border-bottom-width:3px;border-radius:5px;padding:0 6px;background:var(--paper)}
+@media (max-width:600px){.head,.body{padding-inline:16px}.controls{padding-inline:16px}.head .date{margin-left:0}table.journal td.acct{min-width:10em}}
+@media (prefers-reduced-motion: reduce){.rv{animation:none}}
+</style>
+<style>
+/* ---- simulation layout: problem card on the left, live ledger on the right ---- */
+.inner{max-width:1500px}
+:root{--good:#1E7A3C;--goodsoft:#E7F4EB}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--good:#3FB86A;--goodsoft:#123020}}
+:root[data-theme="dark"]{--good:#3FB86A;--goodsoft:#123020}
+.sim{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(330px,1fr);gap:18px;align-items:start}
+.body{font-size:20px}
+.body p{max-width:none}
+.q{font-size:22px}
+.lines{font-size:21px}
+table{font-size:19px}
+table.journal td.acct{min-width:12em}
+.why{border-left:6px solid var(--good);background:var(--goodsoft);border-radius:0 10px 10px 0;padding:10px 16px;font-size:19px}
+.why b{font-family:var(--display);font-weight:600}
+.ledger{position:sticky;top:12px;display:grid;gap:12px}
+.lh{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.lh b{font-family:var(--display);font-weight:600;font-size:22px;letter-spacing:.04em;text-transform:uppercase}
+.lh span{font-size:14px;color:var(--muted);font-weight:600}
+.tacct{background:var(--paper);border:2px solid var(--line);border-radius:12px;padding:8px 12px 10px;font-variant-numeric:tabular-nums}
+.tacct .tn{font-family:var(--display);font-weight:600;font-size:20px;text-align:center;border-bottom:3px solid var(--ink);padding-bottom:4px}
+.tcols{display:grid;grid-template-columns:1fr 1fr}
+.tcols>div{padding:4px 8px;display:grid;gap:1px;align-content:start;min-height:30px}
+.tcols>div:first-child{border-right:3px solid var(--ink)}
+.tl{display:flex;justify-content:space-between;gap:8px;font-size:16px;line-height:1.3;padding:1px 4px;border-radius:4px}
+.tl span{color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.tl b{font-weight:700;white-space:nowrap}
+.tl.new{background:var(--redsoft);animation:in .3s ease-out}
+.tl.new span{color:var(--ink)}
+.tbal{display:flex;justify-content:space-between;border-top:2px solid var(--ink);margin-top:4px;padding:4px 8px 0;font-weight:700;font-size:18px}
+.tbal.zero{color:var(--muted)}
+.tacct.off{opacity:.45}
+.nrv{background:var(--black);color:#fff;border-radius:12px;padding:10px 14px;display:grid;gap:4px;font-variant-numeric:tabular-nums}
+.nrv .r{display:flex;justify-content:space-between;gap:10px;font-size:17px}
+.nrv .r.big{font-family:var(--display);font-weight:600;font-size:26px;border-top:2px solid rgba(255,255,255,.4);padding-top:4px;margin-top:2px}
+.nrv .r.big b{color:#FF8A99}
+.bde{display:flex;gap:8px;flex-wrap:wrap}
+.bde span{background:var(--paper);border:2px solid var(--line);border-radius:999px;padding:3px 12px;font-weight:700;font-size:15px;font-variant-numeric:tabular-nums}
+.bde span.new{border-color:var(--red);background:var(--redsoft)}
+table.aging td.n,table.aging th.n{text-align:right}
+table.aging tr.tot td{font-weight:700;border-top:3px double var(--ink)}
+.cmp{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.cmp>div{border:2px solid var(--line);border-radius:10px;padding:8px 12px;background:var(--paper)}
+.cmp>div.bad{border-color:var(--red)}
+.cmp .ct{font-family:var(--display);font-weight:600;font-size:19px;margin-bottom:4px}
+.cmp .ct small{font-family:var(--body);font-weight:600;font-size:14px;color:var(--muted);display:block}
+.cal{display:grid;grid-template-columns:auto auto;gap:2px 28px;justify-content:start;font-variant-numeric:tabular-nums;font-size:20px}
+.cal .u{border-bottom:2px solid var(--ink)}
+.cal .t{font-weight:700}
+.formula{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-family:var(--display);font-weight:600;font-size:24px;font-variant-numeric:tabular-nums}
+.formula span{background:var(--paper);border:2px solid var(--ink);border-radius:8px;padding:2px 12px}
+.formula span.eq{background:var(--red);border-color:var(--red);color:#fff}
+.sim>*{min-width:0}
+.cmp>div{min-width:0}
+.cmp table.journal{min-width:0;width:100%}
+.cmp table.journal td.acct{min-width:0}
+.cmp table.journal td.cr{padding-left:1.4em}
+.cmp table.journal td.n{width:auto}
+.cmp table,.cmp th,.cmp td{font-size:16px}
+@media (max-width:1280px){.sim{grid-template-columns:1fr}.ledger{position:static}}
+@media (max-width:600px){.cmp{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="shell">
+  <div class="mbar"><a href="/"><img src="logo-214.png" alt="High School District 214"></a><button id="menuBtn" aria-expanded="false" aria-controls="side">Menu</button></div>
+  <aside class="side" id="side">
+    <a class="brandlink" href="/"><img src="logo-214.png" alt="High School District 214"></a>
+    <div class="sitename">Accounting</div>
+    <nav aria-label="Site">
+      <a class="home" href="/"><span class="ch">⌂</span>Home</a>
+      <div class="ng">Live Class Games</div>
+      <a href="credit-desk.html"><span class="ch">7</span>The Credit Desk</a>
+      <a href="review-live.html"><span class="ch">6</span>Review Live</a>
+      <a href="bank-rec-live.html"><span class="ch">6</span>Bank Rec Live</a>
+      <a href="controls-live.html"><span class="ch">6</span>Controls Live</a>
+      <a href="inside-job.html"><span class="ch">6</span>Inside Job</a>
+      <a href="two-books-live.html"><span class="ch">4</span>Two Books Live</a>
+      <div class="ng">Review Games</div>
+      <a href="chapter-6.html"><span class="ch">6</span>Make It Match</a>
+      <a href="chapter-5.html"><span class="ch">5</span>Same Goods, Three Costs</a>
+      <a href="chapter-4.html"><span class="ch">4</span>Same Deal, Two Books</a>
+      <div class="ng">Interactive Practices</div>
+      <div class="nch">Chapter 7</div>
+      <a href="practice-ch7-sim.html" aria-current="page"><span class="ch">7</span>Receivables Simulation</a>
+      <div class="nch">Chapter 6</div>
+      <a href="practice-ch6-bank-rec.html"><span class="ch">6</span>Bank Rec Practice</a>
+      <a href="practice-ch6-side-by-side.html"><span class="ch">6</span>Side-by-Side Recs</a>
+      <div class="nch">Chapter 5</div>
+      <a href="practice-ch5-set-1.html"><span class="ch">5</span>Practice Problem Set 1</a>
+      <a href="practice-ch5-weighted-average.html"><span class="ch">5</span>Weighted Average</a>
+      <div class="nch">Chapter 4</div>
+      <a href="practice-ch4-round-1.html"><span class="ch">4</span>Problem Set Round 1</a>
+      <a href="practice-ch4-round-2.html"><span class="ch">4</span>Problem Set Round 2</a>
+      <div class="nch">Chapter 3</div>
+      <a href="practice-ch3-adjusting.html"><span class="ch">3</span>Adjusting Entries</a>
+      <a href="practice-ch3-depr-closing.html"><span class="ch">3</span>Depreciation and Closing Entries</a>
+    </nav>
+    <div class="sidefoot">High School District 214 | Accounting</div>
+  </aside>
+  <div class="scrim" id="scrim"></div>
+  <main class="main"><div class="inner">
+  <div class="top">
+    <span><a href="/#practices">Interactive Practices</a> / Chapter 7</span>
+  </div>
+  <h1>Receivables Simulation</h1>
+  <p class="sub">Two and a half years at Prairie Peak Outfitters: credit sales, bad debts, write-offs, and notes. Watch the T-accounts on the right change with every entry.</p>
+  <nav class="strip" id="strip" aria-label="Steps"></nav>
+  <div class="sim">
+    <article class="card">
+      <header class="head" id="head"></header>
+      <div class="body"><div id="given" style="display:grid;gap:14px"></div><div class="reveals" id="reveals"></div></div>
+      <div class="controls">
+        <button class="btn" id="revealBtn">Reveal next</button>
+        <button class="btn ghost" id="allBtn">Show all</button>
+        <button class="btn ghost" id="resetBtn">Hide answers</button>
+        <span class="left" id="left"></span>
+      </div>
+    </article>
+    <aside class="ledger" id="ledger" aria-label="Prairie Peak's ledger"></aside>
+  </div>
+  <div class="nav">
+    <button class="btn ghost" id="prevBtn">Back</button>
+    <span class="left" id="pos" style="align-self:center"></span>
+    <button class="btn ghost" id="nextBtn">Next step</button>
+  </div>
+  <p class="hint">Keys: <kbd>Space</kbd> or <kbd>→</kbd> reveals the next part, then moves on. <kbd>←</kbd> goes back a step. <kbd>H</kbd> hides answers. The ledger only shows the entries in this simulation.</p>
+  </div></main>
+</div>
+<script>
+(function(){const s=document.getElementById("side"),b=document.getElementById("menuBtn"),c=document.getElementById("scrim");
+function set(o){s.classList.toggle("open",o);c.classList.toggle("on",o);b.setAttribute("aria-expanded",o);b.textContent=o?"Close":"Menu"}
+b.addEventListener("click",()=>set(!s.classList.contains("open")));c.addEventListener("click",()=>set(false));
+document.addEventListener("keydown",e=>{if(e.key==="Escape")set(false)});
+const cur=s.querySelector('[aria-current="page"]');if(cur&&cur.scrollIntoView)cur.scrollIntoView({block:"nearest"});})();
+</script>
+<script>
+"use strict";
+/* Every reveal can post to the ledger: post:[[account, "dr"|"cr", amount, short label]]
+   AR = Accounts Receivable, AL = Allowance for Doubtful Accounts, NR = Notes Receivable, BDE = Bad Debts Expense (by year) */
+const J=(rows,title)=>({title,rows:rows.map(r=>r[1]!=null?{account:r[0],debit:r[1]}:{account:r[0],credit:r[2]})});
+const STEPS=[
+ {label:"Step 1",tag:"Credit sales",date:"Year 1",heading:"Open for business",
+  given:[{p:"Prairie Peak Outfitters sells camping and climbing gear to stores and rec centers. Customers buy now and pay in 30 days."},
+   {p:"During Year 1, Prairie Peak sells $500,000 of gear on account."},{q:"What's the entry?"}],
+  reveals:[
+   {label:"Journal entry",entry:J([["Accounts Receivable","500,000"],["Sales",null,"500,000"]]),post:[["AR","dr",500000,"Y1 credit sales"]]},
+   {why:"<b>Why:</b> selling on account creates a receivable. No cash comes in yet. Prairie Peak keeps a separate receivable for each customer."}]},
+ {label:"Step 2",tag:"Collections",date:"Year 1",heading:"Customers pay",
+  given:[{p:"During Year 1, customers pay $440,000 of what they owe."},{q:"What's the entry? What is left in Accounts Receivable?"}],
+  reveals:[
+   {label:"Journal entry",entry:J([["Cash","440,000"],["Accounts Receivable",null,"440,000"]]),post:[["AR","cr",440000,"Y1 collections"]]},
+   {label:"Accounts Receivable at year end",lines:["$500,000 − $440,000"],answer:"$60,000 still owed"}]},
+ {label:"Step 3",tag:"Percent of sales",date:"Dec 31, Year 1",heading:"Estimate bad debts: percent of sales",
+  given:[{p:"Not every customer will pay. Prairie Peak uses the allowance method. It estimates that 1% of credit sales will never be collected."},
+   {p:"Credit sales for Year 1: $500,000. The allowance has a $0 balance (first year)."},{q:"What is the adjusting entry?"}],
+  reveals:[
+   {label:"The math",lines:["$500,000 × 1%"],answer:"$5,000"},
+   {label:"Adjusting entry",entry:J([["Bad Debts Expense","5,000"],["Allowance for Doubtful Accounts",null,"5,000"]]),post:[["AL","cr",5000,"Y1 estimate"],["BDE1","dr",5000]]},
+   {why:"<b>Why:</b> the matching principle. The expense lands in Year 1, the same year as the sales. The percent of sales method ignores whatever is already in the allowance. You just book the percent."}]},
+ {label:"Step 4",tag:"Balance sheet",date:"Dec 31, Year 1",heading:"What shows on the balance sheet?",
+  given:[{p:"Allowance for Doubtful Accounts is a contra asset. It sits right under Accounts Receivable and is subtracted from it."},{q:"What is the net realizable value of the receivables?"}],
+  reveals:[
+   {label:"Partial balance sheet, Dec 31, Year 1",table:{rows:[["Accounts receivable","$60,000",""],["Less: Allowance for doubtful accounts","5,000","$55,000"]]}},
+   {answer:"Net realizable value: $55,000"},
+   {why:"<b>Why:</b> net realizable value is the cash Prairie Peak actually expects to collect."}]},
+ {label:"Step 5",tag:"Write-off",date:"March 8, Year 2",heading:"A customer goes under",
+  given:[{p:"Trailhead Bikes goes bankrupt. It still owes Prairie Peak $3,200 from a Year 1 sale. Prairie Peak gives up and writes it off."},{q:"Using the allowance method, what's the entry?"}],
+  reveals:[
+   {label:"Journal entry (allowance method)",entry:J([["Allowance for Doubtful Accounts","3,200"],["Accounts Receivable",null,"3,200"]]),post:[["AL","dr",3200,"Trailhead Bikes"],["AR","cr",3200,"Trailhead Bikes"]]},
+   {label:"Net realizable value",lines:["Before: $60,000 − $5,000 = $55,000","After: $56,800 − $1,800 = $55,000"],answer:"No change. No new expense."},
+   {label:"Compare: the direct write-off method",cmp:[
+     {t:"Allowance method",s:"Expense already in Year 1",e:J([["Allowance for Doubtful Accounts","3,200"],["Accounts Receivable",null,"3,200"]])},
+     {t:"Direct write-off method",s:"Expense shows up now, in Year 2",bad:true,e:J([["Bad Debts Expense","3,200"],["Accounts Receivable",null,"3,200"]])}]},
+   {why:"<b>Why:</b> the direct write-off method puts the expense in Year 2, but the sale happened in Year 1. That breaks matching. A company can only use it when bad debts are so small they are immaterial."}]},
+ {label:"Step 6",tag:"Year 2 activity",date:"Year 2",heading:"A busy Year 2",
+  given:[{p:"During Year 2:"},{list:["Sales on account: $620,000","Collections from customers: $592,300","August: Summit Ski Shop closes. Prairie Peak writes off its $4,500 balance."]},{q:"Record all three. What is in the allowance now?"}],
+  reveals:[
+   {label:"Journal entries",entries:[J([["Accounts Receivable","620,000"],["Sales",null,"620,000"]],"Credit sales"),J([["Cash","592,300"],["Accounts Receivable",null,"592,300"]],"Collections")],
+    post:[["AR","dr",620000,"Y2 credit sales"],["AR","cr",592300,"Y2 collections"]]},
+   {label:"Write-off",entry:J([["Allowance for Doubtful Accounts","4,500"],["Accounts Receivable",null,"4,500"]]),post:[["AL","dr",4500,"Summit Ski Shop"],["AR","cr",4500,"Summit Ski Shop"]]},
+   {label:"Allowance balance before adjusting",lines:["$5,000 credit − $3,200 − $4,500"],answer:"$2,700 DEBIT balance"},
+   {why:"<b>Why:</b> Prairie Peak wrote off more than it estimated. A debit balance in the allowance means the Year 1 estimate was too low. Look at the T-account."}]},
+ {label:"Step 7",tag:"Percent of A/R",date:"Dec 31, Year 2",heading:"Method 1: percent of A/R",
+  given:[{p:"Year end. Accounts Receivable is $80,000. The allowance has a $2,700 debit balance."},
+   {p:"Suppose Prairie Peak estimates that 5% of receivables will never be collected."},{q:"What balance does the allowance need? What is the adjusting entry?"}],
+  reveals:[
+   {label:"Required balance",lines:["$80,000 × 5%"],answer:"$4,000 credit"},
+   {label:"Adjusting entry",lines:["Required balance − balance now","$4,000 − (−$2,700) = $4,000 + $2,700"],answer:"$6,700"},
+   {label:"If Prairie Peak used this method",entry:J([["Bad Debts Expense","6,700"],["Allowance for Doubtful Accounts",null,"6,700"]])},
+   {why:"<b>Why:</b> percent of A/R and aging both find the balance the allowance should have, so they adjust for what is already there. A debit balance makes the entry bigger. Prairie Peak actually uses aging, so this entry is not posted. See the next step."}]},
+ {label:"Step 8",tag:"Aging",date:"Dec 31, Year 2",heading:"Method 2: aging of A/R",
+  given:[{p:"Prairie Peak actually sorts its $80,000 of receivables by how far past due they are."},
+   {table:{head:["Days past due","A/R balance","Percent","Estimated uncollectible"],cls:"aging",rows:[["Not yet due","$50,000","1%","?"],["1 to 30 days","15,000","3%","?"],["31 to 60 days","8,000","7%","?"],["61 to 90 days","4,000","40%","?"],["Over 90 days","3,000","60%","?"],["Total","$80,000","","?"]]}},
+   {q:"What is the required balance? What is the adjusting entry? (The allowance still has a $2,700 debit balance.)"}],
+  reveals:[
+   {label:"The aging schedule",table:{head:["Days past due","A/R balance","Percent","Estimated uncollectible"],cls:"aging",rows:[["Not yet due","$50,000","1%","$500"],["1 to 30 days","15,000","3%","450"],["31 to 60 days","8,000","7%","560"],["61 to 90 days","4,000","40%","1,600"],["Over 90 days","3,000","60%","1,800"],["Total","$80,000","","$4,910"]]}},
+   {label:"Adjusting entry",lines:["$4,910 − (−$2,700) = $4,910 + $2,700"],answer:"$7,610"},
+   {label:"Journal entry",entry:J([["Bad Debts Expense","7,610"],["Allowance for Doubtful Accounts",null,"7,610"]]),post:[["AL","cr",7610,"Y2 adjusting entry"],["BDE2","dr",7610]]},
+   {why:"<b>Why:</b> older receivables are less likely to be paid, so they get bigger percents. Check the T-account: the allowance now has exactly $4,910. If it had started with a $2,700 <b>credit</b> balance instead, the entry would be $4,910 − $2,700 = $2,210."}]},
+ {label:"Step 9",tag:"Notes receivable",date:"April 16, Year 3",heading:"A customer signs a note",
+  given:[{p:"Alpine Rec Center owes $9,000 on account and asks for more time. It signs a 90-day, 8% note for the $9,000."},{q:"When is the note due? How much interest will Prairie Peak earn? What's the entry today?"}],
+  reveals:[
+   {label:"Maturity date",cal:[["Days in April","30"],["Minus the date of the note","16",1],["Days remaining in April","14"],["Days in May","31"],["Days in June","30"],["Days in July (to reach 90)","15",1],["Period of the note","90",2]],answer:"Due July 15"},
+   {label:"Interest",formula:["$9,000","×","8%","×","90/360"],answer:"$180 interest"},
+   {label:"Journal entry today",entry:J([["Notes Receivable","9,000"],["Accounts Receivable",null,"9,000"]]),post:[["NR","dr",9000,"Alpine Rec note"],["AR","cr",9000,"Alpine Rec to a note"]]},
+   {why:"<b>Why:</b> the receivable just changes form, from an account to a written note. Interest is not recorded yet because it has not been earned. Rates are always annual, and a year is 360 days."}]},
+ {label:"Step 10",tag:"Notes receivable",date:"May 25, Year 3",heading:"A sale paid with a note",
+  given:[{p:"Ridgeline Climbing Gym buys $6,000 of climbing walls and gives Prairie Peak a 60-day, 6% note."},{q:"When is the note due? How much interest? What's the entry today?"}],
+  reveals:[
+   {label:"Maturity date",cal:[["Days in May","31"],["Minus the date of the note","25",1],["Days remaining in May","6"],["Days in June","30"],["Days in July (to reach 60)","24",1],["Period of the note","60",2]],answer:"Due July 24"},
+   {label:"Interest",formula:["$6,000","×","6%","×","60/360"],answer:"$60 interest"},
+   {label:"Journal entry today",entry:J([["Notes Receivable","6,000"],["Sales",null,"6,000"]]),post:[["NR","dr",6000,"Ridgeline note"]]},
+   {why:"<b>Why:</b> this time the note pays for a new sale, so the credit is Sales, just like Office Supplies Inc. on the slides."}]},
+ {label:"Step 11",tag:"Note collected",date:"July 15, Year 3",heading:"Alpine pays on time",
+  given:[{p:"The Alpine Rec Center note comes due. Alpine pays the $9,000 plus interest."},{q:"What's the entry?"}],
+  reveals:[
+   {label:"Cash received",lines:["$9,000 principal + $180 interest"],answer:"$9,180"},
+   {label:"Journal entry",entry:J([["Cash","9,180"],["Interest Revenue",null,"180"],["Notes Receivable",null,"9,000"]]),post:[["NR","cr",9000,"Alpine Rec paid"]]},
+   {why:"<b>Why:</b> the note is gone, and Prairie Peak earned 90 days of interest."}]},
+ {label:"Step 12",tag:"Dishonored note",date:"July 24, Year 3",heading:"Ridgeline can't pay",
+  given:[{p:"The Ridgeline Climbing Gym note comes due. Ridgeline tells Prairie Peak it cannot pay the note or the interest."},{q:"What's the entry?"}],
+  reveals:[
+   {label:"What Ridgeline owes",lines:["$6,000 principal + $60 interest"],answer:"$6,060"},
+   {label:"Journal entry",entry:J([["Accounts Receivable","6,060"],["Interest Revenue",null,"60"],["Notes Receivable",null,"6,000"]]),post:[["NR","cr",6000,"Ridgeline dishonored"],["AR","dr",6060,"Ridgeline dishonored"]]},
+   {why:"<b>Why:</b> a dishonored note comes off the books, but Ridgeline still owes the money, interest included. It moves back into Accounts Receivable so Prairie Peak can keep trying to collect. If that fails, it gets written off against the allowance."}]}
+];
+
+(function(){
+const $=id=>document.getElementById(id);
+let i=0,shown=0;const seen=new Set();
+const el=(tag,cls,text)=>{const e=document.createElement(tag);if(cls)e.className=cls;if(text!=null)e.textContent=text;return e};
+const fmt=n=>"$"+Math.round(n).toLocaleString("en-US");
+const plain=n=>Math.round(n).toLocaleString("en-US");
+function table(t){
+  const w=el("div","tw"),tb=el("table",t.cls||null);
+  if(t.head){const tr=el("tr");t.head.forEach((h,k)=>tr.appendChild(el("th",k?"n":null,h)));const th=el("thead");th.appendChild(tr);tb.appendChild(th)}
+  const body=el("tbody");
+  (t.rows||[]).forEach((r,ri)=>{const tr=el("tr",t.cls==="aging"&&ri===t.rows.length-1?"tot":null);r.forEach((c,ci)=>tr.appendChild(el("td",ci&&t.cls==="aging"?"n":null,c)));body.appendChild(tr)});
+  tb.appendChild(body);w.appendChild(tb);return w;
+}
+function entry(e){
+  const box=el("div");if(e.title)box.appendChild(el("div","jt",e.title));
+  const w=el("div","tw"),tb=el("table","journal");
+  const hr=el("tr");["Account","Debit","Credit"].forEach(h=>hr.appendChild(el("th",null,h)));const th=el("thead");th.appendChild(hr);tb.appendChild(th);
+  const body=el("tbody");
+  e.rows.forEach(r=>{const cr=r.credit!=null;const tr=el("tr");tr.appendChild(el("td","acct"+(cr?" cr":""),r.account));tr.appendChild(el("td","n",r.debit||""));tr.appendChild(el("td","n",r.credit||""));body.appendChild(tr)});
+  tb.appendChild(body);w.appendChild(tb);box.appendChild(w);return box;
+}
+function block(b){
+  if(b.p!=null)return el("p",null,b.p);
+  if(b.q!=null)return el("p","q",b.q);
+  if(b.list){const u=el("ul");b.list.forEach(x=>u.appendChild(el("li",null,x)));return u}
+  if(b.table)return table(b.table);
+  return el("div");
+}
+function reveal(r){
+  if(r.why){const d=el("div","why");d.innerHTML=r.why;return d}
+  const d=el("div","rv");if(r.label)d.appendChild(el("div","rl",r.label));
+  if(r.lines){const l=el("div","lines");r.lines.forEach(x=>l.appendChild(el("div",null,x)));d.appendChild(l)}
+  if(r.cal){const c=el("div","cal");r.cal.forEach(([a,b,u])=>{c.appendChild(el("span",u===2?"t":null,a));c.appendChild(el("span",u===1?"u":u===2?"t":null,b))});d.appendChild(c)}
+  if(r.formula){const f=el("div","formula");r.formula.forEach(x=>{const sp=el("span",null,x);if(x==="×"){sp.style.border="0";sp.style.background="none"}f.appendChild(sp)});d.appendChild(f)}
+  if(r.table)d.appendChild(table(r.table));
+  if(r.entry)d.appendChild(entry(r.entry));
+  if(r.entries){const g=el("div");g.style.cssText="display:grid;gap:10px";r.entries.forEach(e=>g.appendChild(entry(e)));d.appendChild(g)}
+  if(r.cmp){const c=el("div","cmp");r.cmp.forEach(x=>{const b=el("div",x.bad?"bad":null);const t=el("div","ct",x.t);t.appendChild(el("small",null,x.s));b.appendChild(t);b.appendChild(entry(x.e));c.appendChild(b)});d.appendChild(c)}
+  if(r.answer)d.appendChild(el("div","answer",r.answer));
+  return d;
+}
+/* ---------- ledger ---------- */
+function posts(){
+  const out=[];
+  STEPS.forEach((s,k)=>{if(k>i)return;s.reveals.forEach((r,ri)=>{if(k===i&&ri>=shown)return;(r.post||[]).forEach(p=>out.push({a:p[0],side:p[1],amt:p[2],lab:p[3],isNew:k===i}))})});
+  return out;
+}
+function ledger(){
+  const L=$("ledger");L.innerHTML="";const ps=posts();
+  const h=el("div","lh");h.appendChild(el("b",null,"Prairie Peak's ledger"));h.appendChild(el("span",null,"Updates as you reveal"));L.appendChild(h);
+  L.appendChild(h);
+  const build=(n,k,norm,off)=>{const mine=ps.filter(p=>p.a===k);const box=el("div","tacct"+(mine.length?"":" off"));box.appendChild(el("div","tn",n));
+    const cols=el("div","tcols"),dr=el("div"),cr=el("div");
+    mine.forEach(p=>{const l=el("div","tl"+(p.isNew?" new":""));l.appendChild(el("span",null,p.lab));l.appendChild(el("b",null,plain(p.amt)));(p.side==="dr"?dr:cr).appendChild(l)});
+    if(!mine.length){const l=el("div","tl");l.appendChild(el("span",null,off||"No entries yet"));dr.appendChild(l)}
+    cols.appendChild(dr);cols.appendChild(cr);box.appendChild(cols);
+    const bal=mine.reduce((t,p)=>t+(p.side===norm?p.amt:-p.amt),0);
+    const side=bal===0?"":(bal>0?(norm==="dr"?"debit":"credit"):(norm==="dr"?"credit":"debit"));
+    const b=el("div","tbal"+(bal===0?" zero":""));b.appendChild(el("span",null,"Balance"));b.appendChild(el("span",null,bal===0?"$0":fmt(Math.abs(bal))+" "+side));box.appendChild(b);
+    L.appendChild(box);return bal};
+  const AR=build("Accounts Receivable","AR","dr");
+  const AL=build("Allowance for Doubtful Accounts","AL","cr");
+  build("Notes Receivable","NR","dr","Notes start in Year 3");
+  const n=el("div","nrv");
+  const row=(a,b,big)=>{const r=el("div","r"+(big?" big":""));r.appendChild(el("span",null,a));r.appendChild(el("b",null,b));n.appendChild(r)};
+  row("Accounts receivable",fmt(AR));
+  row("Less: allowance",AL>=0?"− "+fmt(AL):"+ "+fmt(-AL)+" (debit)");
+  row("Net realizable value",fmt(AR-AL),true);
+  L.appendChild(n);
+  const bd=el("div","bde");const y1=ps.filter(p=>p.a==="BDE1"),y2=ps.filter(p=>p.a==="BDE2");
+  const chip=(t,list)=>{const s=el("span",list.some(p=>p.isNew)?"new":null,t+": "+fmt(list.reduce((a,p)=>a+p.amt,0)));bd.appendChild(s)};
+  chip("Bad Debts Expense, Year 1",y1);chip("Year 2",y2);
+  L.appendChild(bd);
+}
+function strip(){
+  const s=$("strip");s.innerHTML="";
+  STEPS.forEach((p,k)=>{const b=el("button",seen.has(k)?"seen":null,String(k+1));b.title=p.label+": "+p.heading;b.setAttribute("aria-label",b.title);if(k===i)b.setAttribute("aria-current","true");b.onclick=()=>go(k);s.appendChild(b)});
+}
+function render(){
+  const p=STEPS[i],h=$("head");h.innerHTML="";
+  h.appendChild(el("span","label",p.label));h.appendChild(el("span","tag",p.tag));h.appendChild(el("span","date",p.date));
+  const g=$("given");g.innerHTML="";g.appendChild(el("h2",null,p.heading));p.given.forEach(b=>g.appendChild(block(b)));
+  const rv=$("reveals");rv.innerHTML="";p.reveals.slice(0,shown).forEach(r=>rv.appendChild(reveal(r)));
+  const n=p.reveals.length,left=n-shown;
+  $("revealBtn").disabled=left===0&&i===STEPS.length-1;$("allBtn").disabled=left===0;$("resetBtn").disabled=shown===0;
+  $("revealBtn").textContent=left===0?(i===STEPS.length-1?"Done":"Next step →"):(shown===0?"Reveal":"Reveal next");
+  $("left").textContent=left?`${left} part${left===1?"":"s"} left`:"";
+  $("pos").textContent=`Step ${i+1} of ${STEPS.length}`;
+  $("prevBtn").disabled=i===0;$("nextBtn").disabled=i===STEPS.length-1;
+  strip();ledger();
+}
+function go(k){i=Math.max(0,Math.min(STEPS.length-1,k));shown=0;seen.add(i);try{history.replaceState(null,"","#s"+(i+1))}catch(_){}render();window.scrollTo({top:0})}
+function advance(){if(shown<STEPS[i].reveals.length){shown++;render();const r=$("reveals").lastElementChild;if(r)r.scrollIntoView({block:"nearest",behavior:"smooth"})}else if(i<STEPS.length-1)go(i+1)}
+$("revealBtn").onclick=advance;
+$("allBtn").onclick=()=>{shown=STEPS[i].reveals.length;render()};
+$("resetBtn").onclick=()=>{shown=0;render()};
+$("prevBtn").onclick=()=>go(i-1);
+$("nextBtn").onclick=()=>go(i+1);
+document.addEventListener("keydown",e=>{
+  if(e.target.closest&&e.target.closest("input,textarea"))return;
+  if(e.key===" "||e.key==="ArrowRight"||e.key==="Enter"){if(e.target.tagName==="BUTTON"&&e.key!=="ArrowRight")return;e.preventDefault();advance()}
+  else if(e.key==="ArrowLeft"){e.preventDefault();go(i-1)}
+  else if(e.key==="h"||e.key==="H"){shown=0;render()}
+});
+const m=/^#s(\d+)$/.exec(location.hash);go(m?(+m[1]-1):0);
+})();
+</script>
+
+<!-- Text size controls: scale the page content, remembered across pages -->
+<style id="tsz-css">
+#tsz{position:fixed;left:14px;bottom:14px;z-index:9999;display:flex;align-items:center;gap:2px;background:#111;color:#fff;border-radius:999px;padding:4px;box-shadow:0 2px 10px rgba(0,0,0,.3);font:600 15px "Barlow",system-ui,sans-serif}
+#tsz button{background:transparent;border:0;color:#fff;font:inherit;cursor:pointer;border-radius:999px;min-width:40px;height:36px;padding:0 10px}
+#tsz button:hover{background:rgba(255,255,255,.15)}
+#tsz button:focus-visible{outline:3px solid #C1102F;outline-offset:1px}
+#tsz button:disabled{opacity:.35;cursor:default}
+#tsz .big{font-size:20px}
+#tsz .pct{min-width:58px;font-variant-numeric:tabular-nums}
+@media print{#tsz{display:none}}
+</style>
+<div id="tsz" role="group" aria-label="Text size">
+  <button type="button" data-d="-1" aria-label="Smaller text" title="Smaller text (-)">A−</button>
+  <button type="button" data-d="0" class="pct" aria-label="Reset text size" title="Reset text size (0)">100%</button>
+  <button type="button" data-d="1" class="big" aria-label="Bigger text" title="Bigger text (+)">A+</button>
+</div>
+<script>
+(function(){
+  var STEPS=[0.8,0.9,1,1.1,1.25,1.4,1.6,1.8,2],KEY="d214-text-size",box=document.getElementById("tsz");
+  var target=document.querySelector("main")||document.body;
+  var i=2;try{var v=parseFloat(localStorage.getItem(KEY));var j=STEPS.indexOf(v);if(j>=0)i=j}catch(e){}
+  function apply(){
+    var z=STEPS[i];target.style.zoom=z;
+    box.style.zoom=target===document.body?1/z:1;
+    box.children[1].textContent=Math.round(z*100)+"%";
+    box.children[0].disabled=i===0;box.children[2].disabled=i===STEPS.length-1;
+    try{localStorage.setItem(KEY,z)}catch(e){}
+  }
+  function step(d){i=d===0?2:Math.max(0,Math.min(STEPS.length-1,i+d));apply()}
+  box.addEventListener("click",function(e){var b=e.target.closest("button");if(b){step(+b.dataset.d);b.blur()}});
+  document.addEventListener("keydown",function(e){
+    if(e.metaKey||e.ctrlKey||e.altKey)return;var t=e.target.tagName;if(t==="INPUT"||t==="TEXTAREA"||t==="SELECT")return;
+    if(e.key==="+"||e.key==="=")step(1);else if(e.key==="-"||e.key==="_")step(-1);else if(e.key==="0")step(0);
+  });
+  apply();
+})();
+</script>
+
+
+</body>
+</html>
