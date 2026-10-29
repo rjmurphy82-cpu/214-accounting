@@ -268,7 +268,7 @@ body.finale-on .top{visibility:hidden}
 "use strict";
 /* ============================================================ GAME CONTENT */
 const CO="Northwest Team Supply";
-const GP=0.40,FEE=500,CFEE=250,AWARD=500,HUDDLE_SECS=120;
+const GP=0.40,FEE=500,CFEE=250,AWARD=500,PICK=500,FOOL=250,HUDDLE_SECS=120;
 const BK=[
  {id:"nyd",name:"Not yet due",short:"Not yet due",pct:.01,lo:0,hi:0},
  {id:"b1",name:"1 to 30 days past due",short:"1 to 30",pct:.03,lo:1,hi:30},
@@ -356,15 +356,20 @@ const CHECKS={
 };
 const HUDDLES={
  h1:{title:"Why now?",prompt:"Not one of your customers has refused to pay yet. So why did you just record Bad Debts Expense this year, instead of waiting until a customer really doesn't pay?",
-  hint:"Talk it over, then type one answer for your team. Use the words matching and sales."},
+  hint:"Use the words matching and sales.",
+  perfect:"Because of the matching principle. The bad debts come from this year's sales, so the expense has to be recorded this year, even before we know which customers won't pay. We estimate it and put it in the allowance."},
  h2:{title:"The owner is upset",prompt:"The owner sees the write-offs and says, \"That must have wrecked our profit this year!\" But net income didn't change at all. Explain to the owner why, in two or three sentences.",
-  hint:"Where did the expense for these customers show up? What did the write-off entry actually change?"},
- s1:{title:"Defend a decision",prompt:"Pick the application your team argued about the most. What did you decide, and what was the one clue that settled it?",
-  hint:"Talk it over, then type one answer for your team. Your answer may go up on the board."},
+  hint:"Where did the expense for these customers show up? What did the write-off entry actually change?",
+  perfect:"The expense for those customers was already recorded last December when we estimated bad debts. The write-off just takes the account out of A/R and uses up the allowance, so net income doesn't change."},
+ s1:{title:"Fresh Kicks: yes or no?",prompt:"Fresh Kicks Pop-Up asked for $12,000 of credit. Should Northwest have approved it? Decide as a team and give the clues that settle it.",
+  hint:"Look at its years in business, credit rating, payment history and what the owner is promising.",
+  perfect:"Deny it. Fresh Kicks is only 4 months old, has no credit rating or payment history, and wants to pay after the holidays. It can only pay us if sales it hasn't made yet actually happen."},
  s3:{title:"Where's the line?",prompt:"Deny everyone and you earn $0. Approve everyone and you get burned. If this were your real business, how would you decide who gets credit? What does it cost to be too strict, and what does it cost to be too loose?",
-  hint:"Use your own numbers on your iPad: what you lost, and the profit you passed up."},
+  hint:"Use your own numbers on your iPad: what you lost, and the profit you passed up.",
+  perfect:"Give credit when there's a track record: years in business, a good rating and on-time payments. Too strict means losing 40% profit on good customers. Too loose is worse, because one customer who never pays costs the whole sale."},
  h3:{title:"Write your credit policy",prompt:"Look back at Year 1. Which applicant fooled your team, or almost did? What clue should you weigh more from now on? Write one rule for your credit policy.",
-  hint:"Your rule will show on your iPad while you review the Year 2 applications."}
+  hint:"Your rule will show on your iPad while you review the Year 2 applications.",
+  perfect:"Don't give credit to a business that is brand new with no payment history, or that already pays suppliers late, unless it has strong references. Fresh Kicks, Rolling Hills and Max's all showed those warning signs."}
 };
 const ROUNDS_FULL=["Open for business","Year 1 closes","Year 2: the bad news","Year 2: new customers","Year 2 closes"];
 const STEPS_FULL=[
@@ -505,12 +510,13 @@ function books(p,through,awards){
       b.ev=ev}
     else if(S.k==="results"){const cs=approvedIds(p,S.b).map(id=>CU[id]),r={never:cs.filter(c=>finalOf(c)==="never"),late:cs.filter(c=>finalOf(c)==="late"),paid:cs.filter(c=>finalOf(c)==="paid")};
       r.lost=sum(r.never.map(c=>c.amt));r.missed=sum(CUST.filter(c=>c.b===S.b&&!cs.includes(c)&&finalOf(c)!=="never").map(c=>Math.round(c.amt*GP)));b.lost+=r.lost;b.res[S.b]=r}
-    else if(S.k==="huddle"){if(awards&&(awards[S.id]||[]).includes(p.id))b.bonus+=AWARD}
+    else if(S.k==="huddle"){if(awards){if((awards[S.id]||[]).includes(p.id))b.bonus+=AWARD;const f=awards["fool_"+S.id];
+      if(f){const pk=p["vote_"+S.id]==="perfect",fo=f[p.id]||0;b.bonus+=(pk?PICK:0)+fo*FOOL;b.hud=b.hud||{};b.hud[S.id]={picked:pk,fooled:fo}}}}
   }
   b.ni=b.gp-b.bde-b.lost-b.fees+b.bonus;b.nrv=b.ar-b.allow;return b;
 }
 function ranks(val){const ids=Object.keys(val).sort((a,b)=>val[b]-val[a]);const r={};let k=0,prev=null;ids.forEach((id,i)=>{if(val[id]!==prev){k=i+1;prev=val[id]}r[id]=k});return r}
-const isLocked=(S,p)=>S.k==="apps"?!!p["lock"+S.b]:S.k==="check"?p["chk_"+S.id]!=null:S.k==="aging"?!!p["lockag"+S.b]:S.k==="events"?p.pred!=null:S.k==="huddle"?!!String(p["hud_"+S.id]||"").trim():S.k==="results"?true:false;
+const isLocked=(S,p,sub)=>S.k==="huddle"&&sub==="vote"?p["vote_"+S.id]!=null:S.k==="apps"?!!p["lock"+S.b]:S.k==="check"?p["chk_"+S.id]!=null:S.k==="aging"?!!p["lockag"+S.b]:S.k==="events"?p.pred!=null:S.k==="huddle"?!!String(p["hud_"+S.id]||"").trim():S.k==="results"?true:false;
 
 /* ============================================================ TEACHER (projector) */
 let H=null;
@@ -527,12 +533,12 @@ async function hostSetup(){
     <li><b>The bad news:</b> write-offs and a recovery, two quick checks. Huddle: why didn't profit drop?</li>
     <li><b>New customers:</b> huddle on a credit policy first, then 6 new applications.</li>
     <li><b>Year 2 closes:</b> aging again, now with each team's own leftover allowance balance.</li></ol>
-    <p class="note">Scoring: gross profit is 40% of every sale they approve. Bad Debts Expense comes off. Each wrong aging answer costs a ${money(FEE)} audit fee and each wrong entry check costs ${money(CFEE)}. During huddles you can award ${money(AWARD)} bonuses to the best answers.</p>`
+    <p class="note">Scoring: gross profit is 40% of every sale they approve. Bad Debts Expense comes off. Each wrong aging answer costs a ${money(FEE)} audit fee and each wrong entry check costs ${money(CFEE)}. Huddles: teams vote on which answer is the perfect one (+${money(PICK)}) and earn ${money(FOOL)} for each team that picks theirs.</p>`
     :`<ol><li><b>Open for business:</b> 8 credit applications and a quick entry check. Huddle: defend a decision.</li>
     <li><b>Year 1: who paid?</b> The news comes in. Huddle: write your credit policy.</li>
     <li><b>Year 2: new customers:</b> 6 new applications, with each team's policy on its iPad.</li>
     <li><b>Year 2: who paid?</b> Final news. Huddle: where's the line?</li></ol>
-    <p class="note">Scoring: gross profit is 40% of every sale they approve. A customer who never pays costs the whole sale. A wrong entry check costs a ${money(CFEE)} audit fee. During huddles you can award ${money(AWARD)} bonuses to the best answers.</p>`}
+    <p class="note">Scoring: gross profit is 40% of every sale they approve. A customer who never pays costs the whole sale. A wrong entry check costs a ${money(CFEE)} audit fee. Huddles: teams vote on which answer is the perfect one (+${money(PICK)}) and earn ${money(FOOL)} for each team that picks theirs. You can also award ${money(AWARD)} bonuses.</p>`}
     <div class="err" id="er"></div><button class="btn main" id="go">Create game</button></div>`;
   app.querySelectorAll(".mode").forEach(x=>x.onclick=()=>{setMode(x.dataset.m);hostSetup()});
   $("#go").onclick=async()=>{$("#go").disabled=true;
@@ -554,12 +560,13 @@ function pushState(st){
   hostSet(st)}
 function tileFor(S,p,teams,th,anim,i,mode){
   const now=books(p,th,H.awards),prev=books(p,th-1,H.awards),d=now.ni-prev.ni,rk=H.rank[p.id];let cls="tile",st="";
-  if(mode==="lock"){const done=isLocked(S,p);cls+=done?" done":" wait";
-    st=done?("✓ "+(S.k==="apps"?`${approvedIds(p,S.b).length} approved`:S.k==="huddle"?"Answer in":S.k==="events"?"Prediction in":S.k==="check"?"Answered":"Locked in")):(S.k==="huddle"?"Talking…":"Deciding…")}
+  if(mode==="lock"){const vt=S.k==="huddle"&&H.state.sub==="vote",done=isLocked(S,p,H.state.sub);cls+=done?" done":" wait";
+    st=done?("✓ "+(S.k==="apps"?`${approvedIds(p,S.b).length} approved`:S.k==="huddle"?(vt?"Voted":"Answer in"):S.k==="events"?"Prediction in":S.k==="check"?"Answered":"Locked in")):(S.k==="huddle"?(vt?"Voting…":"Talking…"):"Deciding…")}
   else if(S.k==="apps"){const n=approvedIds(p,S.b).length;cls+=n?" ok":"";st=`<span class="stamp">${signed(d)}</span>${n} approved`}
   else if(S.k==="check"){const ok=p["chk_"+S.id]===CHECKS[S.id].ans;cls+=ok?" ok":" no";st=ok?`<span class="stamp">✓</span>Correct`:`<span class="stamp">−${money(CFEE)}</span>audit fee`}
   else if(S.k==="aging"){const g=now.ag[S.b];const both=g.okReq&&g.okAdj;cls+=both?" ok":(g.okReq||g.okAdj)?" mid":" no";
     st=`Expense ${money(g.adj)}<br>${both?`<span class="stamp">✓</span>Books right`:`<span class="stamp">−${money(g.fee)}</span>audit fee`}`}
+  else if(S.k==="huddle"&&d){cls+=" ok";st=`<span class="stamp">${signed(d)}</span>huddle points`}
   else if(S.k==="results"&&!now.res[S.b]){st="Waiting for the news"}
   else if(S.k==="results"){const r=now.res[S.b];cls+=r.lost?" no":" ok";st=r.lost?`<span class="stamp">−${money(r.lost)}</span>${r.never.length} never paid`:(r.paid.length+r.late.length?`<span class="stamp">✓</span>Everyone paid`:`No customers`)}
   else if(S.k==="events"){cls+=" mid";st=`<span class="stamp">${signed(d)}</span>net income change<br>Allowance ${balTxt(now.allow)}`}
@@ -577,7 +584,7 @@ function optHTML(c,k){const o=c.opts[k];return typeof o==="string"?`<span class=
 function hostRender(fromPoll){
   const st=H.state,teams=teamsArr();
   const key=st.phase+"|"+st.i+"|"+st.sub;
-  const lockScreen=st.phase==="lobby"||(st.phase==="play"&&(st.sub==="open"));
+  const lockScreen=st.phase==="lobby"||(st.phase==="play"&&(st.sub==="open"||st.sub==="vote"));
   if(fromPoll&&!lockScreen)return;
   const fresh=H.key!==key;H.key=key;
   if(st.phase==="lobby"){
@@ -590,7 +597,7 @@ function hostRender(fromPoll){
     $("#nx").onclick=()=>goStep(0);$("#end").onclick=hostErase;requestAnimationFrame(zoomApp);return}
   if(st.phase==="end"){if(fresh)finale(teams);return}
   const S=STEPS[st.i],last=st.i===STEPS.length-1,open=st.sub==="open";
-  const n=teams.filter(p=>isLocked(S,p)).length;
+  const n=teams.filter(p=>isLocked(S,p,st.sub)).length;
   const head=`<div class="rhead"><span class="rtag">Round ${S.r} of ${ROUNDS.length}</span><span class="rname">${ROUNDS[S.r-1]}</span><span class="yr">Year ${S.yr}</span></div>`;
   const next=()=>last?pushState({phase:"end"}):goStep(st.i+1);
   const th=curThrough(st);
@@ -681,21 +688,36 @@ function hostRender(fromPoll){
       if(t0)t0.onclick=()=>{TIMER_BEEPED=false;pushState({...st,timer:Date.now()+HUDDLE_SECS*1000})};
       if(t1)t1.onclick=()=>{TIMER_BEEPED=false;pushState({...st,timer:Math.max(Date.now(),st.timer)+60000})};
       $("#sk").onclick=()=>{if(confirm("Skip this huddle? No answers or bonuses."))next()};
-      $("#nx").onclick=()=>{if(!warn("sent an answer"))return;beep(660,.12);pushState({...st,sub:"share",timer:0})};
+      $("#nx").onclick=()=>{if(!warn("sent an answer"))return;beep(660,.12);
+        const opts=shuffle([...teams.filter(p=>String(p["hud_"+S.id]||"").trim()).map(p=>({id:p.id,txt:String(p["hud_"+S.id]).trim()})),{id:"perfect",txt:h.perfect}]);
+        pushState({...st,sub:"vote",timer:0,vote:{opts}})};
       requestAnimationFrame(zoomApp);return}
-    const aw=H.awards[S.id]||[];
-    const ans=teams.filter(p=>String(p["hud_"+S.id]||"").trim());
-    app.innerHTML=`${head}<div class="huddle" style="grid-template-columns:1fr"><div><div class="kick">Team huddle · answers</div><h2 style="font-size:36px">${esc(h.title)}</h2><p style="font-size:22px">${esc(h.prompt)}</p></div></div>
-      <div class="answers">${ans.map((p,i)=>`<div class="ans ${aw.includes(p.id)?"star":""}${fresh?" anim":""}" style="--c:${colorOf(teams,p.id)};--d:${i*80}ms" data-id="${p.id}">
-        <div class="who"><span>${H.hideNames?"Team "+(i+1):esc(p.name)}</span>${aw.includes(p.id)?`<span class="medal">+${money(AWARD)}</span>`:""}</div>
-        <div class="txt">${esc(p["hud_"+S.id])}</div>
-        <div class="acts"><button class="btn sp1">Spotlight</button><button class="btn aw">${aw.includes(p.id)?"Remove bonus":"+"+money(AWARD)+" bonus"}</button></div></div>`).join("")||`<p class="note">No answers came in.</p>`}</div>
-      <div class="bar2"><button class="btn" id="hn">${H.hideNames?"Show team names":"Hide team names"}</button><button class="btn main" id="nx">Next →</button></div>`;
-    app.querySelectorAll(".ans").forEach((el,i)=>{const id=el.dataset.id,p=ans[i];
-      el.querySelector(".sp1").onclick=()=>spotlight(H.hideNames?"Team "+(i+1):p.name,p["hud_"+S.id],colorOf(teams,id));
+    const opts=(st.vote&&st.vote.opts)||[],L=i=>String.fromCharCode(65+i);
+    if(st.sub==="vote"){
+      app.innerHTML=`${head}<div class="huddle" style="grid-template-columns:1fr;padding:16px 24px"><div><div class="kick">Team huddle · vote</div><h2 style="font-size:34px;margin-bottom:4px">${esc(h.title)}: which one is the perfect answer?</h2>
+        <p style="font-size:20px">One of these was written by your teacher. Vote on your iPad. Find the perfect answer: <b>+${money(PICK)}</b>. Every team that picks yours: <b>+${money(FOOL)}</b>.</p></div></div>
+        <div class="answers">${opts.map((o,i)=>`<div class="ans${fresh?" anim":""}" style="--c:#111;--d:${i*80}ms"><div class="who"><span style="font-size:28px;color:var(--ink)">${L(i)}</span></div><div class="txt">${esc(o.txt)}</div></div>`).join("")}</div>
+        ${boardHTML(S,teams,th,false,"lock")}
+        <div class="bar2"><span class="count">${n} of ${teams.length} teams voted</span><button class="btn main" id="nx">Reveal</button></div>`;
+      $("#nx").onclick=()=>{if(!warn("voted"))return;const f={};teamsArr().forEach(p=>{const v=p["vote_"+S.id];if(v&&v!=="perfect"&&v!==p.id)f[v]=(f[v]||0)+1});
+        H.awards["fool_"+S.id]=f;beep(990,.15);pushState({...st,sub:"share"})};
+      requestAnimationFrame(zoomApp);return}
+    const aw=H.awards[S.id]||[],f=H.awards["fool_"+S.id]||{};
+    const voters=id=>teams.filter(p=>p["vote_"+S.id]===id);
+    app.innerHTML=`${head}<div class="huddle" style="grid-template-columns:1fr;padding:14px 24px"><div><div class="kick">Team huddle · the reveal</div><h2 style="font-size:34px;margin:0">${esc(h.title)}</h2></div></div>
+      <div class="answers">${opts.map((o,i)=>{const pf=o.id==="perfect",t=teams.find(x=>x.id===o.id),vs=voters(o.id);
+        return `<div class="ans ${pf?"star":aw.includes(o.id)?"star":""}${fresh?" anim":""}" style="--c:${pf?"#1E7A3C":colorOf(teams,o.id)};--d:${i*120}ms" data-id="${o.id}">
+        <div class="who"><span>${L(i)} · ${pf?"★ The perfect answer":H.hideNames?"A team":esc(t?t.name:"?")}</span>${pf?`<span class="medal">+${money(PICK)} each</span>`:(f[o.id]?`<span class="medal">+${money(f[o.id]*FOOL)}</span>`:"")}</div>
+        <div class="txt">${esc(o.txt)}</div>
+        <div class="note" style="margin-bottom:6px">${vs.length?`Picked by: <b>${vs.map(v=>esc(v.name)).join(", ")}</b>`:"Nobody picked this one"}</div>
+        ${pf?"":`<div class="acts"><button class="btn sp1">Spotlight</button><button class="btn aw">${aw.includes(o.id)?"Remove bonus":"+"+money(AWARD)+" bonus"}</button></div>`}</div>`}).join("")||`<p class="note">No answers came in.</p>`}</div>
+      ${boardHTML(S,teams,th,fresh)}
+      <div class="bar2"><button class="btn" id="hn">${H.hideNames?"Show team names":"Hide team names"}</button><button class="btn main" id="nx">${last?"Final results →":"Next →"}</button></div>`;
+    app.querySelectorAll(".ans[data-id]").forEach(el=>{const id=el.dataset.id;if(id==="perfect")return;const o=opts.find(x=>x.id===id),t=teams.find(x=>x.id===id);
+      el.querySelector(".sp1").onclick=()=>spotlight(H.hideNames||!t?"A team":t.name,o.txt,colorOf(teams,id));
       el.querySelector(".aw").onclick=()=>{const a=H.awards[S.id]=H.awards[S.id]||[];const k=a.indexOf(id);k>=0?a.splice(k,1):(a.push(id),beep(990,.15));H.key=null;pushState({...H.state})}});
     $("#hn").onclick=()=>{H.hideNames=!H.hideNames;H.key=null;hostRender()};
-    $("#nx").onclick=next;requestAnimationFrame(zoomApp);return}
+    $("#nx").onclick=next;if(fresh)countUp();requestAnimationFrame(zoomApp);return}
 }
 function spotlight(name,txt,c){const d=document.createElement("div");d.className="spot";d.innerHTML=`<div style="--c:${c}"><b>${esc(name)}</b><p>${esc(txt)}</p></div>`;d.onclick=()=>d.remove();document.body.appendChild(d)}
 function goStep(i){pushState({phase:"play",i,sub:"open"})}
@@ -752,7 +774,7 @@ function classResults(teams){
   const pct=f=>Math.round(teams.filter(f).length/n*100)+"%";
   const ag=b=>p=>{const g=books(p,th,H.awards).ag[b];return g&&g.okReq&&g.okAdj};
   const burnt=bb=>teams.filter(p=>(books(p,th,H.awards).res[bb]||{}).lost>0).length;
-  const stars=Object.entries(H.awards).flatMap(([h,ids])=>ids.map(id=>({h,p:teams.find(t=>t.id===id)}))).filter(x=>x.p);
+  const stars=Object.entries(H.awards).filter(([h])=>HUDDLES[h]).flatMap(([h,ids])=>ids.map(id=>({h,p:teams.find(t=>t.id===id)}))).filter(x=>x.p);
   app.innerHTML=`<div class="rep"><h2>Class results</h2>
     <div style="display:grid;grid-template-columns:1.3fr 1fr;gap:28px">
     <div><h3 style="font-family:var(--display);font-size:26px;margin:6px 0">Year 1 applicants · teams that approved</h3>${CUST.filter(c=>c.b==="A").map(row).join("")}
@@ -818,8 +840,8 @@ function myLine(st){const M=ME;if(!st.ni||st.ni[M.pid]==null)return "";const n=O
 function teamRender(){
   const M=ME,st=M.state;if(!st)return;rejoinBtn();
   const S=st.phase==="play"?STEPS[st.i]:null;
-  const lk=S?isLocked(S,meP()):false;
-  const key=JSON.stringify([st.phase,st.i,st.sub,lk,st.ni&&st.ni[M.pid],S&&S.k==="huddle"&&st.sub==="share"?(st.awards||{})[S.id]:0,S&&S.k==="huddle"?!!st.timer:0]);
+  const lk=S?isLocked(S,meP(),st.sub):false;
+  const key=JSON.stringify([st.phase,st.i,st.sub,lk,st.ni&&st.ni[M.pid],S&&S.k==="huddle"&&st.sub==="share"?[(st.awards||{})[S.id],(st.awards||{})["fool_"+S.id]]:0,S&&S.k==="huddle"?!!st.timer:0]);
   TIMER_END=st.timer||0;
   if(key===M.key)return;M.key=key;
   if(st.phase==="lobby"){app.innerHTML=`<div class="wait"><h2>You're in, ${esc(M.name)}!</h2></div>
@@ -955,14 +977,25 @@ function teamHuddle(S,st,head,b){
     app.innerHTML=`${head}<div class="huddle" style="margin-top:8px"><div><div class="kick">Team huddle</div><h2 style="font-size:36px">${esc(h.title)}</h2><p style="font-size:22px">${esc(h.prompt)}</p><div class="hint" style="font-size:17px">${esc(h.hint)}</div></div>${st.timer?`<div class="timer" data-timer style="font-size:44px">${timerText()}</div>`:""}</div>
       ${ctx?`<div class="box" style="max-width:none">${ctx}</div>`:""}
       <textarea class="field" id="tx" maxlength="400" placeholder="Talk it over first. Then type one answer for your team.">${esc(dv)}</textarea>
-      <div class="row"><button class="btn main" id="sv">${mine?"Update answer":"Send answer"}</button><span class="note" id="sn">${mine?"Sent. You can still edit until your teacher shows the answers.":"Your answer may go up on the board."}</span></div>`;
+      <div class="row"><button class="btn main" id="sv">${mine?"Update answer":"Send answer"}</button><span class="note" id="sn">${mine?"Sent. You can still edit until your teacher shows the answers.":"Your answer goes into a vote against one perfect answer. Make it sound like the real thing."}</span></div>`;
     $("#tx").oninput=e=>M.draft[k]=e.target.value;
     $("#sv").onclick=async()=>{const v=$("#tx").value.trim();if(!v){$("#sn").textContent="Type something first.";return}
       M.draft[k]=v;await save({[k]:v});$("#sv").textContent="Update answer";$("#sn").textContent="Sent. You can still edit until your teacher shows the answers.";M.key=JSON.stringify([st.phase,st.i,st.sub,true,st.ni&&st.ni[M.pid],0,!!st.timer])};
     return}
-  const won=((st.awards||{})[S.id]||[]).includes(M.pid);
-  app.innerHTML=`${head}<div class="verdict ${won?"ok":"neu"}"><h2>${won?"Bonus! +"+money(AWARD):"Answers are up"}</h2><p>${won?"Your teacher picked your answer.":"Look at the board."}</p></div>
+  const opts=(st.vote&&st.vote.opts)||[],L=i=>String.fromCharCode(65+i),vk="vote_"+S.id,myv=M.rec[vk];
+  if(st.sub==="vote"){
+    app.innerHTML=`${head}<div class="huddle" style="margin-top:8px;grid-template-columns:1fr"><div><div class="kick">Team huddle · vote</div><h2 style="font-size:32px">Which one is the perfect answer?</h2>
+      <p style="font-size:19px">Your teacher wrote one of these. Find it: <b>+${money(PICK)}</b>. Every team that picks your answer: <b>+${money(FOOL)}</b>.</p></div></div>
+      <div class="opts" style="grid-template-columns:1fr">${opts.map((o,i)=>o.id===M.pid?"":`<button class="opt" data-v="${o.id}" aria-pressed="${myv===o.id}"><span class="sh">${L(i)}</span><span>${esc(o.txt)}</span></button>`).join("")}</div>
+      <p class="note" style="text-align:center">${myv?"Vote saved. You can change it until your teacher reveals.":"Your own answer isn't in the list. Talk it over, then tap one."}</p>`;
+    app.querySelectorAll(".opt").forEach(x=>x.onclick=async()=>{await save({[vk]:x.dataset.v});M.key=null;teamRender()});return}
+  const won=((st.awards||{})[S.id]||[]).includes(M.pid),hd=(b.hud||{})[S.id]||{picked:myv==="perfect",fooled:((st.awards||{})["fool_"+S.id]||{})[M.pid]||0};
+  const pts=(hd.picked?PICK:0)+hd.fooled*FOOL+(won?AWARD:0);
+  app.innerHTML=`${head}<div class="verdict ${pts?"ok":"neu"}"><h2>${pts?"+"+money(pts):"No points this time"}</h2>
+    <p>${hd.picked?`You found the perfect answer: +${money(PICK)}.`:"You didn't pick the perfect answer."} ${hd.fooled?`You fooled ${hd.fooled} team${hd.fooled>1?"s":""}: +${money(hd.fooled*FOOL)}.`:"Nobody picked your answer."}${won?` Teacher bonus: +${money(AWARD)}.`:""}</p></div>
+    <div class="box"><h3>★ The perfect answer</h3><p style="margin:0">${esc(h.perfect)}</p></div>
     ${mine?`<div class="box"><h3>Your team said</h3><p style="margin:0;white-space:pre-wrap">${esc(mine)}</p></div>`:""}${myLine(st)}`;
+  pts?beep(990,.15):beep(330,.2);
 }
 function teamReport(st){
   const M=ME,p=meP(),b=books(p,STEPS.length-1,st.awards),n=st.ni?Object.keys(st.ni).length:0;
