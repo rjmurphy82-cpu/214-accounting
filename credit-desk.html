@@ -279,7 +279,7 @@ const BK=[
 const bucketOf=d=>BK.find(b=>d>=b.lo&&d<=b.hi);
 // end: "paid" (collected before Dec 31) or days past due at Dec 31 (0 = not yet due)
 // y2 (Year 1 customers only): what happens in Year 2. paid | wo (written off) | rec (written off, then paid)
-const CUST=[
+const CUST1=[
  {id:"maple",b:"A",name:"Maple Grove Park District",what:"Youth league uniforms for the spring season",amt:9000,
   facts:[["In business","Local government, since 1958"],["Credit rating","A"],["Pays suppliers in","25 days on average"]],
   note:"The park board approved this purchase at its last meeting.",end:"paid",y2:null},
@@ -324,15 +324,14 @@ const CUST=[
   facts:[["In business","1 year"],["Credit rating","D"],["Pays suppliers in","90+ days on average"]],
   note:"The owner's last store closed still owing money to two suppliers.",end:66,fin:"never"}
 ];
-const CU=Object.fromEntries(CUST.map(c=>[c.id,c]));
-const NEWS=[
+const NEWS1=[
  {id:"kicks",cls:"",title:"Fresh Kicks shuts down",story:"The pop-up closes in February and the owner stops answering calls. Northwest writes off the $12,000 balance."},
  {id:"hills",cls:"",title:"Rolling Hills Fitness closes",story:"The gym loses its lease in April and closes its doors. Northwest writes off the $8,000 balance."},
  {id:"max",cls:"",title:"Max's goes bankrupt",story:"Max's files for bankruptcy in May. There's nothing left to collect. Northwest writes off the $7,000 balance."},
  {id:"prairie",cls:"mix",title:"Prairie Tennis: written off, then paid",story:"Northwest gives up and writes off the $5,000 in March. In August the academy's new owner pays the full $5,000."},
  {id:"rest",cls:"good",title:"Everyone else pays",story:"Northwest Swim Club and Elevate Volleyball pay their December balances in full in January."}
 ];
-const NEWS_S={
+const NEWS_S1={
  A:[{cls:"",title:"Fresh Kicks shuts down",story:"The pop-up closes in February and the owner stops answering calls. The $12,000 is never paid."},
   {cls:"",title:"Rolling Hills Fitness closes",story:"The gym loses its lease in April. The $8,000 is never paid."},
   {cls:"",title:"Max's goes bankrupt",story:"Max's files for bankruptcy in May. There's nothing left. The $7,000 is never paid."},
@@ -343,7 +342,7 @@ const NEWS_S={
   {cls:"mix",title:"Willow Creek pays late",story:"The new owners finally set up their bill paying and pay the $8,000 in full."},
   {cls:"good",title:"Everyone else pays",story:"Maple Grove, Windy City Pickleball and Riverside Rec all pay in full."}]
 };
-const CHECKS={
+const CHECKS1={
  sale:{q:"Northwest ships $9,000 of uniforms to Maple Grove Park District on account. Which entry records the sale?",
   opts:[["Accounts Receivable","Sales"],["Cash","Sales"],["Sales","Accounts Receivable"],["Accounts Receivable","Allowance for Doubtful Accounts"]],amt:"9,000",ans:0,
   why:"Selling on account creates a receivable. Cash doesn't change until the customer pays."},
@@ -354,7 +353,92 @@ const CHECKS={
   opts:["$28,125","$16,125","$40,125","$30,500"],ans:0,
   why:"Before: 42,500 − 14,375 = 28,125. After: 30,500 − 2,375 = 28,125. A/R and the allowance both drop by $12,000, so the net amount stays the same."}
 };
-const HUDDLES={
+const CUST2=[
+ {id:"lake",b:"A",name:"Lakeview Township Recreation",what:"Youth soccer uniforms for the spring league",amt:8000,
+  facts:[["In business","Local government, since 1962"],["Credit rating","A"],["Pays suppliers in","25 days on average"]],
+  note:"The township board approved this purchase at its last meeting.",end:"paid",y2:null},
+ {id:"lax",b:"A",name:"Northshore Lacrosse Club",what:"Sticks, helmets and team bags",amt:6500,
+  facts:[["In business","9 years"],["Credit rating","B"],["Pays suppliers in","35 days on average"]],
+  note:"Other suppliers say: usually a little late, never missed a payment.",end:22,y2:"paid"},
+ {id:"hype",b:"A",name:"Hype Drop Streetwear",what:"Limited-edition team jerseys to resell online",amt:11000,
+  facts:[["In business","5 months"],["Credit rating","None yet (too new)"],["Pays suppliers in","No history"]],
+  note:"Owner: \"Our drops sell out in minutes. We'll pay you right after our spring drop.\"",end:78,y2:"wo"},
+ {id:"summit",b:"A",name:"Summit Gymnastics Academy",what:"Mats and competition leotards",amt:5000,
+  facts:[["In business","15 years"],["Credit rating","A"],["Pays suppliers in","18 days on average"]],
+  note:"Has bought from other suppliers for years. Always on time. Order ships in mid-December.",end:0,y2:"paid"},
+ {id:"iron",b:"A",name:"Iron Forge CrossFit",what:"Kettlebells, rowers and floor mats",amt:7500,
+  facts:[["In business","2 years"],["Credit rating","C"],["Pays suppliers in","60+ days on average"]],
+  note:"Two suppliers report late payments. Lost half its members when a new gym opened next door.",end:98,y2:"wo"},
+ {id:"fox",b:"A",name:"Fox Valley Swim School",what:"Kickboards, lane lines and team suits",amt:4500,
+  facts:[["In business","7 years"],["Credit rating","B−"],["Pays suppliers in","45 days on average"]],
+  note:"One payment was 80 days late last year, but it was paid in full.",end:52,y2:"rec"},
+ {id:"boost",b:"A",name:"Riverbend Youth Hockey Boosters",what:"Practice jerseys and goalie gear",amt:3500,
+  facts:[["In business","25 years (volunteer run)"],["Credit rating","None (small nonprofit)"],["Pays suppliers in","Paid its last supplier in full, on time"]],
+  note:"The boosters are holding $20,000 from their fall fundraiser.",end:"paid",y2:null},
+ {id:"al",b:"A",name:"Big Al's Sports Liquidators",what:"Closeout cleats and bats to resell",amt:6000,
+  facts:[["In business","3 years"],["Credit rating","C−"],["Pays suppliers in","80 days on average"]],
+  note:"A check to another supplier bounced in April. Al: \"Business is booming, trust me.\"",end:117,y2:"wo"},
+
+ {id:"lake2",b:"B",name:"Lakeview Township Recreation",what:"Summer camp T-shirts",amt:9500,
+  facts:[["In business","Local government, since 1962"],["Credit rating","A"],["Pays suppliers in","25 days on average"]],
+  note:"Paid every supplier in full last year. Order ships in mid-December.",end:0,fin:"paid"},
+ {id:"droplab",b:"B",name:"Drop Lab Online",what:"Jerseys for a new online store",amt:9000,
+  facts:[["In business","2 months"],["Credit rating","None yet (too new)"],["Owner","Jordan Pierce"]],
+  note:"Jordan ran Hype Drop Streetwear last year. \"New name, new website, fresh start.\"",end:95,fin:"never"},
+ {id:"paddle",b:"B",name:"Prairie Paddle Club",what:"Paddles and nets for 4 new courts",amt:5500,
+  facts:[["In business","1 year"],["Credit rating","B"],["Pays suppliers in","30 days on average"]],
+  note:"Growing fast. Two suppliers give strong references.",end:14,fin:"paid"},
+ {id:"cedar",b:"B",name:"Cedar Ridge Country Club",what:"Pro shop apparel",amt:7000,
+  facts:[["In business","45 years"],["Credit rating","A"],["Pays suppliers in","20 days on average"]],
+  note:"The club just hired a new manager who hasn't set up bill paying yet.",end:41,fin:"late"},
+ {id:"oakton",b:"B",name:"Oakton Village Fitness Center",what:"Treadmills and free weights",amt:4500,
+  facts:[["In business","Village owned, since 1968"],["Credit rating","A"],["Pays suppliers in","15 days on average"]],
+  note:"Pays every invoice by direct deposit.",end:"paid",fin:"paid"},
+ {id:"wind",b:"B",name:"Second Wind Gear Exchange",what:"Used hockey gear to resell",amt:8500,
+  facts:[["In business","1 year"],["Credit rating","D"],["Pays suppliers in","90+ days on average"]],
+  note:"The owner's last store closed still owing money to two suppliers.",end:68,fin:"never"}
+];
+const NEWS2=[
+ {id:"hype",cls:"",title:"Hype Drop shuts down",story:"The website goes dark in February and the owner stops answering. Northwest writes off the $11,000 balance."},
+ {id:"iron",cls:"",title:"Iron Forge CrossFit closes",story:"The gym loses too many members and closes in April. Northwest writes off the $7,500 balance."},
+ {id:"al",cls:"",title:"Big Al's goes bankrupt",story:"Big Al's files for bankruptcy in May. There's nothing left to collect. Northwest writes off the $6,000 balance."},
+ {id:"fox",cls:"mix",title:"Fox Valley: written off, then paid",story:"Northwest gives up and writes off the $4,500 in March. In August the swim school's new owner pays the full $4,500."},
+ {id:"rest",cls:"good",title:"Everyone else pays",story:"Northshore Lacrosse and Summit Gymnastics pay their December balances in full in January."}
+];
+const NEWS_S2={
+ A:[{cls:"",title:"Hype Drop shuts down",story:"The website goes dark in February and the owner stops answering. The $11,000 is never paid."},
+  {cls:"",title:"Iron Forge CrossFit closes",story:"The gym loses too many members and closes in April. The $7,500 is never paid."},
+  {cls:"",title:"Big Al's goes bankrupt",story:"Big Al's files for bankruptcy in May. There's nothing left. The $6,000 is never paid."},
+  {cls:"mix",title:"Fox Valley pays late",story:"Months of reminders. In August the swim school finally pays the full $4,500."},
+  {cls:"good",title:"Everyone else pays",story:"Lakeview Township, Northshore Lacrosse, Summit Gymnastics and the Riverbend Boosters all pay in full."}],
+ B:[{cls:"",title:"Drop Lab vanishes",story:"The website goes dark in March and Jordan Pierce stops answering. The $9,000 is never paid."},
+  {cls:"",title:"Second Wind closes",story:"The store shuts down owing money to five suppliers. The $8,500 is never paid."},
+  {cls:"mix",title:"Cedar Ridge pays late",story:"The new manager finally sets up bill paying and pays the $7,000 in full."},
+  {cls:"good",title:"Everyone else pays",story:"Lakeview Township, Prairie Paddle Club and Oakton Village all pay in full."}]
+};
+const CHECKS2={
+ sale:{...CHECKS1.sale,q:"Northwest ships $8,000 of uniforms to Lakeview Township Recreation on account. Which entry records the sale?",amt:"8,000"},
+ wo:{...CHECKS1.wo,q:"Hype Drop shuts down. Northwest uses the allowance method and writes off the $11,000 balance. Which entry?",amt:"11,000"},
+ nrv:{q:"Before the write-off: Accounts Receivable $40,500 and Allowance $13,060 (credit). After writing off $11,000, what is net realizable value (A/R minus allowance)?",
+  opts:["$27,440","$16,440","$38,440","$29,500"],ans:0,
+  why:"Before: 40,500 − 13,060 = 27,440. After: 29,500 − 2,060 = 27,440. A/R and the allowance both drop by $11,000, so the net amount stays the same."}
+};
+const SETS={
+ 1:{CUST:CUST1,NEWS:NEWS1,NEWS_S:NEWS_S1,CHECKS:CHECKS1,bad:"Fresh Kicks",badAmt:"12,000",rec:"Prairie",recAmt:"5,000",sale:"Maple Grove",saleAmt:"9,000",maxWo:"$32,000",
+  y1:"Fresh Kicks, Rolling Hills and Max's never paid.",y2:"Kick Lab and Gridiron Gear never paid.",
+  s1:{title:"Fresh Kicks: yes or no?",prompt:"Fresh Kicks Pop-Up asked for $12,000 of credit. Should Northwest have approved it? Decide as a team and give the clues that settle it.",
+   perfect:"Deny it. Fresh Kicks is only 4 months old, has no credit rating or payment history, and wants to pay after the holidays. It can only pay us if sales it hasn't made yet actually happen."},
+  h3:"Don't give credit to a business that is brand new with no payment history, or that already pays suppliers late, unless it has strong references. Fresh Kicks, Rolling Hills and Max's all showed those warning signs."},
+ 2:{CUST:CUST2,NEWS:NEWS2,NEWS_S:NEWS_S2,CHECKS:CHECKS2,bad:"Hype Drop",badAmt:"11,000",rec:"Fox Valley",recAmt:"4,500",sale:"Lakeview",saleAmt:"8,000",maxWo:"$29,000",
+  y1:"Hype Drop, Iron Forge and Big Al's never paid.",y2:"Drop Lab and Second Wind never paid.",
+  s1:{title:"Hype Drop: yes or no?",prompt:"Hype Drop Streetwear asked for $11,000 of credit. Should Northwest have approved it? Decide as a team and give the clues that settle it.",
+   perfect:"Deny it. Hype Drop is only 5 months old, has no credit rating or payment history, and wants to pay after its next drop. It can only pay us if sales it hasn't made yet actually happen."},
+  h3:"Don't give credit to a business that is brand new with no payment history, or that already pays suppliers late, unless it has strong references. Hype Drop, Iron Forge and Big Al's all showed those warning signs."}
+};
+let SET=1,SD=SETS[1],CUST=CUST1,CU={},NEWS=NEWS1,NEWS_S=NEWS_S1,CHECKS=CHECKS1;
+function setSet(n){SET=+n===2?2:1;SD=SETS[SET];CUST=SD.CUST;CU=Object.fromEntries(CUST.map(c=>[c.id,c]));NEWS=SD.NEWS;NEWS_S=SD.NEWS_S;CHECKS=SD.CHECKS;
+  if(typeof HUDDLES!=="undefined"){Object.assign(HUDDLES.s1,SD.s1);HUDDLES.h3.perfect=SD.h3}}
+let HUDDLES={
  h1:{title:"Why now?",prompt:"Not one of your customers has refused to pay yet. So why did you just record Bad Debts Expense this year, instead of waiting until a customer really doesn't pay?",
   hint:"Use the words matching and sales.",
   perfect:"Because of the matching principle. The bad debts come from this year's sales, so the expense has to be recorded this year, even before we know which customers won't pay. We estimate it and put it in the allowance."},
@@ -370,7 +454,8 @@ const HUDDLES={
  h3:{title:"Write your credit policy",prompt:"Look back at Year 1. Which applicant fooled your team, or almost did? What clue should you weigh more from now on? Write one rule for your credit policy.",
   hint:"Your rule will show on your iPad while you review the Year 2 applications.",
   perfect:"Don't give credit to a business that is brand new with no payment history, or that already pays suppliers late, unless it has strong references. Fresh Kicks, Rolling Hills and Max's all showed those warning signs."}
-};
+};setSet(1);
+
 const ROUNDS_FULL=["Open for business","Year 1 closes","Year 2: the bad news","Year 2: new customers","Year 2 closes"];
 const STEPS_FULL=[
  {k:"apps",r:1,b:"A",yr:1},
@@ -526,6 +611,7 @@ async function hostSetup(){
   const N=await net().catch(()=>null);if(!N)return needSetup();
   const full=MODE==="full";
   app.innerHTML=`${hdr()}<div class="panel" style="margin-top:0;max-width:760px"><h2>Start a game</h2>
+    <div class="modes"><button class="mode" data-s="1" aria-pressed="${SET===1}"><b>Customers: Set 1</b><span>Maple Grove, Fresh Kicks, Max's and the rest. The first game.</span></button><button class="mode" data-s="2" aria-pressed="${SET===2}"><b>Customers: Set 2</b><span>All new customers for a second play. Same lessons, new clues to read.</span></button></div>
     <div class="modes"><button class="mode" data-m="simple" aria-pressed="${!full}"><b>Credit decisions</b><span>Approve or deny, then find out who pays. No allowance or adjusting entries. About 35 minutes.</span></button>
       <button class="mode" data-m="full" aria-pressed="${full}"><b>Full game</b><span>Adds the aging schedule, the allowance and write-offs. About 50 minutes.</span></button></div>
     ${full?`<ol><li><b>Open for business:</b> 8 credit applications, then a quick entry check.</li>
@@ -540,10 +626,10 @@ async function hostSetup(){
     <li><b>Year 2: who paid?</b> Final news. Huddle: where's the line?</li></ol>
     <p class="note">Scoring: gross profit is 40% of every sale they approve. A customer who never pays costs the whole sale. A wrong entry check costs a ${money(CFEE)} audit fee. Huddles: teams vote on which answer is the perfect one (+${money(PICK)}) and earn ${money(FOOL)} for each team that picks theirs. You can also award ${money(AWARD)} bonuses.</p>`}
     <div class="err" id="er"></div><button class="btn main" id="go">Create game</button></div>`;
-  app.querySelectorAll(".mode").forEach(x=>x.onclick=()=>{setMode(x.dataset.m);hostSetup()});
+  app.querySelectorAll(".mode").forEach(x=>x.onclick=()=>{x.dataset.s?setSet(x.dataset.s):setMode(x.dataset.m);hostSetup()});
   $("#go").onclick=async()=>{$("#go").disabled=true;
     try{let code;for(let t=0;t<20;t++){code=String(Math.floor(1000+Math.random()*9000));if(!(await N.get("games/"+code)))break}
-      await N.set("games/"+code,{created:Date.now(),game:"creditdesk",mode:MODE,seed:1,ids:[],state:{phase:"lobby",mode:MODE}});
+      await N.set("games/"+code,{created:Date.now(),game:"creditdesk",mode:MODE,set:SET,seed:1,ids:[],state:{phase:"lobby",mode:MODE,set:SET}});
       H={N,code,players:{},state:{phase:"lobby",mode:MODE},awards:{},hideNames:false};
       H.off=N.on("games/"+code+"/players",v=>{H.players=v||{};hostRender(true)});
       hostRender()}catch(e){$("#er").textContent="Couldn't reach the game database.";$("#go").disabled=false}};
@@ -553,7 +639,7 @@ const colorOf=(teams,id)=>COLORS[Math.max(0,teams.findIndex(t=>t.id===id))%COLOR
 function curThrough(st){if(st.phase==="end")return STEPS.length-1;if(st.phase!=="play")return -1;return (st.sub==="reveal"||st.sub==="share")?st.i:st.i-1}
 function hostSet(st){H.state=st;H.N.set("games/"+H.code+"/state",st).catch(()=>{});hostRender()}
 function pushState(st){
-  const teams=teamsArr(),th=curThrough(st);st.awards=H.awards;st.mode=MODE;
+  const teams=teamsArr(),th=curThrough(st);st.awards=H.awards;st.mode=MODE;st.set=SET;
   st.ni={};teams.forEach(p=>st.ni[p.id]=books(p,th,H.awards).ni);st.rank=ranks(st.ni);
   st.names=Object.fromEntries(teams.map(t=>[t.id,t.name]));
   if(st.timer){TIMER_END=st.timer}else{TIMER_END=0;TIMER_BEEPED=false}
@@ -615,7 +701,7 @@ function hostRender(fromPoll){
     const N=Math.max(1,teams.length);
     app.innerHTML=`${head}<div class="stitle" style="margin:0">Who got credit?</div>
       <div class="arows">${apps.map((c,i)=>{const k=teams.filter(p=>approvedIds(p,S.b).includes(c.id)).length;return `<div class="arow anim" style="--d:${i*90}ms"><b>${esc(c.name)}</b><span class="num">${money(c.amt)}</span><span class="b"><i style="width:${k/N*100}%"></i></span><span>${k} of ${teams.length} approved</span></div>`}).join("")}</div>
-      <div class="lesson"><b>Each approved sale:</b> ${jrn("Accounts Receivable","Sales","9,000","Example: Maple Grove")} Gross profit is booked now. Whether they pay, nobody knows yet.</div>
+      <div class="lesson"><b>Each approved sale:</b> ${jrn("Accounts Receivable","Sales",SD.saleAmt,"Example: "+SD.sale)} Gross profit is booked now. Whether they pay, nobody knows yet.</div>
       ${boardHTML(S,teams,th,fresh)}
       <div class="bar2"><span></span><button class="btn main" id="nx">Next →</button></div>`;
     $("#nx").onclick=next;if(fresh)countUp();requestAnimationFrame(zoomApp);return}
@@ -658,7 +744,7 @@ function hostRender(fromPoll){
     const said=k=>teams.filter(p=>p.pred===k).length;
     app.innerHTML=`${head}<div class="scard"><div class="stitle">Net income change: $0</div>
       <p class="story" style="font-size:23px">${said("down")} of ${teams.length} teams predicted it would go down. The expense for these customers was already recorded last December, when you made the estimate. A write-off just uses up the allowance.</p>
-      <div class="lesson">${jrn("Allowance for Doubtful Accounts","Accounts Receivable","12,000","Write off Fresh Kicks")} ${jrn("Accounts Receivable","Allowance for Doubtful Accounts","5,000","Reinstate Prairie")} ${jrn("Cash","Accounts Receivable","5,000","Collect")}</div></div>
+      <div class="lesson">${jrn("Allowance for Doubtful Accounts","Accounts Receivable",SD.badAmt,"Write off "+SD.bad)} ${jrn("Accounts Receivable","Allowance for Doubtful Accounts",SD.recAmt,"Reinstate "+SD.rec)} ${jrn("Cash","Accounts Receivable",SD.recAmt,"Collect")}</div></div>
       ${boardHTML(S,teams,th,fresh)}
       <div class="bar2"><span class="count">Write off more than you estimated, and the allowance ends up with a <b>debit</b> balance.</span><button class="btn main" id="nx">Next →</button></div>`;
     $("#nx").onclick=next;requestAnimationFrame(zoomApp);return}
@@ -785,8 +871,8 @@ function classResults(teams){
       <div class="leak okk"><b>Write-off entry: ${pct(p=>p.chk_wo===0)} correct</b>Dr Allowance, Cr Accounts Receivable. No expense.</div>
       <div class="leak okk"><b>NRV after a write-off: ${pct(p=>p.chk_nrv===0)} correct</b>It doesn't change.</div>
       <div class="leak okk"><b>Year 2 aging: ${pct(ag("B"))} fully right</b>Required balance minus what's already in the allowance.</div>`
-      :`<div class="leak mid"><b>Year 1: ${burnt("A")} of ${teams.length} teams approved a customer who never paid</b>Fresh Kicks, Rolling Hills and Max's never paid.</div>
-      <div class="leak mid"><b>Year 2: ${burnt("B")} of ${teams.length} teams got burned again</b>Kick Lab and Gridiron Gear never paid.</div>`}
+      :`<div class="leak mid"><b>Year 1: ${burnt("A")} of ${teams.length} teams approved a customer who never paid</b>${SD.y1}</div>
+      <div class="leak mid"><b>Year 2: ${burnt("B")} of ${teams.length} teams got burned again</b>${SD.y2}</div>`}
       ${stars.length?`<h3 style="font-family:var(--display);font-size:26px;margin:16px 0 6px">Huddle bonuses</h3>${stars.map(s=>`<div class="leak mid"><b>${esc(s.p.name)} · ${esc(HUDDLES[s.h].title)}</b>${esc(s.p["hud_"+s.h]||"")}</div>`).join("")}`:""}
     </div></div>
     <div class="row" style="justify-content:center;margin-top:16px"><button class="btn main" id="pod">Back to standings</button> <button class="btn" id="erase">Erase game</button></div></div>`;
@@ -816,7 +902,7 @@ async function joinForm(){
 async function enterGame(N,code,name,forcePid){
   try{const g=await N.get("games/"+code);
     if(!g||g.game!=="creditdesk")return "No Credit Desk game with that code. Check the board.";
-    setMode(g.mode||"full");
+    setMode(g.mode||"full");setSet(g.set||1);
     const sv=loadSess(),norm=x=>String(x||"").trim().toLowerCase().replace(/\s+/g," ");
     let pid=forcePid||(sv&&sv.code===code&&norm(sv.name)===norm(name)?sv.pid:null);
     if(!pid&&g.players){const hit=Object.entries(g.players).find(([,p])=>norm(p.name)===norm(name));if(hit)pid=hit[0]}
@@ -827,7 +913,7 @@ async function enterGame(N,code,name,forcePid){
     if(ME&&ME.off)ME.off();
     ME={N,code,pid,name,rec,state:null,key:null,draft:{}};
     $("#who").textContent=name;$("#who").hidden=false;$("#zm").hidden=false;teamZoom(0);
-    ME.off=N.on(`games/${code}/state`,st=>{if(!ME)return;if(!st){app.innerHTML=`<div class="wait"><h2>The game has ended</h2><p>Your teacher closed this game.</p></div>`;return}if(st.mode)setMode(st.mode);ME.state=st;teamRender()});
+    ME.off=N.on(`games/${code}/state`,st=>{if(!ME)return;if(!st){app.innerHTML=`<div class="wait"><h2>The game has ended</h2><p>Your teacher closed this game.</p></div>`;return}if(st.mode)setMode(st.mode);if(st.set)setSet(st.set);ME.state=st;teamRender()});
     return null}catch(e){return "Couldn't connect. Try again."}
 }
 async function rejoin(){const N=await net().catch(()=>null);if(!N)return needSetup();
@@ -970,7 +1056,7 @@ function teamHuddle(S,st,head,b){
   if(S.id==="s1"){const all=CUST.filter(c=>c.b==="A"),yes=approvedIds(meP(),"A");ctx=`<div class="chips">${all.map(c=>`<span class="${yes.includes(c.id)?"g":"r"}">${yes.includes(c.id)?"✓ Approved":"✗ Denied"} · ${esc(c.name)}</span>`).join("")}</div>`}
   if(S.id==="s3"){const lost=b.lost,miss=sum(Object.values(b.res).map(r=>r.missed||0));ctx=`Over two years you lost <b>${money(lost)}</b> to customers who never paid, and passed up <b>${money(miss)}</b> of profit from customers you denied who would have paid.`}
   if(S.id==="h1")ctx=`Your Year 1 Bad Debts Expense: <b>${money((b.ag.A||{}).adj||0)}</b>. Not one of those customers has refused to pay yet.`;
-  if(S.id==="h2")ctx=b.wo?`You wrote off <b>${money(b.wo)}</b> of customer accounts. Your net income change: <b>$0</b>.`:`You had no write-offs, but other teams wrote off as much as $32,000. Explain it for them.`;
+  if(S.id==="h2")ctx=b.wo?`You wrote off <b>${money(b.wo)}</b> of customer accounts. Your net income change: <b>$0</b>.`:`You had no write-offs, but other teams wrote off as much as ${SD.maxWo}. Explain it for them.`;
   if(S.id==="h3"){const all=CUST.filter(c=>c.b==="A"),yes=approvedIds(meP(),"A");ctx=`<div class="chips">${all.map(c=>{const o=outcomeOf(c);return `<span class="${o.cls}">${yes.includes(c.id)?"✓ Approved":"✗ Denied"} · ${esc(c.name)}: ${esc(o.t)}</span>`}).join("")}</div>`}
   if(st.sub==="open"){
     const dv=M.draft[k]!=null?M.draft[k]:mine;
