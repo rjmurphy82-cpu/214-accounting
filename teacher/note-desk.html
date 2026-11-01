@@ -1,0 +1,3081 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Teacher | The Note Desk</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="description" content="Notes receivable class game for District 214 Accounting: a Calendar Race on maturity dates, then teams accept notes, compute interest, and collect by June 30.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F2F2F2;--paper:#FFFFFF;--ink:#111111;--muted:#5C5C5C;--line:rgba(17,17,17,.14);--soft:#F4F4F4;--dark:#111111;
+  --red:#C1102F;--good:#1E7A3C;--goodsoft:#E7F4EB;--bad:#C1102F;--badsoft:#FBE7EA;--warn:#9A6700;--warnsoft:#FFF4D6;
+  --display:"Oswald","Arial Narrow",Impact,sans-serif;--body:"Barlow",system-ui,-apple-system,"Segoe UI",sans-serif;
+  color-scheme:light;
+}
+*,*::before,*::after{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:18px/1.45 var(--body);-webkit-tap-highlight-color:transparent}
+[hidden]{display:none!important}
+button{font:inherit;color:inherit;cursor:pointer}
+.wrap{max-width:1180px;margin:0 auto;padding:12px 18px 28px}
+.top{display:flex;align-items:center;gap:12px;flex-wrap:wrap;color:var(--muted);font-size:15px;font-weight:600}
+.top img{height:34px;width:auto;border-radius:3px;display:block}
+.top a{color:inherit;text-decoration:none}
+.sp{flex:1}
+.pill{background:var(--dark);color:#fff;border-radius:999px;padding:3px 12px;font-size:14px;font-weight:700}
+.rejoin{background:var(--red);color:#fff;border:0;border-radius:999px;padding:7px 16px;font:700 16px var(--body);box-shadow:0 2px 0 rgba(0,0,0,.2)}
+.zm{display:inline-flex;gap:4px}
+.zm button{background:var(--paper);border:2px solid var(--line);border-radius:8px;padding:2px 10px;font-weight:700;font-size:15px}
+h1.title{font-family:var(--display);font-weight:700;font-size:clamp(40px,6.5vw,72px);line-height:.98;margin:18px 0 6px}
+h1.title span{color:var(--red)}
+.lede{max-width:66ch;color:var(--muted);margin:0 0 18px}
+.btn{background:var(--paper);border:2px solid var(--line);border-radius:10px;padding:8px 16px;font-weight:700;font-size:17px}
+.btn.main{background:var(--red);border-color:var(--red);color:#fff;font-family:var(--display);font-weight:600;font-size:24px;padding:10px 30px}
+.btn.dark{background:var(--dark);border-color:var(--dark);color:#fff}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.panel{background:var(--paper);border:2px solid var(--line);border-radius:14px;padding:22px;max-width:680px;margin:10px auto 0}
+.panel h2{font-family:var(--display);font-weight:600;font-size:32px;margin:0 0 6px}
+.panel ol{padding-left:22px;margin:6px 0 10px}.panel li{margin:3px 0}
+.field{display:block;width:100%;font-size:26px;font-weight:600;padding:12px 14px;border:2px solid var(--line);border-radius:10px;background:var(--soft);margin:6px 0 14px;font-family:var(--body);color:var(--ink)}
+.field.code{letter-spacing:.3em;text-align:center;font-family:var(--display);font-size:40px}
+.err{color:var(--bad);font-weight:700;min-height:1.4em}
+.note{font-size:15px;color:var(--muted)}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.wait{text-align:center;padding:40px 10px}
+.wait h2{font-family:var(--display);font-size:clamp(32px,6vw,54px);margin:0 0 8px;line-height:1.05}
+.wait p{color:var(--muted);font-size:20px;max-width:46ch;margin:6px auto}
+.num{font-variant-numeric:tabular-nums}
+
+/* lobby */
+.lobby{text-align:center}
+.lobtop{display:flex;align-items:center;justify-content:center;gap:clamp(20px,4vw,60px);flex-wrap:wrap}
+.lobleft{max-width:700px;flex:1 1 420px}
+.lobby .join{font-size:clamp(20px,2.4vw,30px);color:var(--muted);font-weight:600}
+.lobby .code{font-family:var(--display);font-weight:700;font-size:clamp(80px,14vw,170px);line-height:1;letter-spacing:.12em;margin:6px 0}
+.lobby .url{font-weight:700;color:var(--muted);font-size:clamp(14px,1.4vw,20px);word-break:break-all}
+.qr{display:flex;flex-direction:column;align-items:center;gap:6px;background:#fff;border-radius:16px;padding:12px;box-shadow:0 10px 30px rgba(0,0,0,.12);border:2px solid var(--line)}
+.qr svg{width:clamp(180px,22vw,320px);height:auto;display:block}
+.qr span{font-family:var(--display);font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#111;font-size:clamp(14px,1.4vw,20px)}
+.names{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin:18px 0}
+.names span{background:var(--paper);border:2px solid var(--line);border-left:8px solid var(--c,#111);border-radius:999px;padding:6px 16px;font-weight:700;font-size:22px}
+.count{font-family:var(--display);font-size:24px;font-weight:600}
+
+/* projector stage */
+.rhead{display:flex;align-items:baseline;gap:14px;margin:6px 0 10px;flex-wrap:wrap}
+.rtag{font-family:var(--display);font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--red);font-size:22px}
+.rname{font-family:var(--display);font-weight:600;font-size:22px;color:var(--muted)}
+.yr{margin-left:auto;background:var(--dark);color:#fff;border-radius:8px;padding:2px 12px;font-family:var(--display);font-weight:600;font-size:20px;letter-spacing:.06em}
+.scard{background:var(--paper);border:2px solid var(--line);border-left:12px solid var(--red);border-radius:14px;padding:18px 24px;box-shadow:0 10px 30px rgba(0,0,0,.08)}
+.stitle{font-family:var(--display);font-weight:700;font-size:40px;line-height:1.05;margin:0 0 8px}
+.story{font-size:27px;line-height:1.35;margin:0}
+.lesson{margin-top:12px;background:var(--goodsoft);border-left:8px solid var(--good);border-radius:10px;padding:12px 18px;font-size:22px}
+.lesson b{font-family:var(--display);font-weight:600;font-size:24px}
+.ask{font-family:var(--display);font-size:28px;font-weight:600;margin:14px 0 4px;text-align:center}
+.board{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px;margin-top:14px}
+.tile{position:relative;background:var(--paper);border:2px solid var(--line);border-top:8px solid var(--c);border-radius:12px;padding:8px 12px 10px;min-height:96px}
+.tile .tn{font-weight:700;font-size:19px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-right:34px}
+.tile .rk{position:absolute;top:6px;right:10px;font-family:var(--display);font-weight:700;color:var(--muted);font-size:18px}
+.tile .lbl{font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-top:2px}
+.tile .cash{font-family:var(--display);font-weight:700;font-size:36px;line-height:1.05;font-variant-numeric:tabular-nums}
+.tile .st{font-weight:700;font-size:16px;line-height:1.25}
+.tile.ok{background:var(--goodsoft);border-color:var(--good);border-top-color:var(--c)}
+.tile.no{background:var(--badsoft);border-color:var(--bad);border-top-color:var(--c)}
+.tile.mid{background:var(--warnsoft);border-color:var(--warn);border-top-color:var(--c)}
+.stamp{display:inline-block;border-radius:6px;padding:1px 8px;font-family:var(--display);font-weight:700;font-size:18px;letter-spacing:.04em;color:#fff;margin-right:6px;background:var(--dark)}
+.tile.ok .stamp{background:var(--good)} .tile.no .stamp{background:var(--bad)} .tile.mid .stamp{background:var(--warn)}
+.tile.wait .st{color:var(--muted)} .tile.done .st{color:var(--good)}
+.tile.anim{animation:tin .45s cubic-bezier(.2,1.3,.4,1) both;animation-delay:var(--d,0ms)}
+@keyframes tin{from{opacity:0;transform:translateY(16px) scale(.96)}}
+.bar2{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:14px;flex-wrap:wrap}
+.bar2 .row{margin-left:auto}
+.applist{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:8px;margin-top:12px}
+.appchip{background:var(--soft);border:2px solid var(--line);border-radius:10px;padding:6px 12px;font-size:19px;display:flex;justify-content:space-between;gap:10px}
+.appchip b{font-family:var(--display);font-weight:600}
+.arows{display:grid;gap:6px;margin-top:10px}
+.arow{display:grid;grid-template-columns:minmax(0,1.4fr) auto minmax(0,1fr) auto;gap:14px;align-items:center;background:var(--paper);border:2px solid var(--line);border-radius:12px;padding:8px 16px;font-size:21px}
+.arow b{font-family:var(--display);font-weight:600;font-size:23px}
+.arow .b{height:14px;background:var(--soft);border-radius:999px;overflow:hidden}.arow .b i{display:block;height:100%;background:var(--red)}
+.arow.anim{animation:tin .45s both;animation-delay:var(--d,0ms)}
+.pct{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin-top:12px}
+.pct div{background:var(--soft);border:2px solid var(--line);border-radius:10px;padding:8px;text-align:center;font-size:17px;font-weight:600;line-height:1.2}
+.pct b{display:block;font-family:var(--display);font-size:34px;color:var(--red)}
+.news{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:10px;margin-top:12px}
+.newsc{background:var(--paper);border:2px solid var(--line);border-top:8px solid var(--bad);border-radius:12px;padding:12px 16px}
+.newsc.good{border-top-color:var(--good)} .newsc.mix{border-top-color:var(--warn)}
+.newsc b{font-family:var(--display);font-weight:600;font-size:26px;display:block;line-height:1.1}
+.newsc p{margin:4px 0 0;font-size:20px}
+.newsc.anim{animation:tin .45s both;animation-delay:var(--d,0ms)}
+.jrn{display:inline-grid;grid-template-columns:auto auto auto;gap:0 22px;text-align:left;background:var(--paper);border:2px solid var(--line);border-radius:10px;padding:8px 16px;font-size:21px;margin:6px 10px 0 0;vertical-align:top;font-variant-numeric:tabular-nums}
+.jrn>span{white-space:nowrap}.jrn .ci{padding-left:34px}.jrn .d{text-align:right;min-width:4ch}
+.huddle .btn{color:var(--ink)}
+.jrn .h{grid-column:1/-1;font-family:var(--display);font-weight:600;font-size:18px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
+.opt{display:flex;gap:14px;align-items:flex-start;text-align:left;background:var(--paper);border:3px solid var(--line);border-radius:14px;padding:14px 16px;font-size:22px;line-height:1.3}
+.opt .sh{flex:none;width:42px;height:42px;border-radius:10px;display:grid;place-items:center;background:var(--dark);color:#fff;font-family:var(--display);font-weight:700;font-size:24px}
+.opt .ent{display:block;font-variant-numeric:tabular-nums}
+.opt .ent .c{padding-left:28px;display:block}
+.opt[aria-pressed="true"]{border-color:var(--ink);background:var(--soft);box-shadow:inset 0 0 0 2px var(--ink)}
+.opt.right{border-color:var(--good);background:var(--goodsoft)} .opt.right .sh{background:var(--good)}
+.opt.wrong{border-color:var(--bad);background:var(--badsoft)} .opt.wrong .sh{background:var(--bad)}
+.opt .tally{margin-left:auto;font-family:var(--display);font-weight:700;font-size:26px;white-space:nowrap}
+.timer{font-family:var(--display);font-weight:700;font-size:64px;line-height:1;font-variant-numeric:tabular-nums}
+.timer.done{color:var(--red);animation:blink 1s steps(2) infinite}
+@keyframes blink{50%{opacity:.35}}
+.huddle{background:var(--dark);color:#fff;border-radius:16px;padding:22px 28px;display:grid;grid-template-columns:1fr auto;gap:20px;align-items:center}
+.huddle .kick{font-family:var(--display);letter-spacing:.2em;text-transform:uppercase;color:#FF4D63;font-size:20px}
+.huddle h2{font-family:var(--display);font-weight:700;font-size:48px;line-height:1.05;margin:2px 0 8px}
+.huddle p{font-size:28px;line-height:1.35;margin:0}
+.huddle .hint{font-size:21px;color:#ccc;margin-top:10px}
+.answers{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:12px;margin-top:14px}
+.ans{position:relative;background:var(--paper);border:2px solid var(--line);border-left:10px solid var(--c);border-radius:12px;padding:12px 16px 12px;text-align:left;font-size:20px;line-height:1.35}
+.ans .who{font-family:var(--display);font-weight:600;font-size:20px;color:var(--muted);display:flex;justify-content:space-between;gap:8px;align-items:center}
+.ans .txt{margin:4px 0 8px;white-space:pre-wrap;overflow-wrap:anywhere}
+.ans .acts{display:flex;gap:8px}
+.ans .acts button{font-size:15px;padding:4px 12px}
+.ans.star{border-color:var(--good);background:var(--goodsoft)}
+.ans.anim{animation:tin .45s both;animation-delay:var(--d,0ms)}
+.ans .medal{background:var(--good);color:#fff;border-radius:6px;padding:0 8px;font-size:16px}
+.spot{position:fixed;inset:0;z-index:60;background:rgba(10,10,10,.92);display:grid;place-items:center;padding:4vh 6vw;cursor:pointer}
+.spot div{background:var(--paper);border-radius:20px;border-left:16px solid var(--c);padding:4vh 4vw;max-width:1400px}
+.spot b{font-family:var(--display);font-weight:600;font-size:clamp(24px,4vh,44px);color:var(--muted);display:block}
+.spot p{font-size:clamp(30px,5.4vh,66px);line-height:1.25;margin:1vh 0 0;white-space:pre-wrap;overflow-wrap:anywhere}
+
+/* team device (iPad) */
+.tbar{position:sticky;top:0;z-index:5;background:var(--bg);padding:8px 0 10px;border-bottom:2px solid var(--line);margin-bottom:12px}
+.mtext{display:flex;justify-content:space-between;gap:12px;font-weight:700;font-size:20px;flex-wrap:wrap}
+.apps{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:12px}
+.appc{background:var(--paper);border:3px solid var(--line);border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;gap:6px}
+.appc.yes{border-color:var(--good);background:var(--goodsoft)} .appc.noo{border-color:var(--bad);background:var(--badsoft)}
+.appc .hd{display:flex;justify-content:space-between;gap:10px;align-items:baseline}
+.appc .hd b{font-family:var(--display);font-weight:600;font-size:25px;line-height:1.1}
+.appc .amt{font-family:var(--display);font-weight:700;font-size:26px;white-space:nowrap}
+.appc .what{color:var(--muted);font-size:17px;margin-top:-4px}
+.facts{display:grid;grid-template-columns:auto 1fr;gap:2px 12px;font-size:17px;margin:2px 0}
+.facts dt{color:var(--muted);font-weight:600}.facts dd{margin:0;font-weight:700}
+.quote{font-size:17px;font-style:italic;background:var(--soft);border-radius:8px;padding:6px 10px}
+.yn{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:auto;padding-top:4px}
+.yn button{border:3px solid var(--line);background:var(--paper);border-radius:10px;padding:10px;font-family:var(--display);font-weight:600;font-size:22px}
+.yn .y[aria-pressed="true"]{background:var(--good);border-color:var(--good);color:#fff}
+.yn .n[aria-pressed="true"]{background:var(--bad);border-color:var(--bad);color:#fff}
+.lock{position:sticky;bottom:0;background:var(--bg);padding:12px 0;margin-top:12px;border-top:2px solid var(--line);display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}
+.chips span{background:var(--paper);border:2px solid var(--line);border-radius:999px;padding:4px 12px;font-weight:700;font-size:16px}
+.chips .g{border-color:var(--good);background:var(--goodsoft)} .chips .r{border-color:var(--bad);background:var(--badsoft)} .chips .y{border-color:var(--warn);background:var(--warnsoft)}
+.verdict{border-radius:16px;padding:20px;text-align:center;margin:10px auto;max-width:760px}
+.verdict.ok{background:var(--goodsoft);border:3px solid var(--good)} .verdict.no{background:var(--badsoft);border:3px solid var(--bad)} .verdict.mid{background:var(--warnsoft);border:3px solid var(--warn)} .verdict.neu{background:var(--paper);border:3px solid var(--line)}
+.verdict h2{font-family:var(--display);font-size:clamp(36px,7vw,64px);margin:0;line-height:1.05}
+.verdict.ok h2{color:var(--good)} .verdict.no h2{color:var(--bad)} .verdict.mid h2{color:var(--warn)}
+.verdict p{font-size:20px;margin:8px 0 0}
+.box{background:var(--paper);border:2px solid var(--line);border-radius:12px;padding:14px 18px;margin:10px auto;max-width:760px}
+.box h3{font-family:var(--display);font-weight:600;font-size:24px;margin:0 0 6px}
+.cashline{display:flex;justify-content:center;gap:22px;flex-wrap:wrap;margin-top:12px;font-weight:700;font-size:20px}
+.cashline b{font-family:var(--display);font-size:40px;display:block;line-height:1}
+table.t{width:100%;border-collapse:collapse;font-size:18px;font-variant-numeric:tabular-nums}
+table.t th{text-align:left;font-size:14px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);border-bottom:2px solid var(--line);padding:4px 6px}
+table.t td{border-bottom:1px solid var(--line);padding:6px}
+table.t td.r,table.t th.r{text-align:right}
+table.t tr.tot td{border-top:2px solid var(--ink);font-weight:700}
+.inp{width:100%;min-width:90px;font:600 20px var(--body);padding:6px 8px;border:2px solid var(--line);border-radius:8px;background:var(--soft);text-align:right;color:var(--ink)}
+.inp.big{font-size:28px;padding:10px 12px}
+.taccount{display:grid;grid-template-columns:1fr 1fr;border-top:3px solid var(--ink);margin-top:6px;font-size:18px;font-variant-numeric:tabular-nums}
+.taccount>div{padding:4px 10px}.taccount>div:first-child{border-right:3px solid var(--ink)}
+.taccount .ln{display:flex;justify-content:space-between;gap:10px;padding:2px 0}
+.taccount .hd{font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.ans2{display:grid;grid-template-columns:1fr 220px;gap:10px 14px;align-items:center;margin-top:8px;font-size:19px;font-weight:600}
+.rule{background:var(--dark);color:#fff;border-radius:12px;padding:10px 16px;margin-bottom:12px;font-size:18px}
+.rule b{font-family:var(--display);font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#FF8A9A;font-size:15px;display:block}
+textarea.field{font-size:22px;min-height:170px;resize:vertical;line-height:1.35}
+.bs{display:grid;grid-template-columns:1fr auto auto;gap:2px 18px;font-size:19px;font-variant-numeric:tabular-nums}
+.bs .u{border-bottom:2px solid var(--ink)} .bs .tot{font-weight:700}
+.rep h2{font-family:var(--display);font-weight:700;font-size:clamp(34px,5vw,54px);margin:6px 0;line-height:1.05}
+.leak{background:var(--paper);border:2px solid var(--line);border-left:8px solid var(--bad);border-radius:12px;padding:10px 16px;margin:8px 0;font-size:18px}
+.leak b{font-family:var(--display);font-weight:600;font-size:21px;display:block}
+.leak.okk{border-left-color:var(--good)} .leak.mid{border-left-color:var(--warn)}
+.cr{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) 1fr auto;gap:12px;align-items:center;padding:6px 0;border-bottom:1px solid var(--line);font-size:19px}
+.cr .b{height:12px;background:var(--soft);border-radius:999px;overflow:hidden}.cr .b i{display:block;height:100%;background:var(--red)}
+.tag{display:inline-block;border-radius:6px;padding:0 8px;font-weight:700;font-size:15px;color:#fff;background:var(--good)}
+.tag.r{background:var(--bad)}.tag.y{background:var(--warn)}.tag.k{background:var(--dark)}
+
+.modes{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:6px 0 12px}
+.mode{display:flex;flex-direction:column;gap:4px;text-align:left;background:var(--paper);border:3px solid var(--line);border-radius:12px;padding:12px 14px}
+.mode b{font-family:var(--display);font-weight:600;font-size:22px}
+.mode span{font-size:15px;color:var(--muted);line-height:1.3}
+.mode[aria-pressed="true"]{border-color:var(--red);background:#FBE7EA}
+.appwrap{display:grid;grid-template-columns:minmax(0,1fr) 270px;gap:14px;align-items:start}
+.rkey{position:sticky;top:96px;max-height:calc(100vh - 110px);max-height:calc(100dvh - 110px);overflow:auto;background:var(--paper);border:3px solid var(--ink);border-radius:14px;padding:12px 14px}
+.rkey h3{font-family:var(--display);font-weight:600;font-size:22px;margin:0 0 2px;line-height:1.1}
+.rkey .sub{font-size:14px;color:var(--muted);margin:0 0 8px;line-height:1.25}
+.rk{display:grid;grid-template-columns:52px 1fr;gap:8px;align-items:center;padding:3px 0;border-top:1px solid var(--line)}
+.rk b{font-family:var(--display);font-weight:700;font-size:20px;text-align:center;color:#fff;border-radius:6px;padding:1px 0;background:var(--c)}
+.rk span{font-size:13.5px;line-height:1.18}
+.rk span strong{display:block;font-size:15.5px}
+.rkey .tier{font-family:var(--display);font-weight:600;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:5px 0 1px}
+.rkey .pm{font-size:13.5px;color:var(--muted);margin:8px 0 0;line-height:1.25}
+@media (max-width:980px){.appwrap{grid-template-columns:1fr}.rkey{position:static;order:-1}.rkey{max-height:none}.rkey .tier{display:none}.rkey .list{display:grid;grid-template-rows:repeat(6,auto);grid-auto-flow:column;column-gap:14px}}
+@media (max-width:760px){.apps{grid-template-columns:1fr}.opts{grid-template-columns:1fr}.arow{grid-template-columns:1fr auto}.pct{grid-template-columns:repeat(2,1fr)}.ans2{grid-template-columns:1fr}.huddle{grid-template-columns:1fr}}
+
+/* finale */
+body.finale-on{overflow:hidden}
+body.finale-on .top{visibility:hidden}
+.finale{position:fixed;inset:0;z-index:50;background:radial-gradient(120% 80% at 50% 110%,#5a0614 0%,#1a0207 45%,#070707 100%);color:#fff;display:grid;grid-template-rows:auto 1fr auto auto;justify-items:center;padding:2.2vh 3vw 2vh;overflow:hidden}
+.finale canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:1}
+.finale .rays{position:absolute;left:50%;top:62%;width:160vmax;height:160vmax;transform:translate(-50%,-50%);background:repeating-conic-gradient(from 0deg,rgba(255,255,255,.05) 0deg 8deg,transparent 8deg 22deg);animation:spin 60s linear infinite;z-index:0;mask:radial-gradient(circle,#000 0%,transparent 55%);-webkit-mask:radial-gradient(circle,#000 0%,transparent 55%)}
+@keyframes spin{to{transform:translate(-50%,-50%) rotate(360deg)}}
+.fhead{position:relative;z-index:2;text-align:center}
+.fhead .lg{height:clamp(34px,6vh,64px);display:block;margin:0 auto 1vh;border-radius:4px}
+.fhead .kick{font-family:var(--display);letter-spacing:.3em;text-transform:uppercase;color:#FF4D63;font-size:clamp(14px,2.2vh,26px)}
+.fhead h2{font-family:var(--display);font-weight:700;font-size:clamp(48px,10vh,130px);line-height:.95;margin:0;background:linear-gradient(180deg,#fff 45%,#F4B6C0);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 4px 18px rgba(193,16,47,.6))}
+.podium{position:relative;z-index:2;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));align-items:end;gap:1.6vw;width:min(92vw,1500px);align-self:end}
+.pod{display:flex;flex-direction:column;align-items:center;opacity:0;transform:translateY(40px) scale(.9);transition:opacity .5s, transform .7s cubic-bezier(.2,1.6,.4,1)}
+.pod.in{opacity:1;transform:none}
+.pod.empty{visibility:hidden}
+.pod .who{text-align:center;margin-bottom:1.2vh;max-width:100%}
+.pod .medal{width:clamp(44px,8vh,96px);height:clamp(44px,8vh,96px);border-radius:50%;display:grid;place-items:center;margin:0 auto .8vh;font-family:var(--display);font-weight:700;font-size:clamp(24px,4.6vh,56px);color:#3b2600;box-shadow:inset 0 -6px 0 rgba(0,0,0,.18),0 6px 24px rgba(0,0,0,.4)}
+.p1 .medal{background:radial-gradient(circle at 35% 30%,#FFF3B0,#FFC93C 55%,#C98A00)}
+.p2 .medal{background:radial-gradient(circle at 35% 30%,#FFFFFF,#CFD6DD 55%,#8C98A3)}
+.p3 .medal{background:radial-gradient(circle at 35% 30%,#FFD9B8,#D88B4A 55%,#8E4F1C);color:#2b1300}
+.pod .nm{font-family:var(--display);font-weight:600;font-size:clamp(26px,5.4vh,72px);line-height:1.05;overflow-wrap:anywhere}
+.p1 .nm{font-size:clamp(32px,7vh,96px);color:#fff;text-shadow:0 0 24px rgba(232,25,60,.8)}
+.pod .pts{font-weight:700;font-size:clamp(18px,3.2vh,40px);opacity:.85}
+.pod .block{width:100%;border-radius:12px 12px 0 0;display:grid;place-items:start center;padding-top:1.4vh;font-family:var(--display);font-weight:700;font-size:clamp(28px,6vh,80px);color:rgba(255,255,255,.92);background:linear-gradient(180deg,#E0213F,#8F0A20);box-shadow:inset 0 3px 0 rgba(255,255,255,.25),0 -10px 40px rgba(193,16,47,.35)}
+.p1 .block{height:26vh;background:linear-gradient(180deg,#F23A55,#A90C26)}
+.p2 .block{height:18vh}
+.p3 .block{height:13vh}
+.p1.in .who{animation:pop 1.2s ease-out .2s 2}
+@keyframes pop{50%{transform:scale(1.08)}}
+.rest{position:relative;z-index:2;display:grid;grid-template-columns:1fr 1fr;gap:1.4vw;width:min(92vw,1500px);margin-top:1.6vh}
+.row45{display:flex;align-items:center;gap:1.2vw;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);border-radius:12px;padding:1vh 1.4vw;font-size:clamp(20px,3.6vh,44px);font-weight:700;opacity:0;transform:translateX(-30px);transition:opacity .5s, transform .5s}
+.row45.in{opacity:1;transform:none}
+.row45 .r{font-family:var(--display);color:#FF4D63;min-width:1.4em}
+.row45 .n{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.row45 .s{opacity:.8}
+.fbar{position:relative;z-index:4;display:flex;gap:10px;margin-top:1.6vh;opacity:.55;transition:opacity .2s}
+.fbar:hover{opacity:1}
+.fbar .btn{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.25);color:#fff;font-size:15px;padding:6px 14px}
+@media (max-width:700px){.rest{grid-template-columns:1fr}}
+@media (prefers-reduced-motion: reduce){.finale .rays{animation:none}.pod,.row45{transition:none}.p1.in .who{animation:none}.timer.done{animation:none}}
+
+.offers{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px;margin-top:12px}
+.offc{background:var(--paper);border:2px solid var(--line);border-radius:12px;padding:10px 14px}
+.offc .hd,.appc .hd{display:flex;justify-content:space-between;gap:10px;align-items:center}
+.offc .hd b{font-family:var(--display);font-weight:600;font-size:22px;line-height:1.1}
+.terms{display:grid;grid-template-columns:repeat(4,auto);gap:4px 14px;margin-top:6px;font-family:var(--display);font-weight:600;font-size:21px;font-variant-numeric:tabular-nums}
+.terms small{display:block;font-family:var(--body);font-weight:700;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.rt{font-family:var(--display);font-weight:700;font-size:16px;border-radius:6px;padding:1px 8px;color:#fff;background:var(--good);white-space:nowrap}
+.rt.y{background:var(--warn)}.rt.r{background:var(--bad)}
+.mathrow{display:grid;grid-template-columns:1.4fr 1fr;gap:10px;margin-top:6px;background:var(--soft);border-radius:10px;padding:8px 10px}
+.mathrow label{font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);display:flex;flex-direction:column;gap:4px}
+.mathrow input,.mathrow select{font:600 20px var(--body);padding:6px 8px;border:2px solid var(--line);border-radius:8px;background:#fff;color:var(--ink);min-width:0;width:100%}
+.mathrow .dd{display:grid;grid-template-columns:1.5fr 1fr;gap:6px}
+.mtext .over{color:var(--bad)}
+.meter{height:16px;background:var(--soft);border:1px solid var(--line);border-radius:999px;overflow:hidden;margin:6px 0}
+.meter i{display:block;height:100%;background:var(--good);transition:width .25s}.meter.full i{background:var(--red)}
+.cals{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
+.cal{background:var(--paper);border:2px solid var(--line);border-radius:12px;padding:8px 10px}
+.cm{font-family:var(--display);font-weight:600;font-size:22px;text-align:center;margin-bottom:4px}
+.cg{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.cg .dw{text-align:center;font-size:12px;font-weight:700;color:var(--muted)}
+.cd{border:2px solid var(--line);background:var(--soft);border-radius:8px;padding:8px 0;font:700 18px var(--body);color:var(--ink)}
+.cd.on{background:var(--red);border-color:var(--red);color:#fff}
+.cd:disabled{opacity:.6}
+table.t.big{font-size:20px}table.t.big td{padding:7px 8px}
+table.t tr.anim{animation:tin .45s both;animation-delay:var(--d,0ms)}
+.brk td{font-size:20px}
+@media (max-width:760px){.cals{grid-template-columns:1fr}.mathrow{grid-template-columns:1fr}.terms{grid-template-columns:repeat(2,auto)}}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top"><img src="/logo-214.png" alt="District 214"><a href="/">District 214 Accounting</a> | <a href="/teacher">Teacher</a> | Chapter 7: The Note Desk<span class="sp"></span><span class="zm" id="zm" hidden><button id="zo" aria-label="Smaller text">A−</button><button id="zi" aria-label="Bigger text">A+</button></span><span class="pill" id="who" hidden></span><button class="rejoin" id="rejoin" hidden>↻ Rejoin</button></div>
+  <main id="app"></main>
+</div>
+<script>window.ND_ROLE="teacher"</script>
+<script>/* qrcode-generator, MIT License, Copyright (c) 2009 Kazuhiko Arase */
+//---------------------------------------------------------------------
+//
+// QR Code Generator for JavaScript
+//
+// Copyright (c) 2009 Kazuhiko Arase
+//
+// URL: http://www.d-project.com/
+//
+// Licensed under the MIT license:
+//  http://www.opensource.org/licenses/mit-license.php
+//
+// The word 'QR Code' is registered trademark of
+// DENSO WAVE INCORPORATED
+//  http://www.denso-wave.com/qrcode/faqpatent-e.html
+//
+//---------------------------------------------------------------------
+
+var qrcode = function() {
+
+  //---------------------------------------------------------------------
+  // qrcode
+  //---------------------------------------------------------------------
+
+  /**
+   * qrcode
+   * @param typeNumber 1 to 40
+   * @param errorCorrectionLevel 'L','M','Q','H'
+   */
+  var qrcode = function(typeNumber, errorCorrectionLevel) {
+
+    var PAD0 = 0xEC;
+    var PAD1 = 0x11;
+
+    var _typeNumber = typeNumber;
+    var _errorCorrectionLevel = QRErrorCorrectionLevel[errorCorrectionLevel];
+    var _modules = null;
+    var _moduleCount = 0;
+    var _dataCache = null;
+    var _dataList = [];
+
+    var _this = {};
+
+    var makeImpl = function(test, maskPattern) {
+
+      _moduleCount = _typeNumber * 4 + 17;
+      _modules = function(moduleCount) {
+        var modules = new Array(moduleCount);
+        for (var row = 0; row < moduleCount; row += 1) {
+          modules[row] = new Array(moduleCount);
+          for (var col = 0; col < moduleCount; col += 1) {
+            modules[row][col] = null;
+          }
+        }
+        return modules;
+      }(_moduleCount);
+
+      setupPositionProbePattern(0, 0);
+      setupPositionProbePattern(_moduleCount - 7, 0);
+      setupPositionProbePattern(0, _moduleCount - 7);
+      setupPositionAdjustPattern();
+      setupTimingPattern();
+      setupTypeInfo(test, maskPattern);
+
+      if (_typeNumber >= 7) {
+        setupTypeNumber(test);
+      }
+
+      if (_dataCache == null) {
+        _dataCache = createData(_typeNumber, _errorCorrectionLevel, _dataList);
+      }
+
+      mapData(_dataCache, maskPattern);
+    };
+
+    var setupPositionProbePattern = function(row, col) {
+
+      for (var r = -1; r <= 7; r += 1) {
+
+        if (row + r <= -1 || _moduleCount <= row + r) continue;
+
+        for (var c = -1; c <= 7; c += 1) {
+
+          if (col + c <= -1 || _moduleCount <= col + c) continue;
+
+          if ( (0 <= r && r <= 6 && (c == 0 || c == 6) )
+              || (0 <= c && c <= 6 && (r == 0 || r == 6) )
+              || (2 <= r && r <= 4 && 2 <= c && c <= 4) ) {
+            _modules[row + r][col + c] = true;
+          } else {
+            _modules[row + r][col + c] = false;
+          }
+        }
+      }
+    };
+
+    var getBestMaskPattern = function() {
+
+      var minLostPoint = 0;
+      var pattern = 0;
+
+      for (var i = 0; i < 8; i += 1) {
+
+        makeImpl(true, i);
+
+        var lostPoint = QRUtil.getLostPoint(_this);
+
+        if (i == 0 || minLostPoint > lostPoint) {
+          minLostPoint = lostPoint;
+          pattern = i;
+        }
+      }
+
+      return pattern;
+    };
+
+    var setupTimingPattern = function() {
+
+      for (var r = 8; r < _moduleCount - 8; r += 1) {
+        if (_modules[r][6] != null) {
+          continue;
+        }
+        _modules[r][6] = (r % 2 == 0);
+      }
+
+      for (var c = 8; c < _moduleCount - 8; c += 1) {
+        if (_modules[6][c] != null) {
+          continue;
+        }
+        _modules[6][c] = (c % 2 == 0);
+      }
+    };
+
+    var setupPositionAdjustPattern = function() {
+
+      var pos = QRUtil.getPatternPosition(_typeNumber);
+
+      for (var i = 0; i < pos.length; i += 1) {
+
+        for (var j = 0; j < pos.length; j += 1) {
+
+          var row = pos[i];
+          var col = pos[j];
+
+          if (_modules[row][col] != null) {
+            continue;
+          }
+
+          for (var r = -2; r <= 2; r += 1) {
+
+            for (var c = -2; c <= 2; c += 1) {
+
+              if (r == -2 || r == 2 || c == -2 || c == 2
+                  || (r == 0 && c == 0) ) {
+                _modules[row + r][col + c] = true;
+              } else {
+                _modules[row + r][col + c] = false;
+              }
+            }
+          }
+        }
+      }
+    };
+
+    var setupTypeNumber = function(test) {
+
+      var bits = QRUtil.getBCHTypeNumber(_typeNumber);
+
+      for (var i = 0; i < 18; i += 1) {
+        var mod = (!test && ( (bits >> i) & 1) == 1);
+        _modules[Math.floor(i / 3)][i % 3 + _moduleCount - 8 - 3] = mod;
+      }
+
+      for (var i = 0; i < 18; i += 1) {
+        var mod = (!test && ( (bits >> i) & 1) == 1);
+        _modules[i % 3 + _moduleCount - 8 - 3][Math.floor(i / 3)] = mod;
+      }
+    };
+
+    var setupTypeInfo = function(test, maskPattern) {
+
+      var data = (_errorCorrectionLevel << 3) | maskPattern;
+      var bits = QRUtil.getBCHTypeInfo(data);
+
+      // vertical
+      for (var i = 0; i < 15; i += 1) {
+
+        var mod = (!test && ( (bits >> i) & 1) == 1);
+
+        if (i < 6) {
+          _modules[i][8] = mod;
+        } else if (i < 8) {
+          _modules[i + 1][8] = mod;
+        } else {
+          _modules[_moduleCount - 15 + i][8] = mod;
+        }
+      }
+
+      // horizontal
+      for (var i = 0; i < 15; i += 1) {
+
+        var mod = (!test && ( (bits >> i) & 1) == 1);
+
+        if (i < 8) {
+          _modules[8][_moduleCount - i - 1] = mod;
+        } else if (i < 9) {
+          _modules[8][15 - i - 1 + 1] = mod;
+        } else {
+          _modules[8][15 - i - 1] = mod;
+        }
+      }
+
+      // fixed module
+      _modules[_moduleCount - 8][8] = (!test);
+    };
+
+    var mapData = function(data, maskPattern) {
+
+      var inc = -1;
+      var row = _moduleCount - 1;
+      var bitIndex = 7;
+      var byteIndex = 0;
+      var maskFunc = QRUtil.getMaskFunction(maskPattern);
+
+      for (var col = _moduleCount - 1; col > 0; col -= 2) {
+
+        if (col == 6) col -= 1;
+
+        while (true) {
+
+          for (var c = 0; c < 2; c += 1) {
+
+            if (_modules[row][col - c] == null) {
+
+              var dark = false;
+
+              if (byteIndex < data.length) {
+                dark = ( ( (data[byteIndex] >>> bitIndex) & 1) == 1);
+              }
+
+              var mask = maskFunc(row, col - c);
+
+              if (mask) {
+                dark = !dark;
+              }
+
+              _modules[row][col - c] = dark;
+              bitIndex -= 1;
+
+              if (bitIndex == -1) {
+                byteIndex += 1;
+                bitIndex = 7;
+              }
+            }
+          }
+
+          row += inc;
+
+          if (row < 0 || _moduleCount <= row) {
+            row -= inc;
+            inc = -inc;
+            break;
+          }
+        }
+      }
+    };
+
+    var createBytes = function(buffer, rsBlocks) {
+
+      var offset = 0;
+
+      var maxDcCount = 0;
+      var maxEcCount = 0;
+
+      var dcdata = new Array(rsBlocks.length);
+      var ecdata = new Array(rsBlocks.length);
+
+      for (var r = 0; r < rsBlocks.length; r += 1) {
+
+        var dcCount = rsBlocks[r].dataCount;
+        var ecCount = rsBlocks[r].totalCount - dcCount;
+
+        maxDcCount = Math.max(maxDcCount, dcCount);
+        maxEcCount = Math.max(maxEcCount, ecCount);
+
+        dcdata[r] = new Array(dcCount);
+
+        for (var i = 0; i < dcdata[r].length; i += 1) {
+          dcdata[r][i] = 0xff & buffer.getBuffer()[i + offset];
+        }
+        offset += dcCount;
+
+        var rsPoly = QRUtil.getErrorCorrectPolynomial(ecCount);
+        var rawPoly = qrPolynomial(dcdata[r], rsPoly.getLength() - 1);
+
+        var modPoly = rawPoly.mod(rsPoly);
+        ecdata[r] = new Array(rsPoly.getLength() - 1);
+        for (var i = 0; i < ecdata[r].length; i += 1) {
+          var modIndex = i + modPoly.getLength() - ecdata[r].length;
+          ecdata[r][i] = (modIndex >= 0)? modPoly.getAt(modIndex) : 0;
+        }
+      }
+
+      var totalCodeCount = 0;
+      for (var i = 0; i < rsBlocks.length; i += 1) {
+        totalCodeCount += rsBlocks[i].totalCount;
+      }
+
+      var data = new Array(totalCodeCount);
+      var index = 0;
+
+      for (var i = 0; i < maxDcCount; i += 1) {
+        for (var r = 0; r < rsBlocks.length; r += 1) {
+          if (i < dcdata[r].length) {
+            data[index] = dcdata[r][i];
+            index += 1;
+          }
+        }
+      }
+
+      for (var i = 0; i < maxEcCount; i += 1) {
+        for (var r = 0; r < rsBlocks.length; r += 1) {
+          if (i < ecdata[r].length) {
+            data[index] = ecdata[r][i];
+            index += 1;
+          }
+        }
+      }
+
+      return data;
+    };
+
+    var createData = function(typeNumber, errorCorrectionLevel, dataList) {
+
+      var rsBlocks = QRRSBlock.getRSBlocks(typeNumber, errorCorrectionLevel);
+
+      var buffer = qrBitBuffer();
+
+      for (var i = 0; i < dataList.length; i += 1) {
+        var data = dataList[i];
+        buffer.put(data.getMode(), 4);
+        buffer.put(data.getLength(), QRUtil.getLengthInBits(data.getMode(), typeNumber) );
+        data.write(buffer);
+      }
+
+      // calc num max data.
+      var totalDataCount = 0;
+      for (var i = 0; i < rsBlocks.length; i += 1) {
+        totalDataCount += rsBlocks[i].dataCount;
+      }
+
+      if (buffer.getLengthInBits() > totalDataCount * 8) {
+        throw 'code length overflow. ('
+          + buffer.getLengthInBits()
+          + '>'
+          + totalDataCount * 8
+          + ')';
+      }
+
+      // end code
+      if (buffer.getLengthInBits() + 4 <= totalDataCount * 8) {
+        buffer.put(0, 4);
+      }
+
+      // padding
+      while (buffer.getLengthInBits() % 8 != 0) {
+        buffer.putBit(false);
+      }
+
+      // padding
+      while (true) {
+
+        if (buffer.getLengthInBits() >= totalDataCount * 8) {
+          break;
+        }
+        buffer.put(PAD0, 8);
+
+        if (buffer.getLengthInBits() >= totalDataCount * 8) {
+          break;
+        }
+        buffer.put(PAD1, 8);
+      }
+
+      return createBytes(buffer, rsBlocks);
+    };
+
+    _this.addData = function(data, mode) {
+
+      mode = mode || 'Byte';
+
+      var newData = null;
+
+      switch(mode) {
+      case 'Numeric' :
+        newData = qrNumber(data);
+        break;
+      case 'Alphanumeric' :
+        newData = qrAlphaNum(data);
+        break;
+      case 'Byte' :
+        newData = qr8BitByte(data);
+        break;
+      case 'Kanji' :
+        newData = qrKanji(data);
+        break;
+      default :
+        throw 'mode:' + mode;
+      }
+
+      _dataList.push(newData);
+      _dataCache = null;
+    };
+
+    _this.isDark = function(row, col) {
+      if (row < 0 || _moduleCount <= row || col < 0 || _moduleCount <= col) {
+        throw row + ',' + col;
+      }
+      return _modules[row][col];
+    };
+
+    _this.getModuleCount = function() {
+      return _moduleCount;
+    };
+
+    _this.make = function() {
+      if (_typeNumber < 1) {
+        var typeNumber = 1;
+
+        for (; typeNumber < 40; typeNumber++) {
+          var rsBlocks = QRRSBlock.getRSBlocks(typeNumber, _errorCorrectionLevel);
+          var buffer = qrBitBuffer();
+
+          for (var i = 0; i < _dataList.length; i++) {
+            var data = _dataList[i];
+            buffer.put(data.getMode(), 4);
+            buffer.put(data.getLength(), QRUtil.getLengthInBits(data.getMode(), typeNumber) );
+            data.write(buffer);
+          }
+
+          var totalDataCount = 0;
+          for (var i = 0; i < rsBlocks.length; i++) {
+            totalDataCount += rsBlocks[i].dataCount;
+          }
+
+          if (buffer.getLengthInBits() <= totalDataCount * 8) {
+            break;
+          }
+        }
+
+        _typeNumber = typeNumber;
+      }
+
+      makeImpl(false, getBestMaskPattern() );
+    };
+
+    _this.createTableTag = function(cellSize, margin) {
+
+      cellSize = cellSize || 2;
+      margin = (typeof margin == 'undefined')? cellSize * 4 : margin;
+
+      var qrHtml = '';
+
+      qrHtml += '<table style="';
+      qrHtml += ' border-width: 0px; border-style: none;';
+      qrHtml += ' border-collapse: collapse;';
+      qrHtml += ' padding: 0px; margin: ' + margin + 'px;';
+      qrHtml += '">';
+      qrHtml += '<tbody>';
+
+      for (var r = 0; r < _this.getModuleCount(); r += 1) {
+
+        qrHtml += '<tr>';
+
+        for (var c = 0; c < _this.getModuleCount(); c += 1) {
+          qrHtml += '<td style="';
+          qrHtml += ' border-width: 0px; border-style: none;';
+          qrHtml += ' border-collapse: collapse;';
+          qrHtml += ' padding: 0px; margin: 0px;';
+          qrHtml += ' width: ' + cellSize + 'px;';
+          qrHtml += ' height: ' + cellSize + 'px;';
+          qrHtml += ' background-color: ';
+          qrHtml += _this.isDark(r, c)? '#000000' : '#ffffff';
+          qrHtml += ';';
+          qrHtml += '"/>';
+        }
+
+        qrHtml += '</tr>';
+      }
+
+      qrHtml += '</tbody>';
+      qrHtml += '</table>';
+
+      return qrHtml;
+    };
+
+    _this.createSvgTag = function(cellSize, margin, alt, title) {
+
+      var opts = {};
+      if (typeof arguments[0] == 'object') {
+        // Called by options.
+        opts = arguments[0];
+        // overwrite cellSize and margin.
+        cellSize = opts.cellSize;
+        margin = opts.margin;
+        alt = opts.alt;
+        title = opts.title;
+      }
+
+      cellSize = cellSize || 2;
+      margin = (typeof margin == 'undefined')? cellSize * 4 : margin;
+
+      // Compose alt property surrogate
+      alt = (typeof alt === 'string') ? {text: alt} : alt || {};
+      alt.text = alt.text || null;
+      alt.id = (alt.text) ? alt.id || 'qrcode-description' : null;
+
+      // Compose title property surrogate
+      title = (typeof title === 'string') ? {text: title} : title || {};
+      title.text = title.text || null;
+      title.id = (title.text) ? title.id || 'qrcode-title' : null;
+
+      var size = _this.getModuleCount() * cellSize + margin * 2;
+      var c, mc, r, mr, qrSvg='', rect;
+
+      rect = 'l' + cellSize + ',0 0,' + cellSize +
+        ' -' + cellSize + ',0 0,-' + cellSize + 'z ';
+
+      qrSvg += '<svg version="1.1" xmlns="http://www.w3.org/2000/svg"';
+      qrSvg += !opts.scalable ? ' width="' + size + 'px" height="' + size + 'px"' : '';
+      qrSvg += ' viewBox="0 0 ' + size + ' ' + size + '" ';
+      qrSvg += ' preserveAspectRatio="xMinYMin meet"';
+      qrSvg += (title.text || alt.text) ? ' role="img" aria-labelledby="' +
+          escapeXml([title.id, alt.id].join(' ').trim() ) + '"' : '';
+      qrSvg += '>';
+      qrSvg += (title.text) ? '<title id="' + escapeXml(title.id) + '">' +
+          escapeXml(title.text) + '</title>' : '';
+      qrSvg += (alt.text) ? '<description id="' + escapeXml(alt.id) + '">' +
+          escapeXml(alt.text) + '</description>' : '';
+      qrSvg += '<rect width="100%" height="100%" fill="white" cx="0" cy="0"/>';
+      qrSvg += '<path d="';
+
+      for (r = 0; r < _this.getModuleCount(); r += 1) {
+        mr = r * cellSize + margin;
+        for (c = 0; c < _this.getModuleCount(); c += 1) {
+          if (_this.isDark(r, c) ) {
+            mc = c*cellSize+margin;
+            qrSvg += 'M' + mc + ',' + mr + rect;
+          }
+        }
+      }
+
+      qrSvg += '" stroke="transparent" fill="black"/>';
+      qrSvg += '</svg>';
+
+      return qrSvg;
+    };
+
+    _this.createDataURL = function(cellSize, margin) {
+
+      cellSize = cellSize || 2;
+      margin = (typeof margin == 'undefined')? cellSize * 4 : margin;
+
+      var size = _this.getModuleCount() * cellSize + margin * 2;
+      var min = margin;
+      var max = size - margin;
+
+      return createDataURL(size, size, function(x, y) {
+        if (min <= x && x < max && min <= y && y < max) {
+          var c = Math.floor( (x - min) / cellSize);
+          var r = Math.floor( (y - min) / cellSize);
+          return _this.isDark(r, c)? 0 : 1;
+        } else {
+          return 1;
+        }
+      } );
+    };
+
+    _this.createImgTag = function(cellSize, margin, alt) {
+
+      cellSize = cellSize || 2;
+      margin = (typeof margin == 'undefined')? cellSize * 4 : margin;
+
+      var size = _this.getModuleCount() * cellSize + margin * 2;
+
+      var img = '';
+      img += '<img';
+      img += '\u0020src="';
+      img += _this.createDataURL(cellSize, margin);
+      img += '"';
+      img += '\u0020width="';
+      img += size;
+      img += '"';
+      img += '\u0020height="';
+      img += size;
+      img += '"';
+      if (alt) {
+        img += '\u0020alt="';
+        img += escapeXml(alt);
+        img += '"';
+      }
+      img += '/>';
+
+      return img;
+    };
+
+    var escapeXml = function(s) {
+      var escaped = '';
+      for (var i = 0; i < s.length; i += 1) {
+        var c = s.charAt(i);
+        switch(c) {
+        case '<': escaped += '&lt;'; break;
+        case '>': escaped += '&gt;'; break;
+        case '&': escaped += '&amp;'; break;
+        case '"': escaped += '&quot;'; break;
+        default : escaped += c; break;
+        }
+      }
+      return escaped;
+    };
+
+    var _createHalfASCII = function(margin) {
+      var cellSize = 1;
+      margin = (typeof margin == 'undefined')? cellSize * 2 : margin;
+
+      var size = _this.getModuleCount() * cellSize + margin * 2;
+      var min = margin;
+      var max = size - margin;
+
+      var y, x, r1, r2, p;
+
+      var blocks = {
+        '██': '█',
+        '█ ': '▀',
+        ' █': '▄',
+        '  ': ' '
+      };
+
+      var blocksLastLineNoMargin = {
+        '██': '▀',
+        '█ ': '▀',
+        ' █': ' ',
+        '  ': ' '
+      };
+
+      var ascii = '';
+      for (y = 0; y < size; y += 2) {
+        r1 = Math.floor((y - min) / cellSize);
+        r2 = Math.floor((y + 1 - min) / cellSize);
+        for (x = 0; x < size; x += 1) {
+          p = '█';
+
+          if (min <= x && x < max && min <= y && y < max && _this.isDark(r1, Math.floor((x - min) / cellSize))) {
+            p = ' ';
+          }
+
+          if (min <= x && x < max && min <= y+1 && y+1 < max && _this.isDark(r2, Math.floor((x - min) / cellSize))) {
+            p += ' ';
+          }
+          else {
+            p += '█';
+          }
+
+          // Output 2 characters per pixel, to create full square. 1 character per pixels gives only half width of square.
+          ascii += (margin < 1 && y+1 >= max) ? blocksLastLineNoMargin[p] : blocks[p];
+        }
+
+        ascii += '\n';
+      }
+
+      if (size % 2 && margin > 0) {
+        return ascii.substring(0, ascii.length - size - 1) + Array(size+1).join('▀');
+      }
+
+      return ascii.substring(0, ascii.length-1);
+    };
+
+    _this.createASCII = function(cellSize, margin) {
+      cellSize = cellSize || 1;
+
+      if (cellSize < 2) {
+        return _createHalfASCII(margin);
+      }
+
+      cellSize -= 1;
+      margin = (typeof margin == 'undefined')? cellSize * 2 : margin;
+
+      var size = _this.getModuleCount() * cellSize + margin * 2;
+      var min = margin;
+      var max = size - margin;
+
+      var y, x, r, p;
+
+      var white = Array(cellSize+1).join('██');
+      var black = Array(cellSize+1).join('  ');
+
+      var ascii = '';
+      var line = '';
+      for (y = 0; y < size; y += 1) {
+        r = Math.floor( (y - min) / cellSize);
+        line = '';
+        for (x = 0; x < size; x += 1) {
+          p = 1;
+
+          if (min <= x && x < max && min <= y && y < max && _this.isDark(r, Math.floor((x - min) / cellSize))) {
+            p = 0;
+          }
+
+          // Output 2 characters per pixel, to create full square. 1 character per pixels gives only half width of square.
+          line += p ? white : black;
+        }
+
+        for (r = 0; r < cellSize; r += 1) {
+          ascii += line + '\n';
+        }
+      }
+
+      return ascii.substring(0, ascii.length-1);
+    };
+
+    _this.renderTo2dContext = function(context, cellSize) {
+      cellSize = cellSize || 2;
+      var length = _this.getModuleCount();
+      for (var row = 0; row < length; row++) {
+        for (var col = 0; col < length; col++) {
+          context.fillStyle = _this.isDark(row, col) ? 'black' : 'white';
+          context.fillRect(col * cellSize, row * cellSize, cellSize, cellSize);
+        }
+      }
+    }
+
+    return _this;
+  };
+
+  //---------------------------------------------------------------------
+  // qrcode.stringToBytes
+  //---------------------------------------------------------------------
+
+  qrcode.stringToBytesFuncs = {
+    'default' : function(s) {
+      var bytes = [];
+      for (var i = 0; i < s.length; i += 1) {
+        var c = s.charCodeAt(i);
+        bytes.push(c & 0xff);
+      }
+      return bytes;
+    }
+  };
+
+  qrcode.stringToBytes = qrcode.stringToBytesFuncs['default'];
+
+  //---------------------------------------------------------------------
+  // qrcode.createStringToBytes
+  //---------------------------------------------------------------------
+
+  /**
+   * @param unicodeData base64 string of byte array.
+   * [16bit Unicode],[16bit Bytes], ...
+   * @param numChars
+   */
+  qrcode.createStringToBytes = function(unicodeData, numChars) {
+
+    // create conversion map.
+
+    var unicodeMap = function() {
+
+      var bin = base64DecodeInputStream(unicodeData);
+      var read = function() {
+        var b = bin.read();
+        if (b == -1) throw 'eof';
+        return b;
+      };
+
+      var count = 0;
+      var unicodeMap = {};
+      while (true) {
+        var b0 = bin.read();
+        if (b0 == -1) break;
+        var b1 = read();
+        var b2 = read();
+        var b3 = read();
+        var k = String.fromCharCode( (b0 << 8) | b1);
+        var v = (b2 << 8) | b3;
+        unicodeMap[k] = v;
+        count += 1;
+      }
+      if (count != numChars) {
+        throw count + ' != ' + numChars;
+      }
+
+      return unicodeMap;
+    }();
+
+    var unknownChar = '?'.charCodeAt(0);
+
+    return function(s) {
+      var bytes = [];
+      for (var i = 0; i < s.length; i += 1) {
+        var c = s.charCodeAt(i);
+        if (c < 128) {
+          bytes.push(c);
+        } else {
+          var b = unicodeMap[s.charAt(i)];
+          if (typeof b == 'number') {
+            if ( (b & 0xff) == b) {
+              // 1byte
+              bytes.push(b);
+            } else {
+              // 2bytes
+              bytes.push(b >>> 8);
+              bytes.push(b & 0xff);
+            }
+          } else {
+            bytes.push(unknownChar);
+          }
+        }
+      }
+      return bytes;
+    };
+  };
+
+  //---------------------------------------------------------------------
+  // QRMode
+  //---------------------------------------------------------------------
+
+  var QRMode = {
+    MODE_NUMBER :    1 << 0,
+    MODE_ALPHA_NUM : 1 << 1,
+    MODE_8BIT_BYTE : 1 << 2,
+    MODE_KANJI :     1 << 3
+  };
+
+  //---------------------------------------------------------------------
+  // QRErrorCorrectionLevel
+  //---------------------------------------------------------------------
+
+  var QRErrorCorrectionLevel = {
+    L : 1,
+    M : 0,
+    Q : 3,
+    H : 2
+  };
+
+  //---------------------------------------------------------------------
+  // QRMaskPattern
+  //---------------------------------------------------------------------
+
+  var QRMaskPattern = {
+    PATTERN000 : 0,
+    PATTERN001 : 1,
+    PATTERN010 : 2,
+    PATTERN011 : 3,
+    PATTERN100 : 4,
+    PATTERN101 : 5,
+    PATTERN110 : 6,
+    PATTERN111 : 7
+  };
+
+  //---------------------------------------------------------------------
+  // QRUtil
+  //---------------------------------------------------------------------
+
+  var QRUtil = function() {
+
+    var PATTERN_POSITION_TABLE = [
+      [],
+      [6, 18],
+      [6, 22],
+      [6, 26],
+      [6, 30],
+      [6, 34],
+      [6, 22, 38],
+      [6, 24, 42],
+      [6, 26, 46],
+      [6, 28, 50],
+      [6, 30, 54],
+      [6, 32, 58],
+      [6, 34, 62],
+      [6, 26, 46, 66],
+      [6, 26, 48, 70],
+      [6, 26, 50, 74],
+      [6, 30, 54, 78],
+      [6, 30, 56, 82],
+      [6, 30, 58, 86],
+      [6, 34, 62, 90],
+      [6, 28, 50, 72, 94],
+      [6, 26, 50, 74, 98],
+      [6, 30, 54, 78, 102],
+      [6, 28, 54, 80, 106],
+      [6, 32, 58, 84, 110],
+      [6, 30, 58, 86, 114],
+      [6, 34, 62, 90, 118],
+      [6, 26, 50, 74, 98, 122],
+      [6, 30, 54, 78, 102, 126],
+      [6, 26, 52, 78, 104, 130],
+      [6, 30, 56, 82, 108, 134],
+      [6, 34, 60, 86, 112, 138],
+      [6, 30, 58, 86, 114, 142],
+      [6, 34, 62, 90, 118, 146],
+      [6, 30, 54, 78, 102, 126, 150],
+      [6, 24, 50, 76, 102, 128, 154],
+      [6, 28, 54, 80, 106, 132, 158],
+      [6, 32, 58, 84, 110, 136, 162],
+      [6, 26, 54, 82, 110, 138, 166],
+      [6, 30, 58, 86, 114, 142, 170]
+    ];
+    var G15 = (1 << 10) | (1 << 8) | (1 << 5) | (1 << 4) | (1 << 2) | (1 << 1) | (1 << 0);
+    var G18 = (1 << 12) | (1 << 11) | (1 << 10) | (1 << 9) | (1 << 8) | (1 << 5) | (1 << 2) | (1 << 0);
+    var G15_MASK = (1 << 14) | (1 << 12) | (1 << 10) | (1 << 4) | (1 << 1);
+
+    var _this = {};
+
+    var getBCHDigit = function(data) {
+      var digit = 0;
+      while (data != 0) {
+        digit += 1;
+        data >>>= 1;
+      }
+      return digit;
+    };
+
+    _this.getBCHTypeInfo = function(data) {
+      var d = data << 10;
+      while (getBCHDigit(d) - getBCHDigit(G15) >= 0) {
+        d ^= (G15 << (getBCHDigit(d) - getBCHDigit(G15) ) );
+      }
+      return ( (data << 10) | d) ^ G15_MASK;
+    };
+
+    _this.getBCHTypeNumber = function(data) {
+      var d = data << 12;
+      while (getBCHDigit(d) - getBCHDigit(G18) >= 0) {
+        d ^= (G18 << (getBCHDigit(d) - getBCHDigit(G18) ) );
+      }
+      return (data << 12) | d;
+    };
+
+    _this.getPatternPosition = function(typeNumber) {
+      return PATTERN_POSITION_TABLE[typeNumber - 1];
+    };
+
+    _this.getMaskFunction = function(maskPattern) {
+
+      switch (maskPattern) {
+
+      case QRMaskPattern.PATTERN000 :
+        return function(i, j) { return (i + j) % 2 == 0; };
+      case QRMaskPattern.PATTERN001 :
+        return function(i, j) { return i % 2 == 0; };
+      case QRMaskPattern.PATTERN010 :
+        return function(i, j) { return j % 3 == 0; };
+      case QRMaskPattern.PATTERN011 :
+        return function(i, j) { return (i + j) % 3 == 0; };
+      case QRMaskPattern.PATTERN100 :
+        return function(i, j) { return (Math.floor(i / 2) + Math.floor(j / 3) ) % 2 == 0; };
+      case QRMaskPattern.PATTERN101 :
+        return function(i, j) { return (i * j) % 2 + (i * j) % 3 == 0; };
+      case QRMaskPattern.PATTERN110 :
+        return function(i, j) { return ( (i * j) % 2 + (i * j) % 3) % 2 == 0; };
+      case QRMaskPattern.PATTERN111 :
+        return function(i, j) { return ( (i * j) % 3 + (i + j) % 2) % 2 == 0; };
+
+      default :
+        throw 'bad maskPattern:' + maskPattern;
+      }
+    };
+
+    _this.getErrorCorrectPolynomial = function(errorCorrectLength) {
+      var a = qrPolynomial([1], 0);
+      for (var i = 0; i < errorCorrectLength; i += 1) {
+        a = a.multiply(qrPolynomial([1, QRMath.gexp(i)], 0) );
+      }
+      return a;
+    };
+
+    _this.getLengthInBits = function(mode, type) {
+
+      if (1 <= type && type < 10) {
+
+        // 1 - 9
+
+        switch(mode) {
+        case QRMode.MODE_NUMBER    : return 10;
+        case QRMode.MODE_ALPHA_NUM : return 9;
+        case QRMode.MODE_8BIT_BYTE : return 8;
+        case QRMode.MODE_KANJI     : return 8;
+        default :
+          throw 'mode:' + mode;
+        }
+
+      } else if (type < 27) {
+
+        // 10 - 26
+
+        switch(mode) {
+        case QRMode.MODE_NUMBER    : return 12;
+        case QRMode.MODE_ALPHA_NUM : return 11;
+        case QRMode.MODE_8BIT_BYTE : return 16;
+        case QRMode.MODE_KANJI     : return 10;
+        default :
+          throw 'mode:' + mode;
+        }
+
+      } else if (type < 41) {
+
+        // 27 - 40
+
+        switch(mode) {
+        case QRMode.MODE_NUMBER    : return 14;
+        case QRMode.MODE_ALPHA_NUM : return 13;
+        case QRMode.MODE_8BIT_BYTE : return 16;
+        case QRMode.MODE_KANJI     : return 12;
+        default :
+          throw 'mode:' + mode;
+        }
+
+      } else {
+        throw 'type:' + type;
+      }
+    };
+
+    _this.getLostPoint = function(qrcode) {
+
+      var moduleCount = qrcode.getModuleCount();
+
+      var lostPoint = 0;
+
+      // LEVEL1
+
+      for (var row = 0; row < moduleCount; row += 1) {
+        for (var col = 0; col < moduleCount; col += 1) {
+
+          var sameCount = 0;
+          var dark = qrcode.isDark(row, col);
+
+          for (var r = -1; r <= 1; r += 1) {
+
+            if (row + r < 0 || moduleCount <= row + r) {
+              continue;
+            }
+
+            for (var c = -1; c <= 1; c += 1) {
+
+              if (col + c < 0 || moduleCount <= col + c) {
+                continue;
+              }
+
+              if (r == 0 && c == 0) {
+                continue;
+              }
+
+              if (dark == qrcode.isDark(row + r, col + c) ) {
+                sameCount += 1;
+              }
+            }
+          }
+
+          if (sameCount > 5) {
+            lostPoint += (3 + sameCount - 5);
+          }
+        }
+      };
+
+      // LEVEL2
+
+      for (var row = 0; row < moduleCount - 1; row += 1) {
+        for (var col = 0; col < moduleCount - 1; col += 1) {
+          var count = 0;
+          if (qrcode.isDark(row, col) ) count += 1;
+          if (qrcode.isDark(row + 1, col) ) count += 1;
+          if (qrcode.isDark(row, col + 1) ) count += 1;
+          if (qrcode.isDark(row + 1, col + 1) ) count += 1;
+          if (count == 0 || count == 4) {
+            lostPoint += 3;
+          }
+        }
+      }
+
+      // LEVEL3
+
+      for (var row = 0; row < moduleCount; row += 1) {
+        for (var col = 0; col < moduleCount - 6; col += 1) {
+          if (qrcode.isDark(row, col)
+              && !qrcode.isDark(row, col + 1)
+              &&  qrcode.isDark(row, col + 2)
+              &&  qrcode.isDark(row, col + 3)
+              &&  qrcode.isDark(row, col + 4)
+              && !qrcode.isDark(row, col + 5)
+              &&  qrcode.isDark(row, col + 6) ) {
+            lostPoint += 40;
+          }
+        }
+      }
+
+      for (var col = 0; col < moduleCount; col += 1) {
+        for (var row = 0; row < moduleCount - 6; row += 1) {
+          if (qrcode.isDark(row, col)
+              && !qrcode.isDark(row + 1, col)
+              &&  qrcode.isDark(row + 2, col)
+              &&  qrcode.isDark(row + 3, col)
+              &&  qrcode.isDark(row + 4, col)
+              && !qrcode.isDark(row + 5, col)
+              &&  qrcode.isDark(row + 6, col) ) {
+            lostPoint += 40;
+          }
+        }
+      }
+
+      // LEVEL4
+
+      var darkCount = 0;
+
+      for (var col = 0; col < moduleCount; col += 1) {
+        for (var row = 0; row < moduleCount; row += 1) {
+          if (qrcode.isDark(row, col) ) {
+            darkCount += 1;
+          }
+        }
+      }
+
+      var ratio = Math.abs(100 * darkCount / moduleCount / moduleCount - 50) / 5;
+      lostPoint += ratio * 10;
+
+      return lostPoint;
+    };
+
+    return _this;
+  }();
+
+  //---------------------------------------------------------------------
+  // QRMath
+  //---------------------------------------------------------------------
+
+  var QRMath = function() {
+
+    var EXP_TABLE = new Array(256);
+    var LOG_TABLE = new Array(256);
+
+    // initialize tables
+    for (var i = 0; i < 8; i += 1) {
+      EXP_TABLE[i] = 1 << i;
+    }
+    for (var i = 8; i < 256; i += 1) {
+      EXP_TABLE[i] = EXP_TABLE[i - 4]
+        ^ EXP_TABLE[i - 5]
+        ^ EXP_TABLE[i - 6]
+        ^ EXP_TABLE[i - 8];
+    }
+    for (var i = 0; i < 255; i += 1) {
+      LOG_TABLE[EXP_TABLE[i] ] = i;
+    }
+
+    var _this = {};
+
+    _this.glog = function(n) {
+
+      if (n < 1) {
+        throw 'glog(' + n + ')';
+      }
+
+      return LOG_TABLE[n];
+    };
+
+    _this.gexp = function(n) {
+
+      while (n < 0) {
+        n += 255;
+      }
+
+      while (n >= 256) {
+        n -= 255;
+      }
+
+      return EXP_TABLE[n];
+    };
+
+    return _this;
+  }();
+
+  //---------------------------------------------------------------------
+  // qrPolynomial
+  //---------------------------------------------------------------------
+
+  function qrPolynomial(num, shift) {
+
+    if (typeof num.length == 'undefined') {
+      throw num.length + '/' + shift;
+    }
+
+    var _num = function() {
+      var offset = 0;
+      while (offset < num.length && num[offset] == 0) {
+        offset += 1;
+      }
+      var _num = new Array(num.length - offset + shift);
+      for (var i = 0; i < num.length - offset; i += 1) {
+        _num[i] = num[i + offset];
+      }
+      return _num;
+    }();
+
+    var _this = {};
+
+    _this.getAt = function(index) {
+      return _num[index];
+    };
+
+    _this.getLength = function() {
+      return _num.length;
+    };
+
+    _this.multiply = function(e) {
+
+      var num = new Array(_this.getLength() + e.getLength() - 1);
+
+      for (var i = 0; i < _this.getLength(); i += 1) {
+        for (var j = 0; j < e.getLength(); j += 1) {
+          num[i + j] ^= QRMath.gexp(QRMath.glog(_this.getAt(i) ) + QRMath.glog(e.getAt(j) ) );
+        }
+      }
+
+      return qrPolynomial(num, 0);
+    };
+
+    _this.mod = function(e) {
+
+      if (_this.getLength() - e.getLength() < 0) {
+        return _this;
+      }
+
+      var ratio = QRMath.glog(_this.getAt(0) ) - QRMath.glog(e.getAt(0) );
+
+      var num = new Array(_this.getLength() );
+      for (var i = 0; i < _this.getLength(); i += 1) {
+        num[i] = _this.getAt(i);
+      }
+
+      for (var i = 0; i < e.getLength(); i += 1) {
+        num[i] ^= QRMath.gexp(QRMath.glog(e.getAt(i) ) + ratio);
+      }
+
+      // recursive call
+      return qrPolynomial(num, 0).mod(e);
+    };
+
+    return _this;
+  };
+
+  //---------------------------------------------------------------------
+  // QRRSBlock
+  //---------------------------------------------------------------------
+
+  var QRRSBlock = function() {
+
+    var RS_BLOCK_TABLE = [
+
+      // L
+      // M
+      // Q
+      // H
+
+      // 1
+      [1, 26, 19],
+      [1, 26, 16],
+      [1, 26, 13],
+      [1, 26, 9],
+
+      // 2
+      [1, 44, 34],
+      [1, 44, 28],
+      [1, 44, 22],
+      [1, 44, 16],
+
+      // 3
+      [1, 70, 55],
+      [1, 70, 44],
+      [2, 35, 17],
+      [2, 35, 13],
+
+      // 4
+      [1, 100, 80],
+      [2, 50, 32],
+      [2, 50, 24],
+      [4, 25, 9],
+
+      // 5
+      [1, 134, 108],
+      [2, 67, 43],
+      [2, 33, 15, 2, 34, 16],
+      [2, 33, 11, 2, 34, 12],
+
+      // 6
+      [2, 86, 68],
+      [4, 43, 27],
+      [4, 43, 19],
+      [4, 43, 15],
+
+      // 7
+      [2, 98, 78],
+      [4, 49, 31],
+      [2, 32, 14, 4, 33, 15],
+      [4, 39, 13, 1, 40, 14],
+
+      // 8
+      [2, 121, 97],
+      [2, 60, 38, 2, 61, 39],
+      [4, 40, 18, 2, 41, 19],
+      [4, 40, 14, 2, 41, 15],
+
+      // 9
+      [2, 146, 116],
+      [3, 58, 36, 2, 59, 37],
+      [4, 36, 16, 4, 37, 17],
+      [4, 36, 12, 4, 37, 13],
+
+      // 10
+      [2, 86, 68, 2, 87, 69],
+      [4, 69, 43, 1, 70, 44],
+      [6, 43, 19, 2, 44, 20],
+      [6, 43, 15, 2, 44, 16],
+
+      // 11
+      [4, 101, 81],
+      [1, 80, 50, 4, 81, 51],
+      [4, 50, 22, 4, 51, 23],
+      [3, 36, 12, 8, 37, 13],
+
+      // 12
+      [2, 116, 92, 2, 117, 93],
+      [6, 58, 36, 2, 59, 37],
+      [4, 46, 20, 6, 47, 21],
+      [7, 42, 14, 4, 43, 15],
+
+      // 13
+      [4, 133, 107],
+      [8, 59, 37, 1, 60, 38],
+      [8, 44, 20, 4, 45, 21],
+      [12, 33, 11, 4, 34, 12],
+
+      // 14
+      [3, 145, 115, 1, 146, 116],
+      [4, 64, 40, 5, 65, 41],
+      [11, 36, 16, 5, 37, 17],
+      [11, 36, 12, 5, 37, 13],
+
+      // 15
+      [5, 109, 87, 1, 110, 88],
+      [5, 65, 41, 5, 66, 42],
+      [5, 54, 24, 7, 55, 25],
+      [11, 36, 12, 7, 37, 13],
+
+      // 16
+      [5, 122, 98, 1, 123, 99],
+      [7, 73, 45, 3, 74, 46],
+      [15, 43, 19, 2, 44, 20],
+      [3, 45, 15, 13, 46, 16],
+
+      // 17
+      [1, 135, 107, 5, 136, 108],
+      [10, 74, 46, 1, 75, 47],
+      [1, 50, 22, 15, 51, 23],
+      [2, 42, 14, 17, 43, 15],
+
+      // 18
+      [5, 150, 120, 1, 151, 121],
+      [9, 69, 43, 4, 70, 44],
+      [17, 50, 22, 1, 51, 23],
+      [2, 42, 14, 19, 43, 15],
+
+      // 19
+      [3, 141, 113, 4, 142, 114],
+      [3, 70, 44, 11, 71, 45],
+      [17, 47, 21, 4, 48, 22],
+      [9, 39, 13, 16, 40, 14],
+
+      // 20
+      [3, 135, 107, 5, 136, 108],
+      [3, 67, 41, 13, 68, 42],
+      [15, 54, 24, 5, 55, 25],
+      [15, 43, 15, 10, 44, 16],
+
+      // 21
+      [4, 144, 116, 4, 145, 117],
+      [17, 68, 42],
+      [17, 50, 22, 6, 51, 23],
+      [19, 46, 16, 6, 47, 17],
+
+      // 22
+      [2, 139, 111, 7, 140, 112],
+      [17, 74, 46],
+      [7, 54, 24, 16, 55, 25],
+      [34, 37, 13],
+
+      // 23
+      [4, 151, 121, 5, 152, 122],
+      [4, 75, 47, 14, 76, 48],
+      [11, 54, 24, 14, 55, 25],
+      [16, 45, 15, 14, 46, 16],
+
+      // 24
+      [6, 147, 117, 4, 148, 118],
+      [6, 73, 45, 14, 74, 46],
+      [11, 54, 24, 16, 55, 25],
+      [30, 46, 16, 2, 47, 17],
+
+      // 25
+      [8, 132, 106, 4, 133, 107],
+      [8, 75, 47, 13, 76, 48],
+      [7, 54, 24, 22, 55, 25],
+      [22, 45, 15, 13, 46, 16],
+
+      // 26
+      [10, 142, 114, 2, 143, 115],
+      [19, 74, 46, 4, 75, 47],
+      [28, 50, 22, 6, 51, 23],
+      [33, 46, 16, 4, 47, 17],
+
+      // 27
+      [8, 152, 122, 4, 153, 123],
+      [22, 73, 45, 3, 74, 46],
+      [8, 53, 23, 26, 54, 24],
+      [12, 45, 15, 28, 46, 16],
+
+      // 28
+      [3, 147, 117, 10, 148, 118],
+      [3, 73, 45, 23, 74, 46],
+      [4, 54, 24, 31, 55, 25],
+      [11, 45, 15, 31, 46, 16],
+
+      // 29
+      [7, 146, 116, 7, 147, 117],
+      [21, 73, 45, 7, 74, 46],
+      [1, 53, 23, 37, 54, 24],
+      [19, 45, 15, 26, 46, 16],
+
+      // 30
+      [5, 145, 115, 10, 146, 116],
+      [19, 75, 47, 10, 76, 48],
+      [15, 54, 24, 25, 55, 25],
+      [23, 45, 15, 25, 46, 16],
+
+      // 31
+      [13, 145, 115, 3, 146, 116],
+      [2, 74, 46, 29, 75, 47],
+      [42, 54, 24, 1, 55, 25],
+      [23, 45, 15, 28, 46, 16],
+
+      // 32
+      [17, 145, 115],
+      [10, 74, 46, 23, 75, 47],
+      [10, 54, 24, 35, 55, 25],
+      [19, 45, 15, 35, 46, 16],
+
+      // 33
+      [17, 145, 115, 1, 146, 116],
+      [14, 74, 46, 21, 75, 47],
+      [29, 54, 24, 19, 55, 25],
+      [11, 45, 15, 46, 46, 16],
+
+      // 34
+      [13, 145, 115, 6, 146, 116],
+      [14, 74, 46, 23, 75, 47],
+      [44, 54, 24, 7, 55, 25],
+      [59, 46, 16, 1, 47, 17],
+
+      // 35
+      [12, 151, 121, 7, 152, 122],
+      [12, 75, 47, 26, 76, 48],
+      [39, 54, 24, 14, 55, 25],
+      [22, 45, 15, 41, 46, 16],
+
+      // 36
+      [6, 151, 121, 14, 152, 122],
+      [6, 75, 47, 34, 76, 48],
+      [46, 54, 24, 10, 55, 25],
+      [2, 45, 15, 64, 46, 16],
+
+      // 37
+      [17, 152, 122, 4, 153, 123],
+      [29, 74, 46, 14, 75, 47],
+      [49, 54, 24, 10, 55, 25],
+      [24, 45, 15, 46, 46, 16],
+
+      // 38
+      [4, 152, 122, 18, 153, 123],
+      [13, 74, 46, 32, 75, 47],
+      [48, 54, 24, 14, 55, 25],
+      [42, 45, 15, 32, 46, 16],
+
+      // 39
+      [20, 147, 117, 4, 148, 118],
+      [40, 75, 47, 7, 76, 48],
+      [43, 54, 24, 22, 55, 25],
+      [10, 45, 15, 67, 46, 16],
+
+      // 40
+      [19, 148, 118, 6, 149, 119],
+      [18, 75, 47, 31, 76, 48],
+      [34, 54, 24, 34, 55, 25],
+      [20, 45, 15, 61, 46, 16]
+    ];
+
+    var qrRSBlock = function(totalCount, dataCount) {
+      var _this = {};
+      _this.totalCount = totalCount;
+      _this.dataCount = dataCount;
+      return _this;
+    };
+
+    var _this = {};
+
+    var getRsBlockTable = function(typeNumber, errorCorrectionLevel) {
+
+      switch(errorCorrectionLevel) {
+      case QRErrorCorrectionLevel.L :
+        return RS_BLOCK_TABLE[(typeNumber - 1) * 4 + 0];
+      case QRErrorCorrectionLevel.M :
+        return RS_BLOCK_TABLE[(typeNumber - 1) * 4 + 1];
+      case QRErrorCorrectionLevel.Q :
+        return RS_BLOCK_TABLE[(typeNumber - 1) * 4 + 2];
+      case QRErrorCorrectionLevel.H :
+        return RS_BLOCK_TABLE[(typeNumber - 1) * 4 + 3];
+      default :
+        return undefined;
+      }
+    };
+
+    _this.getRSBlocks = function(typeNumber, errorCorrectionLevel) {
+
+      var rsBlock = getRsBlockTable(typeNumber, errorCorrectionLevel);
+
+      if (typeof rsBlock == 'undefined') {
+        throw 'bad rs block @ typeNumber:' + typeNumber +
+            '/errorCorrectionLevel:' + errorCorrectionLevel;
+      }
+
+      var length = rsBlock.length / 3;
+
+      var list = [];
+
+      for (var i = 0; i < length; i += 1) {
+
+        var count = rsBlock[i * 3 + 0];
+        var totalCount = rsBlock[i * 3 + 1];
+        var dataCount = rsBlock[i * 3 + 2];
+
+        for (var j = 0; j < count; j += 1) {
+          list.push(qrRSBlock(totalCount, dataCount) );
+        }
+      }
+
+      return list;
+    };
+
+    return _this;
+  }();
+
+  //---------------------------------------------------------------------
+  // qrBitBuffer
+  //---------------------------------------------------------------------
+
+  var qrBitBuffer = function() {
+
+    var _buffer = [];
+    var _length = 0;
+
+    var _this = {};
+
+    _this.getBuffer = function() {
+      return _buffer;
+    };
+
+    _this.getAt = function(index) {
+      var bufIndex = Math.floor(index / 8);
+      return ( (_buffer[bufIndex] >>> (7 - index % 8) ) & 1) == 1;
+    };
+
+    _this.put = function(num, length) {
+      for (var i = 0; i < length; i += 1) {
+        _this.putBit( ( (num >>> (length - i - 1) ) & 1) == 1);
+      }
+    };
+
+    _this.getLengthInBits = function() {
+      return _length;
+    };
+
+    _this.putBit = function(bit) {
+
+      var bufIndex = Math.floor(_length / 8);
+      if (_buffer.length <= bufIndex) {
+        _buffer.push(0);
+      }
+
+      if (bit) {
+        _buffer[bufIndex] |= (0x80 >>> (_length % 8) );
+      }
+
+      _length += 1;
+    };
+
+    return _this;
+  };
+
+  //---------------------------------------------------------------------
+  // qrNumber
+  //---------------------------------------------------------------------
+
+  var qrNumber = function(data) {
+
+    var _mode = QRMode.MODE_NUMBER;
+    var _data = data;
+
+    var _this = {};
+
+    _this.getMode = function() {
+      return _mode;
+    };
+
+    _this.getLength = function(buffer) {
+      return _data.length;
+    };
+
+    _this.write = function(buffer) {
+
+      var data = _data;
+
+      var i = 0;
+
+      while (i + 2 < data.length) {
+        buffer.put(strToNum(data.substring(i, i + 3) ), 10);
+        i += 3;
+      }
+
+      if (i < data.length) {
+        if (data.length - i == 1) {
+          buffer.put(strToNum(data.substring(i, i + 1) ), 4);
+        } else if (data.length - i == 2) {
+          buffer.put(strToNum(data.substring(i, i + 2) ), 7);
+        }
+      }
+    };
+
+    var strToNum = function(s) {
+      var num = 0;
+      for (var i = 0; i < s.length; i += 1) {
+        num = num * 10 + chatToNum(s.charAt(i) );
+      }
+      return num;
+    };
+
+    var chatToNum = function(c) {
+      if ('0' <= c && c <= '9') {
+        return c.charCodeAt(0) - '0'.charCodeAt(0);
+      }
+      throw 'illegal char :' + c;
+    };
+
+    return _this;
+  };
+
+  //---------------------------------------------------------------------
+  // qrAlphaNum
+  //---------------------------------------------------------------------
+
+  var qrAlphaNum = function(data) {
+
+    var _mode = QRMode.MODE_ALPHA_NUM;
+    var _data = data;
+
+    var _this = {};
+
+    _this.getMode = function() {
+      return _mode;
+    };
+
+    _this.getLength = function(buffer) {
+      return _data.length;
+    };
+
+    _this.write = function(buffer) {
+
+      var s = _data;
+
+      var i = 0;
+
+      while (i + 1 < s.length) {
+        buffer.put(
+          getCode(s.charAt(i) ) * 45 +
+          getCode(s.charAt(i + 1) ), 11);
+        i += 2;
+      }
+
+      if (i < s.length) {
+        buffer.put(getCode(s.charAt(i) ), 6);
+      }
+    };
+
+    var getCode = function(c) {
+
+      if ('0' <= c && c <= '9') {
+        return c.charCodeAt(0) - '0'.charCodeAt(0);
+      } else if ('A' <= c && c <= 'Z') {
+        return c.charCodeAt(0) - 'A'.charCodeAt(0) + 10;
+      } else {
+        switch (c) {
+        case ' ' : return 36;
+        case '$' : return 37;
+        case '%' : return 38;
+        case '*' : return 39;
+        case '+' : return 40;
+        case '-' : return 41;
+        case '.' : return 42;
+        case '/' : return 43;
+        case ':' : return 44;
+        default :
+          throw 'illegal char :' + c;
+        }
+      }
+    };
+
+    return _this;
+  };
+
+  //---------------------------------------------------------------------
+  // qr8BitByte
+  //---------------------------------------------------------------------
+
+  var qr8BitByte = function(data) {
+
+    var _mode = QRMode.MODE_8BIT_BYTE;
+    var _data = data;
+    var _bytes = qrcode.stringToBytes(data);
+
+    var _this = {};
+
+    _this.getMode = function() {
+      return _mode;
+    };
+
+    _this.getLength = function(buffer) {
+      return _bytes.length;
+    };
+
+    _this.write = function(buffer) {
+      for (var i = 0; i < _bytes.length; i += 1) {
+        buffer.put(_bytes[i], 8);
+      }
+    };
+
+    return _this;
+  };
+
+  //---------------------------------------------------------------------
+  // qrKanji
+  //---------------------------------------------------------------------
+
+  var qrKanji = function(data) {
+
+    var _mode = QRMode.MODE_KANJI;
+    var _data = data;
+
+    var stringToBytes = qrcode.stringToBytesFuncs['SJIS'];
+    if (!stringToBytes) {
+      throw 'sjis not supported.';
+    }
+    !function(c, code) {
+      // self test for sjis support.
+      var test = stringToBytes(c);
+      if (test.length != 2 || ( (test[0] << 8) | test[1]) != code) {
+        throw 'sjis not supported.';
+      }
+    }('\u53cb', 0x9746);
+
+    var _bytes = stringToBytes(data);
+
+    var _this = {};
+
+    _this.getMode = function() {
+      return _mode;
+    };
+
+    _this.getLength = function(buffer) {
+      return ~~(_bytes.length / 2);
+    };
+
+    _this.write = function(buffer) {
+
+      var data = _bytes;
+
+      var i = 0;
+
+      while (i + 1 < data.length) {
+
+        var c = ( (0xff & data[i]) << 8) | (0xff & data[i + 1]);
+
+        if (0x8140 <= c && c <= 0x9FFC) {
+          c -= 0x8140;
+        } else if (0xE040 <= c && c <= 0xEBBF) {
+          c -= 0xC140;
+        } else {
+          throw 'illegal char at ' + (i + 1) + '/' + c;
+        }
+
+        c = ( (c >>> 8) & 0xff) * 0xC0 + (c & 0xff);
+
+        buffer.put(c, 13);
+
+        i += 2;
+      }
+
+      if (i < data.length) {
+        throw 'illegal char at ' + (i + 1);
+      }
+    };
+
+    return _this;
+  };
+
+  //=====================================================================
+  // GIF Support etc.
+  //
+
+  //---------------------------------------------------------------------
+  // byteArrayOutputStream
+  //---------------------------------------------------------------------
+
+  var byteArrayOutputStream = function() {
+
+    var _bytes = [];
+
+    var _this = {};
+
+    _this.writeByte = function(b) {
+      _bytes.push(b & 0xff);
+    };
+
+    _this.writeShort = function(i) {
+      _this.writeByte(i);
+      _this.writeByte(i >>> 8);
+    };
+
+    _this.writeBytes = function(b, off, len) {
+      off = off || 0;
+      len = len || b.length;
+      for (var i = 0; i < len; i += 1) {
+        _this.writeByte(b[i + off]);
+      }
+    };
+
+    _this.writeString = function(s) {
+      for (var i = 0; i < s.length; i += 1) {
+        _this.writeByte(s.charCodeAt(i) );
+      }
+    };
+
+    _this.toByteArray = function() {
+      return _bytes;
+    };
+
+    _this.toString = function() {
+      var s = '';
+      s += '[';
+      for (var i = 0; i < _bytes.length; i += 1) {
+        if (i > 0) {
+          s += ',';
+        }
+        s += _bytes[i];
+      }
+      s += ']';
+      return s;
+    };
+
+    return _this;
+  };
+
+  //---------------------------------------------------------------------
+  // base64EncodeOutputStream
+  //---------------------------------------------------------------------
+
+  var base64EncodeOutputStream = function() {
+
+    var _buffer = 0;
+    var _buflen = 0;
+    var _length = 0;
+    var _base64 = '';
+
+    var _this = {};
+
+    var writeEncoded = function(b) {
+      _base64 += String.fromCharCode(encode(b & 0x3f) );
+    };
+
+    var encode = function(n) {
+      if (n < 0) {
+        // error.
+      } else if (n < 26) {
+        return 0x41 + n;
+      } else if (n < 52) {
+        return 0x61 + (n - 26);
+      } else if (n < 62) {
+        return 0x30 + (n - 52);
+      } else if (n == 62) {
+        return 0x2b;
+      } else if (n == 63) {
+        return 0x2f;
+      }
+      throw 'n:' + n;
+    };
+
+    _this.writeByte = function(n) {
+
+      _buffer = (_buffer << 8) | (n & 0xff);
+      _buflen += 8;
+      _length += 1;
+
+      while (_buflen >= 6) {
+        writeEncoded(_buffer >>> (_buflen - 6) );
+        _buflen -= 6;
+      }
+    };
+
+    _this.flush = function() {
+
+      if (_buflen > 0) {
+        writeEncoded(_buffer << (6 - _buflen) );
+        _buffer = 0;
+        _buflen = 0;
+      }
+
+      if (_length % 3 != 0) {
+        // padding
+        var padlen = 3 - _length % 3;
+        for (var i = 0; i < padlen; i += 1) {
+          _base64 += '=';
+        }
+      }
+    };
+
+    _this.toString = function() {
+      return _base64;
+    };
+
+    return _this;
+  };
+
+  //---------------------------------------------------------------------
+  // base64DecodeInputStream
+  //---------------------------------------------------------------------
+
+  var base64DecodeInputStream = function(str) {
+
+    var _str = str;
+    var _pos = 0;
+    var _buffer = 0;
+    var _buflen = 0;
+
+    var _this = {};
+
+    _this.read = function() {
+
+      while (_buflen < 8) {
+
+        if (_pos >= _str.length) {
+          if (_buflen == 0) {
+            return -1;
+          }
+          throw 'unexpected end of file./' + _buflen;
+        }
+
+        var c = _str.charAt(_pos);
+        _pos += 1;
+
+        if (c == '=') {
+          _buflen = 0;
+          return -1;
+        } else if (c.match(/^\s$/) ) {
+          // ignore if whitespace.
+          continue;
+        }
+
+        _buffer = (_buffer << 6) | decode(c.charCodeAt(0) );
+        _buflen += 6;
+      }
+
+      var n = (_buffer >>> (_buflen - 8) ) & 0xff;
+      _buflen -= 8;
+      return n;
+    };
+
+    var decode = function(c) {
+      if (0x41 <= c && c <= 0x5a) {
+        return c - 0x41;
+      } else if (0x61 <= c && c <= 0x7a) {
+        return c - 0x61 + 26;
+      } else if (0x30 <= c && c <= 0x39) {
+        return c - 0x30 + 52;
+      } else if (c == 0x2b) {
+        return 62;
+      } else if (c == 0x2f) {
+        return 63;
+      } else {
+        throw 'c:' + c;
+      }
+    };
+
+    return _this;
+  };
+
+  //---------------------------------------------------------------------
+  // gifImage (B/W)
+  //---------------------------------------------------------------------
+
+  var gifImage = function(width, height) {
+
+    var _width = width;
+    var _height = height;
+    var _data = new Array(width * height);
+
+    var _this = {};
+
+    _this.setPixel = function(x, y, pixel) {
+      _data[y * _width + x] = pixel;
+    };
+
+    _this.write = function(out) {
+
+      //---------------------------------
+      // GIF Signature
+
+      out.writeString('GIF87a');
+
+      //---------------------------------
+      // Screen Descriptor
+
+      out.writeShort(_width);
+      out.writeShort(_height);
+
+      out.writeByte(0x80); // 2bit
+      out.writeByte(0);
+      out.writeByte(0);
+
+      //---------------------------------
+      // Global Color Map
+
+      // black
+      out.writeByte(0x00);
+      out.writeByte(0x00);
+      out.writeByte(0x00);
+
+      // white
+      out.writeByte(0xff);
+      out.writeByte(0xff);
+      out.writeByte(0xff);
+
+      //---------------------------------
+      // Image Descriptor
+
+      out.writeString(',');
+      out.writeShort(0);
+      out.writeShort(0);
+      out.writeShort(_width);
+      out.writeShort(_height);
+      out.writeByte(0);
+
+      //---------------------------------
+      // Local Color Map
+
+      //---------------------------------
+      // Raster Data
+
+      var lzwMinCodeSize = 2;
+      var raster = getLZWRaster(lzwMinCodeSize);
+
+      out.writeByte(lzwMinCodeSize);
+
+      var offset = 0;
+
+      while (raster.length - offset > 255) {
+        out.writeByte(255);
+        out.writeBytes(raster, offset, 255);
+        offset += 255;
+      }
+
+      out.writeByte(raster.length - offset);
+      out.writeBytes(raster, offset, raster.length - offset);
+      out.writeByte(0x00);
+
+      //---------------------------------
+      // GIF Terminator
+      out.writeString(';');
+    };
+
+    var bitOutputStream = function(out) {
+
+      var _out = out;
+      var _bitLength = 0;
+      var _bitBuffer = 0;
+
+      var _this = {};
+
+      _this.write = function(data, length) {
+
+        if ( (data >>> length) != 0) {
+          throw 'length over';
+        }
+
+        while (_bitLength + length >= 8) {
+          _out.writeByte(0xff & ( (data << _bitLength) | _bitBuffer) );
+          length -= (8 - _bitLength);
+          data >>>= (8 - _bitLength);
+          _bitBuffer = 0;
+          _bitLength = 0;
+        }
+
+        _bitBuffer = (data << _bitLength) | _bitBuffer;
+        _bitLength = _bitLength + length;
+      };
+
+      _this.flush = function() {
+        if (_bitLength > 0) {
+          _out.writeByte(_bitBuffer);
+        }
+      };
+
+      return _this;
+    };
+
+    var getLZWRaster = function(lzwMinCodeSize) {
+
+      var clearCode = 1 << lzwMinCodeSize;
+      var endCode = (1 << lzwMinCodeSize) + 1;
+      var bitLength = lzwMinCodeSize + 1;
+
+      // Setup LZWTable
+      var table = lzwTable();
+
+      for (var i = 0; i < clearCode; i += 1) {
+        table.add(String.fromCharCode(i) );
+      }
+      table.add(String.fromCharCode(clearCode) );
+      table.add(String.fromCharCode(endCode) );
+
+      var byteOut = byteArrayOutputStream();
+      var bitOut = bitOutputStream(byteOut);
+
+      // clear code
+      bitOut.write(clearCode, bitLength);
+
+      var dataIndex = 0;
+
+      var s = String.fromCharCode(_data[dataIndex]);
+      dataIndex += 1;
+
+      while (dataIndex < _data.length) {
+
+        var c = String.fromCharCode(_data[dataIndex]);
+        dataIndex += 1;
+
+        if (table.contains(s + c) ) {
+
+          s = s + c;
+
+        } else {
+
+          bitOut.write(table.indexOf(s), bitLength);
+
+          if (table.size() < 0xfff) {
+
+            if (table.size() == (1 << bitLength) ) {
+              bitLength += 1;
+            }
+
+            table.add(s + c);
+          }
+
+          s = c;
+        }
+      }
+
+      bitOut.write(table.indexOf(s), bitLength);
+
+      // end code
+      bitOut.write(endCode, bitLength);
+
+      bitOut.flush();
+
+      return byteOut.toByteArray();
+    };
+
+    var lzwTable = function() {
+
+      var _map = {};
+      var _size = 0;
+
+      var _this = {};
+
+      _this.add = function(key) {
+        if (_this.contains(key) ) {
+          throw 'dup key:' + key;
+        }
+        _map[key] = _size;
+        _size += 1;
+      };
+
+      _this.size = function() {
+        return _size;
+      };
+
+      _this.indexOf = function(key) {
+        return _map[key];
+      };
+
+      _this.contains = function(key) {
+        return typeof _map[key] != 'undefined';
+      };
+
+      return _this;
+    };
+
+    return _this;
+  };
+
+  var createDataURL = function(width, height, getPixel) {
+    var gif = gifImage(width, height);
+    for (var y = 0; y < height; y += 1) {
+      for (var x = 0; x < width; x += 1) {
+        gif.setPixel(x, y, getPixel(x, y) );
+      }
+    }
+
+    var b = byteArrayOutputStream();
+    gif.write(b);
+
+    var base64 = base64EncodeOutputStream();
+    var bytes = b.toByteArray();
+    for (var i = 0; i < bytes.length; i += 1) {
+      base64.writeByte(bytes[i]);
+    }
+    base64.flush();
+
+    return 'data:image/gif;base64,' + base64;
+  };
+
+  //---------------------------------------------------------------------
+  // returns qrcode function.
+
+  return qrcode;
+}();
+
+// multibyte support
+!function() {
+
+  qrcode.stringToBytesFuncs['UTF-8'] = function(s) {
+    // http://stackoverflow.com/questions/18729405/how-to-convert-utf8-string-to-byte-array
+    function toUTF8Array(str) {
+      var utf8 = [];
+      for (var i=0; i < str.length; i++) {
+        var charcode = str.charCodeAt(i);
+        if (charcode < 0x80) utf8.push(charcode);
+        else if (charcode < 0x800) {
+          utf8.push(0xc0 | (charcode >> 6),
+              0x80 | (charcode & 0x3f));
+        }
+        else if (charcode < 0xd800 || charcode >= 0xe000) {
+          utf8.push(0xe0 | (charcode >> 12),
+              0x80 | ((charcode>>6) & 0x3f),
+              0x80 | (charcode & 0x3f));
+        }
+        // surrogate pair
+        else {
+          i++;
+          // UTF-16 encodes 0x10000-0x10FFFF by
+          // subtracting 0x10000 and splitting the
+          // 20 bits of 0x0-0xFFFFF into two halves
+          charcode = 0x10000 + (((charcode & 0x3ff)<<10)
+            | (str.charCodeAt(i) & 0x3ff));
+          utf8.push(0xf0 | (charcode >>18),
+              0x80 | ((charcode>>12) & 0x3f),
+              0x80 | ((charcode>>6) & 0x3f),
+              0x80 | (charcode & 0x3f));
+        }
+      }
+      return utf8;
+    }
+    return toUTF8Array(s);
+  };
+
+}();
+
+(function (factory) {
+  if (typeof define === 'function' && define.amd) {
+      define([], factory);
+  } else if (typeof exports === 'object') {
+      module.exports = factory();
+  }
+}(function () {
+    return qrcode;
+}));
+
+</script>
+<script>
+"use strict";
+/* ============================================================ GAME CONTENT */
+const CO="Northwest Team Supply",YR=2027,BUDGET=40000,FEE=250,CHK=100,HEAD=[150,100,50],RACE_SECS=30;
+const MON=["January","February","March","April","May","June","July","August","September","October","November","December"];
+const MS=MON.map(m=>m.slice(0,3));
+const RACE=[{m:4,d:5,n:30},{m:3,d:12,n:60},{m:5,d:20,n:45},{m:6,d:10,n:90},{m:7,d:1,n:120},{m:10,d:25,n:60}];
+const NOTES={
+ 1:[
+  {id:"lake",name:"Lakeshore Rowing Club",what:"New racing shells and oars",rating:"A",clue:"15 years in business. Has paid every note on time.",p:9000,r:8,n:60,m:4,d:6,out:"paid"},
+  {id:"summit",name:"Summit Ridge Ski Shop",what:"Winter jackets and goggles",rating:"B",clue:"Sells most of its gear in winter. Pays reliably once the season starts.",p:12000,r:9,n:120,m:4,d:10,out:"paid"},
+  {id:"strike",name:"Quick Strike Bowling",what:"Bowling balls and shoes for the pro shop",rating:"C−",clue:"Missed two loan payments last year. \"We'll pay you double the usual rate.\"",p:6000,r:12,n:45,m:4,d:15,out:"dis"},
+  {id:"oak",name:"Oak Park Tennis Center",what:"Court nets and ball machines",rating:"A",clue:"Owned by the park district for 40 years. Always pays on the due date.",p:10000,r:6,n:75,m:4,d:20,out:"paid"},
+  {id:"west",name:"Westside Youth Baseball",what:"Uniforms for 20 teams",rating:"B+",clue:"Volunteer run for 25 years. Registration fees come in every spring.",p:5000,r:9,n:60,m:4,d:22,out:"paid"},
+  {id:"fox",name:"Fox River Climbing Gym",what:"Climbing holds and safety mats",rating:"B",clue:"Membership grew 20% this year. Two suppliers give good references.",p:8000,r:9,n:90,m:4,d:1,out:"paid"}
+ ],
+ 2:[
+  {id:"cedar",name:"Cedar Lake Golf Course",what:"Pro shop apparel for the summer",rating:"A",clue:"30 years in business. Pays every invoice by direct deposit.",p:8000,r:9,n:40,m:5,d:12,out:"paid"},
+  {id:"iron",name:"Ironworks Boxing Club",what:"Heavy bags and gloves",rating:"C",clue:"Two suppliers report late payments. \"Business is about to take off.\"",p:7200,r:12,n:30,m:5,d:18,out:"dis"},
+  {id:"paddle",name:"Prairie Paddle Club",what:"Paddles and nets for new courts",rating:"B",clue:"Growing fast. Strong references from two suppliers.",p:6000,r:8,n:45,m:5,d:20,out:"paid"},
+  {id:"north",name:"Northfield Soccer Club",what:"Goals and practice gear",rating:"A−",clue:"Has paid every supplier in full for 12 years.",p:9000,r:10,n:36,m:5,d:25,out:"paid"},
+  {id:"river",name:"Riverside Rec Center",what:"Gym mats and weights",rating:"A",clue:"Village owned since 1971. Never late.",p:4000,r:9,n:30,m:5,d:28,out:"paid"}
+ ]
+};
+const ALLN=[...NOTES[1],...NOTES[2]];
+const CHECKS={
+ acc:{q:"On April 6, Northwest sells $9,000 of rowing gear to Lakeshore Rowing Club and accepts its 60-day, 8% note. Which entry?",
+  opts:[[["Dr","Notes Receivable","9,000"],["Cr","Sales","9,000"]],[["Dr","Cash","9,000"],["Cr","Sales","9,000"]],[["Dr","Notes Receivable","9,120"],["Cr","Sales","9,120"]],[["Dr","Sales","9,000"],["Cr","Notes Receivable","9,000"]]],ans:0,
+  why:"The note replaces cash for now. Interest isn't recorded yet, because it hasn't been earned. It is earned over the 60 days."},
+ col:{q:"On June 30, Fox River Climbing Gym pays its $8,000, 90-day, 9% note in full. Which entry?",
+  opts:[[["Dr","Cash","8,180"],["Cr","Interest Revenue","180"],["Cr","Notes Receivable","8,000"]],[["Dr","Cash","8,180"],["Cr","Notes Receivable","8,180"]],[["Dr","Cash","8,180"],["Cr","Sales","180"],["Cr","Notes Receivable","8,000"]],[["Dr","Cash","8,720"],["Cr","Interest Revenue","720"],["Cr","Notes Receivable","8,000"]]],ans:0,
+  why:"Interest = 8,000 × 9% × 90/360 = $180. The note comes off the books, and the interest is revenue. $720 would be a full year of interest."},
+ dis:{q:"On May 30, Quick Strike Bowling can't pay its $6,000, 45-day, 12% note or the interest. Which entry?",
+  opts:[[["Dr","Accounts Receivable","6,090"],["Cr","Interest Revenue","90"],["Cr","Notes Receivable","6,000"]],[["Dr","Bad Debts Expense","6,000"],["Cr","Notes Receivable","6,000"]],[["Dr","Accounts Receivable","6,000"],["Cr","Notes Receivable","6,000"]],[["Dr","Cash","6,090"],["Cr","Interest Revenue","90"],["Cr","Notes Receivable","6,000"]]],ans:0,
+  why:"The note is dishonored, but Quick Strike still owes the money and the interest it earned. Move the full $6,090 back to Accounts Receivable."}
+};
+const STEPS=[...RACE.map((_,qi)=>({k:"race",qi})),{k:"raceEnd"},{k:"offers",b:1},{k:"check",id:"acc"},{k:"offers",b:2},{k:"check",id:"col"},{k:"payday"},{k:"check",id:"dis"}];
+const ROUNDNAME=S=>S.k==="race"||S.k==="raceEnd"?"Prelim · Calendar Race":(S.k==="offers"&&S.b===1)||S.id==="acc"?"Round 1 · April notes":(S.k==="offers"&&S.b===2)||S.id==="col"?"Round 2 · May notes":"Round 3 · June 30";
+const RACE_END=STEPS.findIndex(s=>s.k==="raceEnd");
+const COLORS=["#C1102F","#1F5FAD","#1E7A3C","#9A6700","#6F3FA8","#0F7C80","#C2410C","#BE185D","#3F3F46","#4D7C0F"];
+
+/* ============================================================ HELPERS */
+const $=s=>document.querySelector(s);
+const app=$("#app");
+const money=n=>(n<0?"−$":"$")+Math.abs(Math.round(n)).toLocaleString("en-US");
+const plain=n=>Math.abs(Math.round(n)).toLocaleString("en-US");
+const signed=n=>(n>0?"+":n<0?"−":"±")+"$"+Math.abs(Math.round(n)).toLocaleString("en-US");
+const esc=s=>String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const ord=n=>n+(n%100>=11&&n%100<=13?"th":["th","st","nd","rd"][n%10]||"th");
+const sum=a=>a.reduce((t,x)=>t+x,0);
+function num(s){if(s==null)return NaN;let t=String(s).trim().replace(/[$,\s]/g,"");if(!/^-?\d+(\.\d+)?$/.test(t))return NaN;return Math.round(+t*100)/100}
+function beep(f,d){try{const c=beep.c||(beep.c=new (window.AudioContext||window.webkitAudioContext)());const o=c.createOscillator(),g=c.createGain();o.frequency.value=f;g.gain.value=.06;o.connect(g);g.connect(c.destination);const t=c.currentTime;g.gain.exponentialRampToValueAtTime(.0001,t+d);o.start(t);o.stop(t+d)}catch(e){}}
+const ROLE=window.ND_ROLE||"team";
+const MOCK=/[?&]mock=1/.test(location.search);
+// dates
+const addDays=(m,d,n)=>{const x=new Date(Date.UTC(YR,m-1,d+n));return{m:x.getUTCMonth()+1,d:x.getUTCDate(),y:x.getUTCFullYear()}};
+const dkey=o=>o.m+"-"+o.d;
+const dtxt=o=>MON[o.m-1]+" "+o.d;
+const dshort=o=>MS[o.m-1]+" "+o.d;
+const dim=(m,y=YR)=>new Date(Date.UTC(y,m,0)).getUTCDate();
+const matOf=x=>addDays(x.m,x.d,x.n);
+const intOf=x=>Math.round(x.p*x.r/100*x.n/360*100)/100;
+const byJune30=x=>{const t=matOf(x);return t.y===YR&&(t.m<6||(t.m===6&&t.d<=30))};
+function countLines(m,d,n){const out=[];let left=dim(m)-d,tot=Math.min(left,n);out.push([`Days left in ${MON[m-1]}: ${dim(m)} − ${d}`,tot]);let mm=m,yy=YR;
+  while(tot<n){mm++;if(mm>12){mm=1;yy++}const take=Math.min(dim(mm,yy),n-tot);tot+=take;out.push([take<dim(mm,yy)?`${MON[mm-1]}: ${take} days to reach ${n}`:`${MON[mm-1]}: ${dim(mm,yy)} days`,tot])}
+  return out}
+const breakdownHTML=(m,d,n)=>`<table class="t brk"><tbody>${countLines(m,d,n).map(([a,t])=>`<tr><td>${esc(a)}</td><td class="r">${t}</td></tr>`).join("")}</tbody></table>`;
+const entHTML=lines=>`<span class="ent">${lines.map(([s,a,v])=>`<span class="${s==="Cr"?"c":""}" style="display:block">${esc(a)} ${esc(v)}</span>`).join("")}</span>`;
+const jrnRows=(rows,h)=>`<span class="jrn">${h?`<span class="h">${esc(h)}</span>`:""}${rows.map(([s,a,v])=>`<span class="${s==="Cr"?"ci":""}">${esc(a)}</span><span class="d">${s==="Dr"?esc(v):""}</span><span class="d">${s==="Cr"?esc(v):""}</span>`).join("")}</span>`;
+const rateTag=r=>`<span class="rt ${/^A/.test(r)?"g":/^B/.test(r)?"y":"r"}">${esc(r)}</span>`;
+
+/* ============================================================ SCORING: one source of truth */
+const raceAns=(p,qi)=>p&&p["r"+qi];
+const raceOK=(p,qi)=>{const a=raceAns(p,qi);return !!a&&a.y===dkey(addDays(RACE[qi].m,RACE[qi].d,RACE[qi].n))};
+const racePts=(p,qi)=>{if(!raceOK(p,qi))return 0;const t=Math.max(0,raceAns(p,qi).t||0);return 500+Math.round(500*Math.max(0,1-t/(RACE_SECS*1000)))};
+function graded(p,b){const o=(p&&p["o"+b])||{},lk=!!(p&&p["lock"+b]);
+  return NOTES[b].map(x=>{const a=o[x.id]||{},acc=lk&&a.a===true,mt=matOf(x),dOK=+a.m===mt.m&&+a.d===mt.d,iOK=num(a.i)===intOf(x);return{x,acc,dOK,iOK,ok:acc&&dOK&&iOK,a}})}
+const bookedNotes=(p,b)=>graded(p,b).filter(g=>g.ok).map(g=>g.x);
+const capUsed=(p,upto)=>sum([1,2].filter(b=>b<=upto).flatMap(b=>bookedNotes(p,b)).map(x=>x.p));
+function ranks(val){const ids=Object.keys(val).sort((a,b)=>val[b]-val[a]);const r={};let k=0,prev=null;ids.forEach((id,i)=>{if(val[id]!==prev){k=i+1;prev=val[id]}r[id]=k});return r}
+function scores(teams,through){
+  const out={};const rp={};teams.forEach(p=>{rp[p.id]=sum(STEPS.map((S,j)=>S.k==="race"&&j<=through?racePts(p,S.qi):0))});
+  const rr=through>=RACE_END?ranks(rp):{};
+  teams.forEach(p=>{const s={race:rp[p.id],head:0,chk:0,int:0,fees:0,paid:[],dis:[],late:[]};
+    if(through>=RACE_END&&teams.length)s.head=HEAD[rr[p.id]-1]||0;
+    STEPS.forEach((S,j)=>{if(j>through)return;
+      if(S.k==="check"&&p["chk_"+S.id]===CHECKS[S.id].ans)s.chk+=CHK;
+      if(S.k==="payday")[1,2].forEach(b=>bookedNotes(p,b).forEach(x=>{if(!byJune30(x))s.late.push(x);else if(x.out==="dis"){s.fees+=FEE;s.dis.push(x)}else{s.int+=intOf(x);s.paid.push(x)}}))});
+    s.total=s.head+s.chk+s.int-s.fees;out[p.id]=s});
+  return out}
+const isLocked=(S,p)=>S.k==="race"?!!raceAns(p,S.qi):S.k==="offers"?!!p["lock"+S.b]:S.k==="check"?p["chk_"+S.id]!=null:true;
+const inRace=th=>th<RACE_END;
+
+/* ---------- backend + screen fit + timer are inserted here ---------- */
+/* ---------- backend (same database as the other live games) ---------- */
+function mockNet(){
+  const KEY="bankRecLiveMock",bc=("BroadcastChannel" in window)?new BroadcastChannel(KEY):null,subs=[];
+  const read=()=>{try{return JSON.parse(localStorage.getItem(KEY)||"{}")}catch(e){return{}}};
+  const write=t=>{localStorage.setItem(KEY,JSON.stringify(t));fire();if(bc)bc.postMessage(1)};
+  const at=(t,p)=>p.split("/").filter(Boolean).reduce((o,k)=>o==null?undefined:o[k],t);
+  const put=(t,p,v)=>{const ks=p.split("/").filter(Boolean);let o=t;ks.slice(0,-1).forEach(k=>{if(typeof o[k]!=="object"||o[k]===null)o[k]={};o=o[k]});if(v===null)delete o[ks[ks.length-1]];else o[ks[ks.length-1]]=v};
+  const fire=()=>{const t=read();subs.forEach(s=>{const v=JSON.stringify(at(t,s.p)??null);if(v!==s.last){s.last=v;s.cb(JSON.parse(v))}})};
+  if(bc)bc.onmessage=fire;window.addEventListener("storage",e=>{if(e.key===KEY)fire()});
+  return{
+    kind:"mock",
+    get:async p=>at(read(),p)??null,
+    set:async(p,v)=>{const t=read();put(t,p,v);write(t)},
+    update:async(p,o)=>{const t=read();Object.entries(o).forEach(([k,v])=>put(t,p+"/"+k,v));write(t)},
+    remove:async p=>{const t=read();put(t,p,null);write(t)},
+    on:(p,cb)=>{const s={p,cb,last:undefined};subs.push(s);setTimeout(fire,0);return()=>{const i=subs.indexOf(s);if(i>=0)subs.splice(i,1)}}
+  };
+}
+async function vercelNet(){
+  const call=async(op,path,v)=>{const r=await fetch("/api/live",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({op,path,v})});
+    const j=await r.json().catch(()=>({}));if(!r.ok)throw new Error(j.error||r.status);return j};
+  try{const p=await call("ping");if(!p.ok)return null}catch(e){return null}
+  return{kind:"vercel",
+    get:async p=>(await call("get",p)).v??null,
+    set:(p,v)=>call("set",p,v),
+    update:(p,o)=>call("update",p,o),
+    remove:p=>call("remove",p),
+    on:(p,cb)=>{let last,stop=false,t;
+      const tick=async()=>{if(stop)return;
+        if(!document.hidden){try{const v=(await call("get",p)).v??null,s=JSON.stringify(v);if(s!==last){last=s;cb(v)}}catch(e){}}
+        if(!stop)t=setTimeout(tick,1200)};
+      tick();return()=>{stop=true;clearTimeout(t)}}};
+}
+let NET=null;
+async function net(){if(NET)return NET;NET=MOCK?mockNet():await vercelNet();return NET}
+function needSetup(){app.innerHTML=`<div class="panel"><h2>${ROLE==="teacher"?"Class games need a one-time setup":"The game isn't open yet"}</h2><p>${ROLE==="teacher"?"Connect Upstash for Redis to this Vercel project (Storage tab), then redeploy.":"Wait for your teacher to start it, then reload this page."}</p><button class="btn main" id="b">Reload</button></div>`;$("#b").onclick=()=>location.reload()}
+
+/* ---------- fit to screen (projector) ---------- */
+function zoomApp(){if(ROLE!=="teacher")return;const a=app;a.style.zoom="";const R=document.documentElement;let lo=.55,hi=2.4;
+  for(let i=0;i<14;i++){const m=(lo+hi)/2;a.style.zoom=m.toFixed(3);(R.scrollHeight<=innerHeight+1&&R.scrollWidth<=innerWidth+1)?lo=m:hi=m}
+  a.style.zoom=lo.toFixed(3)}
+addEventListener("resize",()=>{clearTimeout(zoomApp.t);zoomApp.t=setTimeout(()=>{if(!document.body.classList.contains("finale-on"))zoomApp()},150)});
+
+/* ---------- timer (huddles) ---------- */
+let TIMER_END=0,TIMER_BEEPED=false;
+function timerText(){if(!TIMER_END)return "2:00";const s=Math.max(0,Math.ceil((TIMER_END-Date.now())/1000));return Math.floor(s/60)+":"+String(s%60).padStart(2,"0")}
+setInterval(()=>{const els=document.querySelectorAll("[data-timer]");if(!els.length)return;const t=timerText(),done=TIMER_END&&Date.now()>=TIMER_END;
+  els.forEach(e=>{e.textContent=t;e.classList.toggle("done",!!done)});
+  if(done&&!TIMER_BEEPED&&ROLE==="teacher"){TIMER_BEEPED=true;beep(880,.25);setTimeout(()=>beep(660,.35),280)}},250);
+
+
+/* ============================================================ TEACHER (projector) */
+let H=null;
+function hdr(){return `<h1 class="title">The Note <span>Desk.</span></h1>
+  <p class="lede">${ROLE==="teacher"?`Teacher screen. One iPad per team. A Calendar Race warms up maturity dates, then teams run the note desk at ${CO}: customers who need more time to pay sign notes, and teams decide which notes to accept.`:`Your team runs the note desk at ${CO}. Customers who need more time sign notes. Pick the right notes, get the math right, and collect the most interest by June 30.`}</p>`}
+async function hostSetup(){
+  const N=await net().catch(()=>null);if(!N)return needSetup();
+  app.innerHTML=`${hdr()}<div class="panel" style="margin-top:0;max-width:760px"><h2>Start a game</h2>
+    <p>One iPad per team. About 30 to 35 minutes.</p>
+    <ol><li><b>Prelim: Calendar Race.</b> Six notes flash on the board. Teams tap the maturity date on a calendar. Right and fast wins. The top 3 get a head start of ${money(HEAD[0])}, ${money(HEAD[1])} and ${money(HEAD[2])}.</li>
+    <li><b>Round 1: April notes.</b> Six customers offer notes. To accept one, a team must enter its maturity date and interest. Wrong math cancels the deal.</li>
+    <li><b>Round 2: May notes.</b> Five more offers. Teams can lend ${money(BUDGET)} in total across both rounds.</li>
+    <li><b>Round 3: June 30.</b> Payday. Only interest collected by June 30 counts. A dishonored note costs a ${money(FEE)} collection fee.</li></ol>
+    <p class="note">After each round there's a quick entry check worth ${money(CHK)}: accepting a note, collecting one, and a dishonored note.</p>
+    <div class="err" id="er"></div><button class="btn main" id="go">Create game</button></div>`;
+  $("#go").onclick=async()=>{$("#go").disabled=true;
+    try{let code;for(let t=0;t<20;t++){code=String(Math.floor(1000+Math.random()*9000));if(!(await N.get("games/"+code)))break}
+      await N.set("games/"+code,{created:Date.now(),game:"notedesk",seed:1,ids:[],state:{phase:"lobby"}});
+      H={N,code,players:{},state:{phase:"lobby"}};
+      H.off=N.on("games/"+code+"/players",v=>{H.players=v||{};hostRender(true)});
+      hostRender()}catch(e){$("#er").textContent="Couldn't reach the game database.";$("#go").disabled=false}};
+}
+function teamsArr(){return Object.entries(H.players).map(([id,p])=>({id,...p})).filter(p=>p&&p.name).sort((a,b)=>(a.joined||0)-(b.joined||0))}
+const colorOf=(teams,id)=>COLORS[Math.max(0,teams.findIndex(t=>t.id===id))%COLORS.length];
+function curThrough(st){if(st.phase==="end")return STEPS.length-1;if(st.phase!=="play")return -1;return st.sub==="reveal"?st.i:st.i-1}
+function hostSet(st){H.state=st;H.N.set("games/"+H.code+"/state",st).catch(()=>{});hostRender()}
+function pushState(st){
+  const teams=teamsArr(),th=curThrough(st),sc=scores(teams,th);
+  st.sc={};teams.forEach(p=>st.sc[p.id]=inRace(th)?sc[p.id].race:sc[p.id].total);st.rank=ranks(st.sc);st.race=inRace(th);
+  st.names=Object.fromEntries(teams.map(t=>[t.id,t.name]));
+  TIMER_END=st.timer||0;hostSet(st)}
+function goStep(i){const S=STEPS[i],st={phase:"play",i,sub:S.k==="raceEnd"?"reveal":"open"};if(S.k==="race"){st.timer=Date.now()+RACE_SECS*1000;TIMER_BEEPED=false}pushState(st)}
+function boardHTML(S,teams,th,anim,mode){
+  const now=scores(teams,th),prev=scores(teams,th-1),race=inRace(th)||(S&&S.k==="race");
+  const val={};teams.forEach(p=>val[p.id]=race?now[p.id].race:now[p.id].total);const rk=ranks(val);
+  const order=[...teams].sort((a,b)=>val[b.id]-val[a.id]);
+  return `<div class="board">${order.map((p,i)=>{const v=val[p.id],pv=race?prev[p.id].race:prev[p.id].total,d=v-pv;let cls="tile",st="";
+    if(mode==="lock"){const done=isLocked(S,p);cls+=done?" done":" wait";st=done?"✓ Locked in":"Deciding…"}
+    else if(S.k==="race"){const ok=raceOK(p,S.qi),a=raceAns(p,S.qi);cls+=ok?" ok":" no";st=ok?`<span class="stamp">+${d}</span>${dshort(addDays(RACE[S.qi].m,RACE[S.qi].d,RACE[S.qi].n))}`:`<span class="stamp">✗</span>${a?"Said "+(a.y.split("-").map(Number).reduce((m,dd)=>MS[m-1]+" "+dd)):"No answer"}`}
+    else if(S.k==="offers"){const g=graded(p,S.b),bk=g.filter(x=>x.ok),bad=g.filter(x=>x.acc&&!x.ok);cls+=bad.length?" mid":bk.length?" ok":"";st=`${bk.length} booked · ${money(sum(bk.map(x=>x.x.p)))}${bad.length?`<br>${bad.length} cancelled (math)`:""}`}
+    else if(S.k==="check"){const ok=p["chk_"+S.id]===CHECKS[S.id].ans;cls+=ok?" ok":" no";st=ok?`<span class="stamp">+${money(CHK)}</span>Correct`:`<span class="stamp">✗</span>No points`}
+    else if(S.k==="payday"){cls+=d>0?" ok":d<0?" no":"";st=`<span class="stamp">${signed(d)}</span>${now[p.id].paid.length} paid · ${now[p.id].dis.length} dishonored`}
+    else if(S.k==="raceEnd"){}
+    return `<div class="${cls}${anim?" anim":""}" style="--c:${colorOf(teams,p.id)};--d:${i*70}ms"><div class="tn">${esc(p.name)}</div><span class="rk">${ord(rk[p.id])}</span>
+      <div class="lbl">${race?"Race points":"Score"}</div><div class="cash" data-to="${v}" data-from="${anim&&mode!=="lock"?pv:v}">${race?v:money(anim&&mode!=="lock"?pv:v)}</div><div class="st">${st}</div></div>`}).join("")}</div>`}
+function countUp(){const els=[...app.querySelectorAll(".cash[data-to]")].filter(e=>e.dataset.from!==e.dataset.to);if(!els.length)return;const t0=performance.now(),race=H&&inRace(curThrough(H.state));
+  const f=now=>{const k=Math.min(1,(now-t0-350)/1000);if(k<0){requestAnimationFrame(f);return}const e=1-Math.pow(1-k,3);
+    els.forEach(el=>{const a=+el.dataset.from,b=+el.dataset.to,v=a+(b-a)*e;el.textContent=el.textContent.includes("$")?money(v):Math.round(v)});if(k<1)requestAnimationFrame(f)};requestAnimationFrame(f)}
+function offerCardsHTML(b){return `<div class="offers">${NOTES[b].map(x=>`<div class="offc"><div class="hd"><b>${esc(x.name)}</b>${rateTag(x.rating)}</div>
+  <div class="terms"><span><small>Principal</small>${money(x.p)}</span><span><small>Rate</small>${x.r}%</span><span><small>Term</small>${x.n} days</span><span><small>Dated</small>${dshort(x)}</span></div></div>`).join("")}</div>`}
+function hostRender(fromPoll){
+  const st=H.state,teams=teamsArr();
+  const key=st.phase+"|"+st.i+"|"+st.sub;
+  const lockScreen=st.phase==="lobby"||(st.phase==="play"&&st.sub==="open");
+  if(fromPoll&&!lockScreen)return;
+  const fresh=H.key!==key;H.key=key;
+  if(st.phase==="lobby"){
+    const url=location.origin+"/note-desk?code="+H.code;if(!H.qr)H.qr=window.qrcode?qrSvg(url):"";
+    app.innerHTML=`<div class="lobby"><div class="lobtop"><div class="lobleft"><div class="join">One iPad per team. Scan the code, or go to <b>The Note Desk</b> on the accounting site and enter</div>
+      <div class="code">${H.code}</div><div class="url">${esc(url.replace(/^https?:\/\//,""))}</div></div>${H.qr?`<div class="qr">${H.qr}<span>Scan to join</span></div>`:""}</div>
+      <div class="count">${teams.length} team${teams.length===1?"":"s"} joined</div>
+      <div class="names">${teams.map(t=>`<span style="--c:${colorOf(teams,t.id)}">${esc(t.name)}</span>`).join("")||'<span style="opacity:.5">Waiting for teams…</span>'}</div>
+      <button class="btn main" id="nx" ${teams.length?"":"disabled"}>Start the Calendar Race →</button> <button class="btn" id="end">Cancel</button></div>`;
+    $("#nx").onclick=()=>goStep(0);$("#end").onclick=hostErase;requestAnimationFrame(zoomApp);return}
+  if(st.phase==="end"){if(fresh)finale(teams);return}
+  const S=STEPS[st.i],last=st.i===STEPS.length-1,open=st.sub==="open",th=curThrough(st);
+  const n=teams.filter(p=>isLocked(S,p)).length;
+  const head=`<div class="rhead"><span class="rtag">${ROUNDNAME(S).split(" · ")[0]}</span><span class="rname">${ROUNDNAME(S).split(" · ")[1]}</span>${S.k==="race"?`<span class="yr">Note ${S.qi+1} of ${RACE.length}</span>`:`<span class="yr">Deadline: June 30</span>`}</div>`;
+  const next=()=>last?pushState({phase:"end"}):goStep(st.i+1);
+  const warn=v=>n<teams.length?confirm(`${teams.length-n} team(s) haven't ${v}. Continue anyway?`):true;
+  if(S.k==="race"){const q=RACE[S.qi],ans=addDays(q.m,q.d,q.n);TIMER_END=st.timer||0;
+    if(open){
+      app.innerHTML=`${head}<div class="huddle"><div><div class="kick">Calendar Race</div><h2 style="font-size:56px">${q.n}-day note dated ${dtxt(q)}</h2><p>When is it due? Tap the date on your iPad. Right and fast scores the most.</p></div>
+        <div style="text-align:center"><div class="timer" data-timer>${timerText()}</div></div></div>
+        ${boardHTML(S,teams,th,false,"lock")}
+        <div class="bar2"><span class="count">${n} of ${teams.length} answered</span><button class="btn main" id="nx">Reveal</button></div>`;
+      $("#nx").onclick=()=>{beep(660,.12);pushState({...st,sub:"reveal",timer:0})};requestAnimationFrame(zoomApp);return}
+    const ok=teams.filter(p=>raceOK(p,S.qi)).length;
+    app.innerHTML=`${head}<div class="scard"><div class="row" style="align-items:flex-start;gap:30px"><div><div class="stitle">Due ${dtxt(ans)}</div><p class="story" style="font-size:22px">${q.n} days from ${dtxt(q)}. ${ok} of ${teams.length} teams got it.</p></div>
+      <div style="flex:1;min-width:340px">${breakdownHTML(q.m,q.d,q.n)}</div></div></div>
+      ${boardHTML(S,teams,th,fresh)}
+      <div class="bar2"><span></span><button class="btn main" id="nx">${S.qi===RACE.length-1?"Race results →":"Next note →"}</button></div>`;
+    $("#nx").onclick=next;if(fresh){countUp();beep(ok>teams.length/2?990:330,.15)}requestAnimationFrame(zoomApp);return}
+  if(S.k==="raceEnd"){const sc=scores(teams,st.i),rp={};teams.forEach(p=>rp[p.id]=sc[p.id].race);const rr=ranks(rp),ord3=[...teams].sort((a,b)=>rp[b.id]-rp[a.id]);
+    app.innerHTML=`${head}<div class="scard"><div class="stitle">Calendar Race results</div><p class="story" style="font-size:22px">The top 3 start the note desk with a head start: ${money(HEAD[0])}, ${money(HEAD[1])} and ${money(HEAD[2])}.</p></div>
+      <div class="arows">${ord3.map((p,i)=>`<div class="arow anim" style="--d:${i*90}ms;grid-template-columns:60px minmax(0,1fr) auto auto"><b>${ord(rr[p.id])}</b><b>${esc(p.name)}</b><span>${rp[p.id]} pts</span><span class="tag ${HEAD[rr[p.id]-1]?"":"k"}">${HEAD[rr[p.id]-1]?"+"+money(HEAD[rr[p.id]-1]):"$0"}</span></div>`).join("")}</div>
+      <div class="bar2"><span class="count">Next: customers want to sign notes. Only interest collected by June 30 counts.</span><button class="btn main" id="nx">Open the note desk →</button></div>`;
+    $("#nx").onclick=next;if(fresh)fanfare();requestAnimationFrame(zoomApp);return}
+  if(S.k==="offers"){
+    if(open){
+      app.innerHTML=`${head}<div class="scard"><div class="stitle">${S.b===1?"April":"May"}: ${NOTES[S.b].length} customers want to sign notes</div>
+        <p class="story" style="font-size:22px">Accept or pass on your iPad. To accept, enter the maturity date and the interest. Wrong math cancels the deal. ${money(BUDGET)} limit across both rounds. <b>Only interest collected by June 30 counts.</b></p></div>
+        ${offerCardsHTML(S.b)}
+        ${boardHTML(S,teams,th,false,"lock")}
+        <div class="bar2"><span class="count">${n} of ${teams.length} locked in</span><button class="btn main" id="nx">Reveal</button></div>`;
+      $("#nx").onclick=()=>{if(!warn("locked in"))return;beep(660,.12);pushState({...st,sub:"reveal"})};requestAnimationFrame(zoomApp);return}
+    app.innerHTML=`${head}<div class="stitle" style="margin:0 0 6px">The ${S.b===1?"April":"May"} notes</div>
+      <table class="t big"><thead><tr><th>Customer</th><th class="r">Principal</th><th class="r">Rate</th><th class="r">Days</th><th>Dated</th><th>Due</th><th class="r">Interest</th><th>By June 30?</th><th class="r">Booked by</th></tr></thead><tbody>
+      ${NOTES[S.b].map((x,i)=>{const mt=matOf(x),bk=teams.filter(p=>bookedNotes(p,S.b).includes(x)).length,ok=byJune30(x);
+        return `<tr class="anim" style="--d:${i*90}ms"><td><b>${esc(x.name)}</b> ${rateTag(x.rating)}</td><td class="r">${money(x.p)}</td><td class="r">${x.r}%</td><td class="r">${x.n}</td><td>${dshort(x)}</td><td><b>${dshort(mt)}</b></td><td class="r"><b>${money(intOf(x))}</b></td><td>${ok?`<span class="tag">Yes</span>`:`<span class="tag r">No, too late</span>`}</td><td class="r">${bk} of ${teams.length}</td></tr>`}).join("")}</tbody></table>
+      ${boardHTML(S,teams,th,fresh)}
+      <div class="bar2"><span class="count">Interest = principal × rate × days/360. Who pays shows up on June 30.</span><button class="btn main" id="nx">Next →</button></div>`;
+    $("#nx").onclick=next;requestAnimationFrame(zoomApp);return}
+  if(S.k==="check"){const c=CHECKS[S.id],tally=c.opts.map((_,k)=>teams.filter(p=>p["chk_"+S.id]===k).length);
+    app.innerHTML=`${head}<div class="scard"><div class="stitle">Entry check</div><p class="story">${esc(c.q)}</p>
+      ${open?"":`<div class="lesson"><b>Answer ${"ABCD"[c.ans]}.</b> ${esc(c.why)}</div>`}</div>
+      <div class="opts">${c.opts.map((o,k)=>`<div class="opt ${open?"":k===c.ans?"right":tally[k]?"wrong":""}"><span class="sh">${"ABCD"[k]}</span>${entHTML(o)}${open?"":`<span class="tally">${tally[k]}</span>`}</div>`).join("")}</div>
+      ${boardHTML(S,teams,th,!open&&fresh,open?"lock":null)}
+      <div class="bar2"><span class="count">${open?`${n} of ${teams.length} answered · right answer: +${money(CHK)}`:`${tally[c.ans]} of ${teams.length} correct`}</span><button class="btn main" id="nx">${open?"Reveal answer":last?"Final results →":"Next →"}</button></div>`;
+    $("#nx").onclick=()=>open?(warn("answered")&&(beep(660,.12),pushState({...st,sub:"reveal"}))):next();
+    if(!open&&fresh)countUp();requestAnimationFrame(zoomApp);return}
+  if(S.k==="payday"){
+    if(open){
+      app.innerHTML=`${head}<div class="scard"><div class="stitle">June 30: payday</div><p class="story" style="font-size:22px">Here's what happened to every note. Only teams that booked a note are affected. Notes due after June 30 haven't paid anything yet.</p></div>
+        <div class="news">${ALLN.map((x,i)=>{const mt=matOf(x),ok=byJune30(x);const cls=!ok?"mix":x.out==="dis"?"":"good";
+          const t=!ok?`${esc(x.name)}: not due yet`:x.out==="dis"?`${esc(x.name)}: dishonored`:`${esc(x.name)} pays`;
+          const p=!ok?`Due ${dtxt(mt)}. Nothing collected by June 30.`:x.out==="dis"?`On ${dtxt(mt)} it can't pay the ${money(x.p)} or the interest. Collection fee: ${money(FEE)}.`:`On ${dtxt(mt)}: ${money(x.p+intOf(x))}, including ${money(intOf(x))} of interest.`;
+          return `<div class="newsc ${cls}${fresh?" anim":""}" style="--d:${i*120}ms"><b style="font-size:22px">${t}</b><p style="font-size:17px">${p}</p></div>`}).join("")}</div>
+        <div class="bar2"><span></span><button class="btn main" id="nx">Reveal the scores</button></div>`;
+      $("#nx").onclick=()=>{beep(660,.12);pushState({...st,sub:"reveal"})};requestAnimationFrame(zoomApp);return}
+    app.innerHTML=`${head}<div class="scard"><div class="stitle">Interest collected by June 30</div>
+      <div class="lesson"><b>The best possible desk earned ${money(545)} in interest.</b> Skip the notes due after June 30, skip the risky 12% notes, and fit the rest under ${money(BUDGET)}.</div></div>
+      ${boardHTML(S,teams,th,fresh)}
+      <div class="bar2"><span></span><button class="btn main" id="nx">Next →</button></div>`;
+    $("#nx").onclick=next;if(fresh)countUp();requestAnimationFrame(zoomApp);return}
+}
+async function hostErase(){if(!H)return hostSetup();try{H.off&&H.off();await H.N.remove("games/"+H.code)}catch(e){}H=null;stopFireworks();hostSetup()}
+
+/* ---------- finale ---------- */
+function qrSvg(text){
+  try{if(!window.qrcode)return "";const q=qrcode(0,"M");q.addData(text);q.make();const n=q.getModuleCount(),m=2;let d="";
+    for(let r=0;r<n;r++)for(let c=0;c<n;c++)if(q.isDark(r,c))d+=`M${c+m} ${r+m}h1v1h-1z`;
+    return `<svg viewBox="0 0 ${n+2*m} ${n+2*m}" shape-rendering="crispEdges" xmlns="http://www.w3.org/2000/svg"><rect width="100%" height="100%" fill="#fff"/><path d="${d}" fill="#111"/></svg>`}catch(e){return ""}}
+function fanfare(){[[523,0],[659,.12],[784,.24],[1047,.4]].forEach(([f,t])=>setTimeout(()=>beep(f,.35),t*1000))}
+let FW=null,FIN=[];
+function stopFireworks(){FIN.forEach(clearTimeout);FIN=[];if(FW){cancelAnimationFrame(FW.raf);FW=null}document.body.classList.remove("finale-on")}
+function startFireworks(on){
+  const cv=$("#fw");if(!cv)return;const cx=cv.getContext("2d");if(FW)cancelAnimationFrame(FW.raf);
+  const dpr=Math.min(2,devicePixelRatio||1);const size=()=>{cv.width=innerWidth*dpr;cv.height=innerHeight*dpr};size();addEventListener("resize",size);
+  const COLS=["#C1102F","#E8193C","#FFFFFF","#FFFFFF","#D9D9D9","#C1102F"];
+  const rockets=[],parts=[];const t0=performance.now();
+  const launch=()=>{const W=cv.width,Hh=cv.height;rockets.push({x:W*(.12+Math.random()*.76),y:Hh,vx:(Math.random()-.5)*1.2*dpr,vy:-(Hh*.0125+Math.random()*Hh*.004),ty:Hh*(.12+Math.random()*.35),c:COLS[Math.floor(Math.random()*COLS.length)]})};
+  const burst=(r)=>{const n=70+Math.floor(Math.random()*40),sp=(2.2+Math.random()*2.2)*dpr,ring=Math.random()<.35;
+    for(let k=0;k<n;k++){const a=Math.PI*2*k/n+Math.random()*.1,v=ring?sp:sp*(.35+Math.random()*.75);parts.push({x:r.x,y:r.y,vx:Math.cos(a)*v,vy:Math.sin(a)*v,life:1,d:.008+Math.random()*.01,c:Math.random()<.25?"#FFFFFF":r.c,s:(1.6+Math.random()*1.4)*dpr})}};
+  FW={raf:0};
+  const frame=(now)=>{if(!FW)return;const el=now-t0;
+    const rate=el<7000?260:el<20000?900:1800;
+    if(on&&now-(FW.lastL||0)>rate){FW.lastL=now;launch();if(el<7000&&Math.random()<.5)launch()}
+    cx.globalCompositeOperation="destination-out";cx.fillStyle="rgba(0,0,0,.22)";cx.fillRect(0,0,cv.width,cv.height);cx.globalCompositeOperation="lighter";
+    for(let i=rockets.length-1;i>=0;i--){const r=rockets[i];r.x+=r.vx;r.y+=r.vy;r.vy+=.09*dpr;cx.fillStyle=r.c;cx.beginPath();cx.arc(r.x,r.y,2.2*dpr,0,7);cx.fill();if(r.y<=r.ty||r.vy>=0){burst(r);rockets.splice(i,1)}}
+    for(let i=parts.length-1;i>=0;i--){const p=parts[i];p.x+=p.vx;p.y+=p.vy;p.vx*=.985;p.vy=p.vy*.985+.045*dpr;p.life-=p.d;if(p.life<=0){parts.splice(i,1);continue}
+      cx.globalAlpha=Math.max(0,p.life);cx.fillStyle=p.c;cx.beginPath();cx.arc(p.x,p.y,p.s,0,7);cx.fill()}
+    cx.globalAlpha=1;FW.raf=requestAnimationFrame(frame)};
+  if(!on){[0,1,2].forEach(()=>{launch()});rockets.forEach(r=>{r.y=r.ty;burst(r)});rockets.length=0;parts.forEach(p=>{p.x+=p.vx*25;p.y+=p.vy*25});
+    cx.globalCompositeOperation="lighter";parts.forEach(p=>{cx.fillStyle=p.c;cx.beginPath();cx.arc(p.x,p.y,p.s,0,7);cx.fill()});return}
+  FW.raf=requestAnimationFrame(frame);
+}
+function finale(teams){
+  const sc=scores(teams,STEPS.length-1),val={};teams.forEach(p=>val[p.id]=sc[p.id].total);
+  const order=[...teams].sort((a,b)=>val[b.id]-val[a.id]),rk=ranks(val),top=order.slice(0,5);
+  const slot=(p,i,cls)=>p?`<div class="pod ${cls}" data-i="${i}"><div class="who"><div class="medal">${rk[p.id]}</div><div class="nm">${esc(p.name)}</div><div class="pts">${money(val[p.id])}</div></div><div class="block"><span>${["1st","2nd","3rd"][i]}</span></div></div>`:`<div class="pod ${cls} empty"></div>`;
+  const rows=top.slice(3).map((p,k)=>`<div class="row45" data-i="${k+3}"><span class="r">${rk[p.id]}</span><span class="n">${esc(p.name)}</span><span class="s">${money(val[p.id])}</span></div>`).join("");
+  document.body.classList.add("finale-on");app.style.zoom="";
+  app.innerHTML=`<div class="finale"><canvas id="fw"></canvas><div class="rays"></div>
+    <div class="fhead"><img class="lg" src="/logo-214.png" alt="District 214"><div class="kick">The Note Desk · Final score</div><h2>Final standings</h2></div>
+    <div class="podium">${slot(order[1],1,"p2")}${slot(order[0],0,"p1")}${slot(order[2],2,"p3")}</div><div class="rest">${rows}</div>
+    <div class="fbar"><button class="btn" id="cr">Class results</button><button class="btn" id="again">Replay</button><button class="btn" id="erase">Erase game</button></div></div>`;
+  $("#cr").onclick=()=>{stopFireworks();classResults(teams)};$("#again").onclick=()=>{stopFireworks();finale(teams)};$("#erase").onclick=()=>{stopFireworks();hostErase()};
+  const ord5=[4,3,2,1,0].filter(i=>order[i]),at=[900,1900,3100,4400,6200];
+  const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
+  FIN.forEach(clearTimeout);FIN=ord5.map((i,n)=>setTimeout(()=>{const el=app.querySelector(`.finale [data-i="${i}"]`);if(!el)return;el.classList.add("in");if(i===0){fanfare();startFireworks(!reduce)}else beep(i<3?660:520,.12)},at[n+(5-ord5.length)]||at[n]));
+}
+function classResults(teams){
+  document.body.classList.remove("finale-on");const n=Math.max(1,teams.length);
+  const pct=f=>Math.round(teams.filter(f).length/n*100)+"%";
+  const row=(x,b)=>{const g=teams.map(p=>graded(p,b).find(y=>y.x===x)),acc=g.filter(y=>y.acc).length,ok=g.filter(y=>y.ok).length;
+    return `<div class="cr"><span><b>${esc(x.name)}</b> <span class="note">${money(x.p)} · ${x.r}% · ${x.n} days</span></span><span><span class="tag ${!byJune30(x)?"y":x.out==="dis"?"r":""}">${!byJune30(x)?"Due after June 30":x.out==="dis"?"Dishonored":"Paid "+money(intOf(x))}</span></span><span>${acc} accepted</span><span>${acc?ok+" with right math":"–"}</span></div>`};
+  app.innerHTML=`<div class="rep"><h2>Class results</h2>
+    <div style="display:grid;grid-template-columns:1.4fr 1fr;gap:28px">
+    <div><h3 style="font-family:var(--display);font-size:26px;margin:6px 0">Every note</h3>${NOTES[1].map(x=>row(x,1)).join("")}${NOTES[2].map(x=>row(x,2)).join("")}</div>
+    <div><h3 style="font-family:var(--display);font-size:26px;margin:6px 0">Calendar Race</h3>${RACE.map((q,qi)=>`<div class="leak okk"><b>${q.n} days from ${dshort(q)}: ${pct(p=>raceOK(p,qi))} correct</b>Due ${dtxt(addDays(q.m,q.d,q.n))}</div>`).join("")}
+      <h3 style="font-family:var(--display);font-size:26px;margin:14px 0 6px">Entry checks</h3>
+      <div class="leak okk"><b>Accept a note: ${pct(p=>p.chk_acc===0)}</b>Dr Notes Receivable, Cr Sales.</div>
+      <div class="leak okk"><b>Collect a note: ${pct(p=>p.chk_col===0)}</b>Dr Cash, Cr Interest Revenue, Cr Notes Receivable.</div>
+      <div class="leak okk"><b>Dishonored note: ${pct(p=>p.chk_dis===0)}</b>Dr Accounts Receivable for principal plus interest.</div></div></div>
+    <div class="row" style="justify-content:center;margin-top:16px"><button class="btn main" id="pod">Back to standings</button> <button class="btn" id="erase">Erase game</button></div></div>`;
+  $("#pod").onclick=()=>finale(teams);$("#erase").onclick=hostErase;requestAnimationFrame(zoomApp);
+}
+
+/* ============================================================ TEAM (iPad) */
+let ME=null;const SKEY="ndSession",ZKEY="ndZoom";
+const saveSess=o=>{try{localStorage.setItem(SKEY,JSON.stringify(o))}catch(e){}};
+const loadSess=()=>{try{return JSON.parse(localStorage.getItem(SKEY)||"null")}catch(e){return null}};
+function rejoinBtn(){const b=$("#rejoin");if(b)b.hidden=ROLE==="teacher"}
+function teamZoom(d){let z=1;try{z=+localStorage.getItem(ZKEY)||1}catch(e){}if(d)z=Math.min(1.6,Math.max(.8,Math.round((z+d)*10)/10));try{localStorage.setItem(ZKEY,z)}catch(e){}app.style.zoom=z===1?"":z}
+async function joinForm(){
+  const N=await net().catch(()=>null);if(!N)return needSetup();
+  const sv=loadSess(),qcode=(location.search.match(/[?&]code=(\d{4})/)||[])[1];
+  app.innerHTML=`${hdr()}<div class="panel" style="margin-top:0"><h2>Join with your team</h2><p>${qcode?"Code filled in. ":""}One iPad per team. Type your team name. Lost connection? Join again with the same team name.</p>
+    <input class="field code" id="cd" inputmode="numeric" maxlength="4" placeholder="0000" autocomplete="off" value="${qcode||(sv?esc(sv.code):"")}">
+    <input class="field" id="nm" maxlength="22" placeholder="Team name" autocomplete="off" value="${sv&&(!qcode||sv.code===qcode)?esc(sv.name):""}">
+    <div class="err" id="er"></div><button class="btn main" id="go">Join</button></div>`;
+  rejoinBtn();
+  const go=async()=>{const code=$("#cd").value.trim(),name=$("#nm").value.trim();
+    if(!/^\d{4}$/.test(code)){$("#er").textContent="The code is 4 numbers.";return}
+    if(!name){$("#er").textContent="Type your team name.";return}
+    $("#go").disabled=true;const err=await enterGame(N,code,name);if(err){$("#er").textContent=err;$("#go").disabled=false}};
+  $("#go").onclick=go;$("#nm").onkeydown=e=>{if(e.key==="Enter")go()};
+}
+async function enterGame(N,code,name,forcePid){
+  try{const g=await N.get("games/"+code);
+    if(!g||g.game!=="notedesk")return "No Note Desk game with that code. Check the board.";
+    const sv=loadSess(),norm=x=>String(x||"").trim().toLowerCase().replace(/\s+/g," ");
+    let pid=forcePid||(sv&&sv.code===code&&norm(sv.name)===norm(name)?sv.pid:null);
+    if(!pid&&g.players){const hit=Object.entries(g.players).find(([,p])=>norm(p.name)===norm(name));if(hit)pid=hit[0]}
+    let rec=pid&&g.players&&g.players[pid];
+    if(!rec){if(g.state&&g.state.phase!=="lobby"&&!(g.state.phase==="play"&&g.state.i<=1))return "This game already started. Ask your teacher.";
+      pid="t"+Math.random().toString(36).slice(2,10);rec={name,joined:Date.now()};await N.set(`games/${code}/players/${pid}`,rec)}
+    name=rec.name||name;saveSess({code,pid,name});
+    if(ME&&ME.off)ME.off();
+    ME={N,code,pid,name,rec,state:null,key:null,draft:{},qStart:{}};
+    $("#who").textContent=name;$("#who").hidden=false;$("#zm").hidden=false;teamZoom(0);
+    ME.off=N.on(`games/${code}/state`,st=>{if(!ME)return;if(!st){app.innerHTML=`<div class="wait"><h2>The game has ended</h2><p>Your teacher closed this game.</p></div>`;return}ME.state=st;teamRender()});
+    return null}catch(e){return "Couldn't connect. Try again."}
+}
+async function rejoin(){const N=await net().catch(()=>null);if(!N)return needSetup();
+  if(ME){ME.key=null;try{const r=await ME.N.get(`games/${ME.code}/players/${ME.pid}`);if(r)ME.rec=r;const st=await ME.N.get(`games/${ME.code}/state`);if(st)ME.state=st}catch(e){}teamRender();return}
+  const sv=loadSess();if(!sv)return joinForm();const err=await enterGame(N,sv.code,sv.name,sv.pid);if(err)joinForm()}
+async function save(patch){const M=ME;Object.assign(M.rec,patch);try{await M.N.update(`games/${M.code}/players/${M.pid}`,patch)}catch(e){}}
+const meP=()=>({id:ME.pid,...ME.rec});
+function myLine(st){const M=ME;if(!st.sc||st.sc[M.pid]==null)return "";const n=Object.keys(st.sc).length;
+  return `<div class="cashline"><span><b>${st.race?st.sc[M.pid]:money(st.sc[M.pid])}</b>${st.race?"race points":"score"}</span><span><b>${ord(st.rank[M.pid])}</b>of ${n}</span></div>`}
+function teamRender(){
+  const M=ME,st=M.state;if(!st)return;rejoinBtn();
+  const S=st.phase==="play"?STEPS[st.i]:null,lk=S?isLocked(S,meP()):false;
+  const key=JSON.stringify([st.phase,st.i,st.sub,lk,st.sc&&st.sc[M.pid]]);
+  TIMER_END=st.timer||0;
+  if(key===M.key)return;M.key=key;
+  if(st.phase==="lobby"){app.innerHTML=`<div class="wait"><h2>You're in, ${esc(M.name)}!</h2></div>
+    <div class="box"><h3>How the Note Desk works</h3><p style="margin:0">Customers who need more time to pay sign a note: a promise to pay the principal plus interest on a set date.</p>
+    <p><b>Interest = principal × annual rate × days/360.</b> To find the due date, count the days left in the first month, then add whole months.</p>
+    <p style="margin:0">First up: the Calendar Race. Right and fast wins a head start.</p></div>`;return}
+  if(st.phase==="end")return teamReport(st);
+  const head=`<div class="rtag" style="text-align:center;margin-top:10px">${ROUNDNAME(S)}</div>`;
+  if(S.k==="race")return teamRace(S,st,head);
+  if(S.k==="raceEnd"){const sc=st.sc[M.pid],rk=st.rank[M.pid];app.innerHTML=`${head}<div class="verdict ${rk<=3?"ok":"neu"}"><h2>${ord(rk)} in the race</h2><p>${sc} points. ${HEAD[rk-1]?`You start the note desk with a ${money(HEAD[rk-1])} head start.`:"No head start this time. The note desk is where the real money is."}</p></div>`;return}
+  if(S.k==="offers")return teamOffers(S,st,head);
+  if(S.k==="check")return teamCheck(S,st,head);
+  if(S.k==="payday")return teamPayday(S,st,head);
+}
+function calHTML(m0,pick){let html="";for(let k=0;k<4;k++){let m=m0+k,y=YR;if(m>12){m-=12;y++}const first=new Date(Date.UTC(y,m-1,1)).getUTCDay(),days=dim(m,y);
+  html+=`<div class="cal"><div class="cm">${MON[m-1]}</div><div class="cg">${["S","M","T","W","T","F","S"].map(d=>`<span class="dw">${d}</span>`).join("")}${"<span></span>".repeat(first)}${Array.from({length:days},(_,i)=>`<button class="cd${pick===m+"-"+(i+1)?" on":""}" data-y="${m}-${i+1}">${i+1}</button>`).join("")}</div></div>`}
+  return `<div class="cals">${html}</div>`}
+function teamRace(S,st,head){
+  const M=ME,q=RACE[S.qi],a=raceAns(meP(),S.qi),ans=addDays(q.m,q.d,q.n);
+  if(st.sub==="open"){
+    if(a){app.innerHTML=`${head}<div class="wait"><h2>Locked in: ${a.y.split("-").map(Number).reduce((m,d)=>MON[m-1]+" "+d)}</h2><p>Watch the board.</p></div>${myLine(st)}`;return}
+    if(!M.qStart[S.qi])M.qStart[S.qi]=Date.now();
+    app.innerHTML=`${head}<div class="huddle" style="margin-top:8px;grid-template-columns:1fr auto;padding:14px 20px"><div><div class="kick">Note ${S.qi+1} of ${RACE.length}</div><h2 style="font-size:34px;margin:2px 0">${q.n} days from ${dtxt(q)}</h2><p style="font-size:18px">Tap the due date. You get one tap.</p></div><div class="timer" data-timer style="font-size:44px">${timerText()}</div></div>
+      ${calHTML(q.m,null)}`;
+    app.querySelectorAll(".cd").forEach(b=>b.onclick=async()=>{const y=b.dataset.y;app.querySelectorAll(".cd").forEach(x=>x.disabled=true);b.classList.add("on");
+      await save({["r"+S.qi]:{y,t:Date.now()-M.qStart[S.qi]}});M.key=null;teamRender()});return}
+  const ok=raceOK(meP(),S.qi),pts=racePts(meP(),S.qi);
+  app.innerHTML=`${head}<div class="verdict ${ok?"ok":"no"}"><h2>${ok?"+"+pts+" points":a?"Not quite":"No answer"}</h2><p>Due <b>${dtxt(ans)}</b>.${a&&!ok?` You said ${a.y.split("-").map(Number).reduce((m,d)=>MON[m-1]+" "+d)}.`:""}${ok?` You answered in ${(a.t/1000).toFixed(1)} seconds.`:""}</p></div>
+    <div class="box"><h3>How to count it</h3>${breakdownHTML(q.m,q.d,q.n)}</div>${myLine(st)}`;
+  ok?beep(990,.15):beep(220,.3);
+}
+function teamOffers(S,st,head){
+  const M=ME,b=S.b,used=b===2?capUsed(meP(),1):0,left=BUDGET-used;
+  if(st.sub==="open"&&!M.rec["lock"+b]){
+    const sel=M.draft["o"+b]=M.draft["o"+b]||JSON.parse(JSON.stringify(M.rec["o"+b]||{}));
+    const draw=()=>{const y=scrollY,accs=NOTES[b].filter(x=>sel[x.id]&&sel[x.id].a===true),dec=NOTES[b].filter(x=>sel[x.id]&&sel[x.id].a!=null).length,tot=sum(accs.map(x=>x.p)),over=tot>left;
+      const missing=accs.filter(x=>!sel[x.id].m||!sel[x.id].d||isNaN(num(sel[x.id].i))).length;
+      app.innerHTML=`${head}<div class="tbar"><div class="mtext"><span>${b===1?"April":"May"} notes · ${dec} of ${NOTES[b].length} decided</span><span class="${over?"over":""}">${money(tot)} of ${money(left)} left to lend</span></div>
+        <div class="meter ${over?"full":""}"><i style="width:${Math.min(100,tot/Math.max(1,left)*100)}%"></i></div>
+        <div class="note">Only interest collected by <b>June 30</b> counts. Wrong due date or interest cancels the deal.${b===2?` You already lent ${money(used)} in April.`:""}</div></div>
+        <div class="apps">${NOTES[b].map(x=>{const s=sel[x.id]||{},acc=s.a===true;
+          return `<div class="appc ${acc?"yes":s.a===false?"noo":""}"><div class="hd"><b>${esc(x.name)}</b>${rateTag(x.rating)}</div><div class="what">${esc(x.what)}</div>
+          <div class="terms"><span><small>Principal</small>${money(x.p)}</span><span><small>Rate</small>${x.r}%</span><span><small>Term</small>${x.n} days</span><span><small>Dated</small>${dshort(x)}</span></div>
+          <div class="quote">${esc(x.clue)}</div>
+          <div class="yn"><button class="y" data-id="${x.id}" data-v="1" aria-pressed="${acc}">Accept</button><button class="n" data-id="${x.id}" data-v="0" aria-pressed="${s.a===false}">Pass</button></div>
+          ${acc?`<div class="mathrow"><label>Due date<span class="dd"><select data-f="m" data-id="${x.id}"><option value="">Month</option>${MON.map((mn,i)=>`<option value="${i+1}" ${+s.m===i+1?"selected":""}>${mn}</option>`).join("")}</select><input data-f="d" data-id="${x.id}" inputmode="numeric" maxlength="2" placeholder="Day" value="${esc(s.d||"")}"></span></label>
+            <label>Interest<input data-f="i" data-id="${x.id}" inputmode="decimal" placeholder="$0" value="${esc(s.i||"")}"></label></div>`:""}</div>`}).join("")}</div>
+        <div class="lock"><button class="btn main" id="lk" ${dec<NOTES[b].length||over||missing?"disabled":""}>Lock in ${accs.length} note${accs.length===1?"":"s"}</button><span class="note">${over?"Over your limit. Pass on something.":dec<NOTES[b].length?"Accept or pass on every note.":missing?"Fill in the due date and interest for every note you accept.":"You can't change it after you lock in."}</span></div>`;
+      app.querySelectorAll(".yn button").forEach(x=>x.onclick=()=>{const s=sel[x.dataset.id]=sel[x.dataset.id]||{};s.a=x.dataset.v==="1";draw()});
+      app.querySelectorAll("[data-f]").forEach(el=>{const h=()=>{const s=sel[el.dataset.id];s[el.dataset.f]=el.value;if(el.tagName==="SELECT")draw();else{const lb=$("#lk"),acc2=NOTES[b].filter(x=>sel[x.id]&&sel[x.id].a===true),miss=acc2.filter(x=>!sel[x.id].m||!sel[x.id].d||isNaN(num(sel[x.id].i))).length;lb.disabled=dec<NOTES[b].length||over||miss>0;lb.nextElementSibling.textContent=miss?"Fill in the due date and interest for every note you accept.":"You can't change it after you lock in."}};el.oninput=h;el.onchange=h});
+      $("#lk").onclick=async()=>{if(!confirm(`Lock in ${accs.length} note${accs.length===1?"":"s"} for ${money(tot)}?`))return;await save({["o"+b]:JSON.parse(JSON.stringify(sel)),["lock"+b]:true});M.key=null;teamRender()};
+      scrollTo(0,y)};
+    draw();return}
+  const g=graded(meP(),b);
+  if(st.sub==="open"){app.innerHTML=`${head}<div class="wait"><h2>Locked in</h2><p>${g.filter(x=>x.acc).length} notes. Watch the board.</p></div>`;return}
+  const bk=g.filter(x=>x.ok),bad=g.filter(x=>x.acc&&!x.ok);
+  app.innerHTML=`${head}<div class="verdict ${bad.length?"mid":bk.length?"ok":"neu"}"><h2>${bk.length} booked${bad.length?`, ${bad.length} cancelled`:""}</h2><p>${bk.length?`${money(sum(bk.map(x=>x.x.p)))} lent.`:""} Who pays shows up on June 30.</p></div>
+    <div class="box"><table class="t"><thead><tr><th>Note</th><th>Due</th><th class="r">Interest</th><th>Result</th></tr></thead><tbody>
+    ${g.map(y=>{const mt=matOf(y.x);return `<tr><td><b>${esc(y.x.name)}</b></td><td>${dshort(mt)}${y.acc&&!y.dOK?` <span class="note">(you said ${y.a.m?MS[y.a.m-1]:"?"} ${esc(y.a.d||"?")})</span>`:""}</td><td class="r">${money(intOf(y.x))}${y.acc&&!y.iOK?` <span class="note">(you said ${esc(y.a.i||"?")})</span>`:""}</td>
+      <td>${!y.acc?`<span class="tag k">Passed</span>`:y.ok?`<span class="tag">Booked</span>`:`<span class="tag r">Cancelled</span>`}${byJune30(y.x)?"":` <span class="tag y">After June 30</span>`}</td></tr>`}).join("")}</tbody></table></div>${myLine(st)}`;
+}
+function teamCheck(S,st,head){
+  const M=ME,c=CHECKS[S.id],mine=M.rec["chk_"+S.id];
+  if(st.sub==="open"){
+    app.innerHTML=`${head}<div class="box" style="max-width:none"><h3>Entry check</h3><p style="font-size:22px;margin:0">${esc(c.q)}</p></div>
+      <div class="opts">${c.opts.map((o,k)=>`<button class="opt" data-k="${k}" aria-pressed="${mine===k}"><span class="sh">${"ABCD"[k]}</span>${entHTML(o)}</button>`).join("")}</div>
+      <p class="note" style="text-align:center">${mine!=null?"Answer saved. You can change it until your teacher reveals it.":`Agree as a team, then tap one. Right answer: +${money(CHK)}.`}</p>`;
+    app.querySelectorAll(".opt").forEach(x=>x.onclick=async()=>{await save({["chk_"+S.id]:+x.dataset.k});M.key=null;teamRender()});return}
+  const ok=mine===c.ans;
+  app.innerHTML=`${head}<div class="verdict ${ok?"ok":"no"}"><h2>${ok?"Correct! +"+money(CHK):mine==null?"No answer":"Not quite"}</h2></div>
+    <div class="box"><h3>Answer ${"ABCD"[c.ans]}</h3><div class="opt right" style="border-width:2px"><span class="sh">${"ABCD"[c.ans]}</span>${entHTML(c.opts[c.ans])}</div><p style="margin:10px 0 0">${esc(c.why)}</p></div>${myLine(st)}`;
+}
+function teamPayday(S,st,head){
+  const M=ME,mine=[1,2].flatMap(b=>bookedNotes(meP(),b));
+  const line=x=>{const mt=matOf(x);return !byJune30(x)?`<div class="leak mid"><b>${esc(x.name)}: due ${dtxt(mt)}</b>Too late. Nothing collected by June 30.</div>`:x.out==="dis"?`<div class="leak"><b>${esc(x.name)}: dishonored on ${dtxt(mt)}</b>−${money(FEE)} collection fee. Dr Accounts Receivable ${plain(x.p+intOf(x))}, Cr Interest Revenue ${plain(intOf(x))}, Cr Notes Receivable ${plain(x.p)}.</div>`:`<div class="leak okk"><b>${esc(x.name)} paid on ${dtxt(mt)}: +${money(intOf(x))}</b>Collected ${money(x.p+intOf(x))}.</div>`};
+  if(st.sub==="open"){app.innerHTML=`${head}<div class="box"><h3>Your notes</h3>${mine.length?mine.map(x=>`<div class="leak mid"><b>${esc(x.name)}</b>${money(x.p)} · due ${dtxt(matOf(x))}</div>`).join(""):"<p style='margin:0'>You didn't book any notes.</p>"}</div><div class="wait" style="padding-top:8px"><p>June 30 news is on the board. Did yours pay?</p></div>`;return}
+  const sc=scores([meP()],st.i)[M.pid];
+  app.innerHTML=`${head}<div class="verdict ${sc.int-sc.fees>0?"ok":sc.int-sc.fees<0?"no":"neu"}"><h2>${signed(sc.int-sc.fees)}</h2><p>Interest collected ${money(sc.int)}${sc.fees?`, collection fees −${money(sc.fees)}`:""}.</p></div>
+    <div class="box">${mine.map(line).join("")||"<p style='margin:0'>No notes, no interest.</p>"}</div>${myLine(st)}`;
+}
+function teamReport(st){
+  const M=ME,p=meP(),sc=scores([p],STEPS.length-1)[M.pid],n=st.sc?Object.keys(st.sc).length:0,tot=st.sc?st.sc[M.pid]:sc.total;
+  app.innerHTML=`<div class="rep"><h2>${esc(M.name)}: ${money(tot)}</h2><p style="font-size:22px;margin:0">${st.rank?ord(st.rank[M.pid])+" of "+n:""}</p>
+    <div class="box" style="max-width:none"><table class="t"><tbody>
+      <tr><td>Calendar Race head start</td><td class="r">+${plain(tot-sc.chk-sc.int+sc.fees)}</td></tr>
+      <tr><td>Interest collected by June 30</td><td class="r">+${plain(sc.int)}</td></tr>
+      <tr><td>Collection fees on dishonored notes</td><td class="r">${sc.fees?"−"+plain(sc.fees):"0"}</td></tr>
+      <tr><td>Entry checks</td><td class="r">+${plain(sc.chk)}</td></tr>
+      <tr class="tot"><td>Score</td><td class="r">${money(tot)}</td></tr></tbody></table>
+      <p class="note">The best possible desk collected $545 in interest: Lakeshore, Westside and Fox River in April, then Cedar Lake and Northfield in May.</p></div>
+    ${sc.late.length?`<div class="leak mid"><b>Due after June 30</b>${sc.late.map(x=>esc(x.name)).join(", ")}: money tied up, no interest by the deadline.</div>`:""}
+    ${(c=>c.length?`<div class="leak"><b>Cancelled for math errors</b>${c.map(y=>`${esc(y.x.name)}: due ${dtxt(matOf(y.x))}, interest ${money(intOf(y.x))}`).join(". ")}.</div>`:"")([1,2].flatMap(b=>graded(p,b).filter(y=>y.acc&&!y.ok)))}
+    ${sc.dis.length?`<div class="leak"><b>Dishonored</b>${sc.dis.map(x=>esc(x.name)).join(", ")}. The high rate came with high risk.</div>`:""}</div>`;
+  try{localStorage.removeItem(SKEY)}catch(e){}
+}
+
+/* ============================================================ START */
+$("#rejoin").onclick=rejoin;
+$("#zo").onclick=()=>teamZoom(-.1);$("#zi").onclick=()=>teamZoom(.1);
+ROLE==="teacher"?hostSetup():joinForm();
+
+</script>
+</body>
+</html>
