@@ -258,7 +258,6 @@ body.finale-on .top{visibility:hidden}
 .fbar .btn{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.25);color:#fff;font-size:15px;padding:6px 14px}
 @media (max-width:700px){.rest{grid-template-columns:1fr}}
 @media (prefers-reduced-motion: reduce){.finale .rays{animation:none}.pod,.row45{transition:none}.p1.in .who{animation:none}.timer.done{animation:none}}
-
 .offers{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px;margin-top:12px}
 .offc{background:var(--paper);border:2px solid var(--line);border-radius:12px;padding:10px 14px}
 .offc .hd,.appc .hd{display:flex;justify-content:space-between;gap:10px;align-items:center}
@@ -2601,7 +2600,7 @@ var qrcode = function() {
 const CO="Northwest Team Supply",YR=2027,BUDGET=40000,FEE=250,CHK=100,HEAD=[150,100,50],RACE_SECS=30;
 const MON=["January","February","March","April","May","June","July","August","September","October","November","December"];
 const MS=MON.map(m=>m.slice(0,3));
-const RACE=[{m:4,d:5,n:30},{m:3,d:12,n:60},{m:5,d:20,n:45},{m:6,d:10,n:90},{m:7,d:1,n:120},{m:10,d:25,n:60}];
+const RACE=[{m:4,d:5,n:30},{m:3,d:12,n:60},{m:5,d:20,n:45}];
 const NOTES={
  1:[
   {id:"lake",name:"Lakeshore Rowing Club",what:"New racing shells and oars",rating:"A",clue:"15 years in business. Has paid every note on time.",p:9000,r:8,n:60,m:4,d:6,out:"paid"},
@@ -2624,15 +2623,24 @@ const CHECKS={
  acc:{q:"On April 6, Northwest sells $9,000 of rowing gear to Lakeshore Rowing Club and accepts its 60-day, 8% note. Which entry?",
   opts:[[["Dr","Notes Receivable","9,000"],["Cr","Sales","9,000"]],[["Dr","Cash","9,000"],["Cr","Sales","9,000"]],[["Dr","Notes Receivable","9,120"],["Cr","Sales","9,120"]],[["Dr","Sales","9,000"],["Cr","Notes Receivable","9,000"]]],ans:0,
   why:"The note replaces cash for now. Interest isn't recorded yet, because it hasn't been earned. It is earned over the 60 days."},
+ col1:{q:"On June 5, Lakeshore Rowing Club pays its $9,000, 60-day, 8% note in full. Which entry?",
+  opts:[[["Dr","Cash","9,120"],["Cr","Interest Revenue","120"],["Cr","Notes Receivable","9,000"]],[["Dr","Cash","9,000"],["Cr","Notes Receivable","9,000"]],[["Dr","Cash","9,720"],["Cr","Interest Revenue","720"],["Cr","Notes Receivable","9,000"]],[["Dr","Notes Receivable","9,120"],["Cr","Cash","9,120"]]],ans:0,
+  why:"Interest = 9,000 × 8% × 60/360 = $120. Cash comes in for principal plus interest. $720 would be a full year of interest."},
+ conv:{q:"Suppose Cedar Lake Golf Course had bought $8,000 of gear on account last month, and now signs a 40-day, 9% note to get more time to pay. Which entry?",
+  opts:[[["Dr","Notes Receivable","8,000"],["Cr","Accounts Receivable","8,000"]],[["Dr","Notes Receivable","8,000"],["Cr","Sales","8,000"]],[["Dr","Notes Receivable","8,080"],["Cr","Accounts Receivable","8,080"]],[["Dr","Accounts Receivable","8,000"],["Cr","Notes Receivable","8,000"]]],ans:0,
+  why:"The sale was already recorded last month. The note just replaces the account receivable. No new sale, and no interest until it's earned."},
  col:{q:"On June 30, Fox River Climbing Gym pays its $8,000, 90-day, 9% note in full. Which entry?",
   opts:[[["Dr","Cash","8,180"],["Cr","Interest Revenue","180"],["Cr","Notes Receivable","8,000"]],[["Dr","Cash","8,180"],["Cr","Notes Receivable","8,180"]],[["Dr","Cash","8,180"],["Cr","Sales","180"],["Cr","Notes Receivable","8,000"]],[["Dr","Cash","8,720"],["Cr","Interest Revenue","720"],["Cr","Notes Receivable","8,000"]]],ans:0,
   why:"Interest = 8,000 × 9% × 90/360 = $180. The note comes off the books, and the interest is revenue. $720 would be a full year of interest."},
+ later:{q:"In August, Quick Strike Bowling finally pays the $6,090 it owes from its dishonored note. Which entry?",
+  opts:[[["Dr","Cash","6,090"],["Cr","Accounts Receivable","6,090"]],[["Dr","Cash","6,090"],["Cr","Notes Receivable","6,090"]],[["Dr","Cash","6,090"],["Cr","Interest Revenue","90"],["Cr","Notes Receivable","6,000"]],[["Dr","Cash","6,090"],["Cr","Interest Revenue","6,090"]]],ans:0,
+  why:"After the note was dishonored, the full $6,090 moved to Accounts Receivable. The interest was already recorded, so the payment just clears the receivable."},
  dis:{q:"On May 30, Quick Strike Bowling can't pay its $6,000, 45-day, 12% note or the interest. Which entry?",
   opts:[[["Dr","Accounts Receivable","6,090"],["Cr","Interest Revenue","90"],["Cr","Notes Receivable","6,000"]],[["Dr","Bad Debts Expense","6,000"],["Cr","Notes Receivable","6,000"]],[["Dr","Accounts Receivable","6,000"],["Cr","Notes Receivable","6,000"]],[["Dr","Cash","6,090"],["Cr","Interest Revenue","90"],["Cr","Notes Receivable","6,000"]]],ans:0,
   why:"The note is dishonored, but Quick Strike still owes the money and the interest it earned. Move the full $6,090 back to Accounts Receivable."}
 };
-const STEPS=[...RACE.map((_,qi)=>({k:"race",qi})),{k:"raceEnd"},{k:"offers",b:1},{k:"check",id:"acc"},{k:"offers",b:2},{k:"check",id:"col"},{k:"payday"},{k:"check",id:"dis"}];
-const ROUNDNAME=S=>S.k==="race"||S.k==="raceEnd"?"Prelim · Calendar Race":(S.k==="offers"&&S.b===1)||S.id==="acc"?"Round 1 · April notes":(S.k==="offers"&&S.b===2)||S.id==="col"?"Round 2 · May notes":"Round 3 · June 30";
+const STEPS=[...RACE.map((_,qi)=>({k:"race",qi})),{k:"raceEnd"},{k:"offers",b:1},{k:"check",id:"acc"},{k:"check",id:"col1"},{k:"offers",b:2},{k:"check",id:"conv"},{k:"check",id:"col"},{k:"payday"},{k:"check",id:"dis"},{k:"check",id:"later"}];
+const ROUNDNAME=S=>S.k==="race"||S.k==="raceEnd"?"Prelim · Calendar Race":(S.k==="offers"&&S.b===1)||S.id==="acc"||S.id==="col1"?"Round 1 · April notes":(S.k==="offers"&&S.b===2)||S.id==="conv"||S.id==="col"?"Round 2 · May notes":"Round 3 · June 30";
 const RACE_END=STEPS.findIndex(s=>s.k==="raceEnd");
 const COLORS=["#C1102F","#1F5FAD","#1E7A3C","#9A6700","#6F3FA8","#0F7C80","#C2410C","#BE185D","#3F3F46","#4D7C0F"];
 
@@ -2666,12 +2674,29 @@ const entHTML=lines=>`<span class="ent">${lines.map(([s,a,v])=>`<span class="${s
 const jrnRows=(rows,h)=>`<span class="jrn">${h?`<span class="h">${esc(h)}</span>`:""}${rows.map(([s,a,v])=>`<span class="${s==="Cr"?"ci":""}">${esc(a)}</span><span class="d">${s==="Dr"?esc(v):""}</span><span class="d">${s==="Cr"?esc(v):""}</span>`).join("")}</span>`;
 const rateTag=r=>`<span class="rt ${/^A/.test(r)?"g":/^B/.test(r)?"y":"r"}">${esc(r)}</span>`;
 
+const RATINGS=[
+ ["AAA","Best possible","Almost never misses a payment.","#14532D"],
+ ["AA","Excellent","Very safe. Pays on time.","#1E7A3C"],
+ ["A","Strong","Pays reliably.","#2F8F4E"],
+ ["BBB","Good","Pays, but a bad year could hurt.","#6B8E23"],
+ ["BB","Fair","Some risk. Check their history.","#9A6700"],
+ ["B","Risky","Usually pays, but often late.","#B45309"],
+ ["CCC","Weak","Real chance they don't pay.","#C2410C"],
+ ["CC","Very weak","Likely to miss payments.","#B91C1C"],
+ ["C","Near failure","Close to going under.","#991B1B"],
+ ["D","In default","Already failed to pay a debt.","#111111"],
+ ["None","Not rated","Too new or small. No track record.","#6B7280"]
+];
+const ratingKey=()=>`<aside class="rkey"><h3>Credit ratings</h3><p class="sub">Best at the top, worst at the bottom.</p>
+  <div class="list">${RATINGS.map(([g,t,d,c],i)=>`${i===0?'<div class="tier">Safe</div>':i===3?'<div class="tier">Some risk</div>':i===6?'<div class="tier">Danger</div>':i===10?'<div class="tier">Unknown</div>':""}<div class="rk" style="--c:${c}"><b>${g}</b><span><strong>${t}</strong>${d}</span></div>`).join("")}</div>
+  <p class="pm">A <b>+</b> or <b>−</b> means a little better or worse within that grade. B− is just below B.</p></aside>`;
+
 /* ============================================================ SCORING: one source of truth */
 const raceAns=(p,qi)=>p&&p["r"+qi];
 const raceOK=(p,qi)=>{const a=raceAns(p,qi);return !!a&&a.y===dkey(addDays(RACE[qi].m,RACE[qi].d,RACE[qi].n))};
 const racePts=(p,qi)=>{if(!raceOK(p,qi))return 0;const t=Math.max(0,raceAns(p,qi).t||0);return 500+Math.round(500*Math.max(0,1-t/(RACE_SECS*1000)))};
 function graded(p,b){const o=(p&&p["o"+b])||{},lk=!!(p&&p["lock"+b]);
-  return NOTES[b].map(x=>{const a=o[x.id]||{},acc=lk&&a.a===true,mt=matOf(x),dOK=+a.m===mt.m&&+a.d===mt.d,iOK=num(a.i)===intOf(x);return{x,acc,dOK,iOK,ok:acc&&dOK&&iOK,a}})}
+  return NOTES[b].map(x=>{const a=o[x.id]||{},acc=lk&&a.a===true,iOK=num(a.i)===intOf(x),tOK=num(a.t)===x.p+intOf(x);return{x,acc,iOK,tOK,ok:acc&&iOK&&tOK,a}})}
 const bookedNotes=(p,b)=>graded(p,b).filter(g=>g.ok).map(g=>g.x);
 const capUsed=(p,upto)=>sum([1,2].filter(b=>b<=upto).flatMap(b=>bookedNotes(p,b)).map(x=>x.p));
 function ranks(val){const ids=Object.keys(val).sort((a,b)=>val[b]-val[a]);const r={};let k=0,prev=null;ids.forEach((id,i)=>{if(val[id]!==prev){k=i+1;prev=val[id]}r[id]=k});return r}
@@ -2748,11 +2773,11 @@ async function hostSetup(){
   const N=await net().catch(()=>null);if(!N)return needSetup();
   app.innerHTML=`${hdr()}<div class="panel" style="margin-top:0;max-width:760px"><h2>Start a game</h2>
     <p>One iPad per team. About 30 to 35 minutes.</p>
-    <ol><li><b>Prelim: Calendar Race.</b> Six notes flash on the board. Teams tap the maturity date on a calendar. Right and fast wins. The top 3 get a head start of ${money(HEAD[0])}, ${money(HEAD[1])} and ${money(HEAD[2])}.</li>
-    <li><b>Round 1: April notes.</b> Six customers offer notes. To accept one, a team must enter its maturity date and interest. Wrong math cancels the deal.</li>
+    <ol><li><b>Prelim: Calendar Race.</b> Three notes flash on the board. Teams tap the maturity date on a calendar. Right and fast wins. The top 3 get a head start of ${money(HEAD[0])}, ${money(HEAD[1])} and ${money(HEAD[2])}.</li>
+    <li><b>Round 1: April notes.</b> Six customers offer notes. Each card shows the due date. To accept one, a team must enter the interest and the total amount due at maturity. Wrong math cancels the deal.</li>
     <li><b>Round 2: May notes.</b> Five more offers. Teams can lend ${money(BUDGET)} in total across both rounds.</li>
     <li><b>Round 3: June 30.</b> Payday. Only interest collected by June 30 counts. A dishonored note costs a ${money(FEE)} collection fee.</li></ol>
-    <p class="note">After each round there's a quick entry check worth ${money(CHK)}: accepting a note, collecting one, and a dishonored note.</p>
+    <p class="note">After each round there are two quick entry checks worth ${money(CHK)} each: accepting a note, collecting one, a note that replaces an account receivable, a dishonored note, and collecting after a dishonor.</p>
     <div class="err" id="er"></div><button class="btn main" id="go">Create game</button></div>`;
   $("#go").onclick=async()=>{$("#go").disabled=true;
     try{let code;for(let t=0;t<20;t++){code=String(Math.floor(1000+Math.random()*9000));if(!(await N.get("games/"+code)))break}
@@ -2788,7 +2813,7 @@ function countUp(){const els=[...app.querySelectorAll(".cash[data-to]")].filter(
   const f=now=>{const k=Math.min(1,(now-t0-350)/1000);if(k<0){requestAnimationFrame(f);return}const e=1-Math.pow(1-k,3);
     els.forEach(el=>{const a=+el.dataset.from,b=+el.dataset.to,v=a+(b-a)*e;el.textContent=el.textContent.includes("$")?money(v):Math.round(v)});if(k<1)requestAnimationFrame(f)};requestAnimationFrame(f)}
 function offerCardsHTML(b){return `<div class="offers">${NOTES[b].map(x=>`<div class="offc"><div class="hd"><b>${esc(x.name)}</b>${rateTag(x.rating)}</div>
-  <div class="terms"><span><small>Principal</small>${money(x.p)}</span><span><small>Rate</small>${x.r}%</span><span><small>Term</small>${x.n} days</span><span><small>Dated</small>${dshort(x)}</span></div></div>`).join("")}</div>`}
+  <div class="terms"><span><small>Principal</small>${money(x.p)}</span><span><small>Rate</small>${x.r}%</span><span><small>Term</small>${x.n} days</span><span><small>Dated</small>${dshort(x)}</span><span><small>Due</small>${dshort(matOf(x))}</span></div></div>`).join("")}</div>`}
 function hostRender(fromPoll){
   const st=H.state,teams=teamsArr();
   const key=st.phase+"|"+st.i+"|"+st.sub;
@@ -2830,15 +2855,15 @@ function hostRender(fromPoll){
   if(S.k==="offers"){
     if(open){
       app.innerHTML=`${head}<div class="scard"><div class="stitle">${S.b===1?"April":"May"}: ${NOTES[S.b].length} customers want to sign notes</div>
-        <p class="story" style="font-size:22px">Accept or pass on your iPad. To accept, enter the maturity date and the interest. Wrong math cancels the deal. ${money(BUDGET)} limit across both rounds. <b>Only interest collected by June 30 counts.</b></p></div>
+        <p class="story" style="font-size:22px">Accept or pass on your iPad. To accept, enter the interest and the total amount due at maturity. Wrong math cancels the deal. ${money(BUDGET)} limit across both rounds. <b>Only interest collected by June 30 counts.</b></p></div>
         ${offerCardsHTML(S.b)}
         ${boardHTML(S,teams,th,false,"lock")}
         <div class="bar2"><span class="count">${n} of ${teams.length} locked in</span><button class="btn main" id="nx">Reveal</button></div>`;
       $("#nx").onclick=()=>{if(!warn("locked in"))return;beep(660,.12);pushState({...st,sub:"reveal"})};requestAnimationFrame(zoomApp);return}
     app.innerHTML=`${head}<div class="stitle" style="margin:0 0 6px">The ${S.b===1?"April":"May"} notes</div>
-      <table class="t big"><thead><tr><th>Customer</th><th class="r">Principal</th><th class="r">Rate</th><th class="r">Days</th><th>Dated</th><th>Due</th><th class="r">Interest</th><th>By June 30?</th><th class="r">Booked by</th></tr></thead><tbody>
+      <table class="t big"><thead><tr><th>Customer</th><th class="r">Principal</th><th class="r">Rate</th><th class="r">Days</th><th>Dated</th><th>Due</th><th class="r">Interest</th><th class="r">Amount due</th><th>By June 30?</th><th class="r">Booked by</th></tr></thead><tbody>
       ${NOTES[S.b].map((x,i)=>{const mt=matOf(x),bk=teams.filter(p=>bookedNotes(p,S.b).includes(x)).length,ok=byJune30(x);
-        return `<tr class="anim" style="--d:${i*90}ms"><td><b>${esc(x.name)}</b> ${rateTag(x.rating)}</td><td class="r">${money(x.p)}</td><td class="r">${x.r}%</td><td class="r">${x.n}</td><td>${dshort(x)}</td><td><b>${dshort(mt)}</b></td><td class="r"><b>${money(intOf(x))}</b></td><td>${ok?`<span class="tag">Yes</span>`:`<span class="tag r">No, too late</span>`}</td><td class="r">${bk} of ${teams.length}</td></tr>`}).join("")}</tbody></table>
+        return `<tr class="anim" style="--d:${i*90}ms"><td><b>${esc(x.name)}</b> ${rateTag(x.rating)}</td><td class="r">${money(x.p)}</td><td class="r">${x.r}%</td><td class="r">${x.n}</td><td>${dshort(x)}</td><td><b>${dshort(mt)}</b></td><td class="r"><b>${money(intOf(x))}</b></td><td class="r">${money(x.p+intOf(x))}</td><td>${ok?`<span class="tag">Yes</span>`:`<span class="tag r">No, too late</span>`}</td><td class="r">${bk} of ${teams.length}</td></tr>`}).join("")}</tbody></table>
       ${boardHTML(S,teams,th,fresh)}
       <div class="bar2"><span class="count">Interest = principal × rate × days/360. Who pays shows up on June 30.</span><button class="btn main" id="nx">Next →</button></div>`;
     $("#nx").onclick=next;requestAnimationFrame(zoomApp);return}
@@ -2923,7 +2948,10 @@ function classResults(teams){
       <h3 style="font-family:var(--display);font-size:26px;margin:14px 0 6px">Entry checks</h3>
       <div class="leak okk"><b>Accept a note: ${pct(p=>p.chk_acc===0)}</b>Dr Notes Receivable, Cr Sales.</div>
       <div class="leak okk"><b>Collect a note: ${pct(p=>p.chk_col===0)}</b>Dr Cash, Cr Interest Revenue, Cr Notes Receivable.</div>
-      <div class="leak okk"><b>Dishonored note: ${pct(p=>p.chk_dis===0)}</b>Dr Accounts Receivable for principal plus interest.</div></div></div>
+      <div class="leak okk"><b>Collect a note (Lakeshore): ${pct(p=>p.chk_col1===0)}</b>Dr Cash 9,120.</div>
+      <div class="leak okk"><b>Note replaces A/R: ${pct(p=>p.chk_conv===0)}</b>Dr Notes Receivable, Cr Accounts Receivable.</div>
+      <div class="leak okk"><b>Dishonored note: ${pct(p=>p.chk_dis===0)}</b>Dr Accounts Receivable for principal plus interest.</div>
+      <div class="leak okk"><b>Paying after a dishonor: ${pct(p=>p.chk_later===0)}</b>Dr Cash, Cr Accounts Receivable.</div></div></div>
     <div class="row" style="justify-content:center;margin-top:16px"><button class="btn main" id="pod">Back to standings</button> <button class="btn" id="erase">Erase game</button></div></div>`;
   $("#pod").onclick=()=>finale(teams);$("#erase").onclick=hostErase;requestAnimationFrame(zoomApp);
 }
@@ -2979,7 +3007,7 @@ function teamRender(){
   if(key===M.key)return;M.key=key;
   if(st.phase==="lobby"){app.innerHTML=`<div class="wait"><h2>You're in, ${esc(M.name)}!</h2></div>
     <div class="box"><h3>How the Note Desk works</h3><p style="margin:0">Customers who need more time to pay sign a note: a promise to pay the principal plus interest on a set date.</p>
-    <p><b>Interest = principal × annual rate × days/360.</b> To find the due date, count the days left in the first month, then add whole months.</p>
+    <p><b>Interest = principal × annual rate × days/360.</b> Amount due at maturity = principal + interest. To find a due date, count the days left in the first month, then add whole months.</p>
     <p style="margin:0">First up: the Calendar Race. Right and fast wins a head start.</p></div>`;return}
   if(st.phase==="end")return teamReport(st);
   const head=`<div class="rtag" style="text-align:center;margin-top:10px">${ROUNDNAME(S)}</div>`;
@@ -3011,20 +3039,20 @@ function teamOffers(S,st,head){
   if(st.sub==="open"&&!M.rec["lock"+b]){
     const sel=M.draft["o"+b]=M.draft["o"+b]||JSON.parse(JSON.stringify(M.rec["o"+b]||{}));
     const draw=()=>{const y=scrollY,accs=NOTES[b].filter(x=>sel[x.id]&&sel[x.id].a===true),dec=NOTES[b].filter(x=>sel[x.id]&&sel[x.id].a!=null).length,tot=sum(accs.map(x=>x.p)),over=tot>left;
-      const missing=accs.filter(x=>!sel[x.id].m||!sel[x.id].d||isNaN(num(sel[x.id].i))).length;
+      const missing=accs.filter(x=>isNaN(num(sel[x.id].i))||isNaN(num(sel[x.id].t))).length;
       app.innerHTML=`${head}<div class="tbar"><div class="mtext"><span>${b===1?"April":"May"} notes · ${dec} of ${NOTES[b].length} decided</span><span class="${over?"over":""}">${money(tot)} of ${money(left)} left to lend</span></div>
         <div class="meter ${over?"full":""}"><i style="width:${Math.min(100,tot/Math.max(1,left)*100)}%"></i></div>
-        <div class="note">Only interest collected by <b>June 30</b> counts. Wrong due date or interest cancels the deal.${b===2?` You already lent ${money(used)} in April.`:""}</div></div>
-        <div class="apps">${NOTES[b].map(x=>{const s=sel[x.id]||{},acc=s.a===true;
+        <div class="note">Only interest collected by <b>June 30</b> counts. Check each due date. Wrong interest or amount due cancels the deal.${b===2?` You already lent ${money(used)} in April.`:""}</div></div>
+        <div class="appwrap"><div class="apps">${NOTES[b].map(x=>{const s=sel[x.id]||{},acc=s.a===true;
           return `<div class="appc ${acc?"yes":s.a===false?"noo":""}"><div class="hd"><b>${esc(x.name)}</b>${rateTag(x.rating)}</div><div class="what">${esc(x.what)}</div>
-          <div class="terms"><span><small>Principal</small>${money(x.p)}</span><span><small>Rate</small>${x.r}%</span><span><small>Term</small>${x.n} days</span><span><small>Dated</small>${dshort(x)}</span></div>
+          <div class="terms"><span><small>Principal</small>${money(x.p)}</span><span><small>Rate</small>${x.r}%</span><span><small>Term</small>${x.n} days</span><span><small>Dated</small>${dshort(x)}</span><span><small>Due</small>${dshort(matOf(x))}</span></div>
           <div class="quote">${esc(x.clue)}</div>
           <div class="yn"><button class="y" data-id="${x.id}" data-v="1" aria-pressed="${acc}">Accept</button><button class="n" data-id="${x.id}" data-v="0" aria-pressed="${s.a===false}">Pass</button></div>
-          ${acc?`<div class="mathrow"><label>Due date<span class="dd"><select data-f="m" data-id="${x.id}"><option value="">Month</option>${MON.map((mn,i)=>`<option value="${i+1}" ${+s.m===i+1?"selected":""}>${mn}</option>`).join("")}</select><input data-f="d" data-id="${x.id}" inputmode="numeric" maxlength="2" placeholder="Day" value="${esc(s.d||"")}"></span></label>
-            <label>Interest<input data-f="i" data-id="${x.id}" inputmode="decimal" placeholder="$0" value="${esc(s.i||"")}"></label></div>`:""}</div>`}).join("")}</div>
-        <div class="lock"><button class="btn main" id="lk" ${dec<NOTES[b].length||over||missing?"disabled":""}>Lock in ${accs.length} note${accs.length===1?"":"s"}</button><span class="note">${over?"Over your limit. Pass on something.":dec<NOTES[b].length?"Accept or pass on every note.":missing?"Fill in the due date and interest for every note you accept.":"You can't change it after you lock in."}</span></div>`;
+          ${acc?`<div class="mathrow"><label>Interest<input data-f="i" data-id="${x.id}" inputmode="decimal" placeholder="$0" value="${esc(s.i||"")}"></label>
+            <label>Amount due at maturity<input data-f="t" data-id="${x.id}" inputmode="decimal" placeholder="$0" value="${esc(s.t||"")}"></label></div>`:""}</div>`}).join("")}</div>${ratingKey()}</div>
+        <div class="lock"><button class="btn main" id="lk" ${dec<NOTES[b].length||over||missing?"disabled":""}>Lock in ${accs.length} note${accs.length===1?"":"s"}</button><span class="note">${over?"Over your limit. Pass on something.":dec<NOTES[b].length?"Accept or pass on every note.":missing?"Fill in the interest and amount due for every note you accept.":"You can't change it after you lock in."}</span></div>`;
       app.querySelectorAll(".yn button").forEach(x=>x.onclick=()=>{const s=sel[x.dataset.id]=sel[x.dataset.id]||{};s.a=x.dataset.v==="1";draw()});
-      app.querySelectorAll("[data-f]").forEach(el=>{const h=()=>{const s=sel[el.dataset.id];s[el.dataset.f]=el.value;if(el.tagName==="SELECT")draw();else{const lb=$("#lk"),acc2=NOTES[b].filter(x=>sel[x.id]&&sel[x.id].a===true),miss=acc2.filter(x=>!sel[x.id].m||!sel[x.id].d||isNaN(num(sel[x.id].i))).length;lb.disabled=dec<NOTES[b].length||over||miss>0;lb.nextElementSibling.textContent=miss?"Fill in the due date and interest for every note you accept.":"You can't change it after you lock in."}};el.oninput=h;el.onchange=h});
+      app.querySelectorAll("[data-f]").forEach(el=>{const h=()=>{const s=sel[el.dataset.id];s[el.dataset.f]=el.value;if(el.tagName==="SELECT")draw();else{const lb=$("#lk"),acc2=NOTES[b].filter(x=>sel[x.id]&&sel[x.id].a===true),miss=acc2.filter(x=>isNaN(num(sel[x.id].i))||isNaN(num(sel[x.id].t))).length;lb.disabled=dec<NOTES[b].length||over||miss>0;lb.nextElementSibling.textContent=miss?"Fill in the interest and amount due for every note you accept.":"You can't change it after you lock in."}};el.oninput=h;el.onchange=h});
       $("#lk").onclick=async()=>{if(!confirm(`Lock in ${accs.length} note${accs.length===1?"":"s"} for ${money(tot)}?`))return;await save({["o"+b]:JSON.parse(JSON.stringify(sel)),["lock"+b]:true});M.key=null;teamRender()};
       scrollTo(0,y)};
     draw();return}
@@ -3032,8 +3060,8 @@ function teamOffers(S,st,head){
   if(st.sub==="open"){app.innerHTML=`${head}<div class="wait"><h2>Locked in</h2><p>${g.filter(x=>x.acc).length} notes. Watch the board.</p></div>`;return}
   const bk=g.filter(x=>x.ok),bad=g.filter(x=>x.acc&&!x.ok);
   app.innerHTML=`${head}<div class="verdict ${bad.length?"mid":bk.length?"ok":"neu"}"><h2>${bk.length} booked${bad.length?`, ${bad.length} cancelled`:""}</h2><p>${bk.length?`${money(sum(bk.map(x=>x.x.p)))} lent.`:""} Who pays shows up on June 30.</p></div>
-    <div class="box"><table class="t"><thead><tr><th>Note</th><th>Due</th><th class="r">Interest</th><th>Result</th></tr></thead><tbody>
-    ${g.map(y=>{const mt=matOf(y.x);return `<tr><td><b>${esc(y.x.name)}</b></td><td>${dshort(mt)}${y.acc&&!y.dOK?` <span class="note">(you said ${y.a.m?MS[y.a.m-1]:"?"} ${esc(y.a.d||"?")})</span>`:""}</td><td class="r">${money(intOf(y.x))}${y.acc&&!y.iOK?` <span class="note">(you said ${esc(y.a.i||"?")})</span>`:""}</td>
+    <div class="box"><table class="t"><thead><tr><th>Note</th><th class="r">Interest</th><th class="r">Amount due</th><th>Result</th></tr></thead><tbody>
+    ${g.map(y=>{return `<tr><td><b>${esc(y.x.name)}</b> <span class="note">due ${dshort(matOf(y.x))}</span></td><td class="r">${money(intOf(y.x))}${y.acc&&!y.iOK?` <span class="note">(you said ${esc(y.a.i||"?")})</span>`:""}</td><td class="r">${money(y.x.p+intOf(y.x))}${y.acc&&!y.tOK?` <span class="note">(you said ${esc(y.a.t||"?")})</span>`:""}</td>
       <td>${!y.acc?`<span class="tag k">Passed</span>`:y.ok?`<span class="tag">Booked</span>`:`<span class="tag r">Cancelled</span>`}${byJune30(y.x)?"":` <span class="tag y">After June 30</span>`}</td></tr>`}).join("")}</tbody></table></div>${myLine(st)}`;
 }
 function teamCheck(S,st,head){
@@ -3066,7 +3094,7 @@ function teamReport(st){
       <tr class="tot"><td>Score</td><td class="r">${money(tot)}</td></tr></tbody></table>
       <p class="note">The best possible desk collected $545 in interest: Lakeshore, Westside and Fox River in April, then Cedar Lake and Northfield in May.</p></div>
     ${sc.late.length?`<div class="leak mid"><b>Due after June 30</b>${sc.late.map(x=>esc(x.name)).join(", ")}: money tied up, no interest by the deadline.</div>`:""}
-    ${(c=>c.length?`<div class="leak"><b>Cancelled for math errors</b>${c.map(y=>`${esc(y.x.name)}: due ${dtxt(matOf(y.x))}, interest ${money(intOf(y.x))}`).join(". ")}.</div>`:"")([1,2].flatMap(b=>graded(p,b).filter(y=>y.acc&&!y.ok)))}
+    ${(c=>c.length?`<div class="leak"><b>Cancelled for math errors</b>${c.map(y=>`${esc(y.x.name)}: interest ${money(intOf(y.x))}, amount due ${money(y.x.p+intOf(y.x))}`).join(". ")}.</div>`:"")([1,2].flatMap(b=>graded(p,b).filter(y=>y.acc&&!y.ok)))}
     ${sc.dis.length?`<div class="leak"><b>Dishonored</b>${sc.dis.map(x=>esc(x.name)).join(", ")}. The high rate came with high risk.</div>`:""}</div>`;
   try{localStorage.removeItem(SKEY)}catch(e){}
 }
