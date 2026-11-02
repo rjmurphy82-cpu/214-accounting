@@ -2932,7 +2932,7 @@ function finale(teams){
     <div class="podium">${slot(order[1],1,"p2")}${slot(order[0],0,"p1")}${slot(order[2],2,"p3")}</div><div class="rest">${rows}</div>
     <div class="fbar"><button class="btn" id="cr">Class results</button><button class="btn" id="again">Replay</button><button class="btn" id="erase">Erase game</button></div></div>`;
   $("#cr").onclick=()=>{stopFireworks();classResults(teams)};$("#again").onclick=()=>{stopFireworks();finale(teams)};$("#erase").onclick=()=>{stopFireworks();hostErase()};
-  const ord5=[4,3,2,1,0].filter(i=>order[i]),at=[900,1900,3100,4400,6200];
+  const ord5=[4,3,2,1,0].filter(i=>order[i]),at=[1500,5500,10000,14500,20000];
   const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
   FIN.forEach(clearTimeout);FIN=ord5.map((i,n)=>setTimeout(()=>{const el=app.querySelector(`.finale [data-i="${i}"]`);if(!el)return;el.classList.add("in");if(i===0){fanfare();startFireworks(!reduce)}else beep(i<3?660:520,.12)},at[n+(5-ord5.length)]||at[n]));
 }
