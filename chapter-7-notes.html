@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Principal Plus Interest</title>
+<meta name="description" content="Chapter 7 review game on notes receivable for District 214 Accounting: vocabulary, maturity dates, interest, and entries for collected and dishonored notes.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F4F3F3; --paper:#FFFFFF; --ink:#111111; --muted:#5C5C5C; --dark:#111111;
+  --red:#C1102F; --red2:#D9203F; --accent:#C1102F; --line:rgba(17,17,17,.16);
+  --good:#1E7A3C; --bad:#C1102F; --soft:#F7F6F6;
+  --display:"Oswald","Arial Narrow",Impact,sans-serif;
+  --body:"Barlow",system-ui,-apple-system,"Segoe UI",sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){--bg:#121212;--paper:#1E1E1E;--ink:#F2F2F2;--muted:#A8A8A8;--dark:#2B2B2B;--accent:#FF4D63;--line:rgba(242,242,242,.16);--good:#3FB86A;--bad:#FF4D63;--soft:#262626;color-scheme:dark}
+}
+:root[data-theme="dark"]{--bg:#121212;--paper:#1E1E1E;--ink:#F2F2F2;--muted:#A8A8A8;--dark:#2B2B2B;--accent:#FF4D63;--line:rgba(242,242,242,.16);--good:#3FB86A;--bad:#FF4D63;--soft:#262626;color-scheme:dark}
+*,*::before,*::after{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:18px/1.45 var(--body);min-height:100vh}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,a:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.wrap{max-width:1240px;margin:0 auto;padding:18px 20px 40px}
+.top{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:12px;color:var(--muted);font-size:15px;font-weight:600}
+.brand a{color:inherit;text-decoration:none}
+.brand a:hover{text-decoration:underline}
+.d214{height:40px;width:auto;background:#fff;padding:3px 6px;border-radius:4px;display:block}
+.tools{margin-left:auto;display:flex;gap:8px}
+.icon{background:var(--paper);border:2px solid var(--line);border-radius:8px;padding:4px 12px;font-size:15px;font-weight:600}
+[hidden]{display:none!important}
+
+/* Setup */
+.title{font-family:var(--display);font-weight:700;font-size:clamp(40px,6.5vw,72px);line-height:.98;margin:22px 0 8px}
+.title span{color:var(--accent)}
+.lede{max-width:64ch;color:var(--muted);margin:0 0 22px}
+.modes{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:18px}
+.mode{text-align:left;background:var(--paper);border:2px solid var(--line);border-radius:12px;padding:14px 16px}
+.mode b{display:block;font-family:var(--display);font-weight:600;font-size:24px}
+.mode span{color:var(--muted);font-size:15px}
+.mode[aria-pressed="true"]{border-color:var(--red);box-shadow:inset 0 0 0 2px var(--red)}
+.panel{background:var(--paper);border:2px solid var(--line);border-radius:12px;padding:18px 20px;display:grid;gap:18px}
+.row{display:grid;grid-template-columns:200px 1fr;gap:14px;align-items:start}
+.row>label,.row>.lab{font-family:var(--display);font-weight:600;font-size:20px;padding-top:6px}
+.lab small{display:block;font-family:var(--body);font-weight:500;font-size:14px;color:var(--muted)}
+.seg{display:flex;flex-wrap:wrap;gap:8px}
+.seg button{background:var(--soft);border:2px solid var(--line);border-radius:8px;padding:6px 14px;font-weight:600;min-width:52px}
+.seg button[aria-pressed="true"]{background:var(--dark);color:#fff;border-color:var(--dark)}
+.seg button:disabled{opacity:.35;cursor:not-allowed}
+.rec{font-size:15px;color:var(--muted);margin-top:8px}
+.rec table{border-collapse:collapse;margin-top:6px}
+.rec td{padding:2px 14px 2px 0}
+.rec td:last-child{font-weight:700;color:var(--ink)}
+.rec .star{color:var(--accent);font-weight:700}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{color:#fff;border-radius:999px;padding:4px 12px;font-weight:700;font-size:15px}
+.go{justify-self:start;background:var(--red);color:#fff;border:0;border-radius:10px;font-family:var(--display);font-weight:600;font-size:26px;padding:10px 34px}
+.go:hover{background:var(--red2)}
+.note{font-size:15px;color:var(--muted)}
+
+/* Board */
+.board{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin:14px 0}
+.team{position:relative;border-radius:10px;padding:6px 10px 8px;color:#fff;background:var(--c);transition:transform .15s,opacity .2s,box-shadow .15s}
+.team .n{font-size:14px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;opacity:.9}
+.team .s{font-family:var(--display);font-weight:600;font-size:clamp(26px,3vw,38px);line-height:1}
+.team.on{transform:translateY(-3px);box-shadow:0 0 0 4px var(--paper),0 0 0 7px var(--c)}
+.team.out{opacity:.35}
+.team .adj{position:absolute;top:4px;right:4px;display:none;gap:4px}
+.editing .team .adj{display:flex}
+.adj button{background:rgba(255,255,255,.25);border:0;border-radius:6px;color:#fff;font-weight:700;padding:0 8px;font-size:15px}
+.turn{display:flex;align-items:center;gap:12px;min-height:64px;border-radius:12px;padding:8px 16px;background:var(--c,var(--dark));color:#fff;font-family:var(--display);font-weight:600;font-size:clamp(22px,2.8vw,32px)}
+.turn .msg{flex:1}
+.clock{min-width:2.4em;text-align:center;background:rgba(0,0,0,.25);border-radius:10px;padding:2px 14px;font-size:clamp(30px,4.4vw,46px);line-height:1.15;font-variant-numeric:tabular-nums}
+.clock.steal{background:#fff;color:var(--c)}
+.clock.urgent{background:#fff;color:var(--bad);animation:pulse .5s ease-in-out infinite alternate}
+.clock.paused{opacity:.5}
+@keyframes pulse{from{transform:scale(1)}to{transform:scale(1.1)}}
+.meta{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:14px 0 8px;color:var(--muted);font-weight:600;font-size:16px;flex-wrap:wrap}
+.tag{background:var(--dark);color:#fff;border-radius:6px;padding:2px 10px;font-family:var(--display);letter-spacing:.04em;font-size:17px}
+.tag.pts{background:var(--red)}
+.card{background:var(--paper);border:2px solid var(--line);border-radius:14px;padding:clamp(16px,2.4vw,28px)}
+.prompt{font-size:clamp(22px,2.6vw,32px);font-weight:600;line-height:1.3;margin:0}
+.data{margin:16px 0 0;border-collapse:collapse;font-size:clamp(18px,2vw,24px);min-width:min(520px,100%)}
+.data td{padding:5px 0;border-bottom:1px solid var(--line)}
+.data td:last-child{text-align:right;font-variant-numeric:tabular-nums;font-weight:700;padding-left:30px}
+.data tr.k td{color:var(--muted)}
+.data td:first-child{padding-right:28px}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:20px}
+.opt{display:flex;gap:14px;align-items:center;text-align:left;background:var(--soft);border:2px solid var(--line);border-radius:12px;padding:12px 16px;font-size:clamp(18px,2vw,24px);font-weight:600;min-height:72px}
+.opt:hover:not(:disabled){border-color:var(--ink)}
+.opt .k{flex:none;width:38px;height:38px;border-radius:8px;background:var(--dark);color:#fff;display:grid;place-items:center;font-family:var(--display);font-size:20px}
+.opt:disabled{cursor:default}
+.opt.right{background:var(--good);border-color:var(--good);color:#fff}
+.opt.right .k{background:rgba(0,0,0,.25)}
+.opt.wrong{background:transparent;border-color:var(--bad);color:var(--bad);text-decoration:line-through;opacity:.75}
+.opt.dim{opacity:.4}
+.opts.three .opt:last-child{grid-column:1/-1}
+.je{display:grid;grid-template-columns:1fr auto;column-gap:18px;width:100%;font-size:.92em}
+.je .cr{padding-left:1.6em}
+.je .amt{text-align:right;font-variant-numeric:tabular-nums}
+.explain{margin-top:16px;border-left:6px solid var(--good);background:var(--soft);border-radius:8px;padding:12px 16px;font-size:clamp(17px,1.8vw,21px)}
+.explain.miss{border-color:var(--bad)}
+.explain b{font-family:var(--display);font-weight:600;font-size:1.1em;display:block}
+.bar2{display:flex;gap:10px;justify-content:flex-end;margin-top:16px;flex-wrap:wrap}
+.btn{background:var(--paper);border:2px solid var(--line);border-radius:10px;padding:8px 18px;font-weight:700}
+.btn.main{background:var(--red);border-color:var(--red);color:#fff;font-family:var(--display);font-weight:600;font-size:22px;padding:8px 28px}
+.hint{color:var(--muted);font-size:14px;text-align:right;margin-top:8px}
+
+/* Round intro and end */
+.intro{text-align:center;padding:clamp(30px,6vw,70px) 20px}
+.intro .r{font-family:var(--display);color:var(--accent);font-size:24px;letter-spacing:.1em;text-transform:uppercase}
+.intro h2{font-family:var(--display);font-weight:700;font-size:clamp(48px,8vw,96px);line-height:1;margin:6px 0 10px}
+.intro p{color:var(--muted);font-size:clamp(18px,2vw,24px);max-width:46ch;margin:0 auto 10px}
+.intro .facts{display:flex;justify-content:center;gap:10px;margin:18px 0 26px;flex-wrap:wrap}
+.stand{list-style:none;padding:0;margin:20px auto;max-width:640px;display:grid;gap:10px}
+.stand li{display:flex;align-items:center;gap:14px;background:var(--c);color:#fff;border-radius:12px;padding:10px 18px;font-family:var(--display);font-size:26px}
+.stand li .p{width:2em;opacity:.8}
+.stand li .v{margin-left:auto}
+.stand li:first-child{font-size:34px;padding:16px 20px}
+.stand li.hide{visibility:hidden}
+.stand li.pop{animation:pop .5s ease-out}
+@keyframes pop{from{transform:scale(.85);opacity:0}to{transform:none;opacity:1}}
+@media (prefers-reduced-motion: reduce){.stand li.pop{animation:none}}
+.solo{display:flex;gap:16px;align-items:center;margin:14px 0;font-family:var(--display);font-weight:600;font-size:24px}
+.solo .clock{background:var(--dark);color:#fff}
+@media (max-width:760px){.modes{grid-template-columns:1fr}.row{grid-template-columns:1fr}.opts{grid-template-columns:1fr}}
+@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
+#qBox.big .prompt{font-size:clamp(30px,3.9vw,48px);line-height:1.25}
+#qBox.big .opt{font-size:clamp(20px,2.2vw,27px)}
+
+/* ---- Classroom fit: during play, text grows to fill the screen (no scrolling) ---- */
+body.playing{zoom:1!important}
+body.playing #tsz{display:none!important}
+body.playing .wrap{max-width:min(98vw,2200px);padding:calc(8px * var(--k,1)) clamp(12px,1.6vw,28px) calc(6px * var(--k,1))}
+body.playing .d214{height:calc(30px * var(--k,1))}
+body.playing .brand,body.playing .icon{font-size:calc(13px * var(--k,1))}
+body.playing .board{grid-template-columns:repeat(auto-fit,minmax(calc(104px * var(--k,1)),1fr));gap:calc(7px * var(--k,1));margin:calc(8px * var(--k,1)) 0}
+body.playing .team{padding:calc(5px * var(--k,1)) calc(10px * var(--k,1)) calc(6px * var(--k,1))}
+body.playing .team .n{font-size:calc(14px * var(--k,1))}
+body.playing .team .s{font-size:calc(36px * var(--k,1))}
+body.playing .turn{min-height:calc(54px * var(--k,1));padding:calc(5px * var(--k,1)) calc(16px * var(--k,1));font-size:calc(30px * var(--k,1))}
+body.playing .clock{font-size:calc(42px * var(--k,1))}
+body.playing .meta{margin:calc(8px * var(--k,1)) 0 calc(6px * var(--k,1));font-size:calc(16px * var(--k,1))}
+body.playing .tag{font-size:calc(17px * var(--k,1))}
+body.playing .card{padding:calc(18px * var(--k,1)) calc(22px * var(--k,1))}
+body.playing .prompt{font-size:calc(32px * var(--k,1))}
+body.playing #qBox.big .prompt{font-size:calc(42px * var(--k,1))}
+body.playing .data{font-size:calc(24px * var(--k,1));margin-top:calc(10px * var(--k,1))}
+body.playing .data td{padding:calc(3px * var(--k,1)) 0}
+body.playing .opts{gap:calc(10px * var(--k,1));margin-top:calc(14px * var(--k,1))}
+body.playing .opt{font-size:calc(24px * var(--k,1));min-height:calc(60px * var(--k,1));padding:calc(8px * var(--k,1)) calc(16px * var(--k,1));gap:calc(14px * var(--k,1))}
+body.playing #qBox.big .opt{font-size:calc(28px * var(--k,1))}
+body.playing .opt .k{width:calc(38px * var(--k,1));height:calc(38px * var(--k,1));font-size:calc(20px * var(--k,1))}
+body.playing .explain{font-size:calc(21px * var(--k,1));margin-top:calc(12px * var(--k,1));padding:calc(10px * var(--k,1)) calc(16px * var(--k,1))}
+body.playing .bar2{margin-top:calc(12px * var(--k,1))}
+body.playing .btn{font-size:calc(17px * var(--k,1));padding:calc(6px * var(--k,1)) calc(16px * var(--k,1))}
+body.playing .btn.main{font-size:calc(22px * var(--k,1))}
+body.playing .hint{font-size:calc(13px * var(--k,1));margin-top:calc(6px * var(--k,1))}
+body.playing .solo{font-size:calc(24px * var(--k,1));margin:calc(8px * var(--k,1)) 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div class="brand"><img src="logo-214.png" alt="District 214" class="d214"><a href="/">District 214 Accounting</a> | Chapter 7: Receivables</div>
+    <div class="tools">
+      <button class="icon" id="sound" aria-pressed="true">Sound on</button>
+      <button class="icon" id="home" hidden>Setup</button>
+    </div>
+  </div>
+
+  <!-- SETUP -->
+  <section id="setup">
+    <h1 class="title">Principal <span>Plus Interest.</span></h1>
+    <p class="lede">Notes receivable review for Northwest Team Supply. Learn the parts of a note, count to the due date, figure the interest, and book every entry.</p>
+    <div class="modes" role="group" aria-label="Game mode">
+      <button class="mode" data-mode="teams" aria-pressed="true"><b>Class Teams</b><span>A random team gets each question. Miss it and another team has 5 seconds to steal.</span></button>
+      <button class="mode" data-mode="practice" aria-pressed="false"><b>Practice</b><span>Solo, no clock. Every question with a full explanation.</span></button>
+      <button class="mode" data-mode="blitz" aria-pressed="false"><b>Blitz</b><span>Solo, 3 minutes. Answer as many as you can.</span></button>
+    </div>
+    <div class="panel" id="teamOpts">
+      <div class="row"><div class="lab">Number of teams</div>
+        <div><div class="seg" id="segTeams"></div><div class="chips" id="teamChips" style="margin-top:10px"></div></div></div>
+      <div class="row"><div class="lab">Team pick<small>Who answers each question</small></div>
+        <div><div class="seg" id="segPick">
+          <button data-v="random" aria-pressed="true">Random (spin)</button>
+          <button data-v="order" aria-pressed="false">In order</button></div>
+          <div class="note" style="margin-top:6px">Random still gives every team exactly one question per round, just in a shuffled order. Steals rotate evenly: the steal goes to a team that has had the fewest steal chances so far.</div></div></div>
+      <div class="row"><div class="lab">Seconds to answer<small>Steals are always 5 seconds</small></div>
+        <div><div class="seg" id="segTime">
+          <button data-v="auto" aria-pressed="true">Auto (recommended)</button>
+          <button data-v="15" aria-pressed="false">15</button>
+          <button data-v="20" aria-pressed="false">20</button>
+          <button data-v="30" aria-pressed="false">30</button>
+          <button data-v="45" aria-pressed="false">45</button>
+          <button data-v="60" aria-pressed="false">60</button>
+          <button data-v="90" aria-pressed="false">90</button>
+          <button data-v="0" aria-pressed="false">No clock</button></div>
+          <div class="rec">Recommended times by round (Auto uses these):
+            <table>
+              <tr><td>Round 1: Know the Note (vocabulary)</td><td>20 sec</td></tr>
+              <tr><td>Round 2: Count the Days (maturity dates)</td><td>45 sec</td></tr>
+              <tr><td>Round 3: Principal × Rate × Time (interest and amount due)</td><td>45 sec</td></tr>
+              <tr><td>Round 4: Book It (journal entries)</td><td>30 sec</td></tr>
+            </table>
+            <div style="margin-top:6px">Pick one number to use the same clock for every question. <span class="star">60 or 90</span> works for a class seeing notes receivable for the first time.</div>
+          </div></div></div>
+      <div class="row"><div class="lab">Game length</div>
+        <div><div class="seg" id="segLen">
+          <button data-v="4" aria-pressed="true">Full: 4 rounds</button>
+          <button data-v="2" aria-pressed="false">Quick: Rounds 2 and 3</button></div>
+          <div class="seg" id="segPer" style="margin-top:10px">
+            <button data-v="1" aria-pressed="true">1 question per team per round</button>
+            <button data-v="2" aria-pressed="false">2 per team per round</button></div>
+          <div class="note" style="margin-top:6px" id="lenNote"></div></div></div>
+      <div class="row"><div class="lab">Scoring</div>
+        <div class="note" style="padding-top:6px">Rounds 1 and 2: 100 points. Rounds 3 and 4: 200 points. A miss by the first team (wrong answer, pass, or time runs out) costs 100. Steals are worth double: a correct steal earns 200 in rounds 1 and 2 and 400 in rounds 3 and 4. A missed steal costs 200.</div></div>
+      <button class="go" id="start">Start game</button>
+    </div>
+    <div class="panel" id="soloOpts" hidden>
+      <div class="note" id="soloNote"></div>
+      <button class="go" id="startSolo">Start</button>
+    </div>
+  </section>
+
+  <!-- PLAY -->
+  <section id="play" hidden>
+    <div class="board" id="board"></div>
+    <div class="solo" id="soloBar" hidden><span id="soloScore">0 pts</span><span id="soloProg" style="color:var(--muted);font-size:20px"></span><span class="clock" id="blitzClock" hidden style="margin-left:auto">3:00</span></div>
+    <div id="introBox" class="card intro" hidden></div>
+    <div id="qBox" hidden>
+      <div class="turn" id="turn"><span class="msg" id="turnMsg"></span><span class="clock" id="clock" hidden></span></div>
+      <div class="meta"><span><span class="tag" id="qTag"></span> <span class="tag pts" id="qPts"></span></span><span id="qCount"></span></div>
+      <div class="card">
+        <p class="prompt" id="prompt"></p>
+        <table class="data" id="data" hidden></table>
+        <div class="opts" id="opts"></div>
+        <div class="explain" id="explain" hidden></div>
+        <div class="bar2">
+          <button class="btn" id="pauseBtn" hidden>Pause (P)</button>
+          <button class="btn" id="passBtn" hidden>No answer</button>
+          <button class="btn" id="editBtn" hidden>Adjust scores</button>
+          <button class="btn main" id="nextBtn" hidden>Next</button>
+        </div>
+        <div class="hint" id="hint"></div>
+      </div>
+    </div>
+    <div id="endBox" class="card intro" hidden></div>
+  </section>
+</div>
+
+<script>
+"use strict";
+/* ---------- Question bank (generated, every number checked) ---------- */
+const BANK=[{"t": "vocab", "p": "Lakeshore Rowing Club signs a note promising to pay Northwest. Who is the maker?", "x": "The maker signs the note and promises to pay. The payee receives the money.", "a": 0, "o": ["Lakeshore Rowing Club, the one promising to pay", "Northwest, the one being paid", "The bank", "Whoever wrote the note"]}, {"t": "vocab", "p": "On that same note, who is the payee?", "x": "The payee is the one who will be paid. On Northwest's books it's a Note Receivable.", "a": 0, "o": ["Northwest, the one being paid", "Lakeshore Rowing Club, the one promising to pay", "The bank", "The IRS"]}, {"t": "vocab", "p": "What is the principal of a note?", "x": "Principal is the face amount. Interest is computed on it.", "a": 0, "o": ["The amount owed, not counting interest", "The interest rate", "The amount due at maturity", "The number of days"]}, {"t": "vocab", "p": "What is the maturity date?", "x": "Count the days of the note forward from the date it was signed.", "a": 0, "o": ["The day the note is due", "The day the note is signed", "December 31", "The day interest is recorded"]}, {"t": "vocab", "p": "What is the maturity value (amount due)?", "x": "At maturity the maker pays back the principal plus the interest earned.", "a": 0, "o": ["Principal plus interest", "Principal only", "Interest only", "Principal minus interest"]}, {"t": "vocab", "p": "What does it mean when a note is dishonored?", "x": "A dishonored note isn't paid when due. The maker still owes the money.", "a": 0, "o": ["The maker doesn't pay it at maturity", "The note is paid early", "The note is sold to a bank", "The interest rate changes"]}, {"t": "vocab", "p": "How is a note receivable different from an account receivable?", "x": "Notes are formal written promises that usually charge interest. Accounts receivable usually don't.", "a": 0, "o": ["It's a written promise to pay, usually with interest", "It never has a due date", "It's a liability", "It's only used for cash sales"]}, {"t": "vocab", "p": "When figuring interest on a 60-day note, what is the time part of principal × rate × time?", "x": "Rates are annual, so a 60-day note is 60/360 of a year.", "a": 0, "o": ["60/360", "60/12", "60/100", "1"]}, {"t": "vocab", "p": "Why isn't interest recorded on the day a note is accepted?", "x": "Interest is earned over the life of the note, so it's recorded when it's earned.", "a": 0, "o": ["It hasn't been earned yet", "Interest is never recorded", "It's recorded as a liability", "The customer pays it up front"]}, {"t": "vocab", "p": "Quick Strike Bowling dishonors its note. Why move it to Accounts Receivable instead of writing it off right away?", "x": "Dishonored doesn't mean gone. The full amount owed, interest included, moves back to A/R.", "a": 0, "o": ["Quick Strike still owes the money", "Notes can't be written off", "To earn more interest", "To record a sale"]}, {"t": "vocab", "p": "Where does a 90-day note receivable go on the balance sheet?", "x": "It will be collected within a year, so it's a current asset.", "a": 0, "o": ["Current assets", "Long-term liabilities", "Owner's equity", "The income statement"]}, {"t": "vocab", "p": "Why would Northwest accept a note instead of leaving it on account?", "x": "A customer who needs more time signs a note. Northwest earns interest and has a stronger claim.", "a": 0, "o": ["It earns interest and gives a written, legal promise", "It makes the sale bigger", "It removes the need to collect", "It lowers Bad Debts Expense to zero"]}, {"t": "date", "p": "Lakeshore Rowing Club signs a 60-day note on April 6. When is it due?", "x": "Count the days: April: 30 − 6 = 24; May: 31; June: 5 (due). Total 60. Due June 5.", "a": 0, "o": ["June 5", "June 6", "June 4", "May 30"]}, {"t": "date", "p": "Summit Ridge Ski Shop signs a 120-day note on April 10. When is it due?", "x": "Count the days: April: 30 − 10 = 20; May: 31; June: 30; July: 31; August: 8 (due). Total 120. Due August 8.", "a": 0, "o": ["August 8", "August 9", "August 7", "July 29"]}, {"t": "date", "p": "Cedar Lake Golf Course signs a 40-day note on May 12. When is it due?", "x": "Count the days: May: 31 − 12 = 19; June: 21 (due). Total 40. Due June 21.", "a": 0, "o": ["June 21", "June 22", "June 20", "June 9"]}, {"t": "date", "p": "Quick Strike Bowling signs a 45-day note on April 15. When is it due?", "x": "Count the days: April: 30 − 15 = 15; May: 30 (due). Total 45. Due May 30.", "a": 0, "o": ["May 30", "May 31", "May 29", "May 15"]}, {"t": "date", "p": "Ironworks Boxing Club signs a 30-day note on May 18. When is it due?", "x": "Count the days: May: 31 − 18 = 13; June: 17 (due). Total 30. Due June 17.", "a": 0, "o": ["June 17", "June 18", "June 16", "May 30"]}, {"t": "date", "p": "Oak Park Tennis Center signs a 75-day note on April 20. When is it due?", "x": "Count the days: April: 30 − 20 = 10; May: 31; June: 30; July: 4 (due). Total 75. Due July 4.", "a": 0, "o": ["July 4", "July 5", "July 3", "June 14"]}, {"t": "date", "p": "Fox River Climbing Gym signs a 90-day note on April 1. When is it due?", "x": "Count the days: April: 30 − 1 = 29; May: 31; June: 30 (due). Total 90. Due June 30.", "a": 0, "o": ["June 30", "July 1", "June 29", "July 2"]}, {"t": "date", "p": "Prairie Paddle Club signs a 45-day note on May 20. When is it due?", "x": "Count the days: May: 31 − 20 = 11; June: 30; July: 4 (due). Total 45. Due July 4.", "a": 0, "o": ["July 4", "July 5", "July 3", "June 14"]}, {"t": "date", "p": "Northfield Soccer Club signs a 36-day note on May 25. When is it due?", "x": "Count the days: May: 31 − 25 = 6; June: 30 (due). Total 36. Due June 30.", "a": 0, "o": ["June 30", "July 1", "June 29", "June 5"]}, {"t": "date", "p": "Summit Gymnastics Academy signs a 60-day note on March 12. When is it due?", "x": "Count the days: March: 31 − 12 = 19; April: 30; May: 11 (due). Total 60. Due May 11.", "a": 0, "o": ["May 11", "May 12", "May 10", "April 29"]}, {"t": "date", "p": "Lakeview Township Recreation signs a 90-day note on June 10. When is it due?", "x": "Count the days: June: 30 − 10 = 20; July: 31; August: 31; September: 8 (due). Total 90. Due September 8.", "a": 0, "o": ["September 8", "September 9", "September 7", "August 29"]}, {"t": "date", "p": "Willow Creek Golf Club signs a 120-day note on August 3. When is it due?", "x": "Count the days: August: 31 − 3 = 28; September: 30; October: 31; November: 30; December: 1 (due). Total 120. Due December 1.", "a": 0, "o": ["December 1", "December 2", "November 30", "November 28"]}, {"t": "interest", "p": "Lakeshore Rowing Club: $9,000, 8%, 60-day note. How much interest will Northwest earn?", "x": "$9,000 × 8% × 60/360 = $120. $720 would be a full year of interest.", "a": 0, "o": [120, 720, 118.36, 240]}, {"t": "interest", "p": "Summit Ridge Ski Shop: $12,000, 9%, 120-day note. What is the total amount due at maturity?", "x": "Interest: $12,000 × 9% × 120/360 = $360. Amount due: $12,000 + $360 = $12,360.", "a": 0, "o": [12360, 13080, 360, 12000]}, {"t": "interest", "p": "Quick Strike Bowling: $6,000, 12%, 45-day note. How much interest will Northwest earn?", "x": "$6,000 × 12% × 45/360 = $90. $720 would be a full year of interest.", "a": 0, "o": [90, 720, 88.77, 180]}, {"t": "interest", "p": "Oak Park Tennis Center: $10,000, 6%, 75-day note. What is the total amount due at maturity?", "x": "Interest: $10,000 × 6% × 75/360 = $125. Amount due: $10,000 + $125 = $10,125.", "a": 0, "o": [10125, 10600, 125, 10000]}, {"t": "interest", "p": "Fox River Climbing Gym: $8,000, 9%, 90-day note. How much interest will Northwest earn?", "x": "$8,000 × 9% × 90/360 = $180. $720 would be a full year of interest.", "a": 0, "o": [180, 720, 177.53, 360]}, {"t": "interest", "p": "Cedar Lake Golf Course: $8,000, 9%, 40-day note. What is the total amount due at maturity?", "x": "Interest: $8,000 × 9% × 40/360 = $80. Amount due: $8,000 + $80 = $8,080.", "a": 0, "o": [8080, 8720, 80, 8000]}, {"t": "interest", "p": "Ironworks Boxing Club: $7,200, 12%, 30-day note. How much interest will Northwest earn?", "x": "$7,200 × 12% × 30/360 = $72. $864 would be a full year of interest.", "a": 0, "o": [72, 864, 71.01, 144]}, {"t": "interest", "p": "Riverside Rec Center: $4,000, 9%, 30-day note. What is the total amount due at maturity?", "x": "Interest: $4,000 × 9% × 30/360 = $30. Amount due: $4,000 + $30 = $4,030.", "a": 0, "o": [4030, 4360, 30, 4000]}, {"t": "interest", "p": "Northfield Soccer Club: $9,000, 10%, 36-day note. How much interest will Northwest earn?", "x": "$9,000 × 10% × 36/360 = $90. $900 would be a full year of interest.", "a": 0, "o": [90, 900, 88.77, 180]}, {"t": "interest", "p": "Prairie Paddle Club: $6,000, 8%, 45-day note. What is the total amount due at maturity?", "x": "Interest: $6,000 × 8% × 45/360 = $60. Amount due: $6,000 + $60 = $6,060.", "a": 0, "o": [6060, 6480, 60, 6000]}, {"t": "interest", "p": "Westside Youth Baseball: $5,000, 9%, 60-day note. How much interest will Northwest earn?", "x": "$5,000 × 9% × 60/360 = $75. $450 would be a full year of interest.", "a": 0, "o": [75, 450, 73.97, 150]}, {"t": "interest", "p": "Willow Creek Golf Club: $15,000, 6%, 120-day note. What is the total amount due at maturity?", "x": "Interest: $15,000 × 6% × 120/360 = $300. Amount due: $15,000 + $300 = $15,300.", "a": 0, "o": [15300, 15900, 300, 15000]}, {"t": "nentry", "p": "April 6: Northwest sells $9,000 of rowing gear to Lakeshore Rowing Club and accepts its 60-day, 8% note.", "x": "The note takes the place of cash for now. No interest yet: it hasn't been earned.", "a": 0, "o": [{"je": [["Notes Receivable", 9000, "d"], ["Sales", 9000, "c"]]}, {"je": [["Cash", 9000, "d"], ["Sales", 9000, "c"]]}, {"je": [["Notes Receivable", 9120, "d"], ["Sales", 9120, "c"]]}, {"je": [["Sales", 9000, "d"], ["Notes Receivable", 9000, "c"]]}]}, {"t": "nentry", "p": "Cedar Lake Golf Course already owes $8,000 on account. It signs a 40-day, 9% note to get more time.", "x": "The sale was recorded last month. The note just replaces the account receivable.", "a": 0, "o": [{"je": [["Notes Receivable", 8000, "d"], ["Accounts Receivable", 8000, "c"]]}, {"je": [["Notes Receivable", 8000, "d"], ["Sales", 8000, "c"]]}, {"je": [["Notes Receivable", 8080, "d"], ["Accounts Receivable", 8080, "c"]]}, {"je": [["Accounts Receivable", 8000, "d"], ["Notes Receivable", 8000, "c"]]}]}, {"t": "nentry", "p": "June 5: Lakeshore Rowing Club pays its $9,000, 60-day, 8% note in full.", "x": "Interest: $9,000 × 8% × 60/360 = $120. Cash in = $9,120. The note comes off, and the interest is revenue.", "a": 0, "o": [{"je": [["Cash", 9120, "d"], ["Interest Revenue", 120, "c"], ["Notes Receivable", 9000, "c"]]}, {"je": [["Cash", 9000, "d"], ["Notes Receivable", 9000, "c"]]}, {"je": [["Cash", 9120, "d"], ["Notes Receivable", 9120, "c"]]}, {"je": [["Cash", 9720, "d"], ["Interest Revenue", 720, "c"], ["Notes Receivable", 9000, "c"]]}]}, {"t": "nentry", "p": "June 30: Fox River Climbing Gym pays its $8,000, 90-day, 9% note in full.", "x": "Interest: $8,000 × 9% × 90/360 = $180. Cash in = $8,180. The note comes off, and the interest is revenue.", "a": 0, "o": [{"je": [["Cash", 8180, "d"], ["Interest Revenue", 180, "c"], ["Notes Receivable", 8000, "c"]]}, {"je": [["Cash", 8000, "d"], ["Notes Receivable", 8000, "c"]]}, {"je": [["Cash", 8180, "d"], ["Notes Receivable", 8180, "c"]]}, {"je": [["Cash", 8720, "d"], ["Interest Revenue", 720, "c"], ["Notes Receivable", 8000, "c"]]}]}, {"t": "nentry", "p": "August 8: Summit Ridge Ski Shop pays its $12,000, 120-day, 9% note in full.", "x": "Interest: $12,000 × 9% × 120/360 = $360. Cash in = $12,360. The note comes off, and the interest is revenue.", "a": 0, "o": [{"je": [["Cash", 12360, "d"], ["Interest Revenue", 360, "c"], ["Notes Receivable", 12000, "c"]]}, {"je": [["Cash", 12000, "d"], ["Notes Receivable", 12000, "c"]]}, {"je": [["Cash", 12360, "d"], ["Notes Receivable", 12360, "c"]]}, {"je": [["Cash", 13080, "d"], ["Interest Revenue", 1080, "c"], ["Notes Receivable", 12000, "c"]]}]}, {"t": "nentry", "p": "July 4: Oak Park Tennis Center pays its $10,000, 75-day, 6% note in full.", "x": "Interest: $10,000 × 6% × 75/360 = $125. Cash in = $10,125. The note comes off, and the interest is revenue.", "a": 0, "o": [{"je": [["Cash", 10125, "d"], ["Interest Revenue", 125, "c"], ["Notes Receivable", 10000, "c"]]}, {"je": [["Cash", 10000, "d"], ["Notes Receivable", 10000, "c"]]}, {"je": [["Cash", 10125, "d"], ["Notes Receivable", 10125, "c"]]}, {"je": [["Cash", 10600, "d"], ["Interest Revenue", 600, "c"], ["Notes Receivable", 10000, "c"]]}]}, {"t": "nentry", "p": "June 27: Riverside Rec Center pays its $4,000, 30-day, 9% note in full.", "x": "Interest: $4,000 × 9% × 30/360 = $30. Cash in = $4,030. The note comes off, and the interest is revenue.", "a": 0, "o": [{"je": [["Cash", 4030, "d"], ["Interest Revenue", 30, "c"], ["Notes Receivable", 4000, "c"]]}, {"je": [["Cash", 4000, "d"], ["Notes Receivable", 4000, "c"]]}, {"je": [["Cash", 4030, "d"], ["Notes Receivable", 4030, "c"]]}, {"je": [["Cash", 4360, "d"], ["Interest Revenue", 360, "c"], ["Notes Receivable", 4000, "c"]]}]}, {"t": "nentry", "p": "May 30: Quick Strike Bowling can't pay its $6,000, 45-day, 12% note or the interest.", "x": "Dishonored, but still owed. Interest earned: $90. Move the full $6,090 to Accounts Receivable.", "a": 0, "o": [{"je": [["Accounts Receivable", 6090, "d"], ["Interest Revenue", 90, "c"], ["Notes Receivable", 6000, "c"]]}, {"je": [["Bad Debts Expense", 6000, "d"], ["Notes Receivable", 6000, "c"]]}, {"je": [["Accounts Receivable", 6000, "d"], ["Notes Receivable", 6000, "c"]]}, {"je": [["Cash", 6090, "d"], ["Interest Revenue", 90, "c"], ["Notes Receivable", 6000, "c"]]}]}, {"t": "nentry", "p": "June 17: Ironworks Boxing Club can't pay its $7,200, 30-day, 12% note or the interest.", "x": "Dishonored, but still owed. Interest earned: $72. Move the full $7,272 to Accounts Receivable.", "a": 0, "o": [{"je": [["Accounts Receivable", 7272, "d"], ["Interest Revenue", 72, "c"], ["Notes Receivable", 7200, "c"]]}, {"je": [["Bad Debts Expense", 7200, "d"], ["Notes Receivable", 7200, "c"]]}, {"je": [["Accounts Receivable", 7200, "d"], ["Notes Receivable", 7200, "c"]]}, {"je": [["Cash", 7272, "d"], ["Interest Revenue", 72, "c"], ["Notes Receivable", 7200, "c"]]}]}, {"t": "nentry", "p": "In August, Quick Strike Bowling finally pays the $6,090 it owes from its dishonored note.", "x": "The $6,090 was moved to A/R when the note was dishonored, and the interest was already recorded. The payment just clears A/R.", "a": 0, "o": [{"je": [["Cash", 6090, "d"], ["Accounts Receivable", 6090, "c"]]}, {"je": [["Cash", 6090, "d"], ["Notes Receivable", 6090, "c"]]}, {"je": [["Cash", 6090, "d"], ["Interest Revenue", 90, "c"], ["Notes Receivable", 6000, "c"]]}, {"je": [["Cash", 6090, "d"], ["Interest Revenue", 6090, "c"]]}]}, {"t": "nentry", "p": "Northwest lends $5,000 cash to a new team supplier and accepts a 90-day, 8% note.", "x": "Cash goes out and a note receivable comes in. Interest comes later, when earned.", "a": 0, "o": [{"je": [["Notes Receivable", 5000, "d"], ["Cash", 5000, "c"]]}, {"je": [["Notes Receivable", 5000, "d"], ["Sales", 5000, "c"]]}, {"je": [["Cash", 5000, "d"], ["Notes Receivable", 5000, "c"]]}, {"je": [["Notes Receivable", 5100, "d"], ["Cash", 5100, "c"]]}]}];
+const ROUNDS={"vocab": {"n": 1, "name": "Know the Note", "pts": 100, "secs": 20, "desc": "Maker, payee, principal, maturity and dishonored notes.", "tag": "Know the Note"}, "date": {"n": 2, "name": "Count the Days", "pts": 100, "secs": 45, "desc": "Find the maturity date: days left in the first month, then whole months. All dates are in 2027.", "tag": "Count the Days"}, "interest": {"n": 3, "name": "Principal × Rate × Time", "pts": 200, "secs": 45, "desc": "Interest and amount due, using a 360-day year. Calculators out.", "tag": "Interest"}, "nentry": {"n": 4, "name": "Book It", "pts": 200, "secs": 30, "desc": "Accept the note, collect it, or record it as dishonored.", "tag": "Book It"}};
+const FULL=["vocab", "date", "interest", "nentry"],QUICK=["date", "interest"];
+const TEAMS=[["Team 1","#C1102F"],["Team 2","#1F5FAD"],["Team 3","#23763A"],["Team 4","#9A6B00"],["Team 5","#6A3FA0"],["Team 6","#00737D"],["Team 7","#C2531A"],["Team 8","#46505C"],["Team 9","#8A3B5C"]];
+const STEAL=5,MISS=100,STEAL_MISS=200,BLITZ=180;
+const stealPts=t=>ROUNDS[t].pts*2;
+
+/* ---------- Helpers ---------- */
+const $=id=>document.getElementById(id);
+const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
+const money=n=>"$"+(Number.isInteger(n)?n.toLocaleString("en-US"):n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}));
+const shuffle=a=>{for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const count=t=>BANK.filter(q=>q.t===t).length;
+
+let soundOn=true,actx=null;
+function beep(f,d,type="sine",v=.08){if(!soundOn)return;try{actx=actx||new (window.AudioContext||window.webkitAudioContext)();const o=actx.createOscillator(),g=actx.createGain();o.type=type;o.frequency.value=f;g.gain.value=v;o.connect(g);g.connect(actx.destination);const t=actx.currentTime;g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(.0001,t+d);o.start(t);o.stop(t+d)}catch(e){}}
+const sGood=()=>{beep(660,.12);setTimeout(()=>beep(990,.18),110)};
+const sBad=()=>beep(180,.35,"square",.05);
+const sTick=()=>beep(880,.06,"sine",.05);
+const sTick2=()=>beep(520,.05,"sine",.04);
+
+// Build a playable copy of a question with options in display order
+function inst(q){
+  const c={...q};
+  if(q.f){c.opts=q.f.map((o,i)=>({v:o,ok:i===q.a}));}
+  else{c.opts=shuffle(q.o.map((o,i)=>({v:o,ok:i===q.a})));}
+  return c;
+}
+function optHTML(v,raw){
+  if(v&&v.je)return `<span class="je">${v.je.map(([a,n,sd])=>`<span class="${sd==="c"?"cr":""}">${esc(a)}</span><span class="amt">${money(n)}</span>`).join("")}</span>`;
+  if(typeof v==="number")return money(v);
+  return esc(v);
+}
+function optText(v){if(v&&v.je)return v.je.map(([a,n,sd])=>`${sd==="c"?"Cr":"Dr"} ${a} ${money(n)}`).join(", ");if(typeof v==="number")return money(v);return v}
+
+/* ---------- Setup ---------- */
+const cfg={mode:"teams",n:6,pick:"random",time:"auto",len:4,per:1};
+function segInit(id,key,parse){
+  $(id).addEventListener("click",e=>{const b=e.target.closest("button");if(!b||b.disabled)return;cfg[key]=parse(b.dataset.v);[...$(id).children].forEach(x=>x.setAttribute("aria-pressed",x===b));refreshSetup()});
+}
+(function(){
+  const s=$("segTeams");for(let i=2;i<=9;i++){const b=document.createElement("button");b.dataset.v=i;b.textContent=i;b.setAttribute("aria-pressed",i===cfg.n);s.appendChild(b)}
+  segInit("segTeams","n",Number);segInit("segPick","pick",String);segInit("segTime","time",v=>v==="auto"?"auto":Number(v));
+  segInit("segLen","len",Number);segInit("segPer","per",Number);
+  document.querySelectorAll(".mode").forEach(b=>b.addEventListener("click",()=>{cfg.mode=b.dataset.mode;document.querySelectorAll(".mode").forEach(x=>x.setAttribute("aria-pressed",x===b));refreshSetup()}));
+  refreshSetup();
+})();
+function roundTypes(){return cfg.len===4?FULL:QUICK}
+function maxPer(){const lim=Math.min(...roundTypes().map(count));return Math.floor(lim/cfg.n)}
+function refreshSetup(){
+  const team=cfg.mode==="teams";$("teamOpts").hidden=!team;$("soloOpts").hidden=team;
+  $("teamChips").innerHTML=TEAMS.slice(0,cfg.n).map(([n,c])=>`<span class="chip" style="background:${c}">${n}</span>`).join("");
+  const two=$("segPer").children[1];two.disabled=maxPer()<2;
+  if(two.disabled&&cfg.per===2){cfg.per=1;[...$("segPer").children].forEach((x,i)=>x.setAttribute("aria-pressed",i===0))}
+  const qs=cfg.n*cfg.per*roundTypes().length;
+  $("lenNote").textContent=`${qs} questions total (${cfg.per*roundTypes().length} per team).`+(two.disabled?" 2 per team is available with 4 or fewer teams.":"");
+  $("soloNote").textContent=cfg.mode==="practice"?`All ${BANK.length} questions, mixed from every round. No clock. Read the explanation after each one.`:`3 minutes on the clock. Rounds 1 and 2 questions are worth 100, Rounds 3 and 4 are worth 200. Wrong answers cost nothing but time.`;
+}
+$("sound").addEventListener("click",()=>{soundOn=!soundOn;$("sound").setAttribute("aria-pressed",soundOn);$("sound").textContent=soundOn?"Sound on":"Sound off"});
+
+/* ---------- Clock ---------- */
+const CK={id:null,end:0,left:0,paused:false,el:null,cb:null,last:-1};
+function stopClock(){clearInterval(CK.id);CK.id=null;CK.paused=false;if(CK.el){CK.el.classList.remove("paused")}}
+function startClock(secs,el,cls,cb){
+  stopClock();CK.el=el;CK.cb=cb;CK.end=performance.now()+secs*1000;CK.last=-1;
+  el.hidden=false;el.className="clock"+(cls?" "+cls:"");
+  const draw=()=>{const left=Math.max(0,(CK.end-performance.now())/1000);CK.left=left;const c=Math.ceil(left);
+    el.textContent=c;el.classList.toggle("urgent",left<=3&&left>0);
+    if(c!==CK.last){if(c<=3&&c>0)sTick();CK.last=c}return left};
+  draw();
+  CK.id=setInterval(()=>{if(CK.paused)return;if(draw()<=0){stopClock();cb()}},100);
+}
+function togglePause(){
+  if(!CK.id)return;CK.paused=!CK.paused;
+  if(CK.paused){CK.left=Math.max(0,(CK.end-performance.now())/1000);CK.el.classList.add("paused");$("pauseBtn").textContent="Resume (P)"}
+  else{CK.end=performance.now()+CK.left*1000;CK.el.classList.remove("paused");$("pauseBtn").textContent="Pause (P)"}
+}
+
+
+/* ---------- Classroom fit ---------- */
+const ROOT=document.documentElement;
+function setPlaying(on){document.body.classList.toggle("playing",on);if(!on)ROOT.style.removeProperty("--k")}
+function fits(){return ROOT.scrollHeight<=window.innerHeight+1&&ROOT.scrollWidth<=window.innerWidth+1}
+function fitPlay(){
+  if(!document.body.classList.contains("playing")||$("qBox").hidden||!S.q)return;
+  const e=$("explain"),nb=$("nextBtn"),eH=e.hidden,eHTML=e.innerHTML,eCls=e.className,nbH=nb.hidden;
+  const ans=S.q.opts.find(o=>o.ok);
+  e.hidden=false;e.className="explain miss";e.innerHTML=`<b>Answer: ${esc(optText(ans.v))}</b>${esc(S.q.x)}`;nb.hidden=false;
+  let lo=.55,hi=2.6;
+  for(let i=0;i<12;i++){const m=(lo+hi)/2;ROOT.style.setProperty("--k",m.toFixed(3));if(fits())lo=m;else hi=m}
+  ROOT.style.setProperty("--k",lo.toFixed(3));
+  e.hidden=eH;e.innerHTML=eHTML;e.className=eCls;nb.hidden=nbH;
+}
+let fitT=null;window.addEventListener("resize",()=>{clearTimeout(fitT);fitT=setTimeout(fitPlay,120)});
+/* ---------- Game state ---------- */
+let S={};
+function show(which){["introBox","qBox","endBox"].forEach(k=>$(k).hidden=k!==which)}
+$("start").addEventListener("click",startTeams);
+$("startSolo").addEventListener("click",startSolo);
+$("home").addEventListener("click",()=>{if(S.mode&&S.phase!=="end"&&!confirm("Leave this game and go back to setup?"))return;toSetup()});
+function toSetup(){setPlaying(false);stopClock();clearInterval(S.blitzId);S.gen=(S.gen||0)+1;S={};$("play").hidden=true;$("setup").hidden=false;$("home").hidden=true;window.scrollTo(0,0)}
+
+function startTeams(){
+  const types=roundTypes();
+  S={mode:"teams",gen:0,teams:TEAMS.slice(0,cfg.n).map(([name,color])=>({name,color,score:0})),rounds:[],ri:0,qi:0,steals:Array(cfg.n).fill(0)};
+  for(const t of types){
+    const n=cfg.n*cfg.per;
+    const qs=shuffle(BANK.filter(q=>q.t===t)).slice(0,n).map(inst);
+    let order=[];for(let k=0;k<cfg.per;k++){const base=[...Array(cfg.n).keys()];order.push(...(cfg.pick==="random"?shuffle(base):base))}
+    S.rounds.push({type:t,qs,order});
+  }
+  setPlaying(true);
+  $("setup").hidden=true;$("play").hidden=false;$("home").hidden=false;$("board").hidden=false;$("soloBar").hidden=true;
+  $("editBtn").hidden=false;
+  renderBoard();roundIntro();
+}
+function renderBoard(hi){
+  const b=$("board");
+  b.innerHTML=S.teams.map((t,i)=>{let c="team";
+    const lit=hi!==undefined?hi===i:(S.phase==="steal"?S.stealer===i:(S.phase==="turn"&&S.turn===i));
+    if(lit)c+=" on";
+    if(S.phase==="steal"&&i===S.turn)c+=" out";
+    return `<div class="${c}" style="--c:${t.color}"><div class="n">${t.name}</div><div class="s">${t.score}</div><div class="adj"><button data-i="${i}" data-d="-100" aria-label="Minus 100 for ${t.name}">−</button><button data-i="${i}" data-d="100" aria-label="Plus 100 for ${t.name}">+</button></div></div>`}).join("");
+}
+$("board").addEventListener("click",e=>{const b=e.target.closest("button[data-d]");if(!b)return;S.teams[+b.dataset.i].score+=+b.dataset.d;renderBoard()});
+$("editBtn").addEventListener("click",()=>{const on=$("board").classList.toggle("editing");$("editBtn").textContent=on?"Done adjusting":"Adjust scores"});
+
+function secsFor(type){return cfg.time==="auto"?ROUNDS[type].secs:cfg.time}
+function roundIntro(){
+  stopClock();S.phase="intro";renderBoard();
+  const r=S.rounds[S.ri],R=ROUNDS[r.type],secs=secsFor(r.type);
+  $("introBox").innerHTML=`<div class="r">Round ${S.ri+1} of ${S.rounds.length}</div><h2>${R.name}</h2><p>${R.desc}</p>
+   <div class="facts"><span class="tag pts">${R.pts} points</span><span class="tag">${secs?secs+" seconds":"No clock"}</span><span class="tag">Miss −100</span><span class="tag">Steal +${R.pts*2} / −200</span><span class="tag">${r.qs.length} questions</span></div>
+   <button class="btn main" id="goRound">Start round</button><div class="hint" style="text-align:center">Space to start</div>`;
+  show("introBox");$("goRound").focus({preventScroll:true});
+  $("goRound").addEventListener("click",()=>{S.qi=0;nextQuestion()});
+}
+function nextQuestion(){
+  const r=S.rounds[S.ri];
+  if(S.qi>=r.qs.length){S.ri++;if(S.ri>=S.rounds.length)return endTeams();return roundIntro()}
+  S.q=r.qs[S.qi];S.turn=r.order[S.qi];S.stealer=-1;S.wrong=-1;
+  renderQuestion();
+  const t=S.teams[S.turn],gen=++S.gen;
+  if(cfg.pick==="random"){
+    S.phase="picking";lockOpts(true);setTurn("Picking a team...",t.color);
+    spin([...Array(S.teams.length).keys()],S.turn,gen,()=>beginTurn());
+  }else beginTurn();
+}
+function beginTurn(){
+  const t=S.teams[S.turn];S.phase="turn";renderBoard();lockOpts(false);sTick2();
+  setTurn(`${t.name}, your question`,t.color);
+  const secs=secsFor(S.q.t);
+  $("passBtn").hidden=false;$("pauseBtn").hidden=!secs;$("pauseBtn").textContent="Pause (P)";
+  if(secs)startClock(secs,$("clock"),"",()=>{if(S.phase==="turn"){sBad();firstMiss(-1,true)}});
+  else $("clock").hidden=true;
+}
+function setTurn(msg,color){$("turn").style.setProperty("--c",color);$("turnMsg").textContent=msg}
+function spin(cands,pick,gen,done){
+  const seq=[];const n=reduce||cands.length<2?0:16;
+  for(let k=0;k<n;k++){let r;do{r=cands[Math.floor(Math.random()*cands.length)]}while(seq.length&&r===seq[seq.length-1]);seq.push(r)}
+  if(seq.length&&seq[seq.length-1]===pick)seq.pop();seq.push(pick);let k=0;
+  (function step(){
+    if(gen!==S.gen)return;
+    renderBoard(seq[k]);sTick2();
+    if(k===seq.length-1){setTimeout(()=>{if(gen===S.gen)done()},reduce?0:420);return}
+    const d=55+Math.pow(k/seq.length,2.2)*280;k++;setTimeout(step,d);
+  })();
+}
+function renderQuestion(){
+  const q=S.q,R=ROUNDS[q.t];
+  show("qBox");
+  $("qTag").textContent=S.mode==="teams"?`Round ${S.ri+1}: ${R.tag}`:R.tag;
+  $("qPts").textContent=R.pts+" pts";
+  $("qCount").textContent=S.mode==="teams"?`Question ${S.qi+1} of ${S.rounds[S.ri].qs.length}`:"";
+  $("prompt").textContent=q.p;
+  $("qBox").classList.toggle("big",!!q.f);
+  const d=$("data");
+  if(q.d){d.hidden=false;d.innerHTML=q.d.map(([l,v])=>`<tr><td>${esc(l)}</td><td>${typeof v==="number"?money(v):esc(v)}</td></tr>`).join("")}else{d.hidden=true;d.innerHTML=""}
+  $("opts").classList.toggle("three",q.opts.length===3);$("opts").innerHTML=q.opts.map((o,i)=>`<button class="opt" data-i="${i}"><span class="k">${"ABCD"[i]}</span><span>${optHTML(o.v)}</span></button>`).join("");
+  $("explain").hidden=true;$("nextBtn").hidden=true;$("passBtn").hidden=true;$("pauseBtn").hidden=true;$("clock").hidden=true;
+  $("turn").hidden=S.mode!=="teams";
+  $("hint").textContent=S.mode==="teams"?"Click the answer the team gives (or press A to D). P pauses the clock.":"Press A to D to answer.";
+  fitPlay();
+}
+function optBtns(){return [...$("opts").querySelectorAll(".opt")]}
+function lockOpts(l){optBtns().forEach(b=>{if(!b.classList.contains("wrong"))b.disabled=l})}
+$("opts").addEventListener("click",e=>{const b=e.target.closest(".opt");if(!b||b.disabled)return;choose(+b.dataset.i)});
+function choose(i){
+  if(S.mode==="teams"){
+    if(S.phase==="turn"){
+      stopClock();
+      if(S.q.opts[i].ok){award(S.turn,ROUNDS[S.q.t].pts);finishQ(i,true,`${S.teams[S.turn].name} +${ROUNDS[S.q.t].pts}`)}
+      else{sBad();firstMiss(i,false)}
+    }else if(S.phase==="steal"){
+      stopClock();const t=S.teams[S.stealer];
+      if(S.q.opts[i].ok){award(S.stealer,stealPts(S.q.t));finishQ(i,true,`Stolen! ${t.name} +${stealPts(S.q.t)}`)}
+      else{sBad();award(S.stealer,-STEAL_MISS);optBtns()[i].classList.add("wrong");finishQ(-1,false,`No steal. ${t.name} −${STEAL_MISS}`)}
+    }
+  }else soloChoose(i);
+}
+function award(i,pts){S.teams[i].score+=pts;if(pts>0)sGood();renderBoard()}
+function firstMiss(i,timeout){
+  $("passBtn").hidden=true;$("pauseBtn").hidden=true;
+  if(i>=0){optBtns()[i].classList.add("wrong");optBtns()[i].disabled=true;S.wrong=i}
+  lockOpts(true);
+  S.teams[S.turn].score-=MISS;
+  S.phase="rolling";renderBoard();
+  const others=[...Array(S.teams.length).keys()].filter(x=>x!==S.turn);
+  // fair rotation: only teams with the fewest steal chances so far are eligible
+  const fewest=Math.min(...others.map(x=>S.steals[x]||0));
+  const pool=others.filter(x=>(S.steals[x]||0)===fewest);
+  const pick=pool[Math.floor(Math.random()*pool.length)];S.steals[pick]=(S.steals[pick]||0)+1;
+  setTurn(`${timeout?"Time's up":i<0?"No answer":"Missed"}. ${S.teams[S.turn].name} −${MISS}. Picking a team to steal...`,S.teams[S.turn].color);
+  $("clock").hidden=true;const gen=++S.gen;
+  spin(pool.length>1?pool:others,pick,gen,()=>{
+    S.stealer=pick;S.phase="steal";renderBoard();lockOpts(false);
+    const t=S.teams[pick];setTurn(`${t.name}, steal it! +${stealPts(S.q.t)} or −${STEAL_MISS}`,t.color);$("passBtn").hidden=false;
+    startClock(STEAL,$("clock"),"steal",()=>{if(S.phase==="steal"){sBad();award(S.stealer,-STEAL_MISS);finishQ(-1,false,`Time's up, no steal. ${t.name} −${STEAL_MISS}`)}});
+  });
+}
+$("passBtn").addEventListener("click",()=>{
+  if(S.phase==="turn"){stopClock();sBad();firstMiss(-1,false)}
+  else if(S.phase==="steal"){stopClock();sBad();const t=S.teams[S.stealer];award(S.stealer,-STEAL_MISS);finishQ(-1,false,`No steal. ${t.name} −${STEAL_MISS}`)}
+});
+$("pauseBtn").addEventListener("click",togglePause);
+function finishQ(picked,ok,msg){
+  stopClock();S.phase="done";$("passBtn").hidden=true;$("pauseBtn").hidden=true;$("clock").hidden=true;
+  const btns=optBtns();btns.forEach((b,k)=>{b.disabled=true;if(S.q.opts[k].ok)b.classList.add("right");else if(!b.classList.contains("wrong"))b.classList.add("dim")});
+  const who=S.phase==="done"&&S.stealer>=0?S.teams[S.stealer]:S.teams[S.turn];
+  setTurn(msg,ok?who.color:"#5C5C5C");renderBoard();
+  const ans=S.q.opts.find(o=>o.ok).v;
+  const e=$("explain");e.hidden=false;e.className="explain"+(ok?"":" miss");
+  e.innerHTML=`<b>${ok?"Correct":"Answer: "+esc(optText(ans))}</b>${esc(S.q.x)}`;
+  const last=S.qi===S.rounds[S.ri].qs.length-1;
+  $("nextBtn").hidden=false;$("nextBtn").textContent=last?(S.ri===S.rounds.length-1?"Final standings":"Next round"):"Next question";
+  $("nextBtn").focus({preventScroll:true});
+}
+$("nextBtn").addEventListener("click",()=>{
+  if(S.mode==="teams"){if(S.phase!=="done")return;S.qi++;nextQuestion()}
+  else if(S.mode==="practice"){S.idx++;soloNext()}
+});
+function endTeams(){
+  stopClock();S.phase="end";S.gen++;renderBoard();const gen=S.gen;
+  const ranked=S.teams.map((t,i)=>({...t,i})).sort((a,b)=>b.score-a.score);
+  const place=t=>ranked.findIndex(x=>x.score===t.score)+1;
+  const top=ranked.filter(t=>t.score===ranked[0].score);
+  $("endBox").innerHTML=`<div class="r">Final standings</div><h2 id="winHead">And the results...</h2>
+   <ol class="stand">${ranked.map((t,k)=>`<li class="hide" data-k="${k}" style="--c:${t.color}"><span class="p">${place(t)}</span>${t.name}<span class="v">${t.score}</span></li>`).join("")}</ol>
+   <div class="bar2" style="justify-content:center"><button class="btn" id="revealNext">Reveal next (Space)</button><button class="btn main" id="again" hidden>Play again</button><button class="btn" id="toSet" hidden>Back to setup</button></div>`;
+  show("endBox");
+  const lis=[...$("endBox").querySelectorAll(".stand li")];
+  // reveal order: last place up. Places 6 and lower come in quickly; 5th to 1st wait for applause.
+  let k=lis.length-1,timer=null;
+  const done=()=>{$("winHead").textContent=top.length>1?"It's a tie!":top[0].name+" wins!";$("revealNext").hidden=true;$("again").hidden=false;$("toSet").hidden=false;sGood();setTimeout(()=>{if(gen===S.gen)sGood()},300)};
+  function next(){
+    if(gen!==S.gen||k<0)return;clearTimeout(timer);
+    const li=lis[k];li.classList.remove("hide");li.classList.add("pop");
+    if(k<5)beep(440+(5-k)*90,.2);
+    k--;
+    if(k<0){done();return}
+    const wait=k>=5?700:k===0?6500:4500;
+    timer=setTimeout(next,reduce?300:wait);
+  }
+  S.revealNext=next;
+  $("revealNext").addEventListener("click",next);
+  timer=setTimeout(next,reduce?300:1200);
+  $("again").addEventListener("click",startTeams);$("toSet").addEventListener("click",toSetup);
+}
+
+/* ---------- Solo: Practice and Blitz ---------- */
+function startSolo(){
+  S={mode:cfg.mode,gen:0,deck:shuffle(BANK.map(inst)),idx:0,score:0,right:0,seen:0};
+  setPlaying(true);
+  $("setup").hidden=true;$("play").hidden=false;$("home").hidden=false;$("board").hidden=true;$("soloBar").hidden=false;$("editBtn").hidden=true;
+  $("blitzClock").hidden=S.mode!=="blitz";
+  if(S.mode==="blitz"){S.end=performance.now()+BLITZ*1000;S.blitzId=setInterval(blitzTick,200);blitzTick()}
+  soloNext();
+}
+function blitzTick(){const left=Math.max(0,(S.end-performance.now())/1000);const m=Math.floor(Math.ceil(left)/60),s=Math.ceil(left)%60;
+  $("blitzClock").textContent=`${m}:${String(s).padStart(2,"0")}`;$("blitzClock").classList.toggle("urgent",left<=10&&left>0);
+  if(left<=0){clearInterval(S.blitzId);endSolo()}}
+function soloBar(){$("soloScore").textContent=`${S.score} pts`;$("soloProg").textContent=`${S.right} of ${S.seen} correct`+(S.mode==="practice"?` | Question ${Math.min(S.idx+1,S.deck.length)} of ${S.deck.length}`:"")}
+function soloNext(){
+  if(S.idx>=S.deck.length){if(S.mode==="blitz"){S.deck=shuffle(BANK.map(inst));S.idx=0}else return endSolo()}
+  S.q=S.deck[S.idx];S.phase="turn";renderQuestion();soloBar();
+}
+function soloChoose(i){
+  if(S.phase!=="turn")return;S.phase="done";S.seen++;
+  const ok=S.q.opts[i].ok,btns=optBtns();
+  btns.forEach((b,k)=>{b.disabled=true;if(S.q.opts[k].ok)b.classList.add("right");else if(k===i)b.classList.add("wrong");else b.classList.add("dim")});
+  if(ok){S.right++;S.score+=ROUNDS[S.q.t].pts;sGood()}else sBad();
+  soloBar();
+  if(S.mode==="practice"){
+    const ans=S.q.opts.find(o=>o.ok).v;const e=$("explain");e.hidden=false;e.className="explain"+(ok?"":" miss");
+    e.innerHTML=`<b>${ok?"Correct":"Answer: "+esc(optText(ans))}</b>${esc(S.q.x)}`;
+    $("nextBtn").hidden=false;$("nextBtn").textContent=S.idx===S.deck.length-1?"Finish":"Next question";$("nextBtn").focus({preventScroll:true});
+  }else{const gen=++S.gen;setTimeout(()=>{if(gen!==S.gen||S.mode!=="blitz")return;S.idx++;soloNext()},ok?700:1500)}
+}
+function endSolo(){
+  S.phase="end";S.gen++;clearInterval(S.blitzId);
+  const pct=S.seen?Math.round(S.right/S.seen*100):0;
+  $("endBox").innerHTML=`<div class="r">${S.mode==="blitz"?"Time!":"Practice complete"}</div><h2>${S.score} points</h2><p>${S.right} of ${S.seen} correct (${pct}%).</p>
+   <div class="bar2" style="justify-content:center"><button class="btn main" id="again">Play again</button><button class="btn" id="toSet">Back to setup</button></div>`;
+  show("endBox");$("again").addEventListener("click",startSolo);$("toSet").addEventListener("click",toSetup);
+}
+
+/* ---------- Keyboard ---------- */
+document.addEventListener("keydown",e=>{
+  if($("play").hidden||e.metaKey||e.ctrlKey||e.altKey)return;
+  const k=e.key.toLowerCase();
+  if(k===" "||k==="enter"){
+    if(e.target.tagName==="BUTTON"&&k==="enter")return;
+    e.preventDefault();
+    if(!$("introBox").hidden&&S.phase==="intro"){S.qi=0;nextQuestion();return}
+    if(S.phase==="end"&&S.revealNext&&!$("revealNext").hidden){S.revealNext();return}
+    if(!$("nextBtn").hidden)$("nextBtn").click();
+    return;
+  }
+  if(k==="p"){togglePause();return}
+  const idx="abcd".indexOf(k)>=0?"abcd".indexOf(k):"1234".indexOf(k);
+  if(idx>=0&&!$("qBox").hidden){const b=optBtns()[idx];if(b&&!b.disabled){e.preventDefault();choose(idx)}}
+});
+</script>
+<!-- Text size controls: scale the page content, remembered across pages -->
+<style id="tsz-css">
+#tsz{position:fixed;left:14px;bottom:14px;z-index:9999;display:flex;align-items:center;gap:2px;background:#111;color:#fff;border-radius:999px;padding:4px;box-shadow:0 2px 10px rgba(0,0,0,.3);font:600 15px "Barlow",system-ui,sans-serif}
+#tsz button{background:transparent;border:0;color:#fff;font:inherit;cursor:pointer;border-radius:999px;min-width:40px;height:36px;padding:0 10px}
+#tsz button:hover{background:rgba(255,255,255,.15)}
+#tsz button:focus-visible{outline:3px solid #C1102F;outline-offset:1px}
+#tsz button:disabled{opacity:.35;cursor:default}
+#tsz .big{font-size:20px}
+#tsz .pct{min-width:58px;font-variant-numeric:tabular-nums}
+@media print{#tsz{display:none}}
+</style>
+<div id="tsz" role="group" aria-label="Text size">
+  <button type="button" data-d="-1" aria-label="Smaller text" title="Smaller text (-)">A−</button>
+  <button type="button" data-d="0" class="pct" aria-label="Reset text size" title="Reset text size (0)">100%</button>
+  <button type="button" data-d="1" class="big" aria-label="Bigger text" title="Bigger text (+)">A+</button>
+</div>
+<script>
+(function(){
+  var STEPS=[0.8,0.9,1,1.1,1.25,1.4,1.6,1.8,2],KEY="d214-text-size",box=document.getElementById("tsz");
+  var target=document.querySelector("main")||document.body;
+  var i=2;try{var v=parseFloat(localStorage.getItem(KEY));var j=STEPS.indexOf(v);if(j>=0)i=j}catch(e){}
+  function apply(){
+    var z=STEPS[i];target.style.zoom=z;
+    box.style.zoom=target===document.body?1/z:1;
+    box.children[1].textContent=Math.round(z*100)+"%";
+    box.children[0].disabled=i===0;box.children[2].disabled=i===STEPS.length-1;
+    try{localStorage.setItem(KEY,z)}catch(e){}
+  }
+  function step(d){i=d===0?2:Math.max(0,Math.min(STEPS.length-1,i+d));apply()}
+  box.addEventListener("click",function(e){var b=e.target.closest("button");if(b){step(+b.dataset.d);b.blur()}});
+  document.addEventListener("keydown",function(e){
+    if(e.metaKey||e.ctrlKey||e.altKey)return;var t=e.target.tagName;if(t==="INPUT"||t==="TEXTAREA"||t==="SELECT")return;
+    if(e.key==="+"||e.key==="=")step(1);else if(e.key==="-"||e.key==="_")step(-1);else if(e.key==="0")step(0);
+  });
+  apply();
+})();
+</script>
+</body>
+</html>
