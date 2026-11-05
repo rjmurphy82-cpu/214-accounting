@@ -2839,8 +2839,9 @@ function hostRender(){
         <td class="${d>0?"pos":d<0?"neg":""}">${d===0?"$0":money(Math.abs(d))}<small>${d>0?"over-estimated":d<0?"under-estimated":"right on"}</small></td><td>${bt.includes(t)?`+${c.bonus}<small>closest estimate</small>`:"&nbsp;"}</td></tr>`}
     return go(`<div class="rhead"><span class="rtag">Step 4 · Results</span><span class="rname">How close was each estimate?</span></div>${scoreStrip(st)}
       <table class="sum"><thead><tr><th>Team</th><th>Paper airplane sales</th><th>Warranty expense estimated</th><th>Actual warranty expense</th><th>Difference</th><th>Bonus</th></tr></thead><tbody>${rows}</tbody></table>
-      <div class="bar2"><span></span><button class="btn main" data-act="toend">Final standings →</button></div>`)}
-  if(st.phase==="end"){if(H.anim!=="end"){animFresh("end");finale()}return}
+      <div class="bar2"><span></span><button class="btn main" data-act="totop">Top 5 students →</button></div>`)}
+  if(st.phase==="top"){if(H.anim!=="top"){animFresh("top");finale("ind")}return}
+  if(st.phase==="end"){if(H.anim!=="end"){animFresh("end");finale("team")}return}
 }
 function nextPlane(st,t){const n=flightsOf(st,t).length;return n<st.cfg.planes?n+1:null}
 function flyHTML(st,players){
@@ -2909,6 +2910,7 @@ function hostAct(a,b){
     if(left&&!confirm(`${plural(left,"plane")} not flown yet. Finish the flight test anyway?`))return;
     return hostSet({...st,phase:"tu",timer:null,q:st.q?{...st.q,open:false}:null})}
   if(a==="toend")return hostSet({...st,phase:"end"});
+  if(a==="totop")return hostSet({...st,phase:"top"});
 }
 function record(res){
   let st=H.state;const c=st.cfg,t=st.cur,p=nextPlane(st,t);if(!p)return;
@@ -2960,17 +2962,27 @@ function startFireworks(){
 function finalRows(st){const c=st.cfg,s=st.score||{},bt=bonusTeams(st);
   const rows=Array.from({length:c.teams},(_,t)=>({t,base:s[t]||0,bonus:bt.includes(t)?c.bonus:0})).map(x=>({...x,total:x.base+x.bonus}));
   rows.sort((a,b)=>b.total-a.total);let r=0;rows.forEach((x,i)=>{if(!i||rows[i-1].total!==x.total)r=i+1;x.rank=r});return rows}
-function finale(){
-  const st=H.state,rows=finalRows(st),top=rows.slice(0,5);
-  const sub=x=>`${x.total} pts${x.bonus?` <span style="opacity:.75">(incl. +${x.bonus} bonus)</span>`:""}`;
-  const slot=(x,i,cls)=>x?`<div class="pod ${cls}" data-i="${i}"><div class="who"><div class="medal">${x.rank}</div><div class="nm">${tname(x.t)}</div><div class="pts">${sub(x)}</div></div><div class="block"><span>${["1st","2nd","3rd"][i]}</span></div></div>`:`<div class="pod ${cls} empty"></div>`;
-  const rest=top.slice(3).map((x,k)=>`<div class="row45" data-i="${k+3}"><span class="r">${x.rank}</span><span class="n">${tname(x.t)}</span><span class="s">${x.total} pts</span></div>`).join("");
+function playerRows(st,players){ // individual points: same scoring as the teams, closed questions only
+  const c=st.cfg,closed=(st.qs||[]).filter(q=>!(st.q&&st.q.open&&st.q.id===q.id));
+  const rows=players.map(p=>{let right=0,wrong=0,ms=0;closed.forEach(q=>{if(!eligible(q,p.team,st))return;const a=p.ans&&p.ans[q.id];if(!a)return;if(isRight(a,keyFor(q,p.team,st))){right++;ms+=+a.ms||60000}else wrong++});
+    return{p,right,wrong,ms,total:right*c.pr-wrong*c.pw}});
+  // ties go to whoever locked in their right answers fastest
+  rows.sort((a,b)=>b.total-a.total||b.right-a.right||a.ms-b.ms);
+  let r=0;rows.forEach((x,i)=>{const q=rows[i-1];if(!q||q.total!==x.total||q.right!==x.right||q.ms!==x.ms)r=i+1;x.rank=r});return rows}
+function finale(kind){
+  kind=kind||"team";const st=H.state,ind=kind==="ind";
+  const rows=ind?playerRows(st,playersArr()).map(x=>({rank:x.rank,name:esc(x.p.name),total:x.total,sub:`${x.total} pts · ${x.right} right <span style="opacity:.75">· ${tname(x.p.team)}</span>`,short:`${x.total} pts`})):
+    finalRows(st).map(x=>({rank:x.rank,name:tname(x.t),total:x.total,sub:`${x.total} pts${x.bonus?` <span style="opacity:.75">(incl. +${x.bonus} bonus)</span>`:""}`,short:`${x.total} pts`}));
+  const top=rows.slice(0,5);
+  const slot=(x,i,cls)=>x?`<div class="pod ${cls}" data-i="${i}"><div class="who"><div class="medal">${x.rank}</div><div class="nm">${x.name}</div><div class="pts">${x.sub}</div></div><div class="block"><span>${["1st","2nd","3rd"][i]}</span></div></div>`:`<div class="pod ${cls} empty"></div>`;
+  const rest=top.slice(3).map((x,k)=>`<div class="row45" data-i="${k+3}"><span class="r">${x.rank}</span><span class="n">${x.name}</span><span class="s">${x.short}</span></div>`).join("");
   document.body.classList.add("finale-on");app.style.zoom="";lastPaint="";
   app.innerHTML=`<div class="finale"><canvas id="fw"></canvas><div class="rays"></div>
-    <div class="fhead"><img class="lg" src="/logo-214.png" alt="District 214"><div class="kick">Paper Airplane Inc. · Warranty liabilities</div><h2>Final standings</h2></div>
+    <div class="fhead"><img class="lg" src="/logo-214.png" alt="District 214"><div class="kick">Paper Airplane Inc. · ${ind?"Most points from journal entries · ties go to the fastest":"Team points plus the closest-estimate bonus"}</div><h2>${ind?"Top 5 students":"Final team standings"}</h2></div>
     <div class="podium">${slot(rows[1],1,"p2")}${slot(rows[0],0,"p1")}${slot(rows[2],2,"p3")}</div><div class="rest">${rest}</div>
-    <div class="fbar"><button class="btn" id="cr">Class results</button><button class="btn" id="again">Replay</button><button class="btn" id="erase">Erase game</button></div></div>`;
-  $("#cr").onclick=()=>{stopFireworks();classResults()};$("#again").onclick=()=>{stopFireworks();finale()};$("#erase").onclick=()=>{stopFireworks();hostErase()};
+    <div class="fbar">${ind?`<button class="btn" id="nx" style="background:var(--red);border-color:var(--red);opacity:1">Team standings →</button>`:`<button class="btn" id="tp">Top 5 students</button>`}<button class="btn" id="cr">Class results</button><button class="btn" id="again">Replay</button><button class="btn" id="erase">Erase game</button></div></div>`;
+  if(ind)$("#nx").onclick=()=>{stopFireworks();H.anim=null;hostSet({...H.state,phase:"end"})};else $("#tp").onclick=()=>{stopFireworks();finale("ind")};
+  $("#cr").onclick=()=>{stopFireworks();classResults()};$("#again").onclick=()=>{stopFireworks();finale(kind)};$("#erase").onclick=()=>{stopFireworks();hostErase()};
   const seq=[4,3,2,1,0].filter(i=>rows[i]),at=[2000,8000,14500,21000,28500].slice(5-seq.length);
   FIN.forEach(clearTimeout);FIN=seq.map((i,n)=>setTimeout(()=>{const el=app.querySelector(`.finale [data-i="${i}"]`);if(!el)return;el.classList.add("in");if(i===0){fanfare();startFireworks()}else beep(i<3?660:520,.12)},at[n]));
 }
@@ -2983,7 +2995,7 @@ function classResults(){
     <table class="sum" style="margin-top:18px"><thead><tr><th>Team</th>${kinds.map(x=>`<th>${KIND[x.k]}</th>`).join("")}<th>Points</th></tr></thead><tbody>
     ${Array.from({length:c.teams},(_,t)=>`<tr style="--c:${tcol(t)}"><td>${tname(t)}</td>${kinds.map(x=>{const p=x.per[t];return `<td>${p&&p.n?Math.round(p.r/p.n*100)+"%":"–"}</td>`}).join("")}<td>${finalRows(st).find(r=>r.t===t).total}</td></tr>`).join("")}</tbody></table>
     <div class="row" style="justify-content:center;margin-top:16px"><button class="btn main" id="pod">Back to standings</button> <button class="btn" id="erase">Erase game</button></div></div>`;
-  $("#pod").onclick=()=>finale();$("#erase").onclick=hostErase;requestAnimationFrame(zoomApp);
+  $("#pod").onclick=()=>finale("team");$("#erase").onclick=hostErase;requestAnimationFrame(zoomApp);
 }
 
 /* ============================================================ PLAYER (own device) */
@@ -3036,7 +3048,7 @@ async function save(patch){const M=ME;Object.entries(patch).forEach(([k,v])=>{co
 
 /* one-shot journal entry: pick the debit, pick the credit, type the amount */
 function entryUI(q,allowNone){
-  const u=ME.ui[q.id]||(ME.ui[q.id]={dr:null,cr:null,amt:"",none:false,msg:null});
+  const u=ME.ui[q.id]||(ME.ui[q.id]={dr:null,cr:null,amt:"",none:false,msg:null,shown:Date.now()});
   const col=side=>`<div><h3>${side==="dr"?"Debit":"Credit"}</h3><div class="acct">${ACCTS.map(a=>`<button data-side="${side}" data-a="${esc(a)}" aria-pressed="${!u.none&&u[side]===a}">${esc(a)}</button>`).join("")}</div></div>`;
   return `<div class="jb">${col("dr")}${col("cr")}</div>
     ${allowNone?`<button class="none" data-none="1" aria-pressed="${u.none}">No entry needed</button>`:""}
@@ -3054,7 +3066,7 @@ function wireEntry(q){
       if(!u.dr||!u.cr){u.msg="Pick one account to debit and one to credit.";return playerRender(true)}
       const amt=+String(u.amt).replace(/[^\d.]/g,"");if(!u.amt||!isFinite(amt)){u.msg="Type the amount.";return playerRender(true)}
       a={dr:u.dr,cr:u.cr,amt:r2(amt)}}
-    $("#sub").disabled=true;a.t=Date.now();
+    $("#sub").disabled=true;a.t=Date.now();a.ms=Math.max(0,a.t-(u.shown||a.t));
     beep(660,.1);
     await save({["ans/"+q.id]:a});playerRender(true)};
 }
@@ -3118,8 +3130,8 @@ function playerRender(force){
     const e=estOf(st,t),a=actualOf(st,t),d=r2(e-a);
     return done(`<div class="tcard"><div class="step">Step 4 · How close was the estimate?</div><h2>${d===0?"Right on!":money(Math.abs(d))+(d>0?" over-estimated":" under-estimated")}</h2>
       <div class="stats"><span><b>${money(e)}</b>estimated</span><span><b>${money(a)}</b>actual</span></div>${myScore()}</div><div class="tcard" style="border-left-color:var(--dark)">${tAccount(st,t)}</div>`)}
-  if(st.phase==="end"){const log=(st.qs||[]).filter(x=>eligible(x,t,st));let right=0,ans=0;log.forEach(x=>{const r=myResult(x);if(r){ans++;if(r.ok)right++}});
-    return done(`<div class="tcard"><div class="step">Final</div><h2>${esc(M.name)}</h2><div class="stats"><span><b>${right} of ${log.length}</b>entries right</span>${ans<log.length?`<span><b>${log.length-ans}</b>missed</span>`:""}</div><p class="note" style="text-align:center">Watch the board for the final standings.</p></div>${myScore()}`)}
+  if(st.phase==="end"||st.phase==="top"){const log=(st.qs||[]).filter(x=>eligible(x,t,st));let right=0,ans=0;log.forEach(x=>{const r=myResult(x);if(r){ans++;if(r.ok)right++}});
+    return done(`<div class="tcard"><div class="step">Final</div><h2>${esc(M.name)}</h2><div class="stats"><span><b>${right*c.pr-(ans-right)*c.pw}</b>your points</span><span><b>${right} of ${log.length}</b>entries right</span>${ans<log.length?`<span><b>${log.length-ans}</b>missed</span>`:""}</div><p class="note" style="text-align:center">Watch the board for the final standings.</p></div>${myScore()}`)}
   done(`<div class="wait"><h2>Watch the board</h2></div>${myScore()}`);
 }
 
