@@ -2720,7 +2720,7 @@ function tally(st,players,q){ // per team: answered, right, wrong, eligible
   return out}
 function scores(st,players){
   const c=st.cfg,s={};for(let t=0;t<c.teams;t++)s[t]=0;
-  (st.qs||[]).forEach(q=>{const T=tally(st,players,q);for(const t in T)s[t]+=T[t].right*c.pr-(T[t].ans-T[t].right)*c.pw});
+  (st.qs||[]).forEach(q=>{if(st.q&&st.q.open&&st.q.id===q.id)return;const T=tally(st,players,q);for(const t in T)s[t]+=T[t].right*c.pr-(T[t].ans-T[t].right)*c.pw});
   return s}
 function bonusTeams(st){if(!st.cfg.bonus||!st.est)return[];let best=Infinity,who=[];
   for(let t=0;t<st.cfg.teams;t++){if(!(st.fcs&&st.fcs[t]&&st.fcs[t].n))continue;const d=Math.abs(estOf(st,t)-actualOf(st,t));if(d<best-1e-9){best=d;who=[t]}else if(Math.abs(d-best)<1e-9)who.push(t)}
@@ -2767,7 +2767,9 @@ async function hostSetup(){
   requestAnimationFrame(zoomApp);
 }
 function playersArr(){return Object.entries(H.players).map(([id,p])=>({id,...p})).filter(p=>p&&p.name&&p.team!=null).sort((a,b)=>(a.joined||0)-(b.joined||0))}
-function syncScore(){const s=scores(H.state,playersArr());if(JSON.stringify(s)!==JSON.stringify(H.state.score||{})){H.state.score=s;H.N.set("games/"+H.code+"/state",H.state).catch(()=>{})}}
+function autoClose(){const st=H.state,q=st.q;if(!q||!q.open)return false;const T=tally(st,playersArr(),q);let n=0,a=0;Object.values(T).forEach(o=>{n+=o.n;a+=o.ans});
+  if(n&&a>=n){beep(660,.12);hostSet(clearT({...st,q:{...q,open:false}},q.id));return true}return false}
+function syncScore(){if(autoClose())return;const s=scores(H.state,playersArr());if(JSON.stringify(s)!==JSON.stringify(H.state.score||{})){H.state.score=s;H.N.set("games/"+H.code+"/state",H.state).catch(()=>{})}}
 function hostSet(st){st.score=scores(st,playersArr());H.state=st;H.N.set("games/"+H.code+"/state",st).catch(()=>{});hostRender()}
 function priceSheet(c){return `<div class="prices">
   <div class="pr"><span class="plab">Paper airplane price</span><span class="pv">${money(c.price)}</span></div>
@@ -3042,7 +3044,7 @@ function entryUI(q,allowNone){
   return `<div class="jb">${col("dr")}${col("cr")}</div>
     ${allowNone?`<button class="none" data-none="1" aria-pressed="${u.none}">No entry needed</button>`:""}
     <div class="amt"><label for="amt">Amount</label><span class="dollar"><span>$</span><input id="amt" data-amt="1" inputmode="decimal" autocomplete="off" value="${esc(u.amt)}" ${u.none?"disabled":""}></span>
-      <button class="btn main" id="sub">Lock it in</button></div><p class="note">One try. Your team gets +${ME.state.cfg.pr} if it's right and −${ME.state.cfg.pw} if it's wrong.</p>
+      <button class="btn main" id="sub">Lock it in</button></div><p class="note">One try. Your team gets +${ME.state.cfg.pr} if it's right and −${ME.state.cfg.pw} if it's wrong. You'll find out when everyone is finished.</p>
     ${u.msg?`<div class="fb no"><b>${esc(u.msg)}</b></div>`:""}`;
 }
 function wireEntry(q){
@@ -3056,12 +3058,14 @@ function wireEntry(q){
       const amt=+String(u.amt).replace(/[^\d.]/g,"");if(!u.amt||!isFinite(amt)){u.msg="Type the amount.";return playerRender(true)}
       a={dr:u.dr,cr:u.cr,amt:r2(amt)}}
     $("#sub").disabled=true;a.t=Date.now();
-    const ok=isRight(a,keyFor(q,ME.rec.team,ME.state));ok?beep(990,.15):beep(220,.25);
+    beep(660,.1);
     await save({["ans/"+q.id]:a});playerRender(true)};
 }
 function myResult(q){const a=ME.rec.ans&&ME.rec.ans[q.id];if(!a)return null;return{a,ok:isRight(a,keyFor(q,ME.rec.team,ME.state))}}
 function lockedHTML(q,showKey){const r=myResult(q),k=keyFor(q,ME.rec.team,ME.state),c=ME.state.cfg;
   if(!r)return `<div class="tcard"><h2>Time's up</h2><p>You didn't lock in an answer for this one.</p>${showKey?`<div class="jebox">${jeHTML(k)}</div><p class="note">${esc(k.why)}</p>`:""}</div>`;
+  if(!showKey)return `<div class="tcard" style="text-align:center;border-left-color:var(--dark)"><h2>Locked in</h2><p>Results show when everyone is finished.</p></div>`;
+  if(!ME.seen)ME.seen={};if(!ME.seen[q.id]){ME.seen[q.id]=1;r.ok?beep(990,.15):beep(220,.3)}
   return `<div class="verdict ${r.ok?"ok":"no"}" style="border-radius:16px;padding:18px;text-align:center;margin:10px auto;max-width:820px;background:var(--${r.ok?"goodsoft":"badsoft"});border:3px solid var(--${r.ok?"good":"bad"})"><h2 style="font-family:var(--display);font-size:clamp(36px,7vw,60px);margin:0;color:var(--${r.ok?"good":"bad"})">${r.ok?"Correct! +"+c.pr:"Not quite. −"+c.pw}</h2>
     ${showKey?`<div class="jebox" style="display:inline-block;text-align:left;margin-top:10px">${jeHTML(k)}</div><p style="font-size:18px;margin:8px 0 0">${esc(k.why)}</p>`:`<p style="font-size:19px;margin:8px 0 0">Locked in. The answer shows when your teacher closes it.</p>`}</div>`}
 function myScore(){const s=ME.state.score||{},t=ME.rec.team;return `<div class="stats"><span><b style="color:${tcol(t)}">${s[t]||0}</b>${tname(t)} points</span></div>`}
