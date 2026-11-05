@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Paper Airplane Inc. | Warranties</title>
+<meta name="description" content="Warranty liability class game for District 214 Accounting: teams build paper airplanes, estimate warranty claims, then book every repair and replacement after the flight test.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F2F2F2;--paper:#FFFFFF;--ink:#111111;--muted:#5C5C5C;--line:rgba(17,17,17,.14);--soft:#F4F4F4;--dark:#111111;
+  --red:#C1102F;--good:#1E7A3C;--goodsoft:#E7F4EB;--bad:#C1102F;--badsoft:#FBE7EA;--amber:#9A6700;--ambersoft:#FFF4D6;
+  --display:"Oswald","Arial Narrow",Impact,sans-serif;--body:"Barlow",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --nk:1;
+  color-scheme:light;
+}
+*,*::before,*::after{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:18px/1.45 var(--body);-webkit-tap-highlight-color:transparent}
+[hidden]{display:none!important}
+button{font:inherit;color:inherit;cursor:pointer}
+.wrap{max-width:1240px;margin:0 auto;padding:12px 18px 28px}
+.top{display:flex;align-items:center;gap:12px;flex-wrap:wrap;color:var(--muted);font-size:15px;font-weight:600}
+.top img{height:34px;width:auto;border-radius:3px;display:block}
+.top a{color:inherit;text-decoration:none}
+.sp{flex:1}
+.pill{background:var(--dark);color:#fff;border-radius:999px;padding:3px 12px;font-size:14px;font-weight:700}
+.zm{display:inline-flex;gap:4px}
+.zm button{background:var(--paper);border:2px solid var(--line);border-radius:8px;padding:2px 10px;font-weight:700;font-size:15px}
+.rejoin{background:var(--red);color:#fff;border:0;border-radius:999px;padding:7px 16px;font:700 16px var(--body);box-shadow:0 2px 0 rgba(0,0,0,.2)}
+h1.title{font-family:var(--display);font-weight:700;font-size:clamp(40px,6.5vw,72px);line-height:.98;margin:18px 0 6px}
+h1.title span{color:var(--red)}
+.lede{max-width:66ch;color:var(--muted);margin:0 0 18px}
+.btn{background:var(--paper);border:2px solid var(--line);border-radius:10px;padding:8px 16px;font-weight:700;font-size:17px}
+.btn.main{background:var(--red);border-color:var(--red);color:#fff;font-family:var(--display);font-weight:600;font-size:24px;padding:10px 30px}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.panel{background:var(--paper);border:2px solid var(--line);border-radius:14px;padding:22px;max-width:680px;margin:10px auto 0}
+.panel h2{font-family:var(--display);font-weight:600;font-size:32px;margin:0 0 6px}
+.field{display:block;width:100%;font-size:26px;font-weight:600;padding:12px 14px;border:2px solid var(--line);border-radius:10px;background:var(--soft);margin:6px 0 14px;font-family:var(--body);color:var(--ink)}
+.field.code{letter-spacing:.3em;text-align:center;font-family:var(--display);font-size:40px}
+.err{color:var(--bad);font-weight:700;min-height:1.4em}
+.note{font-size:15px;color:var(--muted)}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.wait{text-align:center;padding:34px 10px}
+.wait h2{font-family:var(--display);font-size:clamp(32px,6vw,54px);margin:0 0 8px;line-height:1.05}
+.wait p{color:var(--muted);font-size:20px;max-width:46ch;margin:6px auto}
+.num{font-variant-numeric:tabular-nums}
+.cfg{display:grid;grid-template-columns:1fr 1fr;gap:4px 18px;margin:12px 0}
+.cfg label{display:flex;flex-direction:column;font-weight:700;font-size:15px;color:var(--muted)}
+.cfg input,.cfg select{font:600 22px var(--body);padding:8px 10px;border:2px solid var(--line);border-radius:10px;background:var(--soft);margin-top:4px;color:var(--ink)}
+
+/* lobby */
+.lobby{text-align:center}
+.lobtop{display:flex;align-items:center;justify-content:center;gap:clamp(20px,4vw,60px);flex-wrap:wrap}
+.lobleft{max-width:700px;flex:1 1 420px}
+.lobby .join{font-size:clamp(20px,2.4vw,30px);color:var(--muted);font-weight:600}
+.lobby .code{font-family:var(--display);font-weight:700;font-size:clamp(80px,14vw,170px);line-height:1;letter-spacing:.12em;margin:6px 0}
+.lobby .url{font-weight:700;color:var(--muted);font-size:clamp(14px,1.4vw,20px);word-break:break-all}
+.qr{display:flex;flex-direction:column;align-items:center;gap:6px;background:#fff;border-radius:16px;padding:12px;box-shadow:0 10px 30px rgba(0,0,0,.12);border:2px solid var(--line)}
+.qr svg{width:clamp(180px,22vw,320px);height:auto;display:block}
+.qr span{font-family:var(--display);font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#111;font-size:clamp(14px,1.4vw,20px)}
+.names{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin:18px 0}
+.names span{background:var(--paper);border:2px solid var(--line);border-left:8px solid var(--c,#111);border-radius:999px;padding:6px 16px;font-weight:700;font-size:22px}
+.count{font-family:var(--display);font-size:24px;font-weight:600}
+
+/* projector stage */
+.rhead{display:flex;align-items:baseline;gap:14px;margin:6px 0 10px;flex-wrap:wrap}
+.rtag{font-family:var(--display);font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--red);font-size:22px}
+.rname{font-family:var(--display);font-weight:600;font-size:22px;color:var(--muted)}
+.scard{background:var(--paper);border:2px solid var(--line);border-left:12px solid var(--red);border-radius:14px;padding:18px 24px;box-shadow:0 10px 30px rgba(0,0,0,.08)}
+.stitle{font-family:var(--display);font-weight:700;font-size:40px;line-height:1.05;margin:0 0 8px}
+.story{font-size:27px;line-height:1.35;margin:0}
+.story+.story{margin-top:10px}
+.bar2{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:14px;flex-wrap:wrap}
+.split{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:16px;align-items:start}
+
+/* price sheet (slide 2 of the old deck) */
+.prices{background:var(--dark);color:#fff;border-radius:14px;padding:6px 22px;display:grid}
+.prices .pr{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:12px 0;border-bottom:2px solid rgba(255,255,255,.2)}
+.prices .pr:last-child{border-bottom:0}
+.prices .plab{font-family:var(--display);font-weight:600;font-size:28px;line-height:1.05;text-transform:uppercase}
+.prices .plab small{display:block;font-family:var(--body);font-weight:600;font-size:17px;text-transform:none;color:#bbb}
+.prices .pv{background:#fff;color:#111;font-family:var(--display);font-weight:700;font-size:calc(40px*var(--nk));border-radius:8px;padding:0 14px;min-width:3.2em;text-align:center}
+.guar{display:inline-block;margin-top:10px;background:var(--red);color:#fff;border-radius:8px;padding:4px 14px;font-family:var(--display);font-weight:600;font-size:24px;letter-spacing:.04em}
+
+/* timer */
+.timer{font-family:var(--display);font-weight:700;font-size:calc(180px*var(--nk));line-height:1;text-align:center;font-variant-numeric:tabular-nums;background:var(--paper);border:3px solid var(--line);border-radius:18px;padding:10px 20px}
+.timer.low{color:var(--red);border-color:var(--red)}
+.timer.done{background:var(--red);color:#fff;border-color:var(--red)}
+
+/* team tiles */
+.board{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px;margin-top:14px}
+.tile{position:relative;background:var(--paper);border:2px solid var(--line);border-top:8px solid var(--c);border-radius:12px;padding:8px 12px 10px;min-height:90px}
+.tile .tn{font-weight:700;font-size:20px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tile .ck{display:flex;flex-direction:column;gap:2px;margin-top:4px;font-weight:700;font-size:17px}
+.tile .ck span{color:var(--muted)}
+.tile .ck span.y{color:var(--good)}
+.tile .big{font-family:var(--display);font-weight:700;font-size:calc(44px*var(--nk));line-height:1.05;font-variant-numeric:tabular-nums}
+.tile .sub{font-weight:700;font-size:17px;color:var(--muted)}
+.tile.anim{animation:tin .5s cubic-bezier(.2,1.3,.4,1) both;animation-delay:var(--d,0ms)}
+@keyframes tin{from{opacity:0;transform:translateY(16px) scale(.96)}}
+
+/* journal entry display */
+.je{font-family:var(--body);font-weight:700;font-variant-numeric:tabular-nums;display:grid;grid-template-columns:minmax(0,1fr) minmax(3.4em,auto) minmax(3.4em,auto);gap:0 16px;align-items:baseline}
+.je .a{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.je .a.ind{padding-left:1.6em}
+.je .v{text-align:right;white-space:nowrap}
+.jebox{background:var(--soft);border:2px solid var(--line);border-radius:12px;padding:10px 16px;font-size:calc(24px*var(--nk))}
+
+/* flight test */
+.tabs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.tabs button{background:var(--paper);border:2px solid var(--line);border-left:8px solid var(--c);border-radius:999px;padding:5px 14px;font-weight:700;font-size:18px}
+.tabs button[aria-pressed="true"]{background:var(--dark);color:#fff;border-color:var(--dark);border-left-color:var(--c)}
+.tabs button small{font-weight:600;opacity:.75;margin-left:6px}
+.runway{background:var(--paper);border:3px solid var(--line);border-top:12px solid var(--c);border-radius:16px;padding:14px 22px 18px;transition:background .3s}
+.runway.flash-ok{background:var(--goodsoft)}
+.runway.flash-no{background:var(--badsoft)}
+.runway .who{font-family:var(--display);font-weight:600;font-size:26px;color:var(--muted);letter-spacing:.04em}
+.runway .pn{font-family:var(--display);font-weight:700;font-size:calc(84px*var(--nk));line-height:1}
+.runway .pk{font-weight:700;font-size:22px;color:var(--muted)}
+.runway .pk.re{color:var(--amber)}
+.flybtns{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}
+.flybtns button{border:0;border-radius:16px;padding:18px 10px;font-family:var(--display);font-weight:700;font-size:40px;color:#fff;box-shadow:0 6px 0 rgba(0,0,0,.25)}
+.flybtns button:active{transform:translateY(4px);box-shadow:0 2px 0 rgba(0,0,0,.25)}
+.flybtns .ok{background:var(--good)}
+.flybtns .no{background:var(--bad)}
+.flybtns small{display:block;font-family:var(--body);font-weight:600;font-size:18px;opacity:.85}
+.runtools{display:flex;gap:10px;justify-content:space-between;margin-top:12px;flex-wrap:wrap}
+.planes{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:8px;margin-top:14px}
+.pl{position:relative;border:2px solid var(--line);background:var(--paper);border-radius:10px;padding:4px 0 2px;text-align:center;font-family:var(--display);font-weight:700;font-size:26px;line-height:1.1}
+.pl small{display:block;font-family:var(--body);font-size:12px;white-space:nowrap;overflow:hidden;font-weight:700;letter-spacing:.02em;color:var(--muted);text-transform:uppercase}
+.pl.next{outline:4px solid var(--ink);outline-offset:1px}
+.pl.ok{background:var(--goodsoft);border-color:var(--good)} .pl.ok small{color:var(--good)}
+.pl.claim{background:var(--badsoft);border-color:var(--bad);cursor:pointer} .pl.claim small{color:var(--bad)}
+.pl.refly{background:var(--ambersoft);border-color:var(--amber)} .pl.refly small{color:var(--amber)}
+.pl.closed{background:var(--soft);border-style:dashed}
+.liab{background:var(--paper);border:2px solid var(--line);border-radius:14px;padding:12px 16px}
+.liab h3{font-family:var(--display);font-weight:600;font-size:24px;margin:0 0 2px}
+.lrow{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 10px;padding:8px 0;border-bottom:1px solid var(--line)}
+.lrow:last-child{border-bottom:0}
+.lrow .n{font-weight:700;font-size:20px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;border-left:8px solid var(--c);padding-left:8px}
+.lrow .left{font-family:var(--display);font-weight:700;font-size:calc(30px*var(--nk));text-align:right;font-variant-numeric:tabular-nums;line-height:1}
+.lrow .left.neg{color:var(--bad)}
+.lrow .m{grid-column:1/-1;height:12px;background:var(--soft);border:1px solid var(--line);border-radius:999px;overflow:hidden}
+.lrow .m i{display:block;height:100%;background:var(--good);transition:width .4s}
+.lrow .m.neg i{background:var(--bad)}
+.lrow .d{grid-column:1/-1;font-size:15px;font-weight:600;color:var(--muted)}
+.feed{margin-top:12px;display:grid;gap:8px}
+.fe{background:var(--soft);border-left:6px solid var(--c);border-radius:10px;padding:6px 12px;font-size:calc(17px*var(--nk))}
+.fe b{font-family:var(--display);font-weight:600}
+.pop{position:fixed;inset:0;background:rgba(0,0,0,.45);display:grid;place-items:center;z-index:40}
+.pop .panel{margin:0}
+
+/* summary table (slide 3 of the old deck) */
+.sum{width:100%;border-collapse:collapse;background:var(--paper);border-radius:14px;overflow:hidden;font-variant-numeric:tabular-nums}
+.sum th{background:var(--dark);color:#fff;font-family:var(--display);font-weight:600;text-transform:uppercase;letter-spacing:.04em;font-size:19px;padding:10px 12px;text-align:right;line-height:1.1}
+.sum th:first-child,.sum td:first-child{text-align:left}
+.sum td{padding:10px 12px;border-bottom:1px solid var(--line);font-weight:700;font-size:calc(28px*var(--nk));text-align:right}
+.sum td:first-child{font-size:22px;border-left:10px solid var(--c);min-width:9em}
+.sum td.pos{color:var(--good)} .sum td.neg{color:var(--bad)}
+.sum td small{display:block;font-size:15px;color:var(--muted);font-weight:600}
+.sum tr.anim{animation:tin .5s both;animation-delay:var(--d,0ms)}
+
+/* team device (iPad) */
+.tcard{background:var(--paper);border:2px solid var(--line);border-left:10px solid var(--red);border-radius:14px;padding:14px 18px;margin:10px auto;max-width:820px}
+.tcard h2{font-family:var(--display);font-weight:700;font-size:clamp(28px,4.4vw,40px);line-height:1.05;margin:0 0 6px}
+.tcard p{font-size:20px;margin:6px 0}
+.step{font-family:var(--display);font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--red);font-size:18px}
+.jb{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:10px}
+.jb h3{font-family:var(--display);font-weight:600;font-size:22px;margin:0 0 6px;letter-spacing:.06em;text-transform:uppercase}
+.acct{display:grid;gap:6px}
+.acct button{text-align:left;background:var(--soft);border:3px solid var(--line);border-radius:10px;padding:7px 12px;font-weight:700;font-size:18px;line-height:1.15}
+.acct button[aria-pressed="true"]{background:var(--dark);border-color:var(--dark);color:#fff}
+.amt{display:flex;align-items:center;gap:10px;margin-top:12px;flex-wrap:wrap}
+.amt label{font-family:var(--display);font-weight:600;font-size:22px;text-transform:uppercase;letter-spacing:.06em}
+.amt .dollar{display:flex;align-items:center;border:3px solid var(--line);border-radius:10px;background:var(--soft);padding:0 10px}
+.amt .dollar span{font-family:var(--display);font-weight:700;font-size:30px}
+.amt input{width:5ch;border:0;background:transparent;font:700 32px var(--display);padding:6px 4px;color:var(--ink)}
+.fb{border-radius:12px;padding:10px 16px;margin-top:12px;font-size:19px;font-weight:600}
+.fb.ok{background:var(--goodsoft);border:2px solid var(--good)}
+.fb.no{background:var(--badsoft);border:2px solid var(--bad)}
+.fb b{font-family:var(--display);font-weight:700;font-size:24px;display:block}
+.stepper{display:flex;align-items:center;gap:14px;margin:8px 0 12px}
+.stepper button{width:64px;height:64px;border-radius:14px;border:3px solid var(--line);background:var(--soft);font:700 34px var(--display)}
+.stepper .v{font-family:var(--display);font-weight:700;font-size:56px;min-width:2ch;text-align:center;font-variant-numeric:tabular-nums}
+.stepper .u{font-weight:700;font-size:20px;color:var(--muted)}
+.choice{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:10px}
+.choice button{text-align:left;border:3px solid var(--line);background:var(--paper);border-radius:14px;padding:14px 16px}
+.choice button b{display:block;font-family:var(--display);font-weight:700;font-size:30px;line-height:1.05}
+.choice button span{display:block;font-size:17px;color:var(--muted);font-weight:600}
+.choice button[aria-pressed="true"]{border-color:var(--ink);background:var(--soft);box-shadow:inset 0 0 0 2px var(--ink)}
+.taccount{display:grid;grid-template-columns:1fr 1fr;border-top:3px solid var(--ink);margin-top:8px;font-variant-numeric:tabular-nums}
+.taccount>div{padding:6px 10px;font-size:18px}
+.taccount>div:first-child{border-right:3px solid var(--ink)}
+.taccount .hd{font-family:var(--display);font-weight:600;letter-spacing:.06em;text-transform:uppercase;font-size:15px;color:var(--muted)}
+.taccount .ln{display:flex;justify-content:space-between;gap:8px;font-weight:600}
+.taccount .bal{grid-column:1/-1;border-top:2px solid var(--line);text-align:center;font-weight:700;font-size:20px;padding:6px}
+.ttitle{text-align:center;font-family:var(--display);font-weight:600;font-size:20px;margin-top:10px}
+.mini{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:5px;margin-top:8px}
+.mini .pl{font-size:18px;padding:2px 0}
+.mini .pl small{font-size:10px}
+.stats{display:flex;justify-content:center;gap:22px;flex-wrap:wrap;margin-top:10px;font-weight:700;font-size:18px;text-align:center}
+.stats b{font-family:var(--display);font-size:38px;display:block;line-height:1;font-variant-numeric:tabular-nums}
+.rep h2{font-family:var(--display);font-weight:700;font-size:clamp(34px,5vw,54px);margin:6px 0;line-height:1.05}
+.cr{display:grid;grid-template-columns:minmax(0,1.3fr) 1.2fr auto;gap:12px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line);font-size:20px}
+.cr .b{height:14px;background:var(--soft);border-radius:999px;overflow:hidden}.cr .b i{display:block;height:100%;background:var(--good)}
+@media (max-width:820px){.split{grid-template-columns:1fr}.cfg{grid-template-columns:1fr}.planes{grid-template-columns:repeat(4,minmax(0,1fr))}}
+@media (max-width:640px){.jb,.choice{grid-template-columns:1fr}}
+
+/* finale */
+body.finale-on{overflow:hidden}
+body.finale-on .top{visibility:hidden}
+.finale{position:fixed;inset:0;z-index:50;background:radial-gradient(120% 80% at 50% 110%,#5a0614 0%,#1a0207 45%,#070707 100%);color:#fff;display:grid;grid-template-rows:auto 1fr auto auto;justify-items:center;padding:2.2vh 3vw 2vh;overflow:hidden}
+.finale canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:1}
+.finale .rays{position:absolute;left:50%;top:62%;width:160vmax;height:160vmax;transform:translate(-50%,-50%);background:repeating-conic-gradient(from 0deg,rgba(255,255,255,.05) 0deg 8deg,transparent 8deg 22deg);animation:spin 60s linear infinite;z-index:0;mask:radial-gradient(circle,#000 0%,transparent 55%);-webkit-mask:radial-gradient(circle,#000 0%,transparent 55%)}
+@keyframes spin{to{transform:translate(-50%,-50%) rotate(360deg)}}
+.fhead{position:relative;z-index:2;text-align:center}
+.fhead .lg{height:clamp(34px,6vh,64px);display:block;margin:0 auto 1vh;border-radius:4px}
+.fhead .kick{font-family:var(--display);letter-spacing:.3em;text-transform:uppercase;color:#FF4D63;font-size:clamp(14px,2.2vh,26px)}
+.fhead h2{font-family:var(--display);font-weight:700;font-size:clamp(48px,10vh,130px);line-height:.95;margin:0;background:linear-gradient(180deg,#fff 45%,#F4B6C0);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 4px 18px rgba(193,16,47,.6))}
+.podium{position:relative;z-index:2;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));align-items:end;gap:1.6vw;width:min(92vw,1500px);align-self:end}
+.pod{display:flex;flex-direction:column;align-items:center;opacity:0;transform:translateY(40px) scale(.9);transition:opacity .5s, transform .7s cubic-bezier(.2,1.6,.4,1)}
+.pod.in{opacity:1;transform:none}
+.pod.empty{visibility:hidden}
+.pod .who{text-align:center;margin-bottom:1.2vh;max-width:100%}
+.pod .medal{width:clamp(44px,8vh,96px);height:clamp(44px,8vh,96px);border-radius:50%;display:grid;place-items:center;margin:0 auto .8vh;font-family:var(--display);font-weight:700;font-size:clamp(24px,4.6vh,56px);color:#3b2600;box-shadow:inset 0 -6px 0 rgba(0,0,0,.18),0 6px 24px rgba(0,0,0,.4)}
+.p1 .medal{background:radial-gradient(circle at 35% 30%,#FFF3B0,#FFC93C 55%,#C98A00)}
+.p2 .medal{background:radial-gradient(circle at 35% 30%,#FFFFFF,#CFD6DD 55%,#8C98A3)}
+.p3 .medal{background:radial-gradient(circle at 35% 30%,#FFD9B8,#D88B4A 55%,#8E4F1C);color:#2b1300}
+.pod .nm{font-family:var(--display);font-weight:600;font-size:clamp(26px,5.4vh,72px);line-height:1.05;overflow-wrap:anywhere}
+.p1 .nm{font-size:clamp(32px,7vh,96px);color:#fff;text-shadow:0 0 24px rgba(232,25,60,.8)}
+.pod .pts{font-weight:700;font-size:clamp(18px,3.2vh,40px);opacity:.85}
+.pod .block{width:100%;border-radius:12px 12px 0 0;display:grid;place-items:start center;padding-top:1.4vh;font-family:var(--display);font-weight:700;font-size:clamp(28px,6vh,80px);color:rgba(255,255,255,.92);background:linear-gradient(180deg,#E0213F,#8F0A20);box-shadow:inset 0 3px 0 rgba(255,255,255,.25),0 -10px 40px rgba(193,16,47,.35)}
+.p1 .block{height:26vh;background:linear-gradient(180deg,#F23A55,#A90C26)}
+.p2 .block{height:18vh}
+.p3 .block{height:13vh}
+.p1.in .who{animation:pop 1.2s ease-out .2s 2}
+@keyframes pop{50%{transform:scale(1.08)}}
+.rest{position:relative;z-index:2;display:grid;grid-template-columns:1fr 1fr;gap:1.4vw;width:min(92vw,1500px);margin-top:1.6vh}
+.row45{display:flex;align-items:center;gap:1.2vw;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);border-radius:12px;padding:1vh 1.4vw;font-size:clamp(20px,3.6vh,44px);font-weight:700;opacity:0;transform:translateX(-30px);transition:opacity .5s, transform .5s}
+.row45.in{opacity:1;transform:none}
+.row45 .r{font-family:var(--display);color:#FF4D63;min-width:1.4em}
+.row45 .n{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.row45 .s{opacity:.8}
+.fbar{position:relative;z-index:4;display:flex;gap:10px;margin-top:1.6vh;opacity:.55;transition:opacity .2s}
+.fbar:hover{opacity:1}
+.fbar .btn{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.25);color:#fff;font-size:15px;padding:6px 14px}
+@media (max-width:700px){.rest{grid-template-columns:1fr}}
+@media (prefers-reduced-motion: reduce){.finale .rays{animation:none}.pod,.row45{transition:none}.p1.in .who{animation:none}.tile.anim,.sum tr.anim{animation:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top"><img src="/logo-214.png" alt="District 214"><a href="/">District 214 Accounting</a> | Chapter 9: Paper Airplane Inc.<span class="sp"></span><span class="zm" id="zm"><button id="zo" aria-label="Smaller numbers">A−</button><button id="zi" aria-label="Bigger numbers">A+</button></span><span class="pill" id="who" hidden></span><button class="rejoin" id="rejoin" hidden>↻ Rejoin</button></div>
+  <main id="app"></main>
+</div>
+<script>
+"use strict";
+/* ============================================================ GAME SETTINGS (teacher can change them when creating a game) */
+const DEFAULTS={planes:16,price:10,repl:3,rep:1,dist:20,build:6,refly:1,trueup:1};
+const ACCTS=["Cash","Accounts Receivable","Merchandise Inventory","Sales Revenue","Cost of Goods Sold","Warranty Expense","Estimated Warranty Liability","Salaries Expense","Salaries Payable"];
+const EWL="Estimated Warranty Liability",WE="Warranty Expense";
+const WHY={
+ sale:"Customers paid cash for every airplane, so Cash goes up and Sales Revenue is earned today.",
+ est:"Matching principle: the warranty cost belongs in the same period as the sale, so you estimate it now, before a single plane flies. The expense goes up, and so does what you owe customers later.",
+ repair:"The expense was already recorded when you made the estimate. A claim just uses up the liability. A repair is labor, and you owe your workers for it: Salaries Payable.",
+ replace:"The expense was already recorded when you made the estimate. A claim just uses up the liability. The new airplane comes out of Merchandise Inventory.",
+ over:"You estimated more than the claims cost. That leftover liability isn't owed to anyone, so take it back out of Warranty Expense.",
+ under:"The claims cost more than you estimated, so the liability went negative. Record the extra Warranty Expense to bring the liability back to zero.",
+ zero:"Your estimate matched the claims exactly. The liability is already at zero, so there's nothing to adjust."
+};
+const KIND={sale:"Sale",est:"Warranty estimate",repair:"Repair claim",replace:"Replacement claim",tu:"Year-end true-up"};
+const COLORS=["#C1102F","#1F5FAD","#1E7A3C","#9A6700","#6F3FA8","#0F7C80","#C2410C","#BE185D","#3F3F46","#4D7C0F"];
+
+/* ============================================================ HELPERS */
+const $=s=>document.querySelector(s);
+const app=$("#app");
+const money=n=>(n<0?"−$":"$")+Math.abs(Math.round(n)).toLocaleString("en-US");
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const ord=n=>n+(n%100>=11&&n%100<=13?"th":["th","st","nd","rd"][n%10]||"th");
+const rid=()=>Math.random().toString(36).slice(2,9);
+const plural=(n,w)=>n+" "+w+(n===1?"":"s");
+function beep(f,d){try{const c=beep.c||(beep.c=new (window.AudioContext||window.webkitAudioContext)());const o=c.createOscillator(),g=c.createGain();o.frequency.value=f;g.gain.value=.06;o.connect(g);g.connect(c.destination);const t=c.currentTime;g.gain.exponentialRampToValueAtTime(.0001,t+d);o.start(t);o.stop(t+d)}catch(e){}}
+const ROLE=window.PA_ROLE||"team";
+const MOCK=/[?&]mock=1/.test(location.search);
+function jeHTML(dr,cr,amt,cls){return `<div class="je ${cls||""}"><span class="a">${esc(dr)}</span><span class="v">${money(amt)}</span><span></span><span class="a ind">${esc(cr)}</span><span></span><span class="v">${money(amt)}</span></div>`}
+
+/* ---------- backend (same database as the other class games) ---------- */
+function mockNet(){
+  const KEY="paLiveMock",bc=("BroadcastChannel" in window)?new BroadcastChannel(KEY):null,subs=[];
+  const read=()=>{try{return JSON.parse(localStorage.getItem(KEY)||"{}")}catch(e){return{}}};
+  const write=t=>{localStorage.setItem(KEY,JSON.stringify(t));fire();if(bc)bc.postMessage(1)};
+  const at=(t,p)=>p.split("/").filter(Boolean).reduce((o,k)=>o==null?undefined:o[k],t);
+  const put=(t,p,v)=>{const ks=p.split("/").filter(Boolean);let o=t;ks.slice(0,-1).forEach(k=>{if(typeof o[k]!=="object"||o[k]===null)o[k]={};o=o[k]});if(v===null)delete o[ks[ks.length-1]];else o[ks[ks.length-1]]=v};
+  const fire=()=>{const t=read();subs.forEach(s=>{const v=JSON.stringify(at(t,s.p)??null);if(v!==s.last){s.last=v;s.cb(JSON.parse(v))}})};
+  if(bc)bc.onmessage=fire;window.addEventListener("storage",e=>{if(e.key===KEY)fire()});
+  return{kind:"mock",
+    get:async p=>at(read(),p)??null,
+    set:async(p,v)=>{const t=read();put(t,p,v);write(t)},
+    update:async(p,o)=>{const t=read();Object.entries(o).forEach(([k,v])=>put(t,p+"/"+k,v));write(t)},
+    remove:async p=>{const t=read();put(t,p,null);write(t)},
+    on:(p,cb)=>{const s={p,cb,last:undefined};subs.push(s);setTimeout(fire,0);return()=>{const i=subs.indexOf(s);if(i>=0)subs.splice(i,1)}}};
+}
+async function vercelNet(){
+  const call=async(op,path,v)=>{const r=await fetch("/api/live",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({op,path,v})});
+    const j=await r.json().catch(()=>({}));if(!r.ok)throw new Error(j.error||r.status);return j};
+  try{const p=await call("ping");if(!p.ok)return null}catch(e){return null}
+  return{kind:"vercel",
+    get:async p=>(await call("get",p)).v??null,
+    set:(p,v)=>call("set",p,v),
+    update:(p,o)=>call("update",p,o),
+    remove:p=>call("remove",p),
+    on:(p,cb)=>{let last,stop=false,t;
+      const tick=async()=>{if(stop)return;
+        if(!document.hidden){try{const v=(await call("get",p)).v??null,s=JSON.stringify(v);if(s!==last){last=s;cb(v)}}catch(e){}}
+        if(!stop)t=setTimeout(tick,1200)};
+      tick();return()=>{stop=true;clearTimeout(t)}}};
+}
+let NET=null;
+async function net(){if(NET)return NET;NET=MOCK?mockNet():await vercelNet();return NET}
+function needSetup(){app.innerHTML=`<div class="panel"><h2>${ROLE==="teacher"?"Class games need a one-time setup":"The game isn't open yet"}</h2><p>${ROLE==="teacher"?"Connect Upstash for Redis to this Vercel project (Storage tab), then redeploy.":"Wait for your teacher to start it, then reload this page."}</p><button class="btn main" id="b">Reload</button></div>`;$("#b").onclick=()=>location.reload()}
+
+/* ---------- size: the board fits the projector; A− / A+ scales the numbers ---------- */
+const ZKEY=ROLE==="teacher"?"paNumSize":"paTeamZoom";
+function getZ(){let z=1;try{z=+localStorage.getItem(ZKEY)||1}catch(e){}return z}
+function setZ(d){let z=getZ();z=Math.min(ROLE==="teacher"?1.8:1.6,Math.max(ROLE==="teacher"?.7:.8,Math.round((z+d)*10)/10));try{localStorage.setItem(ZKEY,z)}catch(e){}applyZ()}
+function applyZ(){const z=getZ();if(ROLE==="teacher"){document.documentElement.style.setProperty("--nk",z);zoomApp()}else app.style.zoom=z===1?"":z}
+function zoomApp(){if(ROLE!=="teacher"||document.body.classList.contains("finale-on"))return;const a=app;a.style.zoom="";const R=document.documentElement;let lo=.55,hi=2.4;
+  for(let i=0;i<14;i++){const m=(lo+hi)/2;a.style.zoom=m.toFixed(3);(R.scrollHeight<=innerHeight+1&&R.scrollWidth<=innerWidth+1)?lo=m:hi=m}
+  a.style.zoom=lo.toFixed(3)}
+addEventListener("resize",()=>{clearTimeout(zoomApp.t);zoomApp.t=setTimeout(zoomApp,150)});
+let lastPaint="";
+function paint(html,force){if(!force&&html===lastPaint)return false;lastPaint=html;app.innerHTML=html;return true}
+
+/* ---------- the books: one source of truth for every team ---------- */
+function calc(rec,pid,st){
+  const c=st.cfg,fl=(st.flights&&st.flights[pid])||[],tf=st.tfix||{},cl=(rec&&rec.claims)||{};
+  const fixOf=id=>cl[id]&&cl[id].done?cl[id].fix:(tf[id]||null);
+  const planes=[];
+  for(let p=1;p<=c.planes;p++){const f=fl.filter(x=>x.p===p);let s="ready";
+    if(f.length){const L=f[f.length-1];if(L.ok)s="ok";else{const fx=fixOf(L.id);s=!fx?"claim":(f.length-1<c.refly?"refly":"closed")}}
+    planes.push({p,s,n:f.length,last:f[f.length-1]||null})}
+  const claims=fl.filter(x=>!x.ok).map(x=>({id:x.id,p:x.p,fix:fixOf(x.id),by:cl[x.id]&&cl[x.id].done?"team":tf[x.id]?"teacher":null,t:x.t||0}));
+  const costOf=f=>f==="repair"?c.rep:f==="replace"?c.repl:0;
+  const actual=claims.reduce((t,x)=>t+costOf(x.fix),0);
+  const fc=rec&&rec.fc&&rec.fc.locked?rec.fc:null;
+  const est=fc?fc.rep*c.rep+fc.repl*c.repl:0;
+  const next=planes.find(x=>x.s==="ready")||planes.find(x=>x.s==="refly")||null;
+  const firstFlights=fl.filter((x,i)=>fl.findIndex(y=>y.p===x.p)===i);
+  return{planes,claims,actual,est,fc,diff:est-actual,next,pending:claims.filter(x=>!x.fix).length,
+    sales:c.planes*c.price,firstPass:firstFlights.filter(x=>x.ok).length,flown:firstFlights.length,
+    repairs:claims.filter(x=>x.fix==="repair").length,repls:claims.filter(x=>x.fix==="replace").length}
+}
+function entryLog(rec){ // every entry this team booked itself, with whether it was right on the first try
+  const out=[];if(!rec)return out;
+  if(rec.sale&&rec.sale.done)out.push({k:"sale",first:rec.sale.first});
+  if(rec.est&&rec.est.done)out.push({k:"est",first:rec.est.first});
+  Object.values(rec.claims||{}).forEach(c=>{if(c.done&&c.first!=null)out.push({k:c.fix,first:c.first})});
+  if(rec.tu&&rec.tu.done)out.push({k:"tu",first:rec.tu.first});
+  return out}
+function standings(teams,st){ // closest estimate wins; ties go to more entries right the first time, then fewer warranty dollars
+  const rows=teams.map(t=>{const k=calc(t,t.id,st),log=entryLog(t);return{t,k,off:Math.abs(k.diff),right:log.filter(x=>x.first).length,n:log.length}});
+  rows.sort((a,b)=>a.off-b.off||b.right-a.right||a.k.actual-b.k.actual);
+  let r=0;rows.forEach((x,i)=>{const p=rows[i-1];if(!p||p.off!==x.off||p.right!==x.right||p.k.actual!==x.k.actual)r=i+1;x.rank=r});
+  return rows}
+
+/* ============================================================ TEACHER (projector) */
+let H=null;
+function hdr(){return `<h1 class="title">Paper Airplane <span>Inc.</span></h1>
+  <p class="lede">${ROLE==="teacher"?"Teacher screen. Teams build paper airplanes, book the sale, and estimate how many will fail the 20-foot flight guarantee. Then the flight test: every plane that comes up short is a warranty claim the team has to repair or replace and journalize on their iPad. Closest estimate wins.":"Your team builds and sells paper airplanes with a 20-foot flight guarantee. Estimate how many will come up short, book the warranty entries, then fix every plane that fails. The team whose estimate is closest wins."}</p>`}
+async function hostSetup(){
+  const N=await net().catch(()=>null);if(!N)return needSetup();
+  const d=DEFAULTS;
+  paint(`${hdr()}<div class="panel" style="margin-top:0"><h2>Start a game</h2>
+    <p>One iPad per team, plus scrap paper and a tape measure marked at the guarantee distance.</p>
+    <div class="cfg">
+      <label>Airplanes per team<input id="c_planes" type="number" min="1" max="40" value="${d.planes}"></label>
+      <label>Price per airplane ($)<input id="c_price" type="number" min="1" max="100" value="${d.price}"></label>
+      <label>Replacement cost, parts and labor ($)<input id="c_repl" type="number" min="1" max="100" value="${d.repl}"></label>
+      <label>Repair cost, labor ($)<input id="c_rep" type="number" min="1" max="100" value="${d.rep}"></label>
+      <label>Guaranteed distance (feet)<input id="c_dist" type="number" min="1" max="100" value="${d.dist}"></label>
+      <label>Build time (minutes)<input id="c_build" type="number" min="1" max="30" value="${d.build}"></label>
+      <label>After a claim, the plane flies again<select id="c_refly"><option value="0">No, the claim closes it</option><option value="1" selected>Once</option><option value="2">Up to twice</option></select></label>
+      <label>Year-end true-up entry<select id="c_trueup"><option value="1" selected>Include it</option><option value="0">Skip it</option></select></label>
+    </div>
+    <div class="err" id="er"></div><button class="btn main" id="go">Create game</button></div>`,1);
+  $("#go").onclick=async()=>{
+    const cfg={};Object.keys(DEFAULTS).forEach(k=>{const v=Math.round(+$("#c_"+k).value);cfg[k]=isFinite(v)?v:DEFAULTS[k]});
+    cfg.planes=Math.max(1,Math.min(40,cfg.planes));
+    $("#go").disabled=true;
+    try{let code;for(let t=0;t<20;t++){code=String(Math.floor(1000+Math.random()*9000));if(!(await N.get("games/"+code)))break}
+      const state={phase:"lobby",cfg,flights:{},tfix:{}};
+      await N.set("games/"+code,{created:Date.now(),game:"airplane",ids:[],state});
+      H={N,code,players:{},state,timer:{left:cfg.build*60000,end:null}};
+      H.off=N.on("games/"+code+"/players",v=>{H.players=v||{};hostRender()});
+      hostRender()}catch(e){$("#er").textContent="Couldn't reach the game database.";$("#go").disabled=false}};
+  requestAnimationFrame(zoomApp);
+}
+function teamsArr(){return Object.entries(H.players).map(([id,p])=>({id,...p})).filter(p=>p&&p.name).sort((a,b)=>(a.joined||0)-(b.joined||0))}
+const colorOf=(teams,id)=>COLORS[Math.max(0,teams.findIndex(t=>t.id===id))%COLORS.length];
+function hostSet(st){st.names=Object.fromEntries(teamsArr().map(t=>[t.id,t.name]));H.state=st;H.N.set("games/"+H.code+"/state",st).catch(()=>{});hostRender()}
+function priceSheet(c){return `<div class="prices">
+  <div class="pr"><span class="plab">Paper airplane price</span><span class="pv">${money(c.price)}</span></div>
+  <div class="pr"><span class="plab">Replacement cost<small>Parts and labor. A brand new airplane.</small></span><span class="pv">${money(c.repl)}</span></div>
+  <div class="pr"><span class="plab">Repair cost<small>Labor only. Fix the one that failed.</small></span><span class="pv">${money(c.rep)}</span></div></div>`}
+function hostRender(){
+  if(!H)return;const st=H.state,teams=teamsArr(),c=st.cfg;
+  const go=(html)=>{if(paint(html))wireHost();requestAnimationFrame(zoomApp)};
+  if(st.phase==="lobby"){
+    const url=location.origin+"/paper-airplane?code="+H.code;if(H.qr==null)H.qr=window.qrSvg?qrSvg(url):"";
+    return go(`<div class="lobby"><div class="lobtop"><div class="lobleft"><div class="join">One iPad per team. Scan the code, or go to <b>Paper Airplane Inc.</b> on the accounting site and enter</div>
+      <div class="code">${H.code}</div><div class="url">${esc(url.replace(/^https?:\/\//,""))}</div></div>${H.qr?`<div class="qr">${H.qr}<span>Scan to join</span></div>`:""}</div>
+      <div class="count">${plural(teams.length,"team")} joined</div>
+      <div class="names">${teams.map(t=>`<span style="--c:${colorOf(teams,t.id)}">${esc(t.name)}</span>`).join("")||'<span style="opacity:.5">Waiting for teams…</span>'}</div>
+      <button class="btn main" data-act="tobuild" ${teams.length>=1?"":"disabled"}>Assembly instructions →</button> <button class="btn" data-act="erase">Cancel</button></div>`)}
+  if(st.phase==="build"){
+    return go(`<div class="rhead"><span class="rtag">Step 1</span><span class="rname">Build the fleet</span></div>
+      <div class="split"><div class="scard"><div class="stitle">Assembly instructions</div>
+        <p class="story">Make any paper airplane you would like. Each team builds <b>${c.planes}</b>.</p>
+        <p class="story">Your warranty: every airplane is guaranteed to fly <b>${c.dist} feet</b>. If it doesn't, your company will either repair it or provide a new one.</p>
+        <span class="guar">Guaranteed to fly ${c.dist} feet</span></div>
+        <div><div class="timer" id="tm">${fmtT(timerLeft())}</div>
+          <div class="row" style="justify-content:center;margin-top:10px"><button class="btn" data-act="tgo" id="tgo">${H.timer.end?"Pause":"Start"}</button><button class="btn" data-act="tplus">+1 min</button><button class="btn" data-act="treset">Reset</button></div></div></div>
+      <div style="margin-top:14px">${priceSheet(c)}</div>
+      <div class="bar2"><span class="note">Teams can see the instructions and prices on their iPads.</span><button class="btn main" data-act="tobooks">Sale day →</button></div>`)}
+  if(st.phase==="books"){
+    const tiles=teams.map((t,i)=>{const s=t.sale&&t.sale.done,f=t.fc&&t.fc.locked,e=t.est&&t.est.done;
+      return `<div class="tile" style="--c:${colorOf(teams,t.id)}"><div class="tn">${esc(t.name)}</div><div class="ck"><span class="${s?"y":""}">${s?"✓":"○"} Sale entry</span><span class="${f?"y":""}">${f?"✓":"○"} Forecast locked</span><span class="${e?"y":""}">${e?"✓":"○"} Estimate entry</span></div></div>`}).join("");
+    const n=teams.filter(t=>t.est&&t.est.done||(t.fc&&t.fc.locked&&calc(t,t.id,st).est===0)).length;
+    return go(`<div class="rhead"><span class="rtag">Step 2</span><span class="rname">Sale day</span></div>
+      <div class="split"><div class="scard"><div class="stitle">You sold ${c.planes} airplanes for cash</div>
+        <p class="story">On your iPad: book the sale, then predict how many of your ${c.planes} planes will <b>not</b> fly ${c.dist} feet. Book the warranty estimate now, before a single plane flies.</p>
+        <p class="story" style="font-size:22px;color:var(--muted)">Matching principle: the warranty cost goes in the same period as the sale.</p></div>${priceSheet(c)}</div>
+      <div class="board">${tiles}</div>
+      <div class="bar2"><span class="count">${n} of ${teams.length} estimates booked</span><button class="btn main" data-act="toreveal">Reveal the estimates →</button></div>`)}
+  if(st.phase==="reveal"){
+    const fresh=animFresh("reveal");
+    const tiles=teams.map((t,i)=>{const k=calc(t,t.id,st);
+      return `<div class="tile${fresh?" anim":""}" style="--c:${colorOf(teams,t.id)};--d:${i*160}ms"><div class="tn">${esc(t.name)}</div>
+        ${k.fc?`<div class="big">${money(k.est)}</div><div class="sub">${k.fc.fail} of ${c.planes} will fail<br>${k.fc.rep} repair · ${k.fc.repl} replace</div>`:`<div class="big">$0</div><div class="sub">No forecast</div>`}</div>`}).join("");
+    return go(`<div class="rhead"><span class="rtag">Step 2</span><span class="rname">The estimates</span></div>
+      <div class="scard"><div class="stitle">Estimated warranty expense</div>
+        <div class="row" style="gap:24px;align-items:center"><div class="jebox">${jeHTML(WE,EWL,0).replace(/\$0/g,"$ ?")}</div><p class="story" style="flex:1;min-width:280px">Every team recorded the expense today and a liability for the repairs and replacements it expects to owe.</p></div></div>
+      <div class="board">${tiles}</div>
+      <div class="bar2"><span></span><button class="btn main" data-act="tofly">Start the flight test →</button></div>`)}
+  if(st.phase==="fly")return go(flyHTML(teams,st));
+  if(st.phase==="trueup"){
+    const fresh=animFresh("trueup");
+    const rows=teams.map((t,i)=>{const k=calc(t,t.id,st),done=t.tu&&t.tu.done;
+      return `<tr class="${fresh?"anim":""}" style="--c:${colorOf(teams,t.id)};--d:${i*140}ms"><td>${esc(t.name)}${c.trueup?`<small>${done?"✓ True-up booked":"Booking the true-up…"}</small>`:""}</td><td>${money(k.sales)}</td><td>${money(k.est)}</td><td>${money(k.actual)}<small>${k.repairs} repair · ${k.repls} replace</small></td>
+        <td class="${k.diff>0?"pos":k.diff<0?"neg":""}">${k.diff===0?"$0":money(Math.abs(k.diff))}<small>${k.diff>0?"over-estimated":k.diff<0?"under-estimated":"right on"}</small></td></tr>`}).join("");
+    const n=teams.filter(t=>t.tu&&t.tu.done).length;
+    return go(`<div class="rhead"><span class="rtag">Step 4</span><span class="rname">${c.trueup?"Year-end true-up":"How close was your estimate?"}</span></div>
+      ${c.trueup?`<div class="scard" style="margin-bottom:12px"><div class="stitle">Clear out the liability</div><p class="story">The warranty period is over. On your iPad, look at what's left in Estimated Warranty Liability and book the entry that brings it to zero.</p></div>`:""}
+      <table class="sum"><thead><tr><th>Team</th><th>Paper airplane sales</th><th>Warranty expense estimated</th><th>Actual warranty expense</th><th>Difference</th></tr></thead><tbody>${rows}</tbody></table>
+      <div class="bar2"><span class="count">${c.trueup?`${n} of ${teams.length} true-ups booked`:""}</span><button class="btn main" data-act="toend">Final standings →</button></div>`)}
+  if(st.phase==="end"){if(H.anim!=="end"){animFresh("end");finale(teams)}return}
+}
+function flyHTML(teams,st){
+  const c=st.cfg;if(!teams.find(t=>t.id===st.cur))st.cur=teams[0]&&teams[0].id;
+  const t=teams.find(x=>x.id===st.cur);if(!t)return `<div class="wait"><h2>No teams</h2></div>`;
+  const k=calc(t,t.id,st),col=colorOf(teams,t.id);
+  const tabs=teams.map(x=>{const q=calc(x,x.id,st),left=q.planes.filter(p=>p.s==="ready"||p.s==="refly").length;
+    return `<button data-act="cur" data-id="${x.id}" aria-pressed="${x.id===st.cur}" style="--c:${colorOf(teams,x.id)}">${esc(x.name)}<small>${left?left+" to fly":q.pending?"":"done"}${q.pending?(left?" · ":"")+q.pending+" open claim"+(q.pending>1?"s":""):""}</small></button>`}).join("");
+  let run;
+  if(k.next){const re=k.next.s==="refly";const lc=re&&k.claims.filter(x=>x.p===k.next.p).slice(-1)[0];
+    run=`<div class="who">${esc(t.name)} · on the runway</div><div class="pn">Plane ${k.next.p} <span style="font-size:.45em;color:var(--muted)">of ${c.planes}</span></div>
+      <div class="pk ${re?"re":""}">${re?`Re-flight after ${lc&&lc.fix==="repair"?"a repair":"a replacement"}`:"First flight"} · needs ${c.dist} feet</div>
+      <div class="flybtns"><button class="ok" data-act="fly" data-ok="1">✈ Made it<small>Key: M</small></button><button class="no" data-act="fly" data-ok="0">✗ Short<small>Key: S</small></button></div>`}
+  else run=`<div class="who">${esc(t.name)}</div><div class="pn" style="font-size:calc(54px*var(--nk))">${k.pending?`Waiting on ${plural(k.pending,"claim")}`:"All planes done"}</div>
+      <div class="pk">${k.pending?"The team books each claim on their iPad. Tap a red plane to settle it from here.":"Pick the next team."}</div>`;
+  const tiles=k.planes.map(p=>{const lab={ready:"",ok:p.n>1?"fixed ✓":"flew ✓",claim:"claim",refly:"re-fly",closed:"fixed"}[p.s];
+    return `<div class="pl ${p.s}${k.next&&k.next.p===p.p?" next":""}" ${p.s==="claim"?`data-act="settle" data-fid="${p.last.id}" data-p="${p.p}"`:""}>${p.p}<small>${lab||"&nbsp;"}</small></div>`}).join("");
+  const liab=teams.map(x=>{const q=calc(x,x.id,st),left=q.est-q.actual,pct=q.est?Math.max(0,Math.min(100,left/q.est*100)):0;
+    return `<div class="lrow" style="--c:${colorOf(teams,x.id)}"><span class="n">${esc(x.name)}</span><span class="left ${left<0?"neg":""}">${money(left)}</span>
+      <span class="m ${left<0?"neg":""}"><i style="width:${left<0?100:pct}%"></i></span><span class="d">Estimated ${money(q.est)} · claims ${money(q.actual)}${q.pending?` · ${q.pending} open`:""}</span></div>`}).join("");
+  const feed=k.claims.filter(x=>x.fix).slice(-2).reverse().map(x=>`<div class="fe" style="--c:${col}"><b>Plane ${x.p}: ${x.fix==="repair"?"Repair":"Replacement"}</b>${x.by==="teacher"?" <span class='note'>(settled by teacher)</span>":""}${jeHTML(EWL,x.fix==="repair"?"Salaries Payable":"Merchandise Inventory",x.fix==="repair"?c.rep:c.repl)}</div>`).join("");
+  return `<div class="rhead"><span class="rtag">Step 3 · Flight test</span><span class="rname">Guaranteed to fly ${c.dist} feet</span></div>
+    <div class="tabs">${tabs}</div>
+    <div class="split"><div><div class="runway" id="runway" style="--c:${col}">${run}
+      <div class="runtools"><button class="btn" data-act="undo" ${(st.flights[t.id]||[]).length?"":"disabled"}>↶ Undo last flight</button><button class="btn" data-act="nextteam">Next team →</button></div></div>
+      <div class="planes">${tiles}</div>${feed?`<div class="feed">${feed}</div>`:""}</div>
+      <div><div class="liab"><h3>Warranty liability left</h3><div class="note" style="margin-bottom:4px">Starts at the estimate. Every claim uses some up.</div>${liab}</div>
+      <div class="bar2" style="justify-content:flex-end"><button class="btn main" data-act="totrueup">Done flying →</button></div></div></div>`;
+}
+function animFresh(ph){if(H.anim!==ph){H.anim=ph;H.animT=Date.now()}return Date.now()-H.animT<4500}
+function wireHost(){
+  app.querySelectorAll("[data-act]").forEach(b=>b.onclick=()=>hostAct(b.dataset.act,b))}
+function hostAct(a,b){
+  const st=H.state,teams=teamsArr();
+  if(a==="erase")return hostErase();
+  if(a==="tobuild")return hostSet({...st,phase:"build"});
+  if(a==="tgo"){const T=H.timer;if(T.end){T.left=Math.max(0,T.end-Date.now());T.end=null}else{if(T.left<=0)T.left=st.cfg.build*60000;T.end=Date.now()+T.left;beep(660,.12)}tickTimer();b.textContent=T.end?"Pause":"Start";return}
+  if(a==="tplus"){const T=H.timer;if(T.end)T.end+=60000;else T.left+=60000;H.timer.rang=false;tickTimer();return}
+  if(a==="treset"){H.timer={left:st.cfg.build*60000,end:null};tickTimer();const g=$("#tgo");if(g)g.textContent="Start";return}
+  if(a==="tobooks"){H.timer.end=null;return hostSet({...st,phase:"books"})}
+  if(a==="toreveal"){const n=teams.filter(t=>t.fc&&t.fc.locked).length;if(n<teams.length&&!confirm(`${teams.length-n} team(s) haven't locked a forecast. Their estimate will be $0. Reveal anyway?`))return;beep(660,.12);return hostSet({...st,phase:"reveal"})}
+  if(a==="tofly")return hostSet({...st,phase:"fly",cur:teams[0]&&teams[0].id});
+  if(a==="cur")return hostSet({...st,cur:b.dataset.id});
+  if(a==="nextteam"){const i=teams.findIndex(t=>t.id===st.cur);const nx=teams[(i+1)%teams.length];return hostSet({...st,cur:nx&&nx.id})}
+  if(a==="fly")return recordFlight(b.dataset.ok==="1");
+  if(a==="undo"){const fl=(st.flights[st.cur]||[]).slice(0,-1);return hostSet({...st,flights:{...st.flights,[st.cur]:fl}})}
+  if(a==="settle")return settle(b.dataset.fid,b.dataset.p);
+  if(a==="totrueup"){const open=teams.reduce((n,t)=>n+calc(t,t.id,st).pending,0),left=teams.reduce((n,t)=>n+calc(t,t.id,st).planes.filter(p=>p.s==="ready"||p.s==="refly").length,0);
+    if((open||left)&&!confirm(`${open?plural(open,"claim")+" still open (they won't count). ":""}${left?plural(left,"flight")+" not flown yet. ":""}Finish the flight test anyway?`))return;
+    return hostSet({...st,phase:st.cfg.trueup?"trueup":"trueup"})}
+  if(a==="toend"){if(st.cfg.trueup){const n=teams.filter(t=>t.tu&&t.tu.done).length;if(n<teams.length&&!confirm(`${teams.length-n} team(s) haven't booked the true-up. Show final standings anyway?`))return}
+    return hostSet({...st,phase:"end"})}
+}
+function recordFlight(ok){
+  const st=H.state,t=teamsArr().find(x=>x.id===st.cur);if(!t)return;const k=calc(t,t.id,st);if(!k.next)return;
+  const f={id:"f"+rid(),p:k.next.p,ok,t:Date.now()};
+  ok?beep(880,.14):beep(220,.3);
+  hostSet({...st,flights:{...st.flights,[t.id]:[...(st.flights[t.id]||[]),f]}});
+  const r=$("#runway");if(r){r.classList.add(ok?"flash-ok":"flash-no");setTimeout(()=>r.classList.remove("flash-ok","flash-no"),600)}
+}
+function settle(fid,p){
+  const c=H.state.cfg,box=document.createElement("div");box.className="pop";
+  box.innerHTML=`<div class="panel"><h2>Settle plane ${esc(p)} from the board</h2><p>Use this only if the team can't book it. The team won't get credit for the entry.</p>
+    <div class="row"><button class="btn main" data-f="repair">Repair ${money(c.rep)}</button><button class="btn main" data-f="replace">Replace ${money(c.repl)}</button><button class="btn" data-f="">Cancel</button></div></div>`;
+  document.body.appendChild(box);
+  box.onclick=e=>{const b=e.target.closest("button");if(!b&&e.target!==box)return;box.remove();if(b&&b.dataset.f){const st=H.state;hostSet({...st,tfix:{...(st.tfix||{}),[fid]:b.dataset.f}})}};
+}
+/* build timer */
+function timerLeft(){const T=H.timer;return T.end?Math.max(0,T.end-Date.now()):T.left}
+const fmtT=ms=>{const s=Math.ceil(ms/1000);return Math.floor(s/60)+":"+String(s%60).padStart(2,"0")};
+function tickTimer(){const el=$("#tm");if(!el||!H)return;const ms=timerLeft();el.textContent=fmtT(ms);el.classList.toggle("low",ms>0&&ms<=30000);el.classList.toggle("done",ms<=0);
+  if(H.timer.end&&ms<=0){H.timer.end=null;H.timer.left=0;if(!H.timer.rang){H.timer.rang=true;[0,350,700].forEach(d=>setTimeout(()=>beep(880,.3),d))}const g=$("#tgo");if(g)g.textContent="Start"}}
+setInterval(()=>{if(H&&H.state.phase==="build")tickTimer()},250);
+addEventListener("keydown",e=>{if(ROLE!=="teacher"||!H||H.state.phase!=="fly"||e.metaKey||e.ctrlKey||e.altKey)return;const tg=e.target.tagName;if(tg==="INPUT"||tg==="SELECT"||tg==="TEXTAREA")return;
+  const k=e.key.toLowerCase();if(k==="m")recordFlight(true);else if(k==="s")recordFlight(false);else if(k==="u")hostAct("undo");else if(k==="n")hostAct("nextteam")});
+async function hostErase(){if(!H)return hostSetup();try{H.off&&H.off();await H.N.remove("games/"+H.code)}catch(e){}H=null;stopFireworks();hostSetup()}
+
+/* ---------- finale ---------- */
+function qrSvg(text){
+  try{if(!window.qrcode)return "";const q=qrcode(0,"M");q.addData(text);q.make();const n=q.getModuleCount(),m=2;let d="";
+    for(let r=0;r<n;r++)for(let c=0;c<n;c++)if(q.isDark(r,c))d+=`M${c+m} ${r+m}h1v1h-1z`;
+    return `<svg viewBox="0 0 ${n+2*m} ${n+2*m}" shape-rendering="crispEdges" xmlns="http://www.w3.org/2000/svg"><rect width="100%" height="100%" fill="#fff"/><path d="${d}" fill="#111"/></svg>`}catch(e){return ""}}
+function fanfare(){[[523,0],[659,.12],[784,.24],[1047,.4]].forEach(([f,t])=>setTimeout(()=>beep(f,.35),t*1000))}
+let FW=null,FIN=[];
+function stopFireworks(){FIN.forEach(clearTimeout);FIN=[];if(FW){cancelAnimationFrame(FW.raf);FW=null}document.body.classList.remove("finale-on")}
+function startFireworks(on){
+  const cv=$("#fw");if(!cv)return;const cx=cv.getContext("2d");if(FW)cancelAnimationFrame(FW.raf);
+  const dpr=Math.min(2,devicePixelRatio||1);const size=()=>{cv.width=innerWidth*dpr;cv.height=innerHeight*dpr};size();addEventListener("resize",size);
+  const COLS=["#C1102F","#E8193C","#FFFFFF","#FFFFFF","#D9D9D9","#C1102F"];
+  const rockets=[],parts=[];const t0=performance.now();
+  const launch=()=>{const W=cv.width,Hh=cv.height;rockets.push({x:W*(.12+Math.random()*.76),y:Hh,vx:(Math.random()-.5)*1.2*dpr,vy:-(Hh*.0125+Math.random()*Hh*.004),ty:Hh*(.12+Math.random()*.35),c:COLS[Math.floor(Math.random()*COLS.length)]})};
+  const burst=(r)=>{const n=70+Math.floor(Math.random()*40),sp=(2.2+Math.random()*2.2)*dpr,ring=Math.random()<.35;
+    for(let k=0;k<n;k++){const a=Math.PI*2*k/n+Math.random()*.1,v=ring?sp:sp*(.35+Math.random()*.75);parts.push({x:r.x,y:r.y,vx:Math.cos(a)*v,vy:Math.sin(a)*v,life:1,d:.008+Math.random()*.01,c:Math.random()<.25?"#FFFFFF":r.c,s:(1.6+Math.random()*1.4)*dpr})}};
+  FW={raf:0};
+  const frame=(now)=>{if(!FW)return;const el=now-t0;
+    const rate=el<7000?260:el<20000?900:1800;
+    if(on&&now-(FW.lastL||0)>rate){FW.lastL=now;launch();if(el<7000&&Math.random()<.5)launch()}
+    cx.globalCompositeOperation="destination-out";cx.fillStyle="rgba(0,0,0,.22)";cx.fillRect(0,0,cv.width,cv.height);cx.globalCompositeOperation="lighter";
+    for(let i=rockets.length-1;i>=0;i--){const r=rockets[i];r.x+=r.vx;r.y+=r.vy;r.vy+=.09*dpr;cx.fillStyle=r.c;cx.beginPath();cx.arc(r.x,r.y,2.2*dpr,0,7);cx.fill();if(r.y<=r.ty||r.vy>=0){burst(r);rockets.splice(i,1)}}
+    for(let i=parts.length-1;i>=0;i--){const p=parts[i];p.x+=p.vx;p.y+=p.vy;p.vx*=.985;p.vy=p.vy*.985+.045*dpr;p.life-=p.d;if(p.life<=0){parts.splice(i,1);continue}
+      cx.globalAlpha=Math.max(0,p.life);cx.fillStyle=p.c;cx.beginPath();cx.arc(p.x,p.y,p.s,0,7);cx.fill()}
+    cx.globalAlpha=1;FW.raf=requestAnimationFrame(frame)};
+  if(matchMedia("(prefers-reduced-motion: reduce)").matches)return;
+  FW.raf=requestAnimationFrame(frame);
+}
+function finale(teams){
+  const st=H.state,rows=standings(teams,st),top=rows.slice(0,5);
+  const off=x=>x.off===0?"Right on!":"Off by "+money(x.off);
+  const slot=(x,i,cls)=>x?`<div class="pod ${cls}" data-i="${i}"><div class="who"><div class="medal">${x.rank}</div><div class="nm">${esc(x.t.name)}</div><div class="pts">${off(x)}</div></div><div class="block"><span>${["1st","2nd","3rd"][i]}</span></div></div>`:`<div class="pod ${cls} empty"></div>`;
+  const rest=top.slice(3).map((x,k)=>`<div class="row45" data-i="${k+3}"><span class="r">${x.rank}</span><span class="n">${esc(x.t.name)}</span><span class="s">${off(x)}</span></div>`).join("");
+  document.body.classList.add("finale-on");app.style.zoom="";lastPaint="";
+  app.innerHTML=`<div class="finale"><canvas id="fw"></canvas><div class="rays"></div>
+    <div class="fhead"><img class="lg" src="/logo-214.png" alt="District 214"><div class="kick">Paper Airplane Inc. · Closest warranty estimate</div><h2>Final standings</h2></div>
+    <div class="podium">${slot(rows[1],1,"p2")}${slot(rows[0],0,"p1")}${slot(rows[2],2,"p3")}</div><div class="rest">${rest}</div>
+    <div class="fbar"><button class="btn" id="cr">Class results</button><button class="btn" id="again">Replay</button><button class="btn" id="erase">Erase game</button></div></div>`;
+  $("#cr").onclick=()=>{stopFireworks();classResults(teams)};$("#again").onclick=()=>{stopFireworks();finale(teams)};$("#erase").onclick=()=>{stopFireworks();hostErase()};
+  // slow reveal, 5th up to 1st, with room for applause
+  const seq=[4,3,2,1,0].filter(i=>rows[i]),at=[2000,8000,14500,21000,28500].slice(5-seq.length);
+  FIN.forEach(clearTimeout);FIN=seq.map((i,n)=>setTimeout(()=>{const el=app.querySelector(`.finale [data-i="${i}"]`);if(!el)return;el.classList.add("in");if(i===0){fanfare();startFireworks(1)}else beep(i<3?660:520,.12)},at[n]));
+}
+function classResults(teams){
+  document.body.classList.remove("finale-on");const st=H.state,c=st.cfg,rows=standings(teams,st);
+  const kinds=["sale","est","repair","replace","tu"].map(k=>{let n=0,r=0;teams.forEach(t=>entryLog(t).forEach(x=>{if(x.k===k){n++;if(x.first)r++}}));return{k,n,r}}).filter(x=>x.n);
+  const all=teams.map(t=>calc(t,t.id,st)),fl=all.reduce((a,k)=>a+k.flown,0),pass=all.reduce((a,k)=>a+k.firstPass,0);
+  lastPaint="";
+  app.innerHTML=`<div class="rep"><h2>Class results</h2>
+    <table class="sum"><thead><tr><th>Rank</th><th>Team</th><th>Sales</th><th>Estimated</th><th>Actual</th><th>Difference</th><th>Entries right 1st try</th></tr></thead><tbody>
+    ${rows.map(x=>`<tr style="--c:${colorOf(teams,x.t.id)}"><td style="border-left:0;font-family:var(--display)">${ord(x.rank)}</td><td style="text-align:left;border-left:10px solid var(--c);font-size:22px">${esc(x.t.name)}</td><td>${money(x.k.sales)}</td><td>${money(x.k.est)}</td><td>${money(x.k.actual)}</td><td class="${x.k.diff>0?"pos":x.k.diff<0?"neg":""}">${money(Math.abs(x.k.diff))}<small>${x.k.diff>0?"over":x.k.diff<0?"under":"exact"}</small></td><td>${x.right} of ${x.n}</td></tr>`).join("")}</tbody></table>
+    <div style="display:grid;grid-template-columns:1.3fr 1fr;gap:24px;margin-top:16px">
+    <div><h3 style="font-family:var(--display);font-size:26px;margin:6px 0">Entries right on the first try</h3>${kinds.map(x=>`<div class="cr"><span><b>${KIND[x.k]}</b></span><span class="b"><i style="width:${x.r/x.n*100}%"></i></span><span>${x.r} of ${x.n}</span></div>`).join("")}</div>
+    <div><h3 style="font-family:var(--display);font-size:26px;margin:6px 0">The fleet</h3><p style="font-size:22px;margin:4px 0"><b>${pass} of ${fl}</b> airplanes flew ${c.dist} feet on the first try (${fl?Math.round(pass/fl*100):0}%).</p>
+      <p style="font-size:22px;margin:4px 0">Teams predicted <b>${all.reduce((a,k)=>a+(k.fc?k.fc.fail:0),0)}</b> failures. There were <b>${all.reduce((a,k)=>a+k.claims.length,0)}</b> claims.</p></div></div>
+    <div class="row" style="justify-content:center;margin-top:16px"><button class="btn main" id="pod">Back to standings</button> <button class="btn" id="erase">Erase game</button></div></div>`;
+  $("#pod").onclick=()=>finale(teams);$("#erase").onclick=hostErase;requestAnimationFrame(zoomApp);
+}
+
+/* ============================================================ TEAM (iPad) */
+let ME=null;const SKEY="paSession";
+const saveSess=o=>{try{localStorage.setItem(SKEY,JSON.stringify(o))}catch(e){}};
+const loadSess=()=>{try{return JSON.parse(localStorage.getItem(SKEY)||"null")}catch(e){return null}};
+async function joinForm(){
+  const N=await net().catch(()=>null);if(!N)return needSetup();
+  const sv=loadSess(),qcode=(location.search.match(/[?&]code=(\d{4})/)||[])[1];
+  paint(`${hdr()}<div class="panel" style="margin-top:0"><h2>Join with your team</h2><p>${qcode?"Code filled in. ":""}One iPad per team. Type your company name. Lost connection? Join again with the same name.</p>
+    <input class="field code" id="cd" inputmode="numeric" maxlength="4" placeholder="0000" autocomplete="off" value="${qcode||(sv?esc(sv.code):"")}">
+    <input class="field" id="nm" maxlength="22" placeholder="Company name" autocomplete="off" value="${sv&&(!qcode||sv.code===qcode)?esc(sv.name):""}">
+    <div class="err" id="er"></div><button class="btn main" id="go">Join</button></div>`,1);
+  $("#rejoin").hidden=true;
+  const go=async()=>{const code=$("#cd").value.trim(),name=$("#nm").value.trim();
+    if(!/^\d{4}$/.test(code)){$("#er").textContent="The code is 4 numbers.";return}
+    if(!name){$("#er").textContent="Type your company name.";return}
+    $("#go").disabled=true;const err=await enterGame(N,code,name);if(err){$("#er").textContent=err;$("#go").disabled=false}};
+  $("#go").onclick=go;$("#nm").onkeydown=e=>{if(e.key==="Enter")go()};
+}
+async function enterGame(N,code,name,forcePid){
+  try{const g=await N.get("games/"+code);
+    if(!g||g.game!=="airplane")return "No Paper Airplane game with that code. Check the board.";
+    const sv=loadSess(),norm=x=>String(x||"").trim().toLowerCase().replace(/\s+/g," ");
+    let pid=forcePid||(sv&&sv.code===code&&norm(sv.name)===norm(name)?sv.pid:null);
+    if(!pid&&g.players){const hit=Object.entries(g.players).find(([,p])=>norm(p.name)===norm(name));if(hit)pid=hit[0]}
+    let rec=pid&&g.players&&g.players[pid];
+    if(!rec){if(g.state&&!["lobby","build","books"].includes(g.state.phase))return "This game already started. Ask your teacher.";
+      pid="t"+rid();rec={name,joined:Date.now()};await N.set(`games/${code}/players/${pid}`,rec)}
+    name=rec.name||name;saveSess({code,pid,name});
+    if(ME&&ME.off)ME.off();
+    ME={N,code,pid,name,rec,state:null,key:null,ui:{}};
+    $("#who").textContent=name;$("#who").hidden=false;$("#rejoin").hidden=false;applyZ();
+    ME.off=N.on(`games/${code}/state`,st=>{if(!ME)return;if(!st){paint(`<div class="wait"><h2>The game has ended</h2><p>Your teacher closed this game.</p></div>`);return}ME.state=st;teamRender()});
+    return null}catch(e){return "Couldn't connect. Try again."}
+}
+async function rejoin(){const N=await net().catch(()=>null);if(!N)return needSetup();
+  if(ME){try{const r=await ME.N.get(`games/${ME.code}/players/${ME.pid}`);if(r)ME.rec=r;const st=await ME.N.get(`games/${ME.code}/state`);if(st)ME.state=st}catch(e){}ME.key=null;teamRender();return}
+  const sv=loadSess();if(!sv)return joinForm();const err=await enterGame(N,sv.code,sv.name,sv.pid);if(err)joinForm()}
+async function save(patch){const M=ME;Object.entries(patch).forEach(([k,v])=>{const ks=k.split("/");let o=M.rec;ks.slice(0,-1).forEach(x=>{if(typeof o[x]!=="object"||!o[x])o[x]={};o=o[x]});o[ks[ks.length-1]]=v});
+  try{await M.N.update(`games/${M.code}/players/${M.pid}`,patch)}catch(e){}}
+
+/* entry builder: pick the debit, pick the credit, type the amount */
+function entryUI(id,prompt,ans){
+  const u=ME.ui[id]||(ME.ui[id]={dr:null,cr:null,amt:"",tries:0,msg:null,shown:false});
+  const col=side=>`<div><h3>${side==="dr"?"Debit":"Credit"}</h3><div class="acct">${ACCTS.map(a=>`<button data-je="${id}" data-side="${side}" data-a="${esc(a)}" aria-pressed="${u[side]===a}" ${u.shown?"disabled":""}>${esc(a)}</button>`).join("")}</div></div>`;
+  return `${prompt}<div class="jb">${col("dr")}${col("cr")}</div>
+    <div class="amt"><label for="amt_${id}">Amount</label><span class="dollar"><span>$</span><input id="amt_${id}" data-amt="${id}" inputmode="numeric" autocomplete="off" value="${esc(u.amt)}" ${u.shown?"disabled":""}></span>
+      ${u.shown?`<button class="btn main" data-jego="${id}">Continue →</button>`:`<button class="btn main" data-jechk="${id}">Book it</button>`}</div>
+    ${u.msg?`<div class="fb ${u.msg.ok?"ok":"no"}"><b>${esc(u.msg.h)}</b>${u.msg.t}</div>`:""}`;
+}
+function wireEntry(id,ans,onDone,why){
+  const u=ME.ui[id];
+  app.querySelectorAll(`[data-je="${id}"]`).forEach(b=>b.onclick=()=>{u[b.dataset.side]=b.dataset.a;u.msg=u.msg&&u.msg.ok?u.msg:null;teamRender(true)});
+  const inp=app.querySelector(`[data-amt="${id}"]`);if(inp)inp.oninput=()=>{u.amt=inp.value.replace(/[^\d.]/g,"")};
+  const chk=app.querySelector(`[data-jechk="${id}"]`);
+  if(chk)chk.onclick=()=>{
+    if(!u.dr||!u.cr){u.msg={ok:false,h:"Pick both accounts",t:"Tap one account to debit and one to credit."};return teamRender(true)}
+    const amt=+String(u.amt).replace(/[^\d.]/g,"");
+    if(!u.amt||!isFinite(amt)){u.msg={ok:false,h:"Type the amount",t:"How many dollars is this entry?"};return teamRender(true)}
+    const okD=u.dr===ans.dr,okC=u.cr===ans.cr,okA=Math.abs(amt-ans.amt)<.001;
+    if(okD&&okC&&okA){const first=u.tries===0;beep(990,.15);u.msg={ok:true,h:first?"Booked! Right the first time.":"Booked!",t:esc(why)};u.done=true;onDone(first);return}
+    u.tries++;beep(220,.25);
+    const bad=[!okD&&"the debit",!okC&&"the credit",!okA&&"the amount"].filter(Boolean);
+    if(u.tries>=2){u.shown=true;u.dr=ans.dr;u.cr=ans.cr;u.amt=String(ans.amt);u.msg={ok:false,h:"Here's the right entry",t:`${jeHTML(ans.dr,ans.cr,ans.amt)}<div style="margin-top:6px">${esc(why)}</div>`};return teamRender(true)}
+    u.msg={ok:false,h:"Not quite. One more try.",t:`Check ${bad.join(" and ")}.`};teamRender(true)};
+  const gob=app.querySelector(`[data-jego="${id}"]`);if(gob)gob.onclick=()=>{u.done=true;onDone(false)};
+}
+function tAccount(rec,st){
+  const c=st.cfg,k=calc(rec,ME.pid,st),dr=k.claims.filter(x=>x.fix).map(x=>({t:"Plane "+x.p+(x.fix==="repair"?" repair":" replace"),amt:x.fix==="repair"?c.rep:c.repl}));
+  const cr=k.est?[{t:"Estimate",amt:k.est}]:[];const bal=k.est-k.actual;
+  if(rec.tu&&rec.tu.done&&bal!==0)(bal>0?dr:cr).push({t:"True-up",amt:Math.abs(bal)});
+  const fb=rec.tu&&rec.tu.done?0:bal;
+  return `<div class="ttitle">${EWL}</div><div class="taccount"><div><div class="hd">Debit</div>${dr.map(x=>`<div class="ln"><span>${esc(x.t)}</span><b>${money(x.amt)}</b></div>`).join("")||`<div class="ln note">none yet</div>`}</div>
+    <div><div class="hd">Credit</div>${cr.map(x=>`<div class="ln"><span>${esc(x.t)}</span><b>${money(x.amt)}</b></div>`).join("")||`<div class="ln note">none</div>`}</div>
+    <div class="bal">Balance: ${fb===0?"$0":money(Math.abs(fb))+(fb>0?" credit":" debit")}</div></div>`}
+function miniPlanes(k){return `<div class="mini">${k.planes.map(p=>`<div class="pl ${p.s}">${p.p}<small>${{ready:"&nbsp;",ok:"✓",claim:"claim",refly:"re-fly",closed:"fixed"}[p.s]}</small></div>`).join("")}</div>`}
+function teamRender(force){
+  const M=ME,st=M&&M.state;if(!st)return;const c=st.cfg,rec=M.rec;
+  const myFl=(st.flights&&st.flights[M.pid])||[],myTf=Object.fromEntries(myFl.map(f=>[f.id,(st.tfix||{})[f.id]]).filter(x=>x[1]));
+  const key=JSON.stringify([st.phase,c,myFl,myTf,st.cur===M.pid]);
+  if(!force&&key===M.key)return;M.key=key;
+  const ae=document.activeElement,focusAmt=ae&&ae.dataset&&ae.dataset.amt;
+  const done=html=>{paint(html,1);const fb=app.querySelector(".fb");if(fb&&fb.scrollIntoView)fb.scrollIntoView({block:"nearest",behavior:"smooth"});if(focusAmt){const i=app.querySelector(`[data-amt="${focusAmt}"]`);if(i){i.focus();const v=i.value;i.setSelectionRange&&i.setSelectionRange(v.length,v.length)}}};
+  if(st.phase==="lobby")return done(`<div class="wait"><h2>You're in, ${esc(M.name)}!</h2><p>Grab some paper. Your teacher will read the assembly instructions.</p></div>`);
+  if(st.phase==="build")return done(`<div class="tcard"><div class="step">Step 1 · Build</div><h2>Assembly instructions</h2>
+      <p>Make any paper airplane you would like. Build <b>${c.planes}</b> of them.</p><p>Your warranty: every airplane is guaranteed to fly <b>${c.dist} feet</b>. If it doesn't, your company will either repair it or provide a new one.</p>
+      <p class="note">The clock is on the board.</p></div><div class="tcard" style="border-left-color:var(--dark)">${priceSheet(c)}</div>`);
+  if(st.phase==="books")return booksScreen(st,done);
+  if(st.phase==="reveal"){const k=calc(rec,M.pid,st);
+    return done(`<div class="tcard"><div class="step">Step 2 · Your estimate</div><h2>${k.fc?`You expect ${plural(k.fc.fail,"plane")} to fail`:"No forecast"}</h2>
+      ${k.fc?`<p>${k.fc.rep} repair at ${money(c.rep)} · ${k.fc.repl} replace at ${money(c.repl)}</p><div class="jebox">${jeHTML(WE,EWL,k.est)}</div>`:""}
+      <p class="note" style="margin-top:10px">Watch the board for everyone's estimates. Then the flight test starts.</p></div>`)}
+  if(st.phase==="fly")return flyScreen(st,done);
+  if(st.phase==="trueup")return trueupScreen(st,done);
+  if(st.phase==="end")return reportScreen(st,done);
+}
+function booksScreen(st,done){
+  const M=ME,c=st.cfg,rec=M.rec,sales=c.planes*c.price;
+  if(!(rec.sale&&rec.sale.done)){
+    const h=entryUI("sale",`<div class="tcard" style="margin-bottom:0"><div class="step">Step 2 · Sale day · 1 of 3</div><h2>Book the sale</h2><p>You sold all <b>${c.planes}</b> airplanes for <b>${money(c.price)}</b> each. Customers paid cash.</p></div>`,null);
+    done(`<div style="max-width:820px;margin:0 auto">${h}</div>`);
+    wireEntry("sale",{dr:"Cash",cr:"Sales Revenue",amt:sales},first=>{save({sale:{done:true,first}});setTimeout(()=>teamRender(true),900)},WHY.sale);return}
+  if(!(rec.fc&&rec.fc.locked)){
+    const u=M.ui.fc||(M.ui.fc={fail:Math.round(c.planes/4),rep:0});u.fail=Math.min(u.fail,c.planes);u.rep=Math.min(u.rep,u.fail);
+    done(`<div class="tcard"><div class="step">Step 2 · Sale day · 2 of 3</div><h2>Forecast your warranty claims</h2>
+      <p>How many of your ${c.planes} airplanes will <b>not</b> fly ${c.dist} feet?</p>
+      <div class="stepper"><button data-s="fail" data-d="-1" aria-label="Fewer">−</button><span class="v">${u.fail}</span><button data-s="fail" data-d="1" aria-label="More">+</button><span class="u">of ${c.planes} will fail</span></div>
+      <p>For those ${plural(u.fail,"plane")}, how many will you <b>repair</b> (${money(c.rep)}, labor)? The rest get <b>replaced</b> (${money(c.repl)}, parts and labor).</p>
+      <div class="stepper"><button data-s="rep" data-d="-1" aria-label="Fewer">−</button><span class="v">${u.rep}</span><button data-s="rep" data-d="1" aria-label="More">+</button><span class="u">repair · ${u.fail-u.rep} replace</span></div>
+      <p class="note">You can still choose repair or replace for each real claim later. This is just your plan for the estimate.</p>
+      <div class="row" style="margin-top:8px"><button class="btn main" id="lk">Lock in forecast</button></div></div>`);
+    app.querySelectorAll("[data-s]").forEach(b=>b.onclick=()=>{const s=b.dataset.s,d=+b.dataset.d;if(s==="fail"){u.fail=Math.max(0,Math.min(c.planes,u.fail+d));u.rep=Math.min(u.rep,u.fail)}else u.rep=Math.max(0,Math.min(u.fail,u.rep+d));teamRender(true)});
+    $("#lk").onclick=async()=>{if(!confirm(`Lock in: ${u.fail} of ${c.planes} fail (${u.rep} repair, ${u.fail-u.rep} replace)?`))return;await save({fc:{locked:true,fail:u.fail,rep:u.rep,repl:u.fail-u.rep}});teamRender(true)};return}
+  const fc=rec.fc,amt=fc.rep*c.rep+fc.repl*c.repl;
+  if(amt===0&&!(rec.est&&rec.est.done)){save({est:{done:true,first:null,amt:0}});}
+  if(!(rec.est&&rec.est.done)){
+    const h=entryUI("est",`<div class="tcard" style="margin-bottom:0"><div class="step">Step 2 · Sale day · 3 of 3</div><h2>Book the warranty estimate</h2><p>Your forecast: <b>${fc.fail}</b> of ${c.planes} fail. <b>${fc.rep}</b> repair at ${money(c.rep)} and <b>${fc.repl}</b> replace at ${money(c.repl)}. Figure the estimated warranty expense and record it today.</p></div>`,null);
+    done(`<div style="max-width:820px;margin:0 auto">${h}</div>`);
+    wireEntry("est",{dr:WE,cr:EWL,amt},first=>{save({est:{done:true,first,amt}});setTimeout(()=>teamRender(true),900)},WHY.est);return}
+  done(`<div class="wait"><h2>Books are done</h2><p>Sale and warranty estimate recorded.</p><div class="jebox" style="display:inline-block;text-align:left;margin-top:10px">${jeHTML("Cash","Sales Revenue",sales)}<div style="height:10px"></div>${amt?jeHTML(WE,EWL,amt):"No warranty estimate (you expect zero claims)."}</div><p>Waiting for the other teams.</p></div>`);
+}
+function flyScreen(st,done){
+  const M=ME,c=st.cfg,rec=M.rec,k=calc(rec,M.pid,st);
+  const open=k.claims.filter(x=>!x.fix);
+  if(open.length){const cl=open[0],id="c_"+cl.id,u=M.ui[id+"_fix"]||(M.ui[id+"_fix"]={fix:null});
+    const head=`<div class="tcard" style="margin-bottom:0;border-left-color:var(--bad)"><div class="step">Warranty claim${open.length>1?` · ${open.length} open`:""}</div><h2>Plane ${cl.p} came up short!</h2>
+      <p>It didn't fly ${c.dist} feet. Honor the warranty: repair it or replace it.</p>
+      <div class="choice"><button data-fix="repair" aria-pressed="${u.fix==="repair"}"><b>Repair · ${money(c.rep)}</b><span>Labor only. You owe your workers.</span></button><button data-fix="replace" aria-pressed="${u.fix==="replace"}"><b>Replace · ${money(c.repl)}</b><span>A new airplane from inventory.</span></button></div></div>`;
+    if(!u.fix){done(`<div style="max-width:820px;margin:0 auto">${head}${tAccount(rec,st)}</div>`)}
+    else{const ans={dr:EWL,cr:u.fix==="repair"?"Salaries Payable":"Merchandise Inventory",amt:u.fix==="repair"?c.rep:c.repl},eid=id+"_"+u.fix;
+      done(`<div style="max-width:820px;margin:0 auto">${head}${entryUI(eid,`<p style="font-size:20px;margin:14px 0 0"><b>Book the ${u.fix}.</b></p>`,ans)}</div>`);
+      wireEntry(eid,ans,first=>{setTimeout(()=>{save({["claims/"+cl.id]:{fix:u.fix,done:true,first}}).then(()=>teamRender(true))},900)},WHY[u.fix])}
+    app.querySelectorAll("[data-fix]").forEach(b=>{b.disabled=!!(M.ui[id+"_"+u.fix]&&M.ui[id+"_"+u.fix].done);b.onclick=()=>{if(u.fix===b.dataset.fix)return;u.fix=b.dataset.fix;teamRender(true)}});
+    return}
+  const left=k.planes.filter(p=>p.s==="ready"||p.s==="refly").length;
+  done(`<div class="tcard"><div class="step">Step 3 · Flight test</div><h2>${st.cur===M.pid?"You're on the runway!":left?"Flight test":"All your planes are done"}</h2>
+    <p>${st.cur===M.pid?"Throw the plane your teacher calls. If it comes up short, your claim shows up here.":"Watch the board. When your plane comes up short, the claim shows up here."}</p>
+    ${miniPlanes(k)}
+    <div class="stats"><span><b>${k.firstPass}</b>flew ${c.dist} ft first try</span><span><b>${k.claims.length}</b>claims</span><span><b>${money(k.est-k.actual)}</b>liability left</span></div></div>
+    <div class="tcard" style="border-left-color:var(--dark)">${tAccount(rec,st)}</div>`);
+}
+function trueupScreen(st,done){
+  const M=ME,c=st.cfg,rec=M.rec,k=calc(rec,M.pid,st),bal=k.est-k.actual;
+  const sumCard=`<div class="stats"><span><b>${money(k.est)}</b>estimated</span><span><b>${money(k.actual)}</b>actual</span><span><b>${money(Math.abs(bal))}</b>${bal>0?"over-estimated":bal<0?"under-estimated":"difference"}</span></div>`;
+  if(!c.trueup||(rec.tu&&rec.tu.done))return done(`<div class="tcard"><div class="step">Step 4 · Results</div><h2>${bal===0?"Right on!":"Off by "+money(Math.abs(bal))}</h2>${sumCard}${rec.tu&&rec.tu.done?`<p class="note" style="text-align:center">True-up booked. The liability is back to zero.</p>`:""}</div><div class="tcard" style="border-left-color:var(--dark)">${tAccount(rec,st)}</div>`);
+  const u=M.ui.tub||(M.ui.tub={pick:null,tries:0,msg:null});
+  const want=bal>0?"over":bal<0?"under":"zero";
+  if(!u.ok){
+    done(`<div style="max-width:820px;margin:0 auto"><div class="tcard"><div class="step">Step 4 · Year-end true-up</div><h2>The warranty period is over</h2>
+      <p>Look at your liability account. What's left?</p>${tAccount(rec,st)}
+      <div class="choice" style="grid-template-columns:1fr 1fr 1fr"><button data-p="over" aria-pressed="${u.pick==="over"}"><b>Credit balance</b><span>We over-estimated</span></button><button data-p="under" aria-pressed="${u.pick==="under"}"><b>Debit balance</b><span>We under-estimated</span></button><button data-p="zero" aria-pressed="${u.pick==="zero"}"><b>Zero</b><span>Right on, no entry</span></button></div>
+      ${u.msg?`<div class="fb no"><b>${esc(u.msg)}</b></div>`:""}</div></div>`);
+    app.querySelectorAll("[data-p]").forEach(b=>b.onclick=()=>{u.pick=b.dataset.p;
+      if(u.pick===want){u.ok=true;beep(990,.12);if(want==="zero"){save({tu:{done:true,first:u.tries===0}})}teamRender(true)}
+      else{u.tries++;beep(220,.25);u.msg=u.tries>=2?(want==="over"?"It's a credit balance: the estimate was bigger than the claims.":want==="under"?"It's a debit balance: the claims were bigger than the estimate.":"It's zero: the claims matched the estimate."):"Not quite. Compare the two sides of the T-account.";
+        if(u.tries>=2){u.ok=true;if(want==="zero")save({tu:{done:true,first:false}})}teamRender(true)}});
+    return}
+  if(want==="zero")return done(`<div class="tcard"><h2>No entry needed</h2><p>${esc(WHY.zero)}</p>${sumCard}</div>`);
+  const ans=want==="over"?{dr:EWL,cr:WE,amt:bal}:{dr:WE,cr:EWL,amt:-bal};
+  const h=entryUI("tu",`<div class="tcard" style="margin-bottom:0"><div class="step">Step 4 · Year-end true-up</div><h2>Bring the liability to zero</h2><p>${want==="over"?`You have ${money(bal)} of liability left that nobody will ever claim.`:`Claims went ${money(-bal)} past your estimate.`} Book the entry that clears it.</p></div>`,ans);
+  done(`<div style="max-width:820px;margin:0 auto">${h}</div>`);
+  wireEntry("tu",ans,first=>{const tf=u.tries===0&&first;setTimeout(()=>{save({tu:{done:true,first:tf}}).then(()=>teamRender(true))},900)},WHY[want]);
+}
+function reportScreen(st,done){
+  const M=ME,c=st.cfg,rec=M.rec,k=calc(rec,M.pid,st),log=entryLog(rec);
+  done(`<div class="tcard"><div class="step">Final</div><h2>${esc(M.name)}: ${k.diff===0?"right on!":"off by "+money(Math.abs(k.diff))}</h2>
+    <div class="stats"><span><b>${money(k.sales)}</b>sales</span><span><b>${money(k.est)}</b>estimated</span><span><b>${money(k.actual)}</b>actual</span><span><b>${log.filter(x=>x.first).length}/${log.length}</b>entries right 1st try</span></div>
+    <p class="note" style="text-align:center">Watch the board for the final standings.</p></div>
+    <div class="tcard" style="border-left-color:var(--dark)"><h2 style="font-size:28px">Your entries</h2>${log.map(x=>`<div class="cr" style="grid-template-columns:1fr auto"><span>${KIND[x.k]}</span><b style="color:${x.first?"var(--good)":"var(--bad)"}">${x.first?"✓ first try":"✗ needed help"}</b></div>`).join("")||"<p>None</p>"}</div>`);
+  try{localStorage.removeItem(SKEY)}catch(e){}
+}
+
+/* ============================================================ START */
+$("#rejoin").onclick=rejoin;
+$("#zo").onclick=()=>setZ(-.1);$("#zi").onclick=()=>setZ(.1);
+applyZ();
+ROLE==="teacher"?hostSetup():joinForm();
+</script>
+</body>
+</html>
