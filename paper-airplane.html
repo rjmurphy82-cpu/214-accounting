@@ -294,6 +294,14 @@ body.finale-on .top{visibility:hidden}
 .none{margin-top:10px;width:100%;text-align:left;background:var(--soft);border:3px solid var(--line);border-radius:10px;padding:9px 14px;font-weight:700;font-size:18px}
 .none[aria-pressed="true"]{background:var(--dark);color:#fff;border-color:var(--dark)}
 .big2{font-family:var(--display);font-weight:700;font-size:clamp(44px,9vw,80px);line-height:1}
+.cd{display:inline-flex;align-items:center;gap:8px;margin-left:auto;background:var(--dark);color:#fff;border-radius:999px;padding:2px 16px 2px 12px;font-family:var(--display);font-weight:700;font-size:calc(34px*var(--nk));font-variant-numeric:tabular-nums;line-height:1.2}
+.cd::before{content:"⏱";font-size:.7em}
+.cd.low{background:var(--red);animation:pulse 1s infinite}
+.cd.out{background:var(--muted)}
+@keyframes pulse{50%{transform:scale(1.06)}}
+.pcd{display:flex;justify-content:center;margin:4px 0 8px}
+.pcd .cd{margin:0;font-size:30px}
+.tadd{margin-left:8px}
 .mypill{display:inline-block;border-radius:999px;padding:2px 12px;color:#fff;font-weight:700;font-size:15px;background:var(--c)}
 @media (max-width:820px){.res3{grid-template-columns:1fr}.fleet .mini{grid-template-columns:repeat(8,minmax(0,1fr))}}
 </style>
@@ -306,7 +314,8 @@ body.finale-on .top{visibility:hidden}
 <script>
 "use strict";
 /* ============================================================ SETTINGS (the teacher can change these when creating a game) */
-const DEFAULTS={teams:2,planes:16,price:10,repl:3,rep:1,dist:20,build:6,pr:10,pw:5,bonus:25,who:"all",alt:1};
+const DEFAULTS={teams:2,planes:16,price:10,repl:3,rep:1,dist:20,build:6,pr:10,pw:5,bonus:25,who:"all",alt:1,tSale:60,tFc:90,tEst:60,tClaim:45,tTu:90};
+const TKEY={sale:"tSale",fc:"tFc",est:"tEst",claim:"tClaim",tu:"tTu"};
 const ACCTS=["Cash","Accounts Receivable","Merchandise Inventory","Sales Revenue","Cost of Goods Sold","Warranty Expense","Estimated Warranty Liability","Salaries Expense","Salaries Payable"];
 const EWL="Estimated Warranty Liability",WE="Warranty Expense";
 const WHY={
@@ -435,9 +444,14 @@ async function hostSetup(){
       <label>Bonus for the closest estimate<input id="c_bonus" type="number" min="0" max="1000" value="${d.bonus}"></label>
       <label>Build time (minutes)<input id="c_build" type="number" min="1" max="30" value="${d.build}"></label>
       <label>Who journalizes a claim<select id="c_who"><option value="all" selected>Every player</option><option value="team">Only the plane's team</option></select></label>
+      <label>Sale entry timer (seconds)<input id="c_tSale" type="number" min="0" max="600" value="${d.tSale}"></label>
+      <label>Forecast timer (seconds)<input id="c_tFc" type="number" min="0" max="600" value="${d.tFc}"></label>
+      <label>Estimate entry timer (seconds)<input id="c_tEst" type="number" min="0" max="600" value="${d.tEst}"></label>
+      <label>Each claim entry timer (seconds)<input id="c_tClaim" type="number" min="0" max="600" value="${d.tClaim}"></label>
+      <label>True-up entry timer (seconds)<input id="c_tTu" type="number" min="0" max="600" value="${d.tTu}"></label>
       <label>Flight order<select id="c_alt"><option value="1" selected>Alternate teams each plane</option><option value="0">One team at a time</option></select></label>
     </div>
-    <div class="err" id="er"></div><button class="btn main" id="go">Create game</button></div>`,1);
+    <p class="note">Timers are recommendations. Set one to 0 to turn it off. When time runs out the question closes; no answer means no points either way.</p><div class="err" id="er"></div><button class="btn main" id="go">Create game</button></div>`,1);
   $("#go").onclick=async()=>{
     const cfg={};Object.keys(DEFAULTS).forEach(k=>{const el=$("#c_"+k);if(k==="who"){cfg.who=el.value;return}const v=Math.round(+el.value);cfg[k]=isFinite(v)?v:DEFAULTS[k]});
     cfg.teams=Math.max(2,Math.min(8,cfg.teams));cfg.planes=Math.max(1,Math.min(32,cfg.planes));
@@ -469,7 +483,7 @@ function questionHTML(st,players,label){
     rows.push(rev?`<div class="prow" style="--c:${tcol(t)}"><b>${tname(t)}</b><div><div class="bar"><i class="g" style="width:${o.n?o.right/o.n*100:0}%"></i><i class="r" style="width:${o.n?w/o.n*100:0}%"></i></div>${q.kind==="sale"?"":`<div style="margin-top:6px">${jeHTML(k)}</div>`}</div><span class="n">${pts(o.right*c.pr-w*c.pw)}<small>${o.right} right · ${w} wrong${o.n-o.ans?" · "+(o.n-o.ans)+" no answer":""}</small></span></div>`
       :`<div class="prow" style="--c:${tcol(t)}"><b>${tname(t)}</b><div class="bar"><i style="width:${o.n?o.ans/o.n*100:0}%"></i></div><span class="n">${o.ans} of ${o.n}<small>answered</small></span></div>`)}
   const all=Object.values(T).reduce((a,o)=>a+o.ans,0),tot=Object.values(T).reduce((a,o)=>a+o.n,0);
-  return `<div class="rhead"><span class="rtag">${label}</span><span class="rname">${KIND[q.kind]}</span></div>${scoreStrip(st)}
+  return `<div class="rhead"><span class="rtag">${label}</span><span class="rname">${KIND[q.kind]}</span>${q.open?cdHTML(st,q.id)+(st.timer&&st.timer.what===q.id?`<button class="btn tadd" data-act="tadd">+15 sec</button>`:""):""}</div>${scoreStrip(st)}
     <div class="scard"><p class="qprompt">${QTEXT[q.kind](c)}</p>${rev&&q.kind==="sale"?`<div class="jebox" style="margin-top:12px;display:inline-block">${jeHTML(keyFor(q,0,st))}</div>`:""}
     ${rev?`<p class="note" style="font-size:19px;margin-top:10px">${esc(keyFor(q,0,st).why)}</p>`:""}</div>
     <div class="prog">${rows.join("")}</div>
@@ -499,7 +513,7 @@ function hostRender(){
   if(st.phase==="forecast"){
     let rows="";for(let t=0;t<c.teams;t++){const ps=byTeam(t),n=ps.filter(p=>p.fc).length;rows+=`<div class="prow" style="--c:${tcol(t)}"><b>${tname(t)}</b><div class="bar"><i style="width:${ps.length?n/ps.length*100:0}%"></i></div><span class="n">${n} of ${ps.length}<small>forecasts in</small></span></div>`}
     const n=players.filter(p=>p.fc).length;
-    return go(`<div class="rhead"><span class="rtag">Step 2 · Sale day</span><span class="rname">Forecast the warranty claims</span></div>${scoreStrip(st)}
+    return go(`<div class="rhead"><span class="rtag">Step 2 · Sale day</span><span class="rname">Forecast the warranty claims</span>${st.fcLock?`<span class="cd out" style="margin-left:auto">Forecasts closed</span>`:cdHTML(st,"fc")+(st.timer&&st.timer.what==="fc"?`<button class="btn tadd" data-act="tadd">+15 sec</button>`:"")}</div>${scoreStrip(st)}
       <div class="split"><div class="scard"><div class="stitle">How many will come up short?</div>
         <p class="story">On your device: how many of your team's ${c.planes} airplanes will <b>not</b> fly ${c.dist} feet, and how many of those would you repair or replace?</p>
         <p class="story" style="font-size:22px;color:var(--muted)">Your team's estimate is the <b>average</b> of everyone's forecast.</p></div>${priceSheet(c)}</div>
@@ -538,7 +552,7 @@ function flyHTML(st,players){
   let cb="";
   const lastQ=[...(st.qs||[])].reverse().find(x=>x.kind==="claim");
   if(lastQ){const T=tally(st,players,lastQ),open=q&&q.id===lastQ.id&&q.open;let ans=0,n=0,right=0;Object.values(T).forEach(o=>{ans+=o.ans;n+=o.n;right+=o.right});
-    cb=`<div class="claimbox ${open?"open":""}"><div class="row"><h3>${open?"Claim open":"Last claim"}: ${tname(lastQ.team)} plane ${lastQ.p}, ${lastQ.fix==="repair"?"repair":"replace"}</h3>${open?`<button class="btn" data-act="qclosec">Close claim</button>`:""}</div>
+    cb=`<div class="claimbox ${open?"open":""}"><div class="row"><h3>${open?"Claim open":"Last claim"}: ${tname(lastQ.team)} plane ${lastQ.p}, ${lastQ.fix==="repair"?"repair":"replace"}</h3>${open?`<span class="row" style="flex-wrap:nowrap">${cdHTML(st,lastQ.id)}${st.timer&&st.timer.what===lastQ.id?`<button class="btn" data-act="tadd">+15</button>`:""}<button class="btn" data-act="qclosec">Close claim</button></span>`:""}</div>
       ${open?`<div class="prog" style="margin-top:6px">${Object.entries(T).filter(([,o])=>o.n).map(([i,o])=>`<div class="prow" style="--c:${tcol(+i)};padding:6px 12px"><b style="font-size:20px">${tname(+i)}</b><div class="bar"><i style="width:${o.n?o.ans/o.n*100:0}%"></i></div><span class="n" style="font-size:22px">${o.ans} of ${o.n}</span></div>`).join("")}</div>`
         :`<div class="row" style="align-items:flex-start"><div class="jebox">${jeHTML(keyFor(lastQ,lastQ.team,st))}</div><div style="font-weight:700;font-size:20px">${Object.entries(T).filter(([,o])=>o.n).map(([i,o])=>`<div><span class="mypill" style="--c:${tcol(+i)}">${tname(+i)}</span> ${o.right} right · ${o.ans-o.right} wrong</div>`).join("")}</div></div>`}</div>`}
   let fleet="",liab="";
@@ -554,7 +568,21 @@ function flyHTML(st,players){
       <div class="fleet">${fleet}</div>
       <div class="bar2" style="justify-content:flex-end"><button class="btn main" data-act="totu">Done flying →</button></div></div></div>`;
 }
-function openQ(st,kind,extra){const q={id:"q"+rid(),kind,...(extra||{}),open:true};return{...st,q,qs:[...(st.qs||[]),{id:q.id,kind,...(extra||{})}]}}
+function withTimer(st,what,kind){const secs=+st.cfg[TKEY[kind]]||0;if(!secs)return{...st,timer:null};const now=Date.now();return{...st,timer:{id:"t"+rid(),what,end:now+secs*1000,sent:now}}}
+function openQ(st,kind,extra){const q={id:"q"+rid(),kind,...(extra||{}),open:true};return withTimer({...st,q,qs:[...(st.qs||[]),{id:q.id,kind,...(extra||{})}]},q.id,kind)}
+const clearT=(st,what)=>st.timer&&(!what||st.timer.what===what)?{...st,timer:null}:st;
+function cdHTML(st,what){const T=st.timer;if(!T||T.what!==what)return "";return `<span class="cd" data-cd>${fmtS(remain(T))}</span>`}
+const fmtS=ms=>{const s=Math.max(0,Math.ceil(ms/1000));return Math.floor(s/60)+":"+String(s%60).padStart(2,"0")};
+function remain(T){if(!T)return 0;if(ROLE==="teacher")return T.end-Date.now();const A=ME&&ME.anchor;if(!A||A.key!==T.id+T.sent)return T.end-T.sent;return A.left-(Date.now()-A.t0)}
+function tickCD(){const st=ROLE==="teacher"?(H&&H.state):(ME&&ME.state);if(!st)return;const T=st.timer;
+  document.querySelectorAll("[data-cd]").forEach(el=>{const ms=T?remain(T):0;el.textContent=ms>0?fmtS(ms):"Time's up";el.classList.toggle("low",ms>0&&ms<=10000);el.classList.toggle("out",ms<=0)});
+  if(ROLE==="teacher"){if(T&&Date.now()>=T.end)timeUp()}
+  else if(T&&remain(T)<=0){const b=$("#sub")||$("#lk");if(b&&!b.disabled){b.disabled=true;b.textContent="Time's up"}}}
+setInterval(tickCD,250);
+function timeUp(){const st=H.state,T=st.timer;if(!T)return;beep(440,.4);
+  if(T.what==="fc")return hostSet({...st,timer:null,fcLock:true});
+  if(st.q&&st.q.id===T.what&&st.q.open)return hostSet({...st,timer:null,q:{...st.q,open:false}});
+  hostSet({...st,timer:null})}
 function wireHost(){app.querySelectorAll("[data-act]").forEach(b=>b.onclick=()=>hostAct(b.dataset.act,b))}
 function hostAct(a,b){
   const st=H.state,c=st.cfg,players=playersArr();
@@ -564,17 +592,18 @@ function hostAct(a,b){
   if(a==="tplus"){const T=H.timer;if(T.end)T.end+=60000;else T.left+=60000;T.rang=false;tickTimer();return}
   if(a==="treset"){H.timer={left:c.build*60000,end:null};tickTimer();const g=$("#tgo");if(g)g.textContent="Start";return}
   if(a==="tosale"){H.timer.end=null;return hostSet(openQ({...st,phase:"sale"},"sale"))}
-  if(a==="qclose"||a==="qclosec"){beep(660,.12);return hostSet({...st,q:{...st.q,open:false}})}
-  if(a==="qnext"){if(st.phase==="sale")return hostSet({...st,phase:"forecast",q:null});if(st.phase==="est")return hostSet({...st,phase:"fly",q:null,cur:0});return}
+  if(a==="qclose"||a==="qclosec"){beep(660,.12);return hostSet(clearT({...st,q:{...st.q,open:false}},st.q.id))}
+  if(a==="tadd"){if(!st.timer)return;const now=Date.now();const end=Math.max(st.timer.end,now)+15000;return hostSet({...st,timer:{...st.timer,end,sent:now,id:"t"+rid()},fcLock:st.timer.what==="fc"?false:st.fcLock})}
+  if(a==="qnext"){if(st.phase==="sale")return hostSet(withTimer({...st,phase:"forecast",q:null,fcLock:false},"fc","fc"));if(st.phase==="est")return hostSet({...st,phase:"fly",q:null,cur:0});return}
   if(a==="toreveal"){const n=players.filter(p=>p.fc).length;if(n<players.length&&!confirm(`${players.length-n} player(s) haven't sent a forecast. Reveal anyway?`))return;
     const est={},fcs={};for(let t=0;t<c.teams;t++){const f=players.filter(p=>p.team===t&&p.fc).map(p=>p.fc);const am=f.map(x=>fcAmt(c,x));
       est[t]=am.length?r2(am.reduce((x,y)=>x+y,0)/am.length):0;fcs[t]={n:am.length,min:am.length?Math.min(...am):0,max:am.length?Math.max(...am):0,fail:am.length?Math.round(f.reduce((x,y)=>x+y.fail,0)/f.length*10)/10:0}}
-    beep(660,.12);return hostSet({...st,phase:"reveal",est,fcs})}
+    beep(660,.12);return hostSet({...st,phase:"reveal",est,fcs,timer:null,fcLock:true})}
   if(a==="toest")return hostSet(openQ({...st,phase:"est"},"est"));
   if(a==="cur")return hostSet({...st,cur:+b.dataset.t});
   if(a==="res")return record(b.dataset.r);
   if(a==="undo"){const log=[...(st.log||[])],L=log.pop();if(!L)return;const fl=flightsOf(st,L.t).slice(0,-1);let ns={...st,log,cur:L.t,flights:{...st.flights,[L.t]:fl}};
-    if(L.qid){ns.qs=(st.qs||[]).filter(x=>x.id!==L.qid);if(st.q&&st.q.id===L.qid)ns.q=null}return hostSet(ns)}
+    if(L.qid){ns.qs=(st.qs||[]).filter(x=>x.id!==L.qid);if(st.q&&st.q.id===L.qid){ns.q=null;ns=clearT(ns,L.qid)}}return hostSet(ns)}
   if(a==="totu"){const left=Array.from({length:c.teams},(_,t)=>c.planes-flightsOf(st,t).length).reduce((x,y)=>x+y,0);
     if(left&&!confirm(`${plural(left,"plane")} not flown yet. Finish the flight test anyway?`))return;
     return hostSet(openQ({...st,phase:"tu",q:st.q?{...st.q,open:false}:null},"tu"))}
@@ -696,7 +725,7 @@ function startPlayer(N,code,pid,rec){
   ME={N,code,pid,name:rec.name,rec,state:null,key:null,ui:{}};
   $("#who").textContent=rec.name+" · "+tname(rec.team);$("#who").style.background=tcol(rec.team);$("#who").hidden=false;$("#rejoin").hidden=false;applyZ();
   paint(`<div class="wait"><h2>Connecting…</h2></div>`,1);
-  ME.off=N.on(`games/${code}/state`,st=>{if(!ME)return;if(!st){paint(`<div class="wait"><h2>The game has ended</h2><p>Your teacher closed this game.</p></div>`,1);return}ME.state=st;playerRender()});
+  ME.off=N.on(`games/${code}/state`,st=>{if(!ME)return;if(st&&st.timer){const k=st.timer.id+st.timer.sent;if(!ME.anchor||ME.anchor.key!==k)ME.anchor={key:k,t0:Date.now(),left:st.timer.end-st.timer.sent}}if(!st){paint(`<div class="wait"><h2>The game has ended</h2><p>Your teacher closed this game.</p></div>`,1);return}ME.state=st;playerRender()});
   return null}
 async function rejoin(){const N=await net().catch(()=>null);if(!N)return needSetup();
   if(ME){try{const r=await ME.N.get(`games/${ME.code}/players/${ME.pid}`);if(r)ME.rec=r;const st=await ME.N.get(`games/${ME.code}/state`);if(st)ME.state=st}catch(e){}ME.key=null;playerRender(true);return}
@@ -741,12 +770,12 @@ function tAccount(st,t){
     <div class="bal">Balance: ${bal===0?"$0":money(Math.abs(bal))+(bal>0?" credit":" debit")}</div></div>`}
 function playerRender(force){
   const M=ME,st=M&&M.state;if(!st)return;const c=st.cfg,t=M.rec.team;
-  const key=JSON.stringify([st.phase,st.q,(st.qs||[]).length,st.score&&st.score[t],st.est,flightsOf(st,t).length,st.cur]);
+  const key=JSON.stringify([st.phase,st.q,(st.qs||[]).length,st.score&&st.score[t],st.est,flightsOf(st,t).length,st.cur,st.timer&&st.timer.id,st.fcLock]);
   if(!force&&key===M.key)return;M.key=key;
   const ae=document.activeElement,fa=ae&&ae.dataset&&ae.dataset.amt;
   const done=html=>{paint(html,1);if(fa){const i=$("#amt");if(i&&!i.disabled){i.focus();const v=i.value;try{i.setSelectionRange(v.length,v.length)}catch(e){}}}};
   const q=st.q;
-  const ask=(head,allowNone)=>{done(`<div style="max-width:820px;margin:0 auto">${head}${entryUI(q,allowNone)}</div>`);wireEntry(q)};
+  const ask=(head,allowNone)=>{done(`<div style="max-width:820px;margin:0 auto">${st.timer&&st.timer.what===q.id?`<div class="pcd">${cdHTML(st,q.id)}</div>`:""}${head}${entryUI(q,allowNone)}</div>`);wireEntry(q);tickCD()};
   if(st.phase==="lobby")return done(`<div class="wait"><h2>You're in, ${esc(M.name)}!</h2><p>You're on <b style="color:${tcol(t)}">${tname(t)}</b>. Grab some paper.</p></div>`);
   if(st.phase==="build")return done(`<div class="tcard"><div class="step">Step 1 · Build</div><h2>Assembly instructions</h2>
       <p>Make any paper airplane you would like. Your team builds <b>${c.planes}</b>.</p><p>Your warranty: every airplane is guaranteed to fly <b>${c.dist} feet</b>. If it doesn't, your company will either repair it or provide a new one.</p>
@@ -755,8 +784,9 @@ function playerRender(force){
     if(q.open&&!myResult(q))return ask(`<div class="tcard" style="margin-bottom:0"><div class="step">Step 2 · Sale day</div><h2>Book the sale</h2><p>Your team sold all <b>${c.planes}</b> airplanes for <b>${money(c.price)}</b> each. Customers paid cash.</p></div>`,false);
     return done(lockedHTML(q,!q.open)+myScore())}
   if(st.phase==="forecast"){
+    if(!M.rec.fc&&st.fcLock)return done(`<div class="wait"><h2>Forecasts are closed</h2><p>Time ran out before you sent one. Your team's average uses everyone who did.</p></div>${myScore()}`);
     if(!M.rec.fc){const u=M.ui.fc||(M.ui.fc={fail:Math.round(c.planes/4),rep:0});u.rep=Math.min(u.rep,u.fail);
-      done(`<div class="tcard"><div class="step">Step 2 · Sale day</div><h2>Your forecast</h2>
+      done(`${st.timer&&st.timer.what==="fc"?`<div class="pcd">${cdHTML(st,"fc")}</div>`:""}<div class="tcard"><div class="step">Step 2 · Sale day</div><h2>Your forecast</h2>
         <p>How many of ${tname(t)}'s ${c.planes} airplanes will <b>not</b> fly ${c.dist} feet?</p>
         <div class="stepper"><button data-s="fail" data-d="-1" aria-label="Fewer">−</button><span class="v">${u.fail}</span><button data-s="fail" data-d="1" aria-label="More">+</button><span class="u">of ${c.planes} will fail</span></div>
         <p>Of those ${plural(u.fail,"plane")}, how many would be <b>repaired</b> (${money(c.rep)})? The rest get <b>replaced</b> (${money(c.repl)}).</p>
@@ -764,7 +794,7 @@ function playerRender(force){
         <p class="note">Your team's estimate is the average of everyone's forecast.</p>
         <button class="btn main" id="lk">Send my forecast</button></div>`);
       app.querySelectorAll("[data-s]").forEach(b=>b.onclick=()=>{const s=b.dataset.s,d=+b.dataset.d;if(s==="fail"){u.fail=Math.max(0,Math.min(c.planes,u.fail+d));u.rep=Math.min(u.rep,u.fail)}else u.rep=Math.max(0,Math.min(u.fail,u.rep+d));playerRender(true)});
-      $("#lk").onclick=async()=>{$("#lk").disabled=true;await save({fc:{fail:u.fail,rep:u.rep}});playerRender(true)};return}
+      $("#lk").onclick=async()=>{$("#lk").disabled=true;await save({fc:{fail:u.fail,rep:u.rep}});playerRender(true)};tickCD();return}
     const f=M.rec.fc;return done(`<div class="wait"><h2>Forecast sent</h2><p>${f.fail} of ${c.planes} fail: ${f.rep} repair, ${f.fail-f.rep} replace.</p><p>Watch the board for ${tname(t)}'s average.</p></div>${myScore()}`)}
   if(st.phase==="reveal"){const e=estOf(st,t);return done(`<div class="tcard"><div class="step">Step 2 · Sale day</div><h2>${tname(t)}'s estimate</h2><div class="big2" style="color:${tcol(t)}">${money(e)}</div><p>The average of everyone's forecast. You'll book it next.</p></div>${myScore()}`)}
   if(st.phase==="est"&&q){const e=estOf(st,t);
