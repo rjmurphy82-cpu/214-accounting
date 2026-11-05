@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Teacher | Paper Airplane Inc.</title>
 <meta name="robots" content="noindex, nofollow">
-<meta name="description" content="Warranty liability class game for District 214 Accounting: teams build paper airplanes, estimate warranty claims, then book every repair and replacement after the flight test.">
+<meta name="description" content="Warranty liability class game for District 214 Accounting: every player forecasts warranty claims and journalizes each repair and replacement for team points.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -250,6 +250,53 @@ body.finale-on .top{visibility:hidden}
 .fbar .btn{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.25);color:#fff;font-size:15px;padding:6px 14px}
 @media (max-width:700px){.rest{grid-template-columns:1fr}}
 @media (prefers-reduced-motion: reduce){.finale .rays{animation:none}.pod,.row45{transition:none}.p1.in .who{animation:none}.tile.anim,.sum tr.anim{animation:none}}
+
+/* v2: individual players, team points */
+.teams{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin:16px 0;text-align:left}
+.tcol{background:var(--paper);border:2px solid var(--line);border-top:10px solid var(--c);border-radius:14px;padding:10px 14px}
+.tcol h3{font-family:var(--display);font-weight:700;font-size:30px;margin:0;display:flex;justify-content:space-between}
+.tcol .ppl{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.tcol .ppl span{background:var(--soft);border-radius:999px;padding:2px 10px;font-weight:700;font-size:17px}
+.scores{display:flex;flex-wrap:wrap;gap:10px;margin:0 0 12px}
+.sc{display:flex;align-items:baseline;gap:12px;background:var(--paper);border:2px solid var(--line);border-left:10px solid var(--c);border-radius:12px;padding:4px 16px}
+.sc b{font-family:var(--display);font-weight:700;font-size:24px}
+.sc span{font-family:var(--display);font-weight:700;font-size:calc(34px*var(--nk));font-variant-numeric:tabular-nums}
+.sc small{font-weight:700;font-size:15px;color:var(--muted)}
+.qprompt{font-size:30px;line-height:1.3;margin:0}
+.prog{display:grid;gap:10px;margin-top:14px}
+.prow{display:grid;grid-template-columns:minmax(120px,auto) 1fr auto;gap:14px;align-items:center;background:var(--paper);border:2px solid var(--line);border-left:10px solid var(--c);border-radius:12px;padding:10px 16px}
+.prow b{font-family:var(--display);font-weight:700;font-size:26px}
+.prow .bar{height:22px;background:var(--soft);border:1px solid var(--line);border-radius:999px;overflow:hidden;display:flex}
+.prow .bar i{display:block;height:100%;background:var(--dark);transition:width .4s}
+.prow .bar i.g{background:var(--good)} .prow .bar i.r{background:var(--bad)}
+.prow .n{font-family:var(--display);font-weight:700;font-size:calc(28px*var(--nk));text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+.prow .n small{display:block;font-family:var(--body);font-size:15px;color:var(--muted);font-weight:700}
+.prow .je{font-size:19px}
+.res3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:14px}
+.res3 button{border:0;border-radius:16px;padding:16px 8px;font-family:var(--display);font-weight:700;font-size:34px;line-height:1.05;color:#fff;box-shadow:0 6px 0 rgba(0,0,0,.25)}
+.res3 button:active{transform:translateY(4px);box-shadow:0 2px 0 rgba(0,0,0,.25)}
+.res3 button small{display:block;font-family:var(--body);font-weight:600;font-size:17px;opacity:.9;margin-top:4px}
+.res3 .ok{background:var(--good)} .res3 .rp{background:var(--amber)} .res3 .rl{background:var(--bad)}
+.res3 button:disabled{opacity:.35}
+.claimbox{margin-top:12px;background:var(--paper);border:3px solid var(--line);border-radius:14px;padding:12px 18px}
+.claimbox.open{border-color:var(--bad);background:var(--badsoft)}
+.claimbox h3{font-family:var(--display);font-weight:700;font-size:26px;margin:0 0 4px}
+.claimbox .row{justify-content:space-between}
+.fleet{display:grid;gap:8px;margin-top:12px}
+.fleet .fr{display:grid;grid-template-columns:5.5em 1fr;gap:8px;align-items:center}
+.fleet .fr b{font-family:var(--display);font-weight:700;font-size:20px;border-left:8px solid var(--c);padding-left:8px}
+.fleet .mini{margin:0;grid-template-columns:repeat(8,minmax(0,1fr))}
+.fleet .mini .pl{font-size:17px;padding:1px 0}
+.pl.repair{background:var(--ambersoft);border-color:var(--amber)} .pl.repair small{color:var(--amber)}
+.pl.replace{background:var(--badsoft);border-color:var(--bad)} .pl.replace small{color:var(--bad)}
+.pickteam{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin:8px 0 14px}
+.pickteam button{border:3px solid var(--line);border-left:12px solid var(--c);background:var(--paper);border-radius:12px;padding:14px;font-family:var(--display);font-weight:700;font-size:28px;text-align:left}
+.pickteam button[aria-pressed="true"]{background:var(--dark);color:#fff;border-color:var(--dark);border-left-color:var(--c)}
+.none{margin-top:10px;width:100%;text-align:left;background:var(--soft);border:3px solid var(--line);border-radius:10px;padding:9px 14px;font-weight:700;font-size:18px}
+.none[aria-pressed="true"]{background:var(--dark);color:#fff;border-color:var(--dark)}
+.big2{font-family:var(--display);font-weight:700;font-size:clamp(44px,9vw,80px);line-height:1}
+.mypill{display:inline-block;border-radius:999px;padding:2px 12px;color:#fff;font-weight:700;font-size:15px;background:var(--c)}
+@media (max-width:820px){.res3{grid-template-columns:1fr}.fleet .mini{grid-template-columns:repeat(8,minmax(0,1fr))}}
 </style>
 </head>
 <body>
@@ -2560,26 +2607,31 @@ var qrcode = function() {
 </script>
 <script>
 "use strict";
-/* ============================================================ GAME SETTINGS (teacher can change them when creating a game) */
-const DEFAULTS={planes:16,price:10,repl:3,rep:1,dist:20,build:6,refly:1,trueup:1};
+/* ============================================================ SETTINGS (the teacher can change these when creating a game) */
+const DEFAULTS={teams:2,planes:16,price:10,repl:3,rep:1,dist:20,build:6,pr:10,pw:5,bonus:25,who:"all",alt:1};
 const ACCTS=["Cash","Accounts Receivable","Merchandise Inventory","Sales Revenue","Cost of Goods Sold","Warranty Expense","Estimated Warranty Liability","Salaries Expense","Salaries Payable"];
 const EWL="Estimated Warranty Liability",WE="Warranty Expense";
 const WHY={
  sale:"Customers paid cash for every airplane, so Cash goes up and Sales Revenue is earned today.",
  est:"Matching principle: the warranty cost belongs in the same period as the sale, so you estimate it now, before a single plane flies. The expense goes up, and so does what you owe customers later.",
- repair:"The expense was already recorded when you made the estimate. A claim just uses up the liability. A repair is labor, and you owe your workers for it: Salaries Payable.",
- replace:"The expense was already recorded when you made the estimate. A claim just uses up the liability. The new airplane comes out of Merchandise Inventory.",
- over:"You estimated more than the claims cost. That leftover liability isn't owed to anyone, so take it back out of Warranty Expense.",
- under:"The claims cost more than you estimated, so the liability went negative. Record the extra Warranty Expense to bring the liability back to zero.",
- zero:"Your estimate matched the claims exactly. The liability is already at zero, so there's nothing to adjust."
+ repair:"The expense was already recorded with the estimate, so a claim just uses up the liability. A repair is labor you owe your workers: Salaries Payable.",
+ replace:"The expense was already recorded with the estimate, so a claim just uses up the liability. The new airplane comes out of Merchandise Inventory.",
+ over:"The team estimated more than the claims cost. The leftover liability isn't owed to anyone, so take it back out of Warranty Expense.",
+ under:"The claims cost more than the estimate, so the liability went negative. Record the extra Warranty Expense to bring the liability back to zero.",
+ zero:"The estimate matched the claims exactly. The liability is already zero, so no entry is needed.",
+ none:"The team estimated no warranty claims, so there's nothing to record."
 };
-const KIND={sale:"Sale",est:"Warranty estimate",repair:"Repair claim",replace:"Replacement claim",tu:"Year-end true-up"};
-const COLORS=["#C1102F","#1F5FAD","#1E7A3C","#9A6700","#6F3FA8","#0F7C80","#C2410C","#BE185D","#3F3F46","#4D7C0F"];
+const KIND={sale:"Sale",est:"Warranty estimate",repair:"Repair claims",replace:"Replacement claims",tu:"Year-end true-up"};
+const COLORS=["#C1102F","#1F5FAD","#1E7A3C","#9A6700","#6F3FA8","#0F7C80","#C2410C","#BE185D"];
+const tname=i=>"Team "+(i+1);
+const tcol=i=>COLORS[i%COLORS.length];
 
 /* ============================================================ HELPERS */
 const $=s=>document.querySelector(s);
 const app=$("#app");
-const money=n=>(n<0?"−$":"$")+Math.abs(Math.round(n)).toLocaleString("en-US");
+const r2=n=>Math.round(n*100)/100;
+const money=n=>{const a=r2(Math.abs(n));return (n<0?"−$":"$")+(Number.isInteger(a)?a.toLocaleString("en-US"):a.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}))};
+const pts=n=>(n>0?"+":n<0?"−":"")+Math.abs(n);
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const ord=n=>n+(n%100>=11&&n%100<=13?"th":["th","st","nd","rd"][n%10]||"th");
 const rid=()=>Math.random().toString(36).slice(2,9);
@@ -2587,7 +2639,8 @@ const plural=(n,w)=>n+" "+w+(n===1?"":"s");
 function beep(f,d){try{const c=beep.c||(beep.c=new (window.AudioContext||window.webkitAudioContext)());const o=c.createOscillator(),g=c.createGain();o.frequency.value=f;g.gain.value=.06;o.connect(g);g.connect(c.destination);const t=c.currentTime;g.gain.exponentialRampToValueAtTime(.0001,t+d);o.start(t);o.stop(t+d)}catch(e){}}
 const ROLE=window.PA_ROLE||"team";
 const MOCK=/[?&]mock=1/.test(location.search);
-function jeHTML(dr,cr,amt,cls){return `<div class="je ${cls||""}"><span class="a">${esc(dr)}</span><span class="v">${money(amt)}</span><span></span><span class="a ind">${esc(cr)}</span><span></span><span class="v">${money(amt)}</span></div>`}
+function jeHTML(k){if(k.none)return `<div class="je"><span class="a">No entry needed</span></div>`;
+  return `<div class="je"><span class="a">${esc(k.dr)}</span><span class="v">${money(k.amt)}</span><span></span><span class="a ind">${esc(k.cr)}</span><span></span><span class="v">${money(k.amt)}</span></div>`}
 
 /* ---------- backend (same database as the other class games) ---------- */
 function mockNet(){
@@ -2636,87 +2689,104 @@ addEventListener("resize",()=>{clearTimeout(zoomApp.t);zoomApp.t=setTimeout(zoom
 let lastPaint="";
 function paint(html,force){if(!force&&html===lastPaint)return false;lastPaint=html;app.innerHTML=html;return true}
 
-/* ---------- the books: one source of truth for every team ---------- */
-function calc(rec,pid,st){
-  const c=st.cfg,fl=(st.flights&&st.flights[pid])||[],tf=st.tfix||{},cl=(rec&&rec.claims)||{};
-  const fixOf=id=>cl[id]&&cl[id].done?cl[id].fix:(tf[id]||null);
-  const planes=[];
-  for(let p=1;p<=c.planes;p++){const f=fl.filter(x=>x.p===p);let s="ready";
-    if(f.length){const L=f[f.length-1];if(L.ok)s="ok";else{const fx=fixOf(L.id);s=!fx?"claim":(f.length-1<c.refly?"refly":"closed")}}
-    planes.push({p,s,n:f.length,last:f[f.length-1]||null})}
-  const claims=fl.filter(x=>!x.ok).map(x=>({id:x.id,p:x.p,fix:fixOf(x.id),by:cl[x.id]&&cl[x.id].done?"team":tf[x.id]?"teacher":null,t:x.t||0}));
-  const costOf=f=>f==="repair"?c.rep:f==="replace"?c.repl:0;
-  const actual=claims.reduce((t,x)=>t+costOf(x.fix),0);
-  const fc=rec&&rec.fc&&rec.fc.locked?rec.fc:null;
-  const est=fc?fc.rep*c.rep+fc.repl*c.repl:0;
-  const next=planes.find(x=>x.s==="ready")||planes.find(x=>x.s==="refly")||null;
-  const firstFlights=fl.filter((x,i)=>fl.findIndex(y=>y.p===x.p)===i);
-  return{planes,claims,actual,est,fc,diff:est-actual,next,pending:claims.filter(x=>!x.fix).length,
-    sales:c.planes*c.price,firstPass:firstFlights.filter(x=>x.ok).length,flown:firstFlights.length,
-    repairs:claims.filter(x=>x.fix==="repair").length,repls:claims.filter(x=>x.fix==="replace").length}
+/* ---------- the books: one source of truth ---------- */
+const flightsOf=(st,t)=>(st.flights&&st.flights[t])||[];
+const costOf=(st,res)=>res==="repair"?st.cfg.rep:res==="replace"?st.cfg.repl:0;
+const actualOf=(st,t)=>r2(flightsOf(st,t).reduce((a,f)=>a+costOf(st,f.res),0));
+const estOf=(st,t)=>(st.est&&st.est[t])||0;
+const fcAmt=(c,fc)=>fc.rep*c.rep+(fc.fail-fc.rep)*c.repl;
+// the right answer to a question, for a player on team t
+function keyFor(q,t,st){
+  const c=st.cfg;
+  if(q.kind==="sale")return{dr:"Cash",cr:"Sales Revenue",amt:c.planes*c.price,why:WHY.sale};
+  if(q.kind==="est"){const a=estOf(st,t);return a?{dr:WE,cr:EWL,amt:a,why:WHY.est}:{none:true,why:WHY.none}}
+  if(q.kind==="claim")return q.fix==="repair"?{dr:EWL,cr:"Salaries Payable",amt:c.rep,why:WHY.repair}:{dr:EWL,cr:"Merchandise Inventory",amt:c.repl,why:WHY.replace};
+  if(q.kind==="tu"){const b=r2(estOf(st,t)-actualOf(st,t));return b>0?{dr:EWL,cr:WE,amt:b,why:WHY.over}:b<0?{dr:WE,cr:EWL,amt:-b,why:WHY.under}:{none:true,why:WHY.zero}}
 }
-function entryLog(rec){ // every entry this team booked itself, with whether it was right on the first try
-  const out=[];if(!rec)return out;
-  if(rec.sale&&rec.sale.done)out.push({k:"sale",first:rec.sale.first});
-  if(rec.est&&rec.est.done)out.push({k:"est",first:rec.est.first});
-  Object.values(rec.claims||{}).forEach(c=>{if(c.done&&c.first!=null)out.push({k:c.fix,first:c.first})});
-  if(rec.tu&&rec.tu.done)out.push({k:"tu",first:rec.tu.first});
+const eligible=(q,t,st)=>q.kind!=="claim"||st.cfg.who==="all"||q.team===t;
+function isRight(a,k){if(!a)return false;if(k.none)return a.none===true;return !a.none&&a.dr===k.dr&&a.cr===k.cr&&Math.abs(+a.amt-k.amt)<.005}
+function tally(st,players,q){ // per team: answered, right, wrong, eligible
+  const out={};for(let t=0;t<st.cfg.teams;t++)out[t]={n:0,ans:0,right:0};
+  players.forEach(p=>{if(p.team==null||!out[p.team]||!eligible(q,p.team,st))return;const o=out[p.team];o.n++;const a=p.ans&&p.ans[q.id];if(!a)return;o.ans++;if(isRight(a,keyFor(q,p.team,st)))o.right++});
   return out}
-function standings(teams,st){ // closest estimate wins; ties go to more entries right the first time, then fewer warranty dollars
-  const rows=teams.map(t=>{const k=calc(t,t.id,st),log=entryLog(t);return{t,k,off:Math.abs(k.diff),right:log.filter(x=>x.first).length,n:log.length}});
-  rows.sort((a,b)=>a.off-b.off||b.right-a.right||a.k.actual-b.k.actual);
-  let r=0;rows.forEach((x,i)=>{const p=rows[i-1];if(!p||p.off!==x.off||p.right!==x.right||p.k.actual!==x.k.actual)r=i+1;x.rank=r});
-  return rows}
+function scores(st,players){
+  const c=st.cfg,s={};for(let t=0;t<c.teams;t++)s[t]=0;
+  (st.qs||[]).forEach(q=>{const T=tally(st,players,q);for(const t in T)s[t]+=T[t].right*c.pr-(T[t].ans-T[t].right)*c.pw});
+  return s}
+function bonusTeams(st){if(!st.cfg.bonus||!st.est)return[];let best=Infinity,who=[];
+  for(let t=0;t<st.cfg.teams;t++){if(!(st.fcs&&st.fcs[t]&&st.fcs[t].n))continue;const d=Math.abs(estOf(st,t)-actualOf(st,t));if(d<best-1e-9){best=d;who=[t]}else if(Math.abs(d-best)<1e-9)who.push(t)}
+  return who}
 
 /* ============================================================ TEACHER (projector) */
 let H=null;
 function hdr(){return `<h1 class="title">Paper Airplane <span>Inc.</span></h1>
-  <p class="lede">${ROLE==="teacher"?"Teacher screen. Teams build paper airplanes, book the sale, and estimate how many will fail the 20-foot flight guarantee. Then the flight test: every plane that comes up short is a warranty claim the team has to repair or replace and journalize on their iPad. Closest estimate wins.":"Your team builds and sells paper airplanes with a 20-foot flight guarantee. Estimate how many will come up short, book the warranty entries, then fix every plane that fails. The team whose estimate is closest wins."}</p>`}
+  <p class="lede">${ROLE==="teacher"?"Teacher screen. Students join on their own devices and pick their team. Everyone books the sale and forecasts how many planes will miss the guarantee; each team's estimate is the average of its players' forecasts. In the flight test you call each plane: no warranty needed, repair, or replace. Every repair or replacement sends a journal entry to every player. Right answers earn team points, wrong ones cost points. Nobody's name is shown with an answer.":"Join your team. Book the sale, forecast your warranty claims, and journalize every repair and replacement. Right answers earn your team points; wrong answers cost points."}</p>`}
 async function hostSetup(){
   const N=await net().catch(()=>null);if(!N)return needSetup();
   const d=DEFAULTS;
-  paint(`${hdr()}<div class="panel" style="margin-top:0"><h2>Start a game</h2>
-    <p>One iPad per team, plus scrap paper and a tape measure marked at the guarantee distance.</p>
+  paint(`${hdr()}<div class="panel" style="margin-top:0;max-width:760px"><h2>Start a game</h2>
     <div class="cfg">
-      <label>Airplanes per team<input id="c_planes" type="number" min="1" max="40" value="${d.planes}"></label>
+      <label>Number of teams<input id="c_teams" type="number" min="2" max="8" value="${d.teams}"></label>
+      <label>Airplanes per team<input id="c_planes" type="number" min="1" max="32" value="${d.planes}"></label>
       <label>Price per airplane ($)<input id="c_price" type="number" min="1" max="100" value="${d.price}"></label>
+      <label>Guaranteed distance (feet)<input id="c_dist" type="number" min="1" max="100" value="${d.dist}"></label>
       <label>Replacement cost, parts and labor ($)<input id="c_repl" type="number" min="1" max="100" value="${d.repl}"></label>
       <label>Repair cost, labor ($)<input id="c_rep" type="number" min="1" max="100" value="${d.rep}"></label>
-      <label>Guaranteed distance (feet)<input id="c_dist" type="number" min="1" max="100" value="${d.dist}"></label>
+      <label>Points for a correct entry<input id="c_pr" type="number" min="1" max="1000" value="${d.pr}"></label>
+      <label>Points lost for a wrong entry<input id="c_pw" type="number" min="0" max="1000" value="${d.pw}"></label>
+      <label>Bonus for the closest estimate<input id="c_bonus" type="number" min="0" max="1000" value="${d.bonus}"></label>
       <label>Build time (minutes)<input id="c_build" type="number" min="1" max="30" value="${d.build}"></label>
-      <label>After a claim, the plane flies again<select id="c_refly"><option value="0">No, the claim closes it</option><option value="1" selected>Once</option><option value="2">Up to twice</option></select></label>
-      <label>Year-end true-up entry<select id="c_trueup"><option value="1" selected>Include it</option><option value="0">Skip it</option></select></label>
+      <label>Who journalizes a claim<select id="c_who"><option value="all" selected>Every player</option><option value="team">Only the plane's team</option></select></label>
+      <label>Flight order<select id="c_alt"><option value="1" selected>Alternate teams each plane</option><option value="0">One team at a time</option></select></label>
     </div>
     <div class="err" id="er"></div><button class="btn main" id="go">Create game</button></div>`,1);
   $("#go").onclick=async()=>{
-    const cfg={};Object.keys(DEFAULTS).forEach(k=>{const v=Math.round(+$("#c_"+k).value);cfg[k]=isFinite(v)?v:DEFAULTS[k]});
-    cfg.planes=Math.max(1,Math.min(40,cfg.planes));
+    const cfg={};Object.keys(DEFAULTS).forEach(k=>{const el=$("#c_"+k);if(k==="who"){cfg.who=el.value;return}const v=Math.round(+el.value);cfg[k]=isFinite(v)?v:DEFAULTS[k]});
+    cfg.teams=Math.max(2,Math.min(8,cfg.teams));cfg.planes=Math.max(1,Math.min(32,cfg.planes));
     $("#go").disabled=true;
     try{let code;for(let t=0;t<20;t++){code=String(Math.floor(1000+Math.random()*9000));if(!(await N.get("games/"+code)))break}
-      const state={phase:"lobby",cfg,flights:{},tfix:{}};
-      await N.set("games/"+code,{created:Date.now(),game:"airplane",ids:[],state});
+      const state={phase:"lobby",cfg,flights:{},qs:[],q:null,log:[],cur:0,score:{}};
+      await N.set("games/"+code,{created:Date.now(),game:"airplane2",ids:[],state});
       H={N,code,players:{},state,timer:{left:cfg.build*60000,end:null}};
-      H.off=N.on("games/"+code+"/players",v=>{H.players=v||{};hostRender()});
+      H.off=N.on("games/"+code+"/players",v=>{H.players=v||{};syncScore();hostRender()});
       hostRender()}catch(e){$("#er").textContent="Couldn't reach the game database.";$("#go").disabled=false}};
   requestAnimationFrame(zoomApp);
 }
-function teamsArr(){return Object.entries(H.players).map(([id,p])=>({id,...p})).filter(p=>p&&p.name).sort((a,b)=>(a.joined||0)-(b.joined||0))}
-const colorOf=(teams,id)=>COLORS[Math.max(0,teams.findIndex(t=>t.id===id))%COLORS.length];
-function hostSet(st){st.names=Object.fromEntries(teamsArr().map(t=>[t.id,t.name]));H.state=st;H.N.set("games/"+H.code+"/state",st).catch(()=>{});hostRender()}
+function playersArr(){return Object.entries(H.players).map(([id,p])=>({id,...p})).filter(p=>p&&p.name&&p.team!=null).sort((a,b)=>(a.joined||0)-(b.joined||0))}
+function syncScore(){const s=scores(H.state,playersArr());if(JSON.stringify(s)!==JSON.stringify(H.state.score||{})){H.state.score=s;H.N.set("games/"+H.code+"/state",H.state).catch(()=>{})}}
+function hostSet(st){st.score=scores(st,playersArr());H.state=st;H.N.set("games/"+H.code+"/state",st).catch(()=>{});hostRender()}
 function priceSheet(c){return `<div class="prices">
   <div class="pr"><span class="plab">Paper airplane price</span><span class="pv">${money(c.price)}</span></div>
   <div class="pr"><span class="plab">Replacement cost<small>Parts and labor. A brand new airplane.</small></span><span class="pv">${money(c.repl)}</span></div>
   <div class="pr"><span class="plab">Repair cost<small>Labor only. Fix the one that failed.</small></span><span class="pv">${money(c.rep)}</span></div></div>`}
+function scoreStrip(st){const c=st.cfg,s=st.score||{};let h="";for(let t=0;t<c.teams;t++)h+=`<div class="sc" style="--c:${tcol(t)}"><b>${tname(t)}</b><span>${s[t]||0}</span><small>pts</small></div>`;return `<div class="scores">${h}</div>`}
+function animFresh(ph){if(H.anim!==ph){H.anim=ph;H.animT=Date.now()}return Date.now()-H.animT<4500}
+const QTEXT={
+  sale:c=>`Book the sale. Each team sold <b>${c.planes}</b> airplanes at <b>${money(c.price)}</b> each. Customers paid cash.`,
+  est:c=>`Book your team's warranty estimate. Use your team's average shown on your screen.`,
+  tu:c=>`The warranty period is over. Book the entry that brings your team's Estimated Warranty Liability to zero.`};
+function questionHTML(st,players,label){
+  const c=st.cfg,q=st.q,T=tally(st,players,q),rev=!q.open;
+  const rows=[];for(let t=0;t<c.teams;t++){const o=T[t],k=keyFor(q,t,st),w=o.ans-o.right;
+    rows.push(rev?`<div class="prow" style="--c:${tcol(t)}"><b>${tname(t)}</b><div><div class="bar"><i class="g" style="width:${o.n?o.right/o.n*100:0}%"></i><i class="r" style="width:${o.n?w/o.n*100:0}%"></i></div>${q.kind==="sale"?"":`<div style="margin-top:6px">${jeHTML(k)}</div>`}</div><span class="n">${pts(o.right*c.pr-w*c.pw)}<small>${o.right} right · ${w} wrong${o.n-o.ans?" · "+(o.n-o.ans)+" no answer":""}</small></span></div>`
+      :`<div class="prow" style="--c:${tcol(t)}"><b>${tname(t)}</b><div class="bar"><i style="width:${o.n?o.ans/o.n*100:0}%"></i></div><span class="n">${o.ans} of ${o.n}<small>answered</small></span></div>`)}
+  const all=Object.values(T).reduce((a,o)=>a+o.ans,0),tot=Object.values(T).reduce((a,o)=>a+o.n,0);
+  return `<div class="rhead"><span class="rtag">${label}</span><span class="rname">${KIND[q.kind]}</span></div>${scoreStrip(st)}
+    <div class="scard"><p class="qprompt">${QTEXT[q.kind](c)}</p>${rev&&q.kind==="sale"?`<div class="jebox" style="margin-top:12px;display:inline-block">${jeHTML(keyFor(q,0,st))}</div>`:""}
+    ${rev?`<p class="note" style="font-size:19px;margin-top:10px">${esc(keyFor(q,0,st).why)}</p>`:""}</div>
+    <div class="prog">${rows.join("")}</div>
+    <div class="bar2"><span class="count">${rev?"":`${all} of ${tot} answered`}</span>${rev?`<button class="btn main" data-act="qnext">Next →</button>`:`<button class="btn main" data-act="qclose">Close and show answers</button>`}</div>`}
 function hostRender(){
-  if(!H)return;const st=H.state,teams=teamsArr(),c=st.cfg;
-  const go=(html)=>{if(paint(html))wireHost();requestAnimationFrame(zoomApp)};
+  if(!H)return;const st=H.state,c=st.cfg,players=playersArr();
+  const go=html=>{if(paint(html))wireHost();requestAnimationFrame(zoomApp)};
+  const byTeam=t=>players.filter(p=>p.team===t);
   if(st.phase==="lobby"){
     const url=location.origin+"/paper-airplane?code="+H.code;if(H.qr==null)H.qr=window.qrSvg?qrSvg(url):"";
-    return go(`<div class="lobby"><div class="lobtop"><div class="lobleft"><div class="join">One iPad per team. Scan the code, or go to <b>Paper Airplane Inc.</b> on the accounting site and enter</div>
+    let cols="";for(let t=0;t<c.teams;t++){const ps=byTeam(t);cols+=`<div class="tcol" style="--c:${tcol(t)}"><h3>${tname(t)}<span>${ps.length}</span></h3><div class="ppl">${ps.map(p=>`<span>${esc(p.name)}</span>`).join("")||'<span style="opacity:.5">nobody yet</span>'}</div></div>`}
+    return go(`<div class="lobby"><div class="lobtop"><div class="lobleft"><div class="join">Everyone on their own device. Scan the code, or go to <b>Paper Airplane Inc.</b> on the accounting site, enter the code, and pick your team.</div>
       <div class="code">${H.code}</div><div class="url">${esc(url.replace(/^https?:\/\//,""))}</div></div>${H.qr?`<div class="qr">${H.qr}<span>Scan to join</span></div>`:""}</div>
-      <div class="count">${plural(teams.length,"team")} joined</div>
-      <div class="names">${teams.map(t=>`<span style="--c:${colorOf(teams,t.id)}">${esc(t.name)}</span>`).join("")||'<span style="opacity:.5">Waiting for teams…</span>'}</div>
-      <button class="btn main" data-act="tobuild" ${teams.length>=1?"":"disabled"}>Assembly instructions →</button> <button class="btn" data-act="erase">Cancel</button></div>`)}
+      <div class="teams">${cols}</div>
+      <button class="btn main" data-act="tobuild" ${players.length?"":"disabled"}>Assembly instructions →</button> <button class="btn" data-act="erase">Cancel</button></div>`)}
   if(st.phase==="build"){
     return go(`<div class="rhead"><span class="rtag">Step 1</span><span class="rname">Build the fleet</span></div>
       <div class="split"><div class="scard"><div class="stitle">Assembly instructions</div>
@@ -2726,104 +2796,102 @@ function hostRender(){
         <div><div class="timer" id="tm">${fmtT(timerLeft())}</div>
           <div class="row" style="justify-content:center;margin-top:10px"><button class="btn" data-act="tgo" id="tgo">${H.timer.end?"Pause":"Start"}</button><button class="btn" data-act="tplus">+1 min</button><button class="btn" data-act="treset">Reset</button></div></div></div>
       <div style="margin-top:14px">${priceSheet(c)}</div>
-      <div class="bar2"><span class="note">Teams can see the instructions and prices on their iPads.</span><button class="btn main" data-act="tobooks">Sale day →</button></div>`)}
-  if(st.phase==="books"){
-    const tiles=teams.map((t,i)=>{const s=t.sale&&t.sale.done,f=t.fc&&t.fc.locked,e=t.est&&t.est.done;
-      return `<div class="tile" style="--c:${colorOf(teams,t.id)}"><div class="tn">${esc(t.name)}</div><div class="ck"><span class="${s?"y":""}">${s?"✓":"○"} Sale entry</span><span class="${f?"y":""}">${f?"✓":"○"} Forecast locked</span><span class="${e?"y":""}">${e?"✓":"○"} Estimate entry</span></div></div>`}).join("");
-    const n=teams.filter(t=>t.est&&t.est.done||(t.fc&&t.fc.locked&&calc(t,t.id,st).est===0)).length;
-    return go(`<div class="rhead"><span class="rtag">Step 2</span><span class="rname">Sale day</span></div>
-      <div class="split"><div class="scard"><div class="stitle">You sold ${c.planes} airplanes for cash</div>
-        <p class="story">On your iPad: book the sale, then predict how many of your ${c.planes} planes will <b>not</b> fly ${c.dist} feet. Book the warranty estimate now, before a single plane flies.</p>
-        <p class="story" style="font-size:22px;color:var(--muted)">Matching principle: the warranty cost goes in the same period as the sale.</p></div>${priceSheet(c)}</div>
-      <div class="board">${tiles}</div>
-      <div class="bar2"><span class="count">${n} of ${teams.length} estimates booked</span><button class="btn main" data-act="toreveal">Reveal the estimates →</button></div>`)}
+      <div class="bar2"><span class="note">Players see the instructions and prices on their devices.</span><button class="btn main" data-act="tosale">Sale day →</button></div>`)}
+  if(st.phase==="sale")return go(questionHTML(st,players,"Step 2 · Sale day"));
+  if(st.phase==="forecast"){
+    let rows="";for(let t=0;t<c.teams;t++){const ps=byTeam(t),n=ps.filter(p=>p.fc).length;rows+=`<div class="prow" style="--c:${tcol(t)}"><b>${tname(t)}</b><div class="bar"><i style="width:${ps.length?n/ps.length*100:0}%"></i></div><span class="n">${n} of ${ps.length}<small>forecasts in</small></span></div>`}
+    const n=players.filter(p=>p.fc).length;
+    return go(`<div class="rhead"><span class="rtag">Step 2 · Sale day</span><span class="rname">Forecast the warranty claims</span></div>${scoreStrip(st)}
+      <div class="split"><div class="scard"><div class="stitle">How many will come up short?</div>
+        <p class="story">On your device: how many of your team's ${c.planes} airplanes will <b>not</b> fly ${c.dist} feet, and how many of those would you repair or replace?</p>
+        <p class="story" style="font-size:22px;color:var(--muted)">Your team's estimate is the <b>average</b> of everyone's forecast.</p></div>${priceSheet(c)}</div>
+      <div class="prog">${rows}</div>
+      <div class="bar2"><span class="count">${n} of ${players.length} in</span><button class="btn main" data-act="toreveal">Reveal team estimates →</button></div>`)}
   if(st.phase==="reveal"){
-    const fresh=animFresh("reveal");
-    const tiles=teams.map((t,i)=>{const k=calc(t,t.id,st);
-      return `<div class="tile${fresh?" anim":""}" style="--c:${colorOf(teams,t.id)};--d:${i*160}ms"><div class="tn">${esc(t.name)}</div>
-        ${k.fc?`<div class="big">${money(k.est)}</div><div class="sub">${k.fc.fail} of ${c.planes} will fail<br>${k.fc.rep} repair · ${k.fc.repl} replace</div>`:`<div class="big">$0</div><div class="sub">No forecast</div>`}</div>`}).join("");
-    return go(`<div class="rhead"><span class="rtag">Step 2</span><span class="rname">The estimates</span></div>
-      <div class="scard"><div class="stitle">Estimated warranty expense</div>
-        <div class="row" style="gap:24px;align-items:center"><div class="jebox">${jeHTML(WE,EWL,0).replace(/\$0/g,"$ ?")}</div><p class="story" style="flex:1;min-width:280px">Every team recorded the expense today and a liability for the repairs and replacements it expects to owe.</p></div></div>
-      <div class="board">${tiles}</div>
-      <div class="bar2"><span></span><button class="btn main" data-act="tofly">Start the flight test →</button></div>`)}
-  if(st.phase==="fly")return go(flyHTML(teams,st));
-  if(st.phase==="trueup"){
-    const fresh=animFresh("trueup");
-    const rows=teams.map((t,i)=>{const k=calc(t,t.id,st),done=t.tu&&t.tu.done;
-      return `<tr class="${fresh?"anim":""}" style="--c:${colorOf(teams,t.id)};--d:${i*140}ms"><td>${esc(t.name)}${c.trueup?`<small>${done?"✓ True-up booked":"Booking the true-up…"}</small>`:""}</td><td>${money(k.sales)}</td><td>${money(k.est)}</td><td>${money(k.actual)}<small>${k.repairs} repair · ${k.repls} replace</small></td>
-        <td class="${k.diff>0?"pos":k.diff<0?"neg":""}">${k.diff===0?"$0":money(Math.abs(k.diff))}<small>${k.diff>0?"over-estimated":k.diff<0?"under-estimated":"right on"}</small></td></tr>`}).join("");
-    const n=teams.filter(t=>t.tu&&t.tu.done).length;
-    return go(`<div class="rhead"><span class="rtag">Step 4</span><span class="rname">${c.trueup?"Year-end true-up":"How close was your estimate?"}</span></div>
-      ${c.trueup?`<div class="scard" style="margin-bottom:12px"><div class="stitle">Clear out the liability</div><p class="story">The warranty period is over. On your iPad, look at what's left in Estimated Warranty Liability and book the entry that brings it to zero.</p></div>`:""}
-      <table class="sum"><thead><tr><th>Team</th><th>Paper airplane sales</th><th>Warranty expense estimated</th><th>Actual warranty expense</th><th>Difference</th></tr></thead><tbody>${rows}</tbody></table>
-      <div class="bar2"><span class="count">${c.trueup?`${n} of ${teams.length} true-ups booked`:""}</span><button class="btn main" data-act="toend">Final standings →</button></div>`)}
-  if(st.phase==="end"){if(H.anim!=="end"){animFresh("end");finale(teams)}return}
+    const fresh=animFresh("reveal");let tiles="";
+    for(let t=0;t<c.teams;t++){const f=st.fcs[t];
+      tiles+=`<div class="tile${fresh?" anim":""}" style="--c:${tcol(t)};--d:${t*300}ms"><div class="tn">${tname(t)}</div>${f&&f.n?`<div class="big">${money(st.est[t])}</div><div class="sub">Average of ${plural(f.n,"forecast")}<br>About ${f.fail} of ${c.planes} planes will fail<br>Forecasts ranged ${money(f.min)} to ${money(f.max)}</div>`:`<div class="big">$0</div><div class="sub">No forecasts</div>`}</div>`}
+    return go(`<div class="rhead"><span class="rtag">Step 2 · Sale day</span><span class="rname">Team estimates</span></div>${scoreStrip(st)}
+      <div class="scard"><div class="stitle">Estimated warranty expense</div><p class="story">Each team's estimate is the average of its players' forecasts. Next, everyone books it.</p></div>
+      <div class="board" style="grid-template-columns:repeat(auto-fit,minmax(260px,1fr))">${tiles}</div>
+      <div class="bar2"><span></span><button class="btn main" data-act="toest">Book the estimate →</button></div>`)}
+  if(st.phase==="est")return go(questionHTML(st,players,"Step 2 · Sale day"));
+  if(st.phase==="fly")return go(flyHTML(st,players));
+  if(st.phase==="tu"){
+    if(st.q&&st.q.open)return go(questionHTML(st,players,"Step 4 · Year-end"));
+    const fresh=animFresh("tusum"),bt=bonusTeams(st),T=tally(st,players,st.q);
+    let rows="";for(let t=0;t<c.teams;t++){const e=estOf(st,t),a=actualOf(st,t),d=r2(e-a),fl=flightsOf(st,t),o=T[t],w=o.ans-o.right;
+      rows+=`<tr class="${fresh?"anim":""}" style="--c:${tcol(t)};--d:${t*200}ms"><td>${tname(t)}<small>True-up: ${o.right} right · ${w} wrong</small></td><td>${money(c.planes*c.price)}</td><td>${money(e)}</td><td>${money(a)}<small>${fl.filter(f=>f.res==="repair").length} repair · ${fl.filter(f=>f.res==="replace").length} replace</small></td>
+        <td class="${d>0?"pos":d<0?"neg":""}">${d===0?"$0":money(Math.abs(d))}<small>${d>0?"over-estimated":d<0?"under-estimated":"right on"}</small></td><td>${bt.includes(t)?`+${c.bonus}<small>closest estimate</small>`:"&nbsp;"}</td></tr>`}
+    return go(`<div class="rhead"><span class="rtag">Step 4 · Year-end</span><span class="rname">How close was each estimate?</span></div>${scoreStrip(st)}
+      <table class="sum"><thead><tr><th>Team</th><th>Paper airplane sales</th><th>Warranty expense estimated</th><th>Actual warranty expense</th><th>Difference</th><th>Bonus</th></tr></thead><tbody>${rows}</tbody></table>
+      <div class="scard" style="margin-top:12px"><p class="story" style="font-size:22px">${esc(WHY.over)} If the claims cost more, record the extra Warranty Expense instead.</p></div>
+      <div class="bar2"><span></span><button class="btn main" data-act="toend">Final standings →</button></div>`)}
+  if(st.phase==="end"){if(H.anim!=="end"){animFresh("end");finale()}return}
 }
-function flyHTML(teams,st){
-  const c=st.cfg;if(!teams.find(t=>t.id===st.cur))st.cur=teams[0]&&teams[0].id;
-  const t=teams.find(x=>x.id===st.cur);if(!t)return `<div class="wait"><h2>No teams</h2></div>`;
-  const k=calc(t,t.id,st),col=colorOf(teams,t.id);
-  const tabs=teams.map(x=>{const q=calc(x,x.id,st),left=q.planes.filter(p=>p.s==="ready"||p.s==="refly").length;
-    return `<button data-act="cur" data-id="${x.id}" aria-pressed="${x.id===st.cur}" style="--c:${colorOf(teams,x.id)}">${esc(x.name)}<small>${left?left+" to fly":q.pending?"":"done"}${q.pending?(left?" · ":"")+q.pending+" open claim"+(q.pending>1?"s":""):""}</small></button>`}).join("");
-  let run;
-  if(k.next){const re=k.next.s==="refly";const lc=re&&k.claims.filter(x=>x.p===k.next.p).slice(-1)[0];
-    run=`<div class="who">${esc(t.name)} · on the runway</div><div class="pn">Plane ${k.next.p} <span style="font-size:.45em;color:var(--muted)">of ${c.planes}</span></div>
-      <div class="pk ${re?"re":""}">${re?`Re-flight after ${lc&&lc.fix==="repair"?"a repair":"a replacement"}`:"First flight"} · needs ${c.dist} feet</div>
-      <div class="flybtns"><button class="ok" data-act="fly" data-ok="1">✈ Made it<small>Key: M</small></button><button class="no" data-act="fly" data-ok="0">✗ Short<small>Key: S</small></button></div>`}
-  else run=`<div class="who">${esc(t.name)}</div><div class="pn" style="font-size:calc(54px*var(--nk))">${k.pending?`Waiting on ${plural(k.pending,"claim")}`:"All planes done"}</div>
-      <div class="pk">${k.pending?"The team books each claim on their iPad. Tap a red plane to settle it from here.":"Pick the next team."}</div>`;
-  const tiles=k.planes.map(p=>{const lab={ready:"",ok:p.n>1?"fixed ✓":"flew ✓",claim:"claim",refly:"re-fly",closed:"fixed"}[p.s];
-    return `<div class="pl ${p.s}${k.next&&k.next.p===p.p?" next":""}" ${p.s==="claim"?`data-act="settle" data-fid="${p.last.id}" data-p="${p.p}"`:""}>${p.p}<small>${lab||"&nbsp;"}</small></div>`}).join("");
-  const liab=teams.map(x=>{const q=calc(x,x.id,st),left=q.est-q.actual,pct=q.est?Math.max(0,Math.min(100,left/q.est*100)):0;
-    return `<div class="lrow" style="--c:${colorOf(teams,x.id)}"><span class="n">${esc(x.name)}</span><span class="left ${left<0?"neg":""}">${money(left)}</span>
-      <span class="m ${left<0?"neg":""}"><i style="width:${left<0?100:pct}%"></i></span><span class="d">Estimated ${money(q.est)} · claims ${money(q.actual)}${q.pending?` · ${q.pending} open`:""}</span></div>`}).join("");
-  const feed=k.claims.filter(x=>x.fix).slice(-2).reverse().map(x=>`<div class="fe" style="--c:${col}"><b>Plane ${x.p}: ${x.fix==="repair"?"Repair":"Replacement"}</b>${x.by==="teacher"?" <span class='note'>(settled by teacher)</span>":""}${jeHTML(EWL,x.fix==="repair"?"Salaries Payable":"Merchandise Inventory",x.fix==="repair"?c.rep:c.repl)}</div>`).join("");
-  return `<div class="rhead"><span class="rtag">Step 3 · Flight test</span><span class="rname">Guaranteed to fly ${c.dist} feet</span></div>
+function nextPlane(st,t){const n=flightsOf(st,t).length;return n<st.cfg.planes?n+1:null}
+function flyHTML(st,players){
+  const c=st.cfg,t=st.cur,p=nextPlane(st,t),q=st.q&&st.q.kind==="claim"?st.q:null;
+  let tabs="";for(let i=0;i<c.teams;i++){const left=c.planes-flightsOf(st,i).length;tabs+=`<button data-act="cur" data-t="${i}" aria-pressed="${i===t}" style="--c:${tcol(i)}">${tname(i)}<small>${left?left+" to fly":"done"}</small></button>`}
+  const run=p?`<div class="who">${tname(t)} · on the runway</div><div class="pn">Plane ${p} <span style="font-size:.45em;color:var(--muted)">of ${c.planes}</span></div><div class="pk">Did it fly ${c.dist} feet?</div>
+      <div class="res3"><button class="ok" data-act="res" data-r="ok">✓ No warranty needed<small>It made it · key 1</small></button><button class="rp" data-act="res" data-r="repair">Repair · ${money(c.rep)}<small>Short · key 2</small></button><button class="rl" data-act="res" data-r="replace">Replace · ${money(c.repl)}<small>Short · key 3</small></button></div>`
+    :`<div class="who">${tname(t)}</div><div class="pn" style="font-size:calc(54px*var(--nk))">All ${c.planes} planes flown</div><div class="pk">${st.cfg.teams>1?"Pick another team, or finish the flight test.":""}</div>`;
+  // claim status (no names, just counts)
+  let cb="";
+  const lastQ=[...(st.qs||[])].reverse().find(x=>x.kind==="claim");
+  if(lastQ){const T=tally(st,players,lastQ),open=q&&q.id===lastQ.id&&q.open;let ans=0,n=0,right=0;Object.values(T).forEach(o=>{ans+=o.ans;n+=o.n;right+=o.right});
+    cb=`<div class="claimbox ${open?"open":""}"><div class="row"><h3>${open?"Claim open":"Last claim"}: ${tname(lastQ.team)} plane ${lastQ.p}, ${lastQ.fix==="repair"?"repair":"replace"}</h3>${open?`<button class="btn" data-act="qclosec">Close claim</button>`:""}</div>
+      ${open?`<div class="prog" style="margin-top:6px">${Object.entries(T).filter(([,o])=>o.n).map(([i,o])=>`<div class="prow" style="--c:${tcol(+i)};padding:6px 12px"><b style="font-size:20px">${tname(+i)}</b><div class="bar"><i style="width:${o.n?o.ans/o.n*100:0}%"></i></div><span class="n" style="font-size:22px">${o.ans} of ${o.n}</span></div>`).join("")}</div>`
+        :`<div class="row" style="align-items:flex-start"><div class="jebox">${jeHTML(keyFor(lastQ,lastQ.team,st))}</div><div style="font-weight:700;font-size:20px">${Object.entries(T).filter(([,o])=>o.n).map(([i,o])=>`<div><span class="mypill" style="--c:${tcol(+i)}">${tname(+i)}</span> ${o.right} right · ${o.ans-o.right} wrong</div>`).join("")}</div></div>`}</div>`}
+  let fleet="",liab="";
+  for(let i=0;i<c.teams;i++){const fl=flightsOf(st,i);let cells="";for(let k=1;k<=c.planes;k++){const f=fl[k-1];const s=f?f.res:"ready";cells+=`<div class="pl ${s==="ok"?"ok":s}${i===t&&k===p?" next":""}">${k}<small>${{ready:"&nbsp;",ok:"✓",repair:"rep",replace:"new"}[s]}</small></div>`}
+    fleet+=`<div class="fr" style="--c:${tcol(i)}"><b>${tname(i)}</b><div class="mini">${cells}</div></div>`;
+    const e=estOf(st,i),a=actualOf(st,i),left=r2(e-a),pct=e?Math.max(0,Math.min(100,left/e*100)):0;
+    liab+=`<div class="lrow" style="--c:${tcol(i)}"><span class="n">${tname(i)}</span><span class="left ${left<0?"neg":""}">${money(left)}</span><span class="m ${left<0?"neg":""}"><i style="width:${left<0?100:pct}%"></i></span><span class="d">Estimated ${money(e)} · claims ${money(a)}</span></div>`}
+  return `<div class="rhead"><span class="rtag">Step 3 · Flight test</span><span class="rname">Guaranteed to fly ${c.dist} feet</span></div>${scoreStrip(st)}
     <div class="tabs">${tabs}</div>
-    <div class="split"><div><div class="runway" id="runway" style="--c:${col}">${run}
-      <div class="runtools"><button class="btn" data-act="undo" ${(st.flights[t.id]||[]).length?"":"disabled"}>↶ Undo last flight</button><button class="btn" data-act="nextteam">Next team →</button></div></div>
-      <div class="planes">${tiles}</div>${feed?`<div class="feed">${feed}</div>`:""}</div>
-      <div><div class="liab"><h3>Warranty liability left</h3><div class="note" style="margin-bottom:4px">Starts at the estimate. Every claim uses some up.</div>${liab}</div>
-      <div class="bar2" style="justify-content:flex-end"><button class="btn main" data-act="totrueup">Done flying →</button></div></div></div>`;
+    <div class="split"><div><div class="runway" id="runway" style="--c:${tcol(t)}">${run}
+      <div class="runtools"><button class="btn" data-act="undo" ${(st.log||[]).length?"":"disabled"}>↶ Undo last plane</button></div></div>${cb}</div>
+      <div><div class="liab"><h3>Warranty liability left</h3><div class="note" style="margin-bottom:4px">Starts at the team's estimate. Every claim uses some up.</div>${liab}</div>
+      <div class="fleet">${fleet}</div>
+      <div class="bar2" style="justify-content:flex-end"><button class="btn main" data-act="totu">Done flying →</button></div></div></div>`;
 }
-function animFresh(ph){if(H.anim!==ph){H.anim=ph;H.animT=Date.now()}return Date.now()-H.animT<4500}
-function wireHost(){
-  app.querySelectorAll("[data-act]").forEach(b=>b.onclick=()=>hostAct(b.dataset.act,b))}
+function openQ(st,kind,extra){const q={id:"q"+rid(),kind,...(extra||{}),open:true};return{...st,q,qs:[...(st.qs||[]),{id:q.id,kind,...(extra||{})}]}}
+function wireHost(){app.querySelectorAll("[data-act]").forEach(b=>b.onclick=()=>hostAct(b.dataset.act,b))}
 function hostAct(a,b){
-  const st=H.state,teams=teamsArr();
+  const st=H.state,c=st.cfg,players=playersArr();
   if(a==="erase")return hostErase();
   if(a==="tobuild")return hostSet({...st,phase:"build"});
-  if(a==="tgo"){const T=H.timer;if(T.end){T.left=Math.max(0,T.end-Date.now());T.end=null}else{if(T.left<=0)T.left=st.cfg.build*60000;T.end=Date.now()+T.left;beep(660,.12)}tickTimer();b.textContent=T.end?"Pause":"Start";return}
-  if(a==="tplus"){const T=H.timer;if(T.end)T.end+=60000;else T.left+=60000;H.timer.rang=false;tickTimer();return}
-  if(a==="treset"){H.timer={left:st.cfg.build*60000,end:null};tickTimer();const g=$("#tgo");if(g)g.textContent="Start";return}
-  if(a==="tobooks"){H.timer.end=null;return hostSet({...st,phase:"books"})}
-  if(a==="toreveal"){const n=teams.filter(t=>t.fc&&t.fc.locked).length;if(n<teams.length&&!confirm(`${teams.length-n} team(s) haven't locked a forecast. Their estimate will be $0. Reveal anyway?`))return;beep(660,.12);return hostSet({...st,phase:"reveal"})}
-  if(a==="tofly")return hostSet({...st,phase:"fly",cur:teams[0]&&teams[0].id});
-  if(a==="cur")return hostSet({...st,cur:b.dataset.id});
-  if(a==="nextteam"){const i=teams.findIndex(t=>t.id===st.cur);const nx=teams[(i+1)%teams.length];return hostSet({...st,cur:nx&&nx.id})}
-  if(a==="fly")return recordFlight(b.dataset.ok==="1");
-  if(a==="undo"){const fl=(st.flights[st.cur]||[]).slice(0,-1);return hostSet({...st,flights:{...st.flights,[st.cur]:fl}})}
-  if(a==="settle")return settle(b.dataset.fid,b.dataset.p);
-  if(a==="totrueup"){const open=teams.reduce((n,t)=>n+calc(t,t.id,st).pending,0),left=teams.reduce((n,t)=>n+calc(t,t.id,st).planes.filter(p=>p.s==="ready"||p.s==="refly").length,0);
-    if((open||left)&&!confirm(`${open?plural(open,"claim")+" still open (they won't count). ":""}${left?plural(left,"flight")+" not flown yet. ":""}Finish the flight test anyway?`))return;
-    return hostSet({...st,phase:st.cfg.trueup?"trueup":"trueup"})}
-  if(a==="toend"){if(st.cfg.trueup){const n=teams.filter(t=>t.tu&&t.tu.done).length;if(n<teams.length&&!confirm(`${teams.length-n} team(s) haven't booked the true-up. Show final standings anyway?`))return}
-    return hostSet({...st,phase:"end"})}
+  if(a==="tgo"){const T=H.timer;if(T.end){T.left=Math.max(0,T.end-Date.now());T.end=null}else{if(T.left<=0)T.left=c.build*60000;T.end=Date.now()+T.left;beep(660,.12)}tickTimer();b.textContent=T.end?"Pause":"Start";return}
+  if(a==="tplus"){const T=H.timer;if(T.end)T.end+=60000;else T.left+=60000;T.rang=false;tickTimer();return}
+  if(a==="treset"){H.timer={left:c.build*60000,end:null};tickTimer();const g=$("#tgo");if(g)g.textContent="Start";return}
+  if(a==="tosale"){H.timer.end=null;return hostSet(openQ({...st,phase:"sale"},"sale"))}
+  if(a==="qclose"||a==="qclosec"){beep(660,.12);return hostSet({...st,q:{...st.q,open:false}})}
+  if(a==="qnext"){if(st.phase==="sale")return hostSet({...st,phase:"forecast",q:null});if(st.phase==="est")return hostSet({...st,phase:"fly",q:null,cur:0});return}
+  if(a==="toreveal"){const n=players.filter(p=>p.fc).length;if(n<players.length&&!confirm(`${players.length-n} player(s) haven't sent a forecast. Reveal anyway?`))return;
+    const est={},fcs={};for(let t=0;t<c.teams;t++){const f=players.filter(p=>p.team===t&&p.fc).map(p=>p.fc);const am=f.map(x=>fcAmt(c,x));
+      est[t]=am.length?r2(am.reduce((x,y)=>x+y,0)/am.length):0;fcs[t]={n:am.length,min:am.length?Math.min(...am):0,max:am.length?Math.max(...am):0,fail:am.length?Math.round(f.reduce((x,y)=>x+y.fail,0)/f.length*10)/10:0}}
+    beep(660,.12);return hostSet({...st,phase:"reveal",est,fcs})}
+  if(a==="toest")return hostSet(openQ({...st,phase:"est"},"est"));
+  if(a==="cur")return hostSet({...st,cur:+b.dataset.t});
+  if(a==="res")return record(b.dataset.r);
+  if(a==="undo"){const log=[...(st.log||[])],L=log.pop();if(!L)return;const fl=flightsOf(st,L.t).slice(0,-1);let ns={...st,log,cur:L.t,flights:{...st.flights,[L.t]:fl}};
+    if(L.qid){ns.qs=(st.qs||[]).filter(x=>x.id!==L.qid);if(st.q&&st.q.id===L.qid)ns.q=null}return hostSet(ns)}
+  if(a==="totu"){const left=Array.from({length:c.teams},(_,t)=>c.planes-flightsOf(st,t).length).reduce((x,y)=>x+y,0);
+    if(left&&!confirm(`${plural(left,"plane")} not flown yet. Finish the flight test anyway?`))return;
+    return hostSet(openQ({...st,phase:"tu",q:st.q?{...st.q,open:false}:null},"tu"))}
+  if(a==="toend")return hostSet({...st,phase:"end"});
 }
-function recordFlight(ok){
-  const st=H.state,t=teamsArr().find(x=>x.id===st.cur);if(!t)return;const k=calc(t,t.id,st);if(!k.next)return;
-  const f={id:"f"+rid(),p:k.next.p,ok,t:Date.now()};
-  ok?beep(880,.14):beep(220,.3);
-  hostSet({...st,flights:{...st.flights,[t.id]:[...(st.flights[t.id]||[]),f]}});
-  const r=$("#runway");if(r){r.classList.add(ok?"flash-ok":"flash-no");setTimeout(()=>r.classList.remove("flash-ok","flash-no"),600)}
-}
-function settle(fid,p){
-  const c=H.state.cfg,box=document.createElement("div");box.className="pop";
-  box.innerHTML=`<div class="panel"><h2>Settle plane ${esc(p)} from the board</h2><p>Use this only if the team can't book it. The team won't get credit for the entry.</p>
-    <div class="row"><button class="btn main" data-f="repair">Repair ${money(c.rep)}</button><button class="btn main" data-f="replace">Replace ${money(c.repl)}</button><button class="btn" data-f="">Cancel</button></div></div>`;
-  document.body.appendChild(box);
-  box.onclick=e=>{const b=e.target.closest("button");if(!b&&e.target!==box)return;box.remove();if(b&&b.dataset.f){const st=H.state;hostSet({...st,tfix:{...(st.tfix||{}),[fid]:b.dataset.f}})}};
+function record(res){
+  let st=H.state;const c=st.cfg,t=st.cur,p=nextPlane(st,t);if(!p)return;
+  const f={id:"f"+rid(),p,res};let ns={...st,flights:{...st.flights,[t]:[...flightsOf(st,t),f]}};
+  if(res!=="ok"){if(ns.q&&ns.q.open)ns.q={...ns.q,open:false};ns=openQ(ns,"claim",{team:t,p,fix:res});f.qid=ns.q.id}
+  ns.log=[...(st.log||[]),{t,qid:f.qid||null}];
+  if(c.alt){for(let k=1;k<=c.teams;k++){const n=(t+k)%c.teams;if(nextPlane(ns,n)){ns.cur=n;break}}}
+  else if(!nextPlane(ns,t)){for(let k=1;k<=c.teams;k++){const n=(t+k)%c.teams;if(nextPlane(ns,n)){ns.cur=n;break}}}
+  res==="ok"?beep(880,.14):beep(330,.25);
+  hostSet(ns);
+  const r=$("#runway");if(r){r.classList.add(res==="ok"?"flash-ok":"flash-no");setTimeout(()=>r.classList.remove("flash-ok","flash-no"),600)}
 }
 /* build timer */
 function timerLeft(){const T=H.timer;return T.end?Math.max(0,T.end-Date.now()):T.left}
@@ -2832,7 +2900,7 @@ function tickTimer(){const el=$("#tm");if(!el||!H)return;const ms=timerLeft();el
   if(H.timer.end&&ms<=0){H.timer.end=null;H.timer.left=0;if(!H.timer.rang){H.timer.rang=true;[0,350,700].forEach(d=>setTimeout(()=>beep(880,.3),d))}const g=$("#tgo");if(g)g.textContent="Start"}}
 setInterval(()=>{if(H&&H.state.phase==="build")tickTimer()},250);
 addEventListener("keydown",e=>{if(ROLE!=="teacher"||!H||H.state.phase!=="fly"||e.metaKey||e.ctrlKey||e.altKey)return;const tg=e.target.tagName;if(tg==="INPUT"||tg==="SELECT"||tg==="TEXTAREA")return;
-  const k=e.key.toLowerCase();if(k==="m")recordFlight(true);else if(k==="s")recordFlight(false);else if(k==="u")hostAct("undo");else if(k==="n")hostAct("nextteam")});
+  if(e.key==="1")record("ok");else if(e.key==="2")record("repair");else if(e.key==="3")record("replace");else if(e.key.toLowerCase()==="u")hostAct("undo")});
 async function hostErase(){if(!H)return hostSetup();try{H.off&&H.off();await H.N.remove("games/"+H.code)}catch(e){}H=null;stopFireworks();hostSetup()}
 
 /* ---------- finale ---------- */
@@ -2843,8 +2911,8 @@ function qrSvg(text){
 function fanfare(){[[523,0],[659,.12],[784,.24],[1047,.4]].forEach(([f,t])=>setTimeout(()=>beep(f,.35),t*1000))}
 let FW=null,FIN=[];
 function stopFireworks(){FIN.forEach(clearTimeout);FIN=[];if(FW){cancelAnimationFrame(FW.raf);FW=null}document.body.classList.remove("finale-on")}
-function startFireworks(on){
-  const cv=$("#fw");if(!cv)return;const cx=cv.getContext("2d");if(FW)cancelAnimationFrame(FW.raf);
+function startFireworks(){
+  const cv=$("#fw");if(!cv||matchMedia("(prefers-reduced-motion: reduce)").matches)return;const cx=cv.getContext("2d");if(FW)cancelAnimationFrame(FW.raf);
   const dpr=Math.min(2,devicePixelRatio||1);const size=()=>{cv.width=innerWidth*dpr;cv.height=innerHeight*dpr};size();addEventListener("resize",size);
   const COLS=["#C1102F","#E8193C","#FFFFFF","#FFFFFF","#D9D9D9","#C1102F"];
   const rockets=[],parts=[];const t0=performance.now();
@@ -2852,217 +2920,176 @@ function startFireworks(on){
   const burst=(r)=>{const n=70+Math.floor(Math.random()*40),sp=(2.2+Math.random()*2.2)*dpr,ring=Math.random()<.35;
     for(let k=0;k<n;k++){const a=Math.PI*2*k/n+Math.random()*.1,v=ring?sp:sp*(.35+Math.random()*.75);parts.push({x:r.x,y:r.y,vx:Math.cos(a)*v,vy:Math.sin(a)*v,life:1,d:.008+Math.random()*.01,c:Math.random()<.25?"#FFFFFF":r.c,s:(1.6+Math.random()*1.4)*dpr})}};
   FW={raf:0};
-  const frame=(now)=>{if(!FW)return;const el=now-t0;
-    const rate=el<7000?260:el<20000?900:1800;
-    if(on&&now-(FW.lastL||0)>rate){FW.lastL=now;launch();if(el<7000&&Math.random()<.5)launch()}
+  const frame=(now)=>{if(!FW)return;const el=now-t0;const rate=el<7000?260:el<20000?900:1800;
+    if(now-(FW.lastL||0)>rate){FW.lastL=now;launch();if(el<7000&&Math.random()<.5)launch()}
     cx.globalCompositeOperation="destination-out";cx.fillStyle="rgba(0,0,0,.22)";cx.fillRect(0,0,cv.width,cv.height);cx.globalCompositeOperation="lighter";
     for(let i=rockets.length-1;i>=0;i--){const r=rockets[i];r.x+=r.vx;r.y+=r.vy;r.vy+=.09*dpr;cx.fillStyle=r.c;cx.beginPath();cx.arc(r.x,r.y,2.2*dpr,0,7);cx.fill();if(r.y<=r.ty||r.vy>=0){burst(r);rockets.splice(i,1)}}
     for(let i=parts.length-1;i>=0;i--){const p=parts[i];p.x+=p.vx;p.y+=p.vy;p.vx*=.985;p.vy=p.vy*.985+.045*dpr;p.life-=p.d;if(p.life<=0){parts.splice(i,1);continue}
       cx.globalAlpha=Math.max(0,p.life);cx.fillStyle=p.c;cx.beginPath();cx.arc(p.x,p.y,p.s,0,7);cx.fill()}
     cx.globalAlpha=1;FW.raf=requestAnimationFrame(frame)};
-  if(matchMedia("(prefers-reduced-motion: reduce)").matches)return;
   FW.raf=requestAnimationFrame(frame);
 }
-function finale(teams){
-  const st=H.state,rows=standings(teams,st),top=rows.slice(0,5);
-  const off=x=>x.off===0?"Right on!":"Off by "+money(x.off);
-  const slot=(x,i,cls)=>x?`<div class="pod ${cls}" data-i="${i}"><div class="who"><div class="medal">${x.rank}</div><div class="nm">${esc(x.t.name)}</div><div class="pts">${off(x)}</div></div><div class="block"><span>${["1st","2nd","3rd"][i]}</span></div></div>`:`<div class="pod ${cls} empty"></div>`;
-  const rest=top.slice(3).map((x,k)=>`<div class="row45" data-i="${k+3}"><span class="r">${x.rank}</span><span class="n">${esc(x.t.name)}</span><span class="s">${off(x)}</span></div>`).join("");
+function finalRows(st){const c=st.cfg,s=st.score||{},bt=bonusTeams(st);
+  const rows=Array.from({length:c.teams},(_,t)=>({t,base:s[t]||0,bonus:bt.includes(t)?c.bonus:0})).map(x=>({...x,total:x.base+x.bonus}));
+  rows.sort((a,b)=>b.total-a.total);let r=0;rows.forEach((x,i)=>{if(!i||rows[i-1].total!==x.total)r=i+1;x.rank=r});return rows}
+function finale(){
+  const st=H.state,rows=finalRows(st),top=rows.slice(0,5);
+  const sub=x=>`${x.total} pts${x.bonus?` <span style="opacity:.75">(incl. +${x.bonus} bonus)</span>`:""}`;
+  const slot=(x,i,cls)=>x?`<div class="pod ${cls}" data-i="${i}"><div class="who"><div class="medal">${x.rank}</div><div class="nm">${tname(x.t)}</div><div class="pts">${sub(x)}</div></div><div class="block"><span>${["1st","2nd","3rd"][i]}</span></div></div>`:`<div class="pod ${cls} empty"></div>`;
+  const rest=top.slice(3).map((x,k)=>`<div class="row45" data-i="${k+3}"><span class="r">${x.rank}</span><span class="n">${tname(x.t)}</span><span class="s">${x.total} pts</span></div>`).join("");
   document.body.classList.add("finale-on");app.style.zoom="";lastPaint="";
   app.innerHTML=`<div class="finale"><canvas id="fw"></canvas><div class="rays"></div>
-    <div class="fhead"><img class="lg" src="/logo-214.png" alt="District 214"><div class="kick">Paper Airplane Inc. · Closest warranty estimate</div><h2>Final standings</h2></div>
+    <div class="fhead"><img class="lg" src="/logo-214.png" alt="District 214"><div class="kick">Paper Airplane Inc. · Warranty liabilities</div><h2>Final standings</h2></div>
     <div class="podium">${slot(rows[1],1,"p2")}${slot(rows[0],0,"p1")}${slot(rows[2],2,"p3")}</div><div class="rest">${rest}</div>
     <div class="fbar"><button class="btn" id="cr">Class results</button><button class="btn" id="again">Replay</button><button class="btn" id="erase">Erase game</button></div></div>`;
-  $("#cr").onclick=()=>{stopFireworks();classResults(teams)};$("#again").onclick=()=>{stopFireworks();finale(teams)};$("#erase").onclick=()=>{stopFireworks();hostErase()};
-  // slow reveal, 5th up to 1st, with room for applause
+  $("#cr").onclick=()=>{stopFireworks();classResults()};$("#again").onclick=()=>{stopFireworks();finale()};$("#erase").onclick=()=>{stopFireworks();hostErase()};
   const seq=[4,3,2,1,0].filter(i=>rows[i]),at=[2000,8000,14500,21000,28500].slice(5-seq.length);
-  FIN.forEach(clearTimeout);FIN=seq.map((i,n)=>setTimeout(()=>{const el=app.querySelector(`.finale [data-i="${i}"]`);if(!el)return;el.classList.add("in");if(i===0){fanfare();startFireworks(1)}else beep(i<3?660:520,.12)},at[n]));
+  FIN.forEach(clearTimeout);FIN=seq.map((i,n)=>setTimeout(()=>{const el=app.querySelector(`.finale [data-i="${i}"]`);if(!el)return;el.classList.add("in");if(i===0){fanfare();startFireworks()}else beep(i<3?660:520,.12)},at[n]));
 }
-function classResults(teams){
-  document.body.classList.remove("finale-on");const st=H.state,c=st.cfg,rows=standings(teams,st);
-  const kinds=["sale","est","repair","replace","tu"].map(k=>{let n=0,r=0;teams.forEach(t=>entryLog(t).forEach(x=>{if(x.k===k){n++;if(x.first)r++}}));return{k,n,r}}).filter(x=>x.n);
-  const all=teams.map(t=>calc(t,t.id,st)),fl=all.reduce((a,k)=>a+k.flown,0),pass=all.reduce((a,k)=>a+k.firstPass,0);
+function classResults(){
+  document.body.classList.remove("finale-on");const st=H.state,c=st.cfg,players=playersArr();
+  const kinds=["sale","est","repair","replace","tu"].map(k=>{const per={};let n=0,r=0;(st.qs||[]).filter(q=>(q.kind==="claim"?q.fix:q.kind)===k).forEach(q=>{const T=tally(st,players,q);Object.entries(T).forEach(([t,o])=>{per[t]=per[t]||{n:0,r:0};per[t].n+=o.ans;per[t].r+=o.right;n+=o.ans;r+=o.right})});return{k,n,r,per}}).filter(x=>x.n);
   lastPaint="";
-  app.innerHTML=`<div class="rep"><h2>Class results</h2>
-    <table class="sum"><thead><tr><th>Rank</th><th>Team</th><th>Sales</th><th>Estimated</th><th>Actual</th><th>Difference</th><th>Entries right 1st try</th></tr></thead><tbody>
-    ${rows.map(x=>`<tr style="--c:${colorOf(teams,x.t.id)}"><td style="border-left:0;font-family:var(--display)">${ord(x.rank)}</td><td style="text-align:left;border-left:10px solid var(--c);font-size:22px">${esc(x.t.name)}</td><td>${money(x.k.sales)}</td><td>${money(x.k.est)}</td><td>${money(x.k.actual)}</td><td class="${x.k.diff>0?"pos":x.k.diff<0?"neg":""}">${money(Math.abs(x.k.diff))}<small>${x.k.diff>0?"over":x.k.diff<0?"under":"exact"}</small></td><td>${x.right} of ${x.n}</td></tr>`).join("")}</tbody></table>
-    <div style="display:grid;grid-template-columns:1.3fr 1fr;gap:24px;margin-top:16px">
-    <div><h3 style="font-family:var(--display);font-size:26px;margin:6px 0">Entries right on the first try</h3>${kinds.map(x=>`<div class="cr"><span><b>${KIND[x.k]}</b></span><span class="b"><i style="width:${x.r/x.n*100}%"></i></span><span>${x.r} of ${x.n}</span></div>`).join("")}</div>
-    <div><h3 style="font-family:var(--display);font-size:26px;margin:6px 0">The fleet</h3><p style="font-size:22px;margin:4px 0"><b>${pass} of ${fl}</b> airplanes flew ${c.dist} feet on the first try (${fl?Math.round(pass/fl*100):0}%).</p>
-      <p style="font-size:22px;margin:4px 0">Teams predicted <b>${all.reduce((a,k)=>a+(k.fc?k.fc.fail:0),0)}</b> failures. There were <b>${all.reduce((a,k)=>a+k.claims.length,0)}</b> claims.</p></div></div>
+  app.innerHTML=`<div class="rep"><h2>Class results</h2><p class="note" style="font-size:18px">Share of answers that were right. No names.</p>
+    ${kinds.map(x=>`<div class="cr"><span><b>${KIND[x.k]}</b></span><span class="b"><i style="width:${x.r/x.n*100}%"></i></span><span>${Math.round(x.r/x.n*100)}% <span class="note">(${x.r} of ${x.n})</span></span></div>`).join("")}
+    <table class="sum" style="margin-top:18px"><thead><tr><th>Team</th>${kinds.map(x=>`<th>${KIND[x.k]}</th>`).join("")}<th>Points</th></tr></thead><tbody>
+    ${Array.from({length:c.teams},(_,t)=>`<tr style="--c:${tcol(t)}"><td>${tname(t)}</td>${kinds.map(x=>{const p=x.per[t];return `<td>${p&&p.n?Math.round(p.r/p.n*100)+"%":"–"}</td>`}).join("")}<td>${finalRows(st).find(r=>r.t===t).total}</td></tr>`).join("")}</tbody></table>
     <div class="row" style="justify-content:center;margin-top:16px"><button class="btn main" id="pod">Back to standings</button> <button class="btn" id="erase">Erase game</button></div></div>`;
-  $("#pod").onclick=()=>finale(teams);$("#erase").onclick=hostErase;requestAnimationFrame(zoomApp);
+  $("#pod").onclick=()=>finale();$("#erase").onclick=hostErase;requestAnimationFrame(zoomApp);
 }
 
-/* ============================================================ TEAM (iPad) */
-let ME=null;const SKEY="paSession";
+/* ============================================================ PLAYER (own device) */
+let ME=null;const SKEY="paSession2";
 const saveSess=o=>{try{localStorage.setItem(SKEY,JSON.stringify(o))}catch(e){}};
 const loadSess=()=>{try{return JSON.parse(localStorage.getItem(SKEY)||"null")}catch(e){return null}};
 async function joinForm(){
   const N=await net().catch(()=>null);if(!N)return needSetup();
   const sv=loadSess(),qcode=(location.search.match(/[?&]code=(\d{4})/)||[])[1];
-  paint(`${hdr()}<div class="panel" style="margin-top:0"><h2>Join with your team</h2><p>${qcode?"Code filled in. ":""}One iPad per team. Type your company name. Lost connection? Join again with the same name.</p>
+  paint(`${hdr()}<div class="panel" style="margin-top:0"><h2>Join the game</h2><p>${qcode?"Code filled in. ":""}Type your first name and last initial. Lost connection? Join again with the same name.</p>
     <input class="field code" id="cd" inputmode="numeric" maxlength="4" placeholder="0000" autocomplete="off" value="${qcode||(sv?esc(sv.code):"")}">
-    <input class="field" id="nm" maxlength="22" placeholder="Company name" autocomplete="off" value="${sv&&(!qcode||sv.code===qcode)?esc(sv.name):""}">
-    <div class="err" id="er"></div><button class="btn main" id="go">Join</button></div>`,1);
+    <input class="field" id="nm" maxlength="22" placeholder="First name and last initial" autocomplete="off" value="${sv&&(!qcode||sv.code===qcode)?esc(sv.name):""}">
+    <div class="err" id="er"></div><button class="btn main" id="go">Next</button></div>`,1);
   $("#rejoin").hidden=true;
   const go=async()=>{const code=$("#cd").value.trim(),name=$("#nm").value.trim();
     if(!/^\d{4}$/.test(code)){$("#er").textContent="The code is 4 numbers.";return}
-    if(!name){$("#er").textContent="Type your company name.";return}
+    if(!name){$("#er").textContent="Type your name.";return}
     $("#go").disabled=true;const err=await enterGame(N,code,name);if(err){$("#er").textContent=err;$("#go").disabled=false}};
   $("#go").onclick=go;$("#nm").onkeydown=e=>{if(e.key==="Enter")go()};
 }
 async function enterGame(N,code,name,forcePid){
   try{const g=await N.get("games/"+code);
-    if(!g||g.game!=="airplane")return "No Paper Airplane game with that code. Check the board.";
+    if(!g||g.game!=="airplane2")return "No Paper Airplane game with that code. Check the board.";
     const sv=loadSess(),norm=x=>String(x||"").trim().toLowerCase().replace(/\s+/g," ");
     let pid=forcePid||(sv&&sv.code===code&&norm(sv.name)===norm(name)?sv.pid:null);
     if(!pid&&g.players){const hit=Object.entries(g.players).find(([,p])=>norm(p.name)===norm(name));if(hit)pid=hit[0]}
     let rec=pid&&g.players&&g.players[pid];
-    if(!rec){if(g.state&&!["lobby","build","books"].includes(g.state.phase))return "This game already started. Ask your teacher.";
-      pid="t"+rid();rec={name,joined:Date.now()};await N.set(`games/${code}/players/${pid}`,rec)}
-    name=rec.name||name;saveSess({code,pid,name});
-    if(ME&&ME.off)ME.off();
-    ME={N,code,pid,name,rec,state:null,key:null,ui:{}};
-    $("#who").textContent=name;$("#who").hidden=false;$("#rejoin").hidden=false;applyZ();
-    ME.off=N.on(`games/${code}/state`,st=>{if(!ME)return;if(!st){paint(`<div class="wait"><h2>The game has ended</h2><p>Your teacher closed this game.</p></div>`);return}ME.state=st;teamRender()});
+    if(rec&&rec.team!=null)return startPlayer(N,code,pid,rec);
+    // pick a team
+    const T=g.state.cfg.teams;let pick=null;
+    paint(`<div class="panel"><h2>Pick your team</h2><p>Your teacher will tell you which one.</p><div class="pickteam">${Array.from({length:T},(_,t)=>`<button data-t="${t}" style="--c:${tcol(t)}">${tname(t)}</button>`).join("")}</div>
+      <div class="err" id="er"></div><button class="btn main" id="jn" disabled>Join ${esc(name)}</button></div>`,1);
+    app.querySelectorAll("[data-t]").forEach(b=>b.onclick=()=>{pick=+b.dataset.t;app.querySelectorAll("[data-t]").forEach(x=>x.setAttribute("aria-pressed",x===b));$("#jn").disabled=false;$("#jn").textContent=`Join ${tname(pick)}`});
+    $("#jn").onclick=async()=>{if(pick==null)return;$("#jn").disabled=true;
+      try{pid=pid||"p"+rid();rec={...(rec||{}),name,team:pick,joined:(rec&&rec.joined)||Date.now()};await N.set(`games/${code}/players/${pid}`,rec);startPlayer(N,code,pid,rec)}catch(e){$("#er").textContent="Couldn't connect. Try again.";$("#jn").disabled=false}};
     return null}catch(e){return "Couldn't connect. Try again."}
 }
+function startPlayer(N,code,pid,rec){
+  saveSess({code,pid,name:rec.name});if(ME&&ME.off)ME.off();
+  ME={N,code,pid,name:rec.name,rec,state:null,key:null,ui:{}};
+  $("#who").textContent=rec.name+" · "+tname(rec.team);$("#who").style.background=tcol(rec.team);$("#who").hidden=false;$("#rejoin").hidden=false;applyZ();
+  paint(`<div class="wait"><h2>Connecting…</h2></div>`,1);
+  ME.off=N.on(`games/${code}/state`,st=>{if(!ME)return;if(!st){paint(`<div class="wait"><h2>The game has ended</h2><p>Your teacher closed this game.</p></div>`,1);return}ME.state=st;playerRender()});
+  return null}
 async function rejoin(){const N=await net().catch(()=>null);if(!N)return needSetup();
-  if(ME){try{const r=await ME.N.get(`games/${ME.code}/players/${ME.pid}`);if(r)ME.rec=r;const st=await ME.N.get(`games/${ME.code}/state`);if(st)ME.state=st}catch(e){}ME.key=null;teamRender();return}
+  if(ME){try{const r=await ME.N.get(`games/${ME.code}/players/${ME.pid}`);if(r)ME.rec=r;const st=await ME.N.get(`games/${ME.code}/state`);if(st)ME.state=st}catch(e){}ME.key=null;playerRender(true);return}
   const sv=loadSess();if(!sv)return joinForm();const err=await enterGame(N,sv.code,sv.name,sv.pid);if(err)joinForm()}
 async function save(patch){const M=ME;Object.entries(patch).forEach(([k,v])=>{const ks=k.split("/");let o=M.rec;ks.slice(0,-1).forEach(x=>{if(typeof o[x]!=="object"||!o[x])o[x]={};o=o[x]});o[ks[ks.length-1]]=v});
   try{await M.N.update(`games/${M.code}/players/${M.pid}`,patch)}catch(e){}}
 
-/* entry builder: pick the debit, pick the credit, type the amount */
-function entryUI(id,prompt,ans){
-  const u=ME.ui[id]||(ME.ui[id]={dr:null,cr:null,amt:"",tries:0,msg:null,shown:false});
-  const col=side=>`<div><h3>${side==="dr"?"Debit":"Credit"}</h3><div class="acct">${ACCTS.map(a=>`<button data-je="${id}" data-side="${side}" data-a="${esc(a)}" aria-pressed="${u[side]===a}" ${u.shown?"disabled":""}>${esc(a)}</button>`).join("")}</div></div>`;
-  return `${prompt}<div class="jb">${col("dr")}${col("cr")}</div>
-    <div class="amt"><label for="amt_${id}">Amount</label><span class="dollar"><span>$</span><input id="amt_${id}" data-amt="${id}" inputmode="numeric" autocomplete="off" value="${esc(u.amt)}" ${u.shown?"disabled":""}></span>
-      ${u.shown?`<button class="btn main" data-jego="${id}">Continue →</button>`:`<button class="btn main" data-jechk="${id}">Book it</button>`}</div>
-    ${u.msg?`<div class="fb ${u.msg.ok?"ok":"no"}"><b>${esc(u.msg.h)}</b>${u.msg.t}</div>`:""}`;
+/* one-shot journal entry: pick the debit, pick the credit, type the amount */
+function entryUI(q,allowNone){
+  const u=ME.ui[q.id]||(ME.ui[q.id]={dr:null,cr:null,amt:"",none:false,msg:null});
+  const col=side=>`<div><h3>${side==="dr"?"Debit":"Credit"}</h3><div class="acct">${ACCTS.map(a=>`<button data-side="${side}" data-a="${esc(a)}" aria-pressed="${!u.none&&u[side]===a}">${esc(a)}</button>`).join("")}</div></div>`;
+  return `<div class="jb">${col("dr")}${col("cr")}</div>
+    ${allowNone?`<button class="none" data-none="1" aria-pressed="${u.none}">No entry needed</button>`:""}
+    <div class="amt"><label for="amt">Amount</label><span class="dollar"><span>$</span><input id="amt" data-amt="1" inputmode="decimal" autocomplete="off" value="${esc(u.amt)}" ${u.none?"disabled":""}></span>
+      <button class="btn main" id="sub">Lock it in</button></div><p class="note">One try. Your team gets +${ME.state.cfg.pr} if it's right and −${ME.state.cfg.pw} if it's wrong.</p>
+    ${u.msg?`<div class="fb no"><b>${esc(u.msg)}</b></div>`:""}`;
 }
-function wireEntry(id,ans,onDone,why){
-  const u=ME.ui[id];
-  app.querySelectorAll(`[data-je="${id}"]`).forEach(b=>b.onclick=()=>{u[b.dataset.side]=b.dataset.a;u.msg=u.msg&&u.msg.ok?u.msg:null;teamRender(true)});
-  const inp=app.querySelector(`[data-amt="${id}"]`);if(inp)inp.oninput=()=>{u.amt=inp.value.replace(/[^\d.]/g,"")};
-  const chk=app.querySelector(`[data-jechk="${id}"]`);
-  if(chk)chk.onclick=()=>{
-    if(!u.dr||!u.cr){u.msg={ok:false,h:"Pick both accounts",t:"Tap one account to debit and one to credit."};return teamRender(true)}
-    const amt=+String(u.amt).replace(/[^\d.]/g,"");
-    if(!u.amt||!isFinite(amt)){u.msg={ok:false,h:"Type the amount",t:"How many dollars is this entry?"};return teamRender(true)}
-    const okD=u.dr===ans.dr,okC=u.cr===ans.cr,okA=Math.abs(amt-ans.amt)<.001;
-    if(okD&&okC&&okA){const first=u.tries===0;beep(990,.15);u.msg={ok:true,h:first?"Booked! Right the first time.":"Booked!",t:esc(why)};u.done=true;onDone(first);return}
-    u.tries++;beep(220,.25);
-    const bad=[!okD&&"the debit",!okC&&"the credit",!okA&&"the amount"].filter(Boolean);
-    if(u.tries>=2){u.shown=true;u.dr=ans.dr;u.cr=ans.cr;u.amt=String(ans.amt);u.msg={ok:false,h:"Here's the right entry",t:`${jeHTML(ans.dr,ans.cr,ans.amt)}<div style="margin-top:6px">${esc(why)}</div>`};return teamRender(true)}
-    u.msg={ok:false,h:"Not quite. One more try.",t:`Check ${bad.join(" and ")}.`};teamRender(true)};
-  const gob=app.querySelector(`[data-jego="${id}"]`);if(gob)gob.onclick=()=>{u.done=true;onDone(false)};
+function wireEntry(q){
+  const u=ME.ui[q.id];
+  app.querySelectorAll("[data-side]").forEach(b=>b.onclick=()=>{u[b.dataset.side]=b.dataset.a;u.none=false;u.msg=null;playerRender(true)});
+  const nb=app.querySelector("[data-none]");if(nb)nb.onclick=()=>{u.none=!u.none;u.msg=null;playerRender(true)};
+  const inp=$("#amt");if(inp)inp.oninput=()=>{u.amt=inp.value.replace(/[^\d.]/g,"")};
+  $("#sub").onclick=async()=>{
+    let a;if(u.none)a={none:true};else{
+      if(!u.dr||!u.cr){u.msg="Pick one account to debit and one to credit.";return playerRender(true)}
+      const amt=+String(u.amt).replace(/[^\d.]/g,"");if(!u.amt||!isFinite(amt)){u.msg="Type the amount.";return playerRender(true)}
+      a={dr:u.dr,cr:u.cr,amt:r2(amt)}}
+    $("#sub").disabled=true;a.t=Date.now();
+    const ok=isRight(a,keyFor(q,ME.rec.team,ME.state));ok?beep(990,.15):beep(220,.25);
+    await save({["ans/"+q.id]:a});playerRender(true)};
 }
-function tAccount(rec,st){
-  const c=st.cfg,k=calc(rec,ME.pid,st),dr=k.claims.filter(x=>x.fix).map(x=>({t:"Plane "+x.p+(x.fix==="repair"?" repair":" replace"),amt:x.fix==="repair"?c.rep:c.repl}));
-  const cr=k.est?[{t:"Estimate",amt:k.est}]:[];const bal=k.est-k.actual;
-  if(rec.tu&&rec.tu.done&&bal!==0)(bal>0?dr:cr).push({t:"True-up",amt:Math.abs(bal)});
-  const fb=rec.tu&&rec.tu.done?0:bal;
-  return `<div class="ttitle">${EWL}</div><div class="taccount"><div><div class="hd">Debit</div>${dr.map(x=>`<div class="ln"><span>${esc(x.t)}</span><b>${money(x.amt)}</b></div>`).join("")||`<div class="ln note">none yet</div>`}</div>
-    <div><div class="hd">Credit</div>${cr.map(x=>`<div class="ln"><span>${esc(x.t)}</span><b>${money(x.amt)}</b></div>`).join("")||`<div class="ln note">none</div>`}</div>
-    <div class="bal">Balance: ${fb===0?"$0":money(Math.abs(fb))+(fb>0?" credit":" debit")}</div></div>`}
-function miniPlanes(k){return `<div class="mini">${k.planes.map(p=>`<div class="pl ${p.s}">${p.p}<small>${{ready:"&nbsp;",ok:"✓",claim:"claim",refly:"re-fly",closed:"fixed"}[p.s]}</small></div>`).join("")}</div>`}
-function teamRender(force){
-  const M=ME,st=M&&M.state;if(!st)return;const c=st.cfg,rec=M.rec;
-  const myFl=(st.flights&&st.flights[M.pid])||[],myTf=Object.fromEntries(myFl.map(f=>[f.id,(st.tfix||{})[f.id]]).filter(x=>x[1]));
-  const key=JSON.stringify([st.phase,c,myFl,myTf,st.cur===M.pid]);
+function myResult(q){const a=ME.rec.ans&&ME.rec.ans[q.id];if(!a)return null;return{a,ok:isRight(a,keyFor(q,ME.rec.team,ME.state))}}
+function lockedHTML(q,showKey){const r=myResult(q),k=keyFor(q,ME.rec.team,ME.state),c=ME.state.cfg;
+  if(!r)return `<div class="tcard"><h2>Time's up</h2><p>You didn't lock in an answer for this one.</p>${showKey?`<div class="jebox">${jeHTML(k)}</div><p class="note">${esc(k.why)}</p>`:""}</div>`;
+  return `<div class="verdict ${r.ok?"ok":"no"}" style="border-radius:16px;padding:18px;text-align:center;margin:10px auto;max-width:820px;background:var(--${r.ok?"goodsoft":"badsoft"});border:3px solid var(--${r.ok?"good":"bad"})"><h2 style="font-family:var(--display);font-size:clamp(36px,7vw,60px);margin:0;color:var(--${r.ok?"good":"bad"})">${r.ok?"Correct! +"+c.pr:"Not quite. −"+c.pw}</h2>
+    ${showKey?`<div class="jebox" style="display:inline-block;text-align:left;margin-top:10px">${jeHTML(k)}</div><p style="font-size:18px;margin:8px 0 0">${esc(k.why)}</p>`:`<p style="font-size:19px;margin:8px 0 0">Locked in. The answer shows when your teacher closes it.</p>`}</div>`}
+function myScore(){const s=ME.state.score||{},t=ME.rec.team;return `<div class="stats"><span><b style="color:${tcol(t)}">${s[t]||0}</b>${tname(t)} points</span></div>`}
+function tAccount(st,t){
+  const c=st.cfg,fl=flightsOf(st,t).filter(f=>f.res!=="ok"),e=estOf(st,t),bal=r2(e-actualOf(st,t));
+  return `<div class="ttitle">${EWL} · ${tname(t)}</div><div class="taccount"><div><div class="hd">Debit</div>${fl.map(f=>`<div class="ln"><span>Plane ${f.p} ${f.res}</span><b>${money(costOf(st,f.res))}</b></div>`).join("")||`<div class="ln note">none yet</div>`}</div>
+    <div><div class="hd">Credit</div>${e?`<div class="ln"><span>Estimate</span><b>${money(e)}</b></div>`:`<div class="ln note">none</div>`}</div>
+    <div class="bal">Balance: ${bal===0?"$0":money(Math.abs(bal))+(bal>0?" credit":" debit")}</div></div>`}
+function playerRender(force){
+  const M=ME,st=M&&M.state;if(!st)return;const c=st.cfg,t=M.rec.team;
+  const key=JSON.stringify([st.phase,st.q,(st.qs||[]).length,st.score&&st.score[t],st.est,flightsOf(st,t).length,st.cur]);
   if(!force&&key===M.key)return;M.key=key;
-  const ae=document.activeElement,focusAmt=ae&&ae.dataset&&ae.dataset.amt;
-  const done=html=>{paint(html,1);const fb=app.querySelector(".fb");if(fb&&fb.scrollIntoView)fb.scrollIntoView({block:"nearest",behavior:"smooth"});if(focusAmt){const i=app.querySelector(`[data-amt="${focusAmt}"]`);if(i){i.focus();const v=i.value;i.setSelectionRange&&i.setSelectionRange(v.length,v.length)}}};
-  if(st.phase==="lobby")return done(`<div class="wait"><h2>You're in, ${esc(M.name)}!</h2><p>Grab some paper. Your teacher will read the assembly instructions.</p></div>`);
+  const ae=document.activeElement,fa=ae&&ae.dataset&&ae.dataset.amt;
+  const done=html=>{paint(html,1);if(fa){const i=$("#amt");if(i&&!i.disabled){i.focus();const v=i.value;try{i.setSelectionRange(v.length,v.length)}catch(e){}}}};
+  const q=st.q;
+  const ask=(head,allowNone)=>{done(`<div style="max-width:820px;margin:0 auto">${head}${entryUI(q,allowNone)}</div>`);wireEntry(q)};
+  if(st.phase==="lobby")return done(`<div class="wait"><h2>You're in, ${esc(M.name)}!</h2><p>You're on <b style="color:${tcol(t)}">${tname(t)}</b>. Grab some paper.</p></div>`);
   if(st.phase==="build")return done(`<div class="tcard"><div class="step">Step 1 · Build</div><h2>Assembly instructions</h2>
-      <p>Make any paper airplane you would like. Build <b>${c.planes}</b> of them.</p><p>Your warranty: every airplane is guaranteed to fly <b>${c.dist} feet</b>. If it doesn't, your company will either repair it or provide a new one.</p>
+      <p>Make any paper airplane you would like. Your team builds <b>${c.planes}</b>.</p><p>Your warranty: every airplane is guaranteed to fly <b>${c.dist} feet</b>. If it doesn't, your company will either repair it or provide a new one.</p>
       <p class="note">The clock is on the board.</p></div><div class="tcard" style="border-left-color:var(--dark)">${priceSheet(c)}</div>`);
-  if(st.phase==="books")return booksScreen(st,done);
-  if(st.phase==="reveal"){const k=calc(rec,M.pid,st);
-    return done(`<div class="tcard"><div class="step">Step 2 · Your estimate</div><h2>${k.fc?`You expect ${plural(k.fc.fail,"plane")} to fail`:"No forecast"}</h2>
-      ${k.fc?`<p>${k.fc.rep} repair at ${money(c.rep)} · ${k.fc.repl} replace at ${money(c.repl)}</p><div class="jebox">${jeHTML(WE,EWL,k.est)}</div>`:""}
-      <p class="note" style="margin-top:10px">Watch the board for everyone's estimates. Then the flight test starts.</p></div>`)}
-  if(st.phase==="fly")return flyScreen(st,done);
-  if(st.phase==="trueup")return trueupScreen(st,done);
-  if(st.phase==="end")return reportScreen(st,done);
-}
-function booksScreen(st,done){
-  const M=ME,c=st.cfg,rec=M.rec,sales=c.planes*c.price;
-  if(!(rec.sale&&rec.sale.done)){
-    const h=entryUI("sale",`<div class="tcard" style="margin-bottom:0"><div class="step">Step 2 · Sale day · 1 of 3</div><h2>Book the sale</h2><p>You sold all <b>${c.planes}</b> airplanes for <b>${money(c.price)}</b> each. Customers paid cash.</p></div>`,null);
-    done(`<div style="max-width:820px;margin:0 auto">${h}</div>`);
-    wireEntry("sale",{dr:"Cash",cr:"Sales Revenue",amt:sales},first=>{save({sale:{done:true,first}});setTimeout(()=>teamRender(true),900)},WHY.sale);return}
-  if(!(rec.fc&&rec.fc.locked)){
-    const u=M.ui.fc||(M.ui.fc={fail:Math.round(c.planes/4),rep:0});u.fail=Math.min(u.fail,c.planes);u.rep=Math.min(u.rep,u.fail);
-    done(`<div class="tcard"><div class="step">Step 2 · Sale day · 2 of 3</div><h2>Forecast your warranty claims</h2>
-      <p>How many of your ${c.planes} airplanes will <b>not</b> fly ${c.dist} feet?</p>
-      <div class="stepper"><button data-s="fail" data-d="-1" aria-label="Fewer">−</button><span class="v">${u.fail}</span><button data-s="fail" data-d="1" aria-label="More">+</button><span class="u">of ${c.planes} will fail</span></div>
-      <p>For those ${plural(u.fail,"plane")}, how many will you <b>repair</b> (${money(c.rep)}, labor)? The rest get <b>replaced</b> (${money(c.repl)}, parts and labor).</p>
-      <div class="stepper"><button data-s="rep" data-d="-1" aria-label="Fewer">−</button><span class="v">${u.rep}</span><button data-s="rep" data-d="1" aria-label="More">+</button><span class="u">repair · ${u.fail-u.rep} replace</span></div>
-      <p class="note">You can still choose repair or replace for each real claim later. This is just your plan for the estimate.</p>
-      <div class="row" style="margin-top:8px"><button class="btn main" id="lk">Lock in forecast</button></div></div>`);
-    app.querySelectorAll("[data-s]").forEach(b=>b.onclick=()=>{const s=b.dataset.s,d=+b.dataset.d;if(s==="fail"){u.fail=Math.max(0,Math.min(c.planes,u.fail+d));u.rep=Math.min(u.rep,u.fail)}else u.rep=Math.max(0,Math.min(u.fail,u.rep+d));teamRender(true)});
-    $("#lk").onclick=async()=>{if(!confirm(`Lock in: ${u.fail} of ${c.planes} fail (${u.rep} repair, ${u.fail-u.rep} replace)?`))return;await save({fc:{locked:true,fail:u.fail,rep:u.rep,repl:u.fail-u.rep}});teamRender(true)};return}
-  const fc=rec.fc,amt=fc.rep*c.rep+fc.repl*c.repl;
-  if(amt===0&&!(rec.est&&rec.est.done)){save({est:{done:true,first:null,amt:0}});}
-  if(!(rec.est&&rec.est.done)){
-    const h=entryUI("est",`<div class="tcard" style="margin-bottom:0"><div class="step">Step 2 · Sale day · 3 of 3</div><h2>Book the warranty estimate</h2><p>Your forecast: <b>${fc.fail}</b> of ${c.planes} fail. <b>${fc.rep}</b> repair at ${money(c.rep)} and <b>${fc.repl}</b> replace at ${money(c.repl)}. Figure the estimated warranty expense and record it today.</p></div>`,null);
-    done(`<div style="max-width:820px;margin:0 auto">${h}</div>`);
-    wireEntry("est",{dr:WE,cr:EWL,amt},first=>{save({est:{done:true,first,amt}});setTimeout(()=>teamRender(true),900)},WHY.est);return}
-  done(`<div class="wait"><h2>Books are done</h2><p>Sale and warranty estimate recorded.</p><div class="jebox" style="display:inline-block;text-align:left;margin-top:10px">${jeHTML("Cash","Sales Revenue",sales)}<div style="height:10px"></div>${amt?jeHTML(WE,EWL,amt):"No warranty estimate (you expect zero claims)."}</div><p>Waiting for the other teams.</p></div>`);
-}
-function flyScreen(st,done){
-  const M=ME,c=st.cfg,rec=M.rec,k=calc(rec,M.pid,st);
-  const open=k.claims.filter(x=>!x.fix);
-  if(open.length){const cl=open[0],id="c_"+cl.id,u=M.ui[id+"_fix"]||(M.ui[id+"_fix"]={fix:null});
-    const head=`<div class="tcard" style="margin-bottom:0;border-left-color:var(--bad)"><div class="step">Warranty claim${open.length>1?` · ${open.length} open`:""}</div><h2>Plane ${cl.p} came up short!</h2>
-      <p>It didn't fly ${c.dist} feet. Honor the warranty: repair it or replace it.</p>
-      <div class="choice"><button data-fix="repair" aria-pressed="${u.fix==="repair"}"><b>Repair · ${money(c.rep)}</b><span>Labor only. You owe your workers.</span></button><button data-fix="replace" aria-pressed="${u.fix==="replace"}"><b>Replace · ${money(c.repl)}</b><span>A new airplane from inventory.</span></button></div></div>`;
-    if(!u.fix){done(`<div style="max-width:820px;margin:0 auto">${head}${tAccount(rec,st)}</div>`)}
-    else{const ans={dr:EWL,cr:u.fix==="repair"?"Salaries Payable":"Merchandise Inventory",amt:u.fix==="repair"?c.rep:c.repl},eid=id+"_"+u.fix;
-      done(`<div style="max-width:820px;margin:0 auto">${head}${entryUI(eid,`<p style="font-size:20px;margin:14px 0 0"><b>Book the ${u.fix}.</b></p>`,ans)}</div>`);
-      wireEntry(eid,ans,first=>{setTimeout(()=>{save({["claims/"+cl.id]:{fix:u.fix,done:true,first}}).then(()=>teamRender(true))},900)},WHY[u.fix])}
-    app.querySelectorAll("[data-fix]").forEach(b=>{b.disabled=!!(M.ui[id+"_"+u.fix]&&M.ui[id+"_"+u.fix].done);b.onclick=()=>{if(u.fix===b.dataset.fix)return;u.fix=b.dataset.fix;teamRender(true)}});
-    return}
-  const left=k.planes.filter(p=>p.s==="ready"||p.s==="refly").length;
-  done(`<div class="tcard"><div class="step">Step 3 · Flight test</div><h2>${st.cur===M.pid?"You're on the runway!":left?"Flight test":"All your planes are done"}</h2>
-    <p>${st.cur===M.pid?"Throw the plane your teacher calls. If it comes up short, your claim shows up here.":"Watch the board. When your plane comes up short, the claim shows up here."}</p>
-    ${miniPlanes(k)}
-    <div class="stats"><span><b>${k.firstPass}</b>flew ${c.dist} ft first try</span><span><b>${k.claims.length}</b>claims</span><span><b>${money(k.est-k.actual)}</b>liability left</span></div></div>
-    <div class="tcard" style="border-left-color:var(--dark)">${tAccount(rec,st)}</div>`);
-}
-function trueupScreen(st,done){
-  const M=ME,c=st.cfg,rec=M.rec,k=calc(rec,M.pid,st),bal=k.est-k.actual;
-  const sumCard=`<div class="stats"><span><b>${money(k.est)}</b>estimated</span><span><b>${money(k.actual)}</b>actual</span><span><b>${money(Math.abs(bal))}</b>${bal>0?"over-estimated":bal<0?"under-estimated":"difference"}</span></div>`;
-  if(!c.trueup||(rec.tu&&rec.tu.done))return done(`<div class="tcard"><div class="step">Step 4 · Results</div><h2>${bal===0?"Right on!":"Off by "+money(Math.abs(bal))}</h2>${sumCard}${rec.tu&&rec.tu.done?`<p class="note" style="text-align:center">True-up booked. The liability is back to zero.</p>`:""}</div><div class="tcard" style="border-left-color:var(--dark)">${tAccount(rec,st)}</div>`);
-  const u=M.ui.tub||(M.ui.tub={pick:null,tries:0,msg:null});
-  const want=bal>0?"over":bal<0?"under":"zero";
-  if(!u.ok){
-    done(`<div style="max-width:820px;margin:0 auto"><div class="tcard"><div class="step">Step 4 · Year-end true-up</div><h2>The warranty period is over</h2>
-      <p>Look at your liability account. What's left?</p>${tAccount(rec,st)}
-      <div class="choice" style="grid-template-columns:1fr 1fr 1fr"><button data-p="over" aria-pressed="${u.pick==="over"}"><b>Credit balance</b><span>We over-estimated</span></button><button data-p="under" aria-pressed="${u.pick==="under"}"><b>Debit balance</b><span>We under-estimated</span></button><button data-p="zero" aria-pressed="${u.pick==="zero"}"><b>Zero</b><span>Right on, no entry</span></button></div>
-      ${u.msg?`<div class="fb no"><b>${esc(u.msg)}</b></div>`:""}</div></div>`);
-    app.querySelectorAll("[data-p]").forEach(b=>b.onclick=()=>{u.pick=b.dataset.p;
-      if(u.pick===want){u.ok=true;beep(990,.12);if(want==="zero"){save({tu:{done:true,first:u.tries===0}})}teamRender(true)}
-      else{u.tries++;beep(220,.25);u.msg=u.tries>=2?(want==="over"?"It's a credit balance: the estimate was bigger than the claims.":want==="under"?"It's a debit balance: the claims were bigger than the estimate.":"It's zero: the claims matched the estimate."):"Not quite. Compare the two sides of the T-account.";
-        if(u.tries>=2){u.ok=true;if(want==="zero")save({tu:{done:true,first:false}})}teamRender(true)}});
-    return}
-  if(want==="zero")return done(`<div class="tcard"><h2>No entry needed</h2><p>${esc(WHY.zero)}</p>${sumCard}</div>`);
-  const ans=want==="over"?{dr:EWL,cr:WE,amt:bal}:{dr:WE,cr:EWL,amt:-bal};
-  const h=entryUI("tu",`<div class="tcard" style="margin-bottom:0"><div class="step">Step 4 · Year-end true-up</div><h2>Bring the liability to zero</h2><p>${want==="over"?`You have ${money(bal)} of liability left that nobody will ever claim.`:`Claims went ${money(-bal)} past your estimate.`} Book the entry that clears it.</p></div>`,ans);
-  done(`<div style="max-width:820px;margin:0 auto">${h}</div>`);
-  wireEntry("tu",ans,first=>{const tf=u.tries===0&&first;setTimeout(()=>{save({tu:{done:true,first:tf}}).then(()=>teamRender(true))},900)},WHY[want]);
-}
-function reportScreen(st,done){
-  const M=ME,c=st.cfg,rec=M.rec,k=calc(rec,M.pid,st),log=entryLog(rec);
-  done(`<div class="tcard"><div class="step">Final</div><h2>${esc(M.name)}: ${k.diff===0?"right on!":"off by "+money(Math.abs(k.diff))}</h2>
-    <div class="stats"><span><b>${money(k.sales)}</b>sales</span><span><b>${money(k.est)}</b>estimated</span><span><b>${money(k.actual)}</b>actual</span><span><b>${log.filter(x=>x.first).length}/${log.length}</b>entries right 1st try</span></div>
-    <p class="note" style="text-align:center">Watch the board for the final standings.</p></div>
-    <div class="tcard" style="border-left-color:var(--dark)"><h2 style="font-size:28px">Your entries</h2>${log.map(x=>`<div class="cr" style="grid-template-columns:1fr auto"><span>${KIND[x.k]}</span><b style="color:${x.first?"var(--good)":"var(--bad)"}">${x.first?"✓ first try":"✗ needed help"}</b></div>`).join("")||"<p>None</p>"}</div>`);
-  try{localStorage.removeItem(SKEY)}catch(e){}
+  if(st.phase==="sale"&&q){
+    if(q.open&&!myResult(q))return ask(`<div class="tcard" style="margin-bottom:0"><div class="step">Step 2 · Sale day</div><h2>Book the sale</h2><p>Your team sold all <b>${c.planes}</b> airplanes for <b>${money(c.price)}</b> each. Customers paid cash.</p></div>`,false);
+    return done(lockedHTML(q,!q.open)+myScore())}
+  if(st.phase==="forecast"){
+    if(!M.rec.fc){const u=M.ui.fc||(M.ui.fc={fail:Math.round(c.planes/4),rep:0});u.rep=Math.min(u.rep,u.fail);
+      done(`<div class="tcard"><div class="step">Step 2 · Sale day</div><h2>Your forecast</h2>
+        <p>How many of ${tname(t)}'s ${c.planes} airplanes will <b>not</b> fly ${c.dist} feet?</p>
+        <div class="stepper"><button data-s="fail" data-d="-1" aria-label="Fewer">−</button><span class="v">${u.fail}</span><button data-s="fail" data-d="1" aria-label="More">+</button><span class="u">of ${c.planes} will fail</span></div>
+        <p>Of those ${plural(u.fail,"plane")}, how many would be <b>repaired</b> (${money(c.rep)})? The rest get <b>replaced</b> (${money(c.repl)}).</p>
+        <div class="stepper"><button data-s="rep" data-d="-1" aria-label="Fewer">−</button><span class="v">${u.rep}</span><button data-s="rep" data-d="1" aria-label="More">+</button><span class="u">repair · ${u.fail-u.rep} replace</span></div>
+        <p class="note">Your team's estimate is the average of everyone's forecast.</p>
+        <button class="btn main" id="lk">Send my forecast</button></div>`);
+      app.querySelectorAll("[data-s]").forEach(b=>b.onclick=()=>{const s=b.dataset.s,d=+b.dataset.d;if(s==="fail"){u.fail=Math.max(0,Math.min(c.planes,u.fail+d));u.rep=Math.min(u.rep,u.fail)}else u.rep=Math.max(0,Math.min(u.fail,u.rep+d));playerRender(true)});
+      $("#lk").onclick=async()=>{$("#lk").disabled=true;await save({fc:{fail:u.fail,rep:u.rep}});playerRender(true)};return}
+    const f=M.rec.fc;return done(`<div class="wait"><h2>Forecast sent</h2><p>${f.fail} of ${c.planes} fail: ${f.rep} repair, ${f.fail-f.rep} replace.</p><p>Watch the board for ${tname(t)}'s average.</p></div>${myScore()}`)}
+  if(st.phase==="reveal"){const e=estOf(st,t);return done(`<div class="tcard"><div class="step">Step 2 · Sale day</div><h2>${tname(t)}'s estimate</h2><div class="big2" style="color:${tcol(t)}">${money(e)}</div><p>The average of everyone's forecast. You'll book it next.</p></div>${myScore()}`)}
+  if(st.phase==="est"&&q){const e=estOf(st,t);
+    if(q.open&&!myResult(q))return ask(`<div class="tcard" style="margin-bottom:0"><div class="step">Step 2 · Sale day</div><h2>Book the warranty estimate</h2><p>${tname(t)}'s estimated warranty expense is <b>${money(e)}</b>, the average of everyone's forecast. Record it today, before a single plane flies.</p></div>`,true);
+    return done(lockedHTML(q,!q.open)+myScore())}
+  if(st.phase==="fly"){
+    if(q&&q.kind==="claim"&&q.open&&eligible(q,t,st)&&!myResult(q)){
+      return ask(`<div class="tcard" style="margin-bottom:0;border-left-color:${tcol(q.team)}"><div class="step">Warranty claim</div><h2>${tname(q.team)}'s plane ${q.p} came up short</h2>
+        <p>Your teacher is <b>${q.fix==="repair"?`repairing it (${money(c.rep)}, labor only)`:`replacing it (${money(c.repl)}, a new airplane from inventory)`}</b>. Book the entry.</p></div>`,false)}
+    const last=[...(st.qs||[])].reverse().find(x=>x.kind==="claim"&&eligible(x,t,st)&&myResult(x));
+    const lastOpen=last&&q&&q.id===last.id&&q.open;
+    const fl=flightsOf(st,t);let cells="";for(let k=1;k<=c.planes;k++){const f=fl[k-1];const s=f?f.res:"ready";cells+=`<div class="pl ${s}">${k}<small>${{ready:"&nbsp;",ok:"✓",repair:"rep",replace:"new"}[s]}</small></div>`}
+    const other=q&&q.kind==="claim"&&q.open&&!eligible(q,t,st)?`<div class="tcard"><p><b>${tname(q.team)}'s plane ${q.p}</b> is being ${q.fix==="repair"?"repaired":"replaced"}. ${tname(q.team)} books this one.</p></div>`:"";
+    return done(`${other}${last?lockedHTML(last,!lastOpen):""}<div class="tcard"><div class="step">Step 3 · Flight test</div><h2>${st.cur===t?tname(t)+" is on the runway":"Watch the runway"}</h2>
+      <p>When a plane comes up short, the journal entry shows up here.</p><div class="mini">${cells}</div>${myScore()}</div>
+      <div class="tcard" style="border-left-color:var(--dark)">${tAccount(st,t)}</div>`)}
+  if(st.phase==="tu"&&q){
+    const e=estOf(st,t),a=actualOf(st,t);
+    if(q.open&&!myResult(q))return ask(`<div class="tcard" style="margin-bottom:0"><div class="step">Step 4 · Year-end true-up</div><h2>Bring the liability to zero</h2><p>The warranty period is over. ${tname(t)} estimated <b>${money(e)}</b>, and claims cost <b>${money(a)}</b>. Book the entry that clears Estimated Warranty Liability.</p>${tAccount(st,t)}</div>`,true);
+    return done(lockedHTML(q,!q.open)+myScore())}
+  if(st.phase==="end"){const log=(st.qs||[]).filter(x=>eligible(x,t,st));let right=0,ans=0;log.forEach(x=>{const r=myResult(x);if(r){ans++;if(r.ok)right++}});
+    return done(`<div class="tcard"><div class="step">Final</div><h2>${esc(M.name)}</h2><div class="stats"><span><b>${right} of ${log.length}</b>entries right</span>${ans<log.length?`<span><b>${log.length-ans}</b>missed</span>`:""}</div><p class="note" style="text-align:center">Watch the board for the final standings.</p></div>${myScore()}`)}
+  done(`<div class="wait"><h2>Watch the board</h2></div>${myScore()}`);
 }
 
 /* ============================================================ START */
