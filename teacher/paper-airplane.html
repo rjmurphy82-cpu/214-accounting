@@ -2616,7 +2616,7 @@ var qrcode = function() {
 <script>
 "use strict";
 /* ============================================================ SETTINGS (the teacher can change these when creating a game) */
-const DEFAULTS={teams:2,planes:16,price:10,repl:3,rep:1,dist:20,build:6,pr:10,pw:5,bonus:25,who:"all",alt:1,tSale:60,tFc:90,tEst:60,tClaim:45,tTu:90};
+const DEFAULTS={teams:2,planes:16,price:10,repl:3,rep:1,dist:20,build:6,pr:10,pw:5,bonus:25,who:"all",alt:1,tSale:60,tFc:90,tEst:60,tClaim:45};
 const TKEY={sale:"tSale",fc:"tFc",est:"tEst",claim:"tClaim",tu:"tTu"};
 const ACCTS=["Cash","Accounts Receivable","Merchandise Inventory","Sales Revenue","Cost of Goods Sold","Warranty Expense","Estimated Warranty Liability","Salaries Expense","Salaries Payable"];
 const EWL="Estimated Warranty Liability",WE="Warranty Expense";
@@ -2750,7 +2750,6 @@ async function hostSetup(){
       <label>Forecast timer (seconds)<input id="c_tFc" type="number" min="0" max="600" value="${d.tFc}"></label>
       <label>Estimate entry timer (seconds)<input id="c_tEst" type="number" min="0" max="600" value="${d.tEst}"></label>
       <label>Each claim entry timer (seconds)<input id="c_tClaim" type="number" min="0" max="600" value="${d.tClaim}"></label>
-      <label>True-up entry timer (seconds)<input id="c_tTu" type="number" min="0" max="600" value="${d.tTu}"></label>
       <label>Flight order<select id="c_alt"><option value="1" selected>Alternate teams each plane</option><option value="0">One team at a time</option></select></label>
     </div>
     <p class="note">Timers are recommendations. Set one to 0 to turn it off. When time runs out the question closes; no answer means no points either way.</p><div class="err" id="er"></div><button class="btn main" id="go">Create game</button></div>`,1);
@@ -2834,14 +2833,12 @@ function hostRender(){
   if(st.phase==="est")return go(questionHTML(st,players,"Step 2 · Sale day"));
   if(st.phase==="fly")return go(flyHTML(st,players));
   if(st.phase==="tu"){
-    if(st.q&&st.q.open)return go(questionHTML(st,players,"Step 4 · Year-end"));
-    const fresh=animFresh("tusum"),bt=bonusTeams(st),T=tally(st,players,st.q);
-    let rows="";for(let t=0;t<c.teams;t++){const e=estOf(st,t),a=actualOf(st,t),d=r2(e-a),fl=flightsOf(st,t),o=T[t],w=o.ans-o.right;
-      rows+=`<tr class="${fresh?"anim":""}" style="--c:${tcol(t)};--d:${t*200}ms"><td>${tname(t)}<small>True-up: ${o.right} right · ${w} wrong</small></td><td>${money(c.planes*c.price)}</td><td>${money(e)}</td><td>${money(a)}<small>${fl.filter(f=>f.res==="repair").length} repair · ${fl.filter(f=>f.res==="replace").length} replace</small></td>
+    const fresh=animFresh("tusum"),bt=bonusTeams(st);
+    let rows="";for(let t=0;t<c.teams;t++){const e=estOf(st,t),a=actualOf(st,t),d=r2(e-a),fl=flightsOf(st,t);
+      rows+=`<tr class="${fresh?"anim":""}" style="--c:${tcol(t)};--d:${t*200}ms"><td>${tname(t)}</td><td>${money(c.planes*c.price)}</td><td>${money(e)}</td><td>${money(a)}<small>${fl.filter(f=>f.res==="repair").length} repair · ${fl.filter(f=>f.res==="replace").length} replace</small></td>
         <td class="${d>0?"pos":d<0?"neg":""}">${d===0?"$0":money(Math.abs(d))}<small>${d>0?"over-estimated":d<0?"under-estimated":"right on"}</small></td><td>${bt.includes(t)?`+${c.bonus}<small>closest estimate</small>`:"&nbsp;"}</td></tr>`}
-    return go(`<div class="rhead"><span class="rtag">Step 4 · Year-end</span><span class="rname">How close was each estimate?</span></div>${scoreStrip(st)}
+    return go(`<div class="rhead"><span class="rtag">Step 4 · Results</span><span class="rname">How close was each estimate?</span></div>${scoreStrip(st)}
       <table class="sum"><thead><tr><th>Team</th><th>Paper airplane sales</th><th>Warranty expense estimated</th><th>Actual warranty expense</th><th>Difference</th><th>Bonus</th></tr></thead><tbody>${rows}</tbody></table>
-      <div class="scard" style="margin-top:12px"><p class="story" style="font-size:22px">${esc(WHY.over)} If the claims cost more, record the extra Warranty Expense instead.</p></div>
       <div class="bar2"><span></span><button class="btn main" data-act="toend">Final standings →</button></div>`)}
   if(st.phase==="end"){if(H.anim!=="end"){animFresh("end");finale()}return}
 }
@@ -2910,7 +2907,7 @@ function hostAct(a,b){
     if(L.qid){ns.qs=(st.qs||[]).filter(x=>x.id!==L.qid);if(st.q&&st.q.id===L.qid){ns.q=null;ns=clearT(ns,L.qid)}}return hostSet(ns)}
   if(a==="totu"){const left=Array.from({length:c.teams},(_,t)=>c.planes-flightsOf(st,t).length).reduce((x,y)=>x+y,0);
     if(left&&!confirm(`${plural(left,"plane")} not flown yet. Finish the flight test anyway?`))return;
-    return hostSet(openQ({...st,phase:"tu",q:st.q?{...st.q,open:false}:null},"tu"))}
+    return hostSet({...st,phase:"tu",timer:null,q:st.q?{...st.q,open:false}:null})}
   if(a==="toend")return hostSet({...st,phase:"end"});
 }
 function record(res){
@@ -3117,10 +3114,10 @@ function playerRender(force){
     return done(`${other}${last?lockedHTML(last,!lastOpen):""}<div class="tcard"><div class="step">Step 3 · Flight test</div><h2>${st.cur===t?tname(t)+" is on the runway":"Watch the runway"}</h2>
       <p>When a plane comes up short, the journal entry shows up here.</p><div class="mini">${cells}</div>${myScore()}</div>
       <div class="tcard" style="border-left-color:var(--dark)">${tAccount(st,t)}</div>`)}
-  if(st.phase==="tu"&&q){
-    const e=estOf(st,t),a=actualOf(st,t);
-    if(q.open&&!myResult(q))return ask(`<div class="tcard" style="margin-bottom:0"><div class="step">Step 4 · Year-end true-up</div><h2>Bring the liability to zero</h2><p>The warranty period is over. ${tname(t)} estimated <b>${money(e)}</b>, and claims cost <b>${money(a)}</b>. Book the entry that clears Estimated Warranty Liability.</p>${tAccount(st,t)}</div>`,true);
-    return done(lockedHTML(q,!q.open)+myScore())}
+  if(st.phase==="tu"){
+    const e=estOf(st,t),a=actualOf(st,t),d=r2(e-a);
+    return done(`<div class="tcard"><div class="step">Step 4 · How close was the estimate?</div><h2>${d===0?"Right on!":money(Math.abs(d))+(d>0?" over-estimated":" under-estimated")}</h2>
+      <div class="stats"><span><b>${money(e)}</b>estimated</span><span><b>${money(a)}</b>actual</span></div>${myScore()}</div><div class="tcard" style="border-left-color:var(--dark)">${tAccount(st,t)}</div>`)}
   if(st.phase==="end"){const log=(st.qs||[]).filter(x=>eligible(x,t,st));let right=0,ans=0;log.forEach(x=>{const r=myResult(x);if(r){ans++;if(r.ok)right++}});
     return done(`<div class="tcard"><div class="step">Final</div><h2>${esc(M.name)}</h2><div class="stats"><span><b>${right} of ${log.length}</b>entries right</span>${ans<log.length?`<span><b>${log.length-ans}</b>missed</span>`:""}</div><p class="note" style="text-align:center">Watch the board for the final standings.</p></div>${myScore()}`)}
   done(`<div class="wait"><h2>Watch the board</h2></div>${myScore()}`);
