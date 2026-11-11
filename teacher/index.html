@@ -99,6 +99,12 @@ h1{font-family:var(--display);font-weight:700;font-size:clamp(40px,6vw,64px);lin
       <p>Bonds. One iPad per team; each team is an underwriting desk pricing five companies' bonds. Each deal opens with market news (Treasury rate plus the rating spread sets the market rate). Teams call par, discount or premium, find n and i, pick the factors from PV tables, and enter the price; the first three right prices win the client's mandate. Entry checks, straight-line amortization, carrying value and a balance sheet follow, with a worked answer after every step, a slow 5th-to-1st finale, and a class results report. Has a Play without iPads mode. About 40 minutes.</p>
       <div class="stu">Teams go to <b>The Underwriting Desk</b> on the site <span class="go">Host →</span></div>
     </a>
+    <a class="card" href="/chapter-10/rating-room">
+      <span class="chip">Chapter 10</span>
+      <h2>The Rating Room</h2>
+      <p>Bond ratings. Team rounds with hidden lock-ins and the drumroll reveal, the 12-question blitz, and the leaderboard. Groups score each case file on the six-factor scorecard (payment history, earnings stability, debt load, interest coverage, cash cushion, backing and outlook) and turn the total into a rating from AAA to CCC. Runs on the projector only.</p>
+      <div class="stu">Groups use the scorecard worksheet <span class="go">Open →</span></div>
+    </a>
   </div>
 
   <h2 class="chhead" id="ch9">Chapter 9<span>Current liabilities and warranties</span></h2>
@@ -242,6 +248,32 @@ const HOW = [
    ],
    need:["The clock starts at 5 minutes a year. Use -1 and +1 to change it.","Ten years is about 100 minutes, so plan two days or stop after fewer years with Finished: final results."],
    tip:"No Wi-Fi? Click <b>Play without iPads</b>, add desks by hand, and tap a desk's tile to enter its choices."},
+ { id:"rating", name:"The Rating Room", unit:"Chapter 10", href:"/chapter-10/rating-room",
+   who:"Teams. Projector only.", go:"Nothing. Groups use the scorecard worksheet.",
+   learn:[
+    "How raters judge a borrower: payment history, earnings stability, debt load, interest coverage, cash cushion, and backing and outlook.",
+    "Turning those numbers into a rating from AAA down to CCC, and why the rating sets the interest rate a company pays on its bonds."
+   ],
+   tell:[
+    "Score each of the six factors from 0 to 4 on your worksheet, then add them up (out of 24).",
+    "Read the rating off the scale: 22+ AAA, 19+ AA, 16+ A, 13+ BBB, 10+ BB, 6+ B, below 6 CCC.",
+    "Exact rating = +10. One step off = 0. Two or more off = -5. No answer counts as two off.",
+    "The Final Round doubles everything."
+   ],
+   strat:[
+    "Do the math on every ratio. Don't eyeball it.",
+    "Skip the noise. Not every note changes the borrower's ability to pay.",
+    "Always lock in an answer. A blank costs the same as being way off.",
+    "Blitz: most right answers wins, and question 12 counts twice."
+   ],
+   steps:[
+    "Hand out scorecards. Open The Rating Room, go to <b>Team Rounds</b>, and click <b>Start</b>.",
+    "When time's up, enter each team's rating with <b>Lock in your answer</b>. Answers stay hidden.",
+    "Click <b>Reveal the official rating</b>. Use <b>Next factor</b> to show the why one at a time.",
+    "<b>Show leaderboard</b>, <b>Next round</b>. Finish with the <b>Blitz</b> tab."
+   ],
+   need:["Scorecard worksheet for each team.","Whiteboards for the Blitz."],
+   tip:"Use <b>Next factor</b> slowly on the first round. It's the best moment to teach the scorecard. Tie it back to bonds: a lower rating means a higher market rate, so the bond sells at a bigger discount."},
  { id:"bondslive", name:"Bonds Live", unit:"Chapter 10", href:"/teacher/bonds-live",
    who:"1 student per iPad (Kahoot style).", go:"/chapter-10/bonds-live",
    learn:[
