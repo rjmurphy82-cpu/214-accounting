@@ -184,6 +184,11 @@ table.aging tr.tot td{font-weight:700;border-top:3px double var(--ink)}
 .factors .fr{display:flex;justify-content:space-between;gap:16px;font-size:20px;flex-wrap:wrap}
 .factors .fr b{font-family:var(--display);font-weight:600;font-size:26px;font-variant-numeric:tabular-nums}
 .flag{background:var(--ambersoft,#FFF4D6);border:2px solid #9A6700;border-radius:10px;padding:8px 14px;font-weight:700;color:#5c3d00}
+.qcard{border:2px solid var(--black);background:var(--paper);border-radius:10px;padding:12px 18px 14px;display:grid;gap:8px;animation:in .25s ease-out}
+.qcard .rl{font-size:14px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--redtext)}
+.qcard .qq{font-family:var(--display);font-weight:600;font-size:calc(26px * var(--scale));line-height:1.2;margin:0}
+.qcard .think{font-size:15px;font-weight:600;color:var(--muted);margin:0}
+.qcard .rv{border-radius:10px}
 .rv .ex{font-size:18px;color:var(--ink);opacity:.85;max-width:70ch;margin:0}
 .lines{font-size:24px}
 .answer{font-size:32px}
@@ -257,6 +262,7 @@ table.aging tr.tot td{font-weight:700;border-top:3px double var(--ink)}
       <header class="head" id="head"></header>
       <div class="body"><div id="given" style="display:grid;gap:14px"></div><div class="reveals" id="reveals"></div></div>
       <div class="controls">
+        <button class="btn ghost" id="backStepBtn">Back</button>
         <button class="btn" id="revealBtn">Reveal next</button>
         <button class="btn ghost" id="allBtn">Show all</button>
         <button class="btn ghost" id="resetBtn">Hide answers</button>
@@ -265,11 +271,11 @@ table.aging tr.tot td{font-weight:700;border-top:3px double var(--ink)}
     </article>
   </div>
   <div class="nav">
-    <button class="btn ghost" id="prevBtn">Back</button>
+    <button class="btn ghost" id="prevBtn">← Previous problem</button>
     <span class="left" id="pos" style="align-self:center"></span>
     <button class="btn ghost" id="nextBtn">Next problem</button>
   </div>
-  <p class="hint">Keys: <kbd>Space</kbd> or <kbd>→</kbd> reveals the next part, then moves on. <kbd>←</kbd> goes back a step. <kbd>H</kbd> hides answers.</p>
+  <p class="hint">Keys: <kbd>Space</kbd> or <kbd>→</kbd> reveals the next part, then moves on. <kbd>←</kbd> or <b>Back</b> hides the last part. <kbd>H</kbd> hides answers.</p>
   </div></main>
 </div>
 <script>
@@ -1563,30 +1569,52 @@ function strip(){
   const s=$("strip");s.innerHTML="";
   STEPS.forEach((p,k)=>{const b=el("button",seen.has(k)?"seen":null,String(k+1));b.title=p.label+": "+p.heading;b.setAttribute("aria-label",b.title);if(k===i)b.setAttribute("aria-current","true");b.onclick=()=>go(k);s.appendChild(b)});
 }
+function isAnnual(p){const f=(p.given.find(b=>b.facts)||{}).facts||[];const r=f.find(x=>/interest payments/i.test(x[0]));return !!(r&&/annual/i.test(r[1])&&!/semi/i.test(r[1]))}
+function parOf(p){const f=(p.given.find(b=>b.facts)||{}).facts||[];const r=f.find(x=>/par value/i.test(x[0]));return r?r[1]:"par value"}
+function question(p,r){
+  const n=+((/^Step (\d+)/.exec(r.label||"")||[])[1]||0),per=isAnnual(p)?"each year":"every six months";
+  return ({1:`How much cash interest does the company pay ${per}?`,
+    2:"How many interest periods are there, and what is the market rate per period?",
+    3:`What is the present value of the ${parOf(p)} repaid at maturity?`,
+    4:"What is the present value of all the interest payments?",
+    5:"What is the bond's price today? Is it par, a discount, or a premium, and by how much?",
+    6:"What is the journal entry to issue the bonds?",
+    7:`What is the journal entry for each interest payment${isAnnual(p)?"":" (every six months)"}, including any amortization?`})[n]||null;
+}
+/* Sequence of clicks: the prediction answer, then for every step its question, then its answer */
+function seq(p){const out=[];p.reveals.forEach((r,k)=>{const q=k>0?question(p,r):null;if(q)out.push({t:"q",r,q});out.push({t:"a",r,asked:!!q})});return out}
 function render(){
   const p=STEPS[i],h=$("head");h.innerHTML="";
   h.appendChild(el("span","label",p.label));h.appendChild(el("span","tag",p.tag));h.appendChild(el("span","date",p.date));
   const g=$("given");g.innerHTML="";g.appendChild(el("h2",null,p.heading));p.given.forEach(b=>g.appendChild(block(b)));
-  const rv=$("reveals");rv.innerHTML="";p.reveals.slice(0,shown).forEach(r=>rv.appendChild(reveal(r)));
-  const n=p.reveals.length,left=n-shown;
+  const rv=$("reveals");rv.innerHTML="";const sq=seq(p);let cur=null;
+  sq.slice(0,shown).forEach(it=>{
+    if(it.t==="q"){cur=el("div","qcard");cur.appendChild(el("div","rl",it.r.label));cur.appendChild(el("p","qq",it.q));cur.appendChild(el("p","think","Work it out, then reveal the answer."));rv.appendChild(cur)}
+    else if(it.asked&&cur){cur.querySelector(".think").remove();const a=reveal({...it.r,label:null});cur.appendChild(a);cur=null}
+    else rv.appendChild(reveal(it.r));
+  });
+  const n=sq.length,left=n-shown,nx=sq[shown];
   $("revealBtn").disabled=left===0&&i===STEPS.length-1;$("allBtn").disabled=left===0;$("resetBtn").disabled=shown===0;
-  $("revealBtn").textContent=left===0?(i===STEPS.length-1?"Done":"Next problem →"):(shown===0?"Reveal":"Reveal next");
+  $("revealBtn").textContent=left===0?(i===STEPS.length-1?"Done":"Next problem →"):nx.t==="q"?"Next question":(shown===0?"Reveal prediction":"Reveal answer");
+  $("backStepBtn").disabled=shown===0&&i===0;
   $("left").textContent=left?`${left} part${left===1?"":"s"} left`:"";
   $("pos").textContent=`Problem ${i+1} of ${STEPS.length}`;
   $("prevBtn").disabled=i===0;$("nextBtn").disabled=i===STEPS.length-1;
   strip();ledger();
 }
 function go(k){i=Math.max(0,Math.min(STEPS.length-1,k));shown=0;seen.add(i);try{history.replaceState(null,"","#s"+(i+1))}catch(_){}render();window.scrollTo({top:0})}
-function advance(){if(shown<STEPS[i].reveals.length){shown++;render();const r=$("reveals").lastElementChild;if(r)r.scrollIntoView({block:"nearest",behavior:"smooth"})}else if(i<STEPS.length-1)go(i+1)}
+function back(){if(shown>0){shown--;render()}else if(i>0){go(i-1);shown=seq(STEPS[i]).length;render()}}
+function advance(){if(shown<seq(STEPS[i]).length){shown++;render();const r=$("reveals").lastElementChild;if(r)r.scrollIntoView({block:"nearest",behavior:"smooth"})}else if(i<STEPS.length-1)go(i+1)}
 $("revealBtn").onclick=advance;
-$("allBtn").onclick=()=>{shown=STEPS[i].reveals.length;render()};
+$("allBtn").onclick=()=>{shown=seq(STEPS[i]).length;render()};
+$("backStepBtn").onclick=back;
 $("resetBtn").onclick=()=>{shown=0;render()};
 $("prevBtn").onclick=()=>go(i-1);
 $("nextBtn").onclick=()=>go(i+1);
 document.addEventListener("keydown",e=>{
   if(e.target.closest&&e.target.closest("input,textarea"))return;
   if(e.key===" "||e.key==="ArrowRight"||e.key==="Enter"){if(e.target.tagName==="BUTTON"&&e.key!=="ArrowRight")return;e.preventDefault();advance()}
-  else if(e.key==="ArrowLeft"){e.preventDefault();go(i-1)}
+  else if(e.key==="ArrowLeft"||e.key==="Backspace"){e.preventDefault();back()}
   else if(e.key==="h"||e.key==="H"){shown=0;render()}
 });
 const m=/^#s(\d+)$/.exec(location.hash);go(m?(+m[1]-1):0);
