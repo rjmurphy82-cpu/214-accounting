@@ -93,7 +93,12 @@ h1{font-family:var(--display);font-weight:700;font-size:clamp(40px,6vw,64px);lin
       <p>Kahoot-style review of Chapter 10 bonds: seven timed rounds from bond vocabulary and par, discount or premium through cash interest, periods and rates, pricing with PV factors, issuance entries, and straight-line amortization and carrying value, with a live leaderboard, then a report of what to reteach. About 12 to 15 minutes.</p>
       <div class="stu">Students go to <b>Bonds Live</b> on the site <span class="go">Host →</span></div>
     </a>
-    <!-- CH10-SIM -->
+    <a class="card" href="/teacher/bond-underwriter">
+      <span class="chip">Chapter 10</span>
+      <h2>The Underwriting Desk</h2>
+      <p>Bonds. One iPad per team; each team is an underwriting desk pricing five companies' bonds. Each deal opens with market news (Treasury rate plus the rating spread sets the market rate). Teams call par, discount or premium, find n and i, pick the factors from PV tables, and enter the price; the first three right prices win the client's mandate. Entry checks, straight-line amortization, carrying value and a balance sheet follow, with a worked answer after every step, a slow 5th-to-1st finale, and a class results report. Has a Play without iPads mode. About 40 minutes.</p>
+      <div class="stu">Teams go to <b>The Underwriting Desk</b> on the site <span class="go">Host →</span></div>
+    </a>
   </div>
 
   <h2 class="chhead" id="ch9">Chapter 9<span>Current liabilities and warranties</span></h2>
@@ -250,7 +255,38 @@ const HOW = [
    steps: KAHOOT_STEPS("Bonds Live", "/chapter-10/bonds-live"),
    need: KAHOOT_NEED,
    tip:"Seven rounds, 3 questions each by default. A student who drops taps <b>Rejoin</b> on their iPad."},
- // CH10-SIM
+ { id:"underwriting", name:"The Underwriting Desk", unit:"Chapter 10", href:"/teacher/bond-underwriter",
+   who:"1 iPad per team (a desk of 2 to 4 students).", go:"/chapter-10/bond-underwriter",
+   learn:[
+    "Market rate = Treasury rate + the spread for the company's rating. Compare it to the contract rate to call par, discount or premium.",
+    "Semi-annual bonds: n = years x 2, i = market rate / 2, cash interest = par x contract rate / 2.",
+    "Price = PV of $1 factor x par + PV of an annuity factor x cash interest, both at the MARKET rate per period.",
+    "Issuance and interest entries, straight-line amortization, carrying value, and how the bond shows on the balance sheet."
+   ],
+   tell:[
+    "Your desk underwrites five companies' bonds. Read the news on the board to find each deal's market rate.",
+    "Pricing pays $100 for the call, $50 each for n and i, $100 for cash interest and $300 for the price. A wrong price costs $100.",
+    "The first three desks with the right price win the client's mandate: +$300, +$200, +$100.",
+    "Entry checks pay $200. Amortization, carrying value and balance sheet answers pay $150 each. Answers within $1 count.",
+    "Once you lock in, you can't change your answers."
+   ],
+   strat:[
+    "Find the market rate first, then call par, discount or premium before you touch the tables.",
+    "The tables show years and periods, and annual and per-period rates. Use PERIODS and the MARKET rate per period.",
+    "Cash interest always uses the CONTRACT rate. Never discount at the contract rate.",
+    "Check yourself: a discount bond's price must be below par, a premium bond's above par.",
+    "Speed only matters for the mandate. A wrong price costs more than a slow right one."
+   ],
+   steps:[
+    "Open The Underwriting Desk and click <b>Create game</b>.",
+    "Teams go to <code>/chapter-10/bond-underwriter</code>, type the code and a desk name.",
+    "Click <b>Open the first deal</b> and read the news together, then <b>Open pricing</b>.",
+    "When desks lock in, click <b>Reveal the price</b> to walk through the solution and the mandate winners.",
+    "Use <b>Next step</b> for the entry checks and follow-ups (<b>Reveal answer</b> after each), then <b>Next deal</b>.",
+    "After Deal 5, <b>Final standings</b> for the 5th-to-1st reveal, then <b>Class results</b>. <b>Erase game</b> when done."
+   ],
+   need:["Calculators.","About 40 minutes. Pricing has a 4:00 soft timer; other steps 1:00 to 2:30."],
+   tip:"No Wi-Fi? Click <b>Play without iPads</b> to run the same five deals and reveals on the projector."},
  { id:"airplane", name:"Paper Airplane Inc.", unit:"Chapter 9", href:"/teacher/paper-airplane",
    who:"Teams. Every student joins on their own device and picks a team.", go:"/paper-airplane",
    learn:[
