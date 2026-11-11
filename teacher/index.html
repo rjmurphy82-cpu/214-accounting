@@ -11,33 +11,63 @@
 <style>
 :root{
   --bg:#F4F3F3; --paper:#FFFFFF; --ink:#111111; --muted:#5C5C5C; --line:rgba(17,17,17,.13);
-  --red:#C1102F; --redtext:#B00E2A;
+  --red:#C1102F; --redtext:#B00E2A; --redsoft:#FBE7EA; --black:#111111;
   --display:"Oswald","Arial Narrow",Impact,sans-serif;
   --body:"Barlow",system-ui,-apple-system,"Segoe UI",sans-serif;
   color-scheme:light;
 }
 @media (prefers-color-scheme: dark){
-  :root:not([data-theme="light"]){--bg:#161616; --paper:#1F1F1F; --ink:#F2F2F2; --muted:#A8A8A8; --line:rgba(242,242,242,.13); --redtext:#FF5C70; color-scheme:dark}
+  :root:not([data-theme="light"]){--bg:#161616; --paper:#1F1F1F; --ink:#F2F2F2; --muted:#A8A8A8; --line:rgba(242,242,242,.13); --redtext:#FF5C70; --redsoft:#3A1219; --black:#F2F2F2; color-scheme:dark}
 }
-:root[data-theme="dark"]{--bg:#161616; --paper:#1F1F1F; --ink:#F2F2F2; --muted:#A8A8A8; --line:rgba(242,242,242,.13); --redtext:#FF5C70; color-scheme:dark}
+:root[data-theme="dark"]{--bg:#161616; --paper:#1F1F1F; --ink:#F2F2F2; --muted:#A8A8A8; --line:rgba(242,242,242,.13); --redtext:#FF5C70; --redsoft:#3A1219; --black:#F2F2F2; color-scheme:dark}
 *,*::before,*::after{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font:18px/1.5 var(--body)}
-.wrap{max-width:1100px;margin:0 auto;padding:22px 16px 48px}
+.wrap{max-width:1320px;margin:0 auto;padding:22px clamp(16px,4vw,40px) 60px}
 .top{display:flex;align-items:center;gap:12px;color:var(--muted);font-weight:600;font-size:15px}
 .top img{height:40px;border-radius:3px}
 .top a{color:inherit;text-decoration:none}
 .eyebrow{font-family:var(--display);color:var(--redtext);letter-spacing:.14em;text-transform:uppercase;font-size:15px;margin:28px 0 0}
 h1{font-family:var(--display);font-weight:700;font-size:clamp(40px,6vw,64px);line-height:1;margin:6px 0 10px}
-.lede{color:var(--muted);max-width:62ch;margin:0 0 26px}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
-.card{display:flex;flex-direction:column;background:var(--paper);border:1px solid var(--line);border-top:4px solid var(--ink);border-radius:10px;padding:18px;color:inherit;text-decoration:none}
+.lede{color:var(--muted);max-width:62ch;margin:0 0 10px}
+/* Layout: chapter sections of game cards on the left, sticky How to run panel on the right */
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 390px;gap:28px;align-items:start}
+.chhead{font-family:var(--display);font-weight:600;font-size:30px;margin:26px 0 10px;border-bottom:3px solid var(--black);padding-bottom:6px}
+.chhead span{font-family:var(--body);font-size:16px;font-weight:600;color:var(--muted);margin-left:8px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:14px}
+.card{display:flex;flex-direction:column;background:var(--paper);border:1px solid var(--line);border-top:4px solid var(--black);border-radius:10px;padding:18px;color:inherit;text-decoration:none}
 .card:hover{border-top-color:var(--red)}
 .chip{align-self:flex-start;background:var(--red);color:#fff;font-weight:700;font-size:13px;border-radius:4px;padding:1px 8px}
-.card h2{font-family:var(--display);font-weight:600;font-size:28px;margin:8px 0 4px}
+.card h2{font-family:var(--display);font-weight:600;font-size:26px;margin:8px 0 4px}
 .card p{color:var(--muted);margin:0 0 12px;font-size:16px}
 .stu{margin-top:auto;border-top:1px solid var(--line);padding-top:10px;font-size:15px;color:var(--muted)}
 .stu b{color:var(--ink)}
 .go{color:var(--redtext);font-weight:700;float:right}
+.how{position:sticky;top:18px;max-height:calc(100vh - 36px);overflow-y:auto;background:var(--paper);border:1px solid var(--line);border-top:4px solid var(--black);border-radius:8px;padding:16px 18px;font-size:15px;line-height:1.45;margin-top:26px}
+.how h2{font-family:var(--display);font-weight:600;font-size:24px;margin:0 0 2px}
+.how h3{font-family:var(--display);font-weight:600;font-size:17px;letter-spacing:.04em;text-transform:uppercase;color:var(--redtext);margin:16px 0 6px}
+.how ol,.how ul{margin:0;padding-left:20px}.how li{margin:3px 0}
+.how .sub{color:var(--muted);margin:2px 0 0}
+.how code{font-family:inherit;font-weight:700;color:var(--redtext)}
+.how .tip{background:var(--redsoft);border-radius:6px;padding:8px 10px;margin-top:14px;font-size:14px}
+.how .pbtn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;margin:12px 0 4px;background:var(--red);color:#fff;border:0;border-radius:6px;font-family:var(--display);font-weight:700;font-size:16px;letter-spacing:.02em;text-transform:uppercase;white-space:nowrap;padding:12px 10px;box-shadow:0 3px 0 rgba(0,0,0,.25);cursor:pointer}
+.how .pbtn:hover{filter:brightness(1.08)}.how .pbtn:active{transform:translateY(2px);box-shadow:0 1px 0 rgba(0,0,0,.25)}
+.how .prt{display:none}
+.how .pick{display:block;margin:10px 0 4px}.how .pick span{display:block;font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+.how select{width:100%;font:600 16px var(--body);color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:8px 10px}
+.how .ttl{font-family:var(--display);font-weight:600;font-size:22px;margin:14px 0 2px}
+.how .meta{margin:8px 0 0;font-size:14px}.how .meta div{border-top:1px solid var(--line);padding:5px 0}.how .meta b{display:block;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.how .open{display:inline-block;margin-top:12px;font-family:var(--display);font-weight:600;color:#fff;background:var(--red);border-radius:5px;padding:4px 12px;text-decoration:none}
+@media (max-width:980px){.layout{grid-template-columns:1fr}.how{position:static;max-height:none;order:-1}}
+@media print{
+  @page{margin:.45in}
+  :root{--ink:#111;--muted:#444;--paper:#fff;--redtext:#B00E2A;--line:rgba(0,0,0,.2);--redsoft:#FBE7EA}
+  body{background:#fff;color:#111}
+  .how>h2,.how .tchr{display:none!important}.how .scr{display:none}.how .prt{display:inline}
+  .top,.eyebrow,h1,.lede,.games,.pbtn,.pick,.open{display:none!important}
+  .layout{display:block}
+  .how{position:static;max-height:none;overflow:visible;border:0;padding:0;margin:0;font-size:15px;line-height:1.45}
+  .how .ttl{font-size:32px}.how h3{font-size:18px;margin-top:16px}.how .meta{font-size:15px}.how li{margin:5px 0}.how .meta div{padding:3px 0}
+}
 </style>
 </head>
 <body>
@@ -46,74 +76,365 @@ h1{font-family:var(--display);font-weight:700;font-size:clamp(40px,6vw,64px);lin
   <p class="eyebrow">Teacher only</p>
   <h1>Class games</h1>
   <p class="lede">Open a game here on the projector computer. Students join on their own devices with the code the game shows. This page is not linked anywhere on the student site.</p>
+  <div class="layout">
+  <div class="games">
+
+  <h2 class="chhead" id="ch10">Chapter 10<span>Bonds and long-term liabilities</span></h2>
   <div class="grid">
     <a class="card" href="/chapter-10/host">
-      <span class="chip">Ch 10</span>
+      <span class="chip">Chapter 10</span>
       <h2>The Bond Desk</h2>
       <p>Bonds. One iPad per desk; each desk runs a $1,000,000 bond fund for ten years. Each year three bonds hit the market: desks read the news, compare each bond's yield to its fair yield (Treasury rate plus the spread for its rating), and pass or buy $100K or $200K. You reveal what happened to each bond and why, then the standings. Has a Play without iPads mode. About 10 minutes a year.</p>
       <div class="stu">Students go to <b>The Bond Desk</b> on the site <span class="go">Host →</span></div>
     </a>
+    <a class="card" href="/teacher/bonds-live">
+      <span class="chip">Chapter 10</span>
+      <h2>Bonds Live</h2>
+      <p>Kahoot-style review of Chapter 10 bonds: seven timed rounds from bond vocabulary and par, discount or premium through cash interest, periods and rates, pricing with PV factors, issuance entries, and straight-line amortization and carrying value, with a live leaderboard, then a report of what to reteach. About 12 to 15 minutes.</p>
+      <div class="stu">Students go to <b>Bonds Live</b> on the site <span class="go">Host →</span></div>
+    </a>
+    <!-- CH10-SIM -->
+  </div>
+
+  <h2 class="chhead" id="ch9">Chapter 9<span>Current liabilities and warranties</span></h2>
+  <div class="grid">
     <a class="card" href="/teacher/paper-airplane">
-      <span class="chip">Ch 9</span>
+      <span class="chip">Chapter 9</span>
       <h2>Paper Airplane Inc.</h2>
       <p>Warranty liabilities. Students join on their own devices and pick Team 1, Team 2, and so on. Everyone books the sale and forecasts the claims; each team's estimate is the average of its players. You call each plane: no warranty needed, repair, or replace, and every repair or replacement sends a journal entry to every player. Right entries earn team points, wrong ones cost points, and no names are shown. Estimate vs. actual, closest-estimate bonus, a Top 5 students podium, then team standings. About 40 to 50 minutes.</p>
       <div class="stu">Students go to <b>Paper Airplane Inc.</b> on the site <span class="go">Host →</span></div>
     </a>
+  </div>
+
+  <h2 class="chhead" id="ch7">Chapter 7<span>Receivables</span></h2>
+  <div class="grid">
     <a class="card" href="/teacher/credit-desk">
-      <span class="chip">Ch 7</span>
+      <span class="chip">Chapter 7</span>
       <h2>The Credit Desk</h2>
       <p>Receivables over two years. Teams approve credit customers on one iPad each, age their receivables, book the allowance, and absorb write-offs. Three team huddles with typed answers you can spotlight and reward. About 50 minutes.</p>
       <div class="stu">Teams go to <b>The Credit Desk</b> on the site <span class="go">Host →</span></div>
     </a>
     <a class="card" href="/teacher/note-desk">
-      <span class="chip">Ch 7</span>
+      <span class="chip">Chapter 7</span>
       <h2>The Note Desk</h2>
       <p>Notes receivable. A Calendar Race on maturity dates, then teams accept or pass on 11 customer notes, entering the interest and amount due, with six entry checks along the way. Payday is June 30. About 30 to 35 minutes.</p>
       <div class="stu">Teams go to <b>The Note Desk</b> on the site <span class="go">Host →</span></div>
     </a>
     <a class="card" href="/teacher/receivables-live">
-      <span class="chip">Ch 7</span>
+      <span class="chip">Chapter 7</span>
       <h2>Receivables Live</h2>
       <p>Kahoot-style review of all of Chapter 7: six timed rounds from write-offs to dishonored notes, live leaderboard, then a report of what to reteach. About 12 to 15 minutes.</p>
       <div class="stu">Students go to <b>Receivables Live</b> on the site <span class="go">Host →</span></div>
     </a>
     <a class="card" href="/teacher/notes-live">
-      <span class="chip">Ch 7</span>
+      <span class="chip">Chapter 7</span>
       <h2>Notes Live</h2>
       <p>Kahoot-style review of notes receivable: six timed rounds on vocabulary, interest, amount due, maturity dates, and the entries for accepting, collecting and dishonored notes. Live leaderboard, then a report of what to reteach. About 12 to 15 minutes.</p>
       <div class="stu">Students go to <b>Notes Live</b> on the site <span class="go">Host →</span></div>
     </a>
+  </div>
+
+  <h2 class="chhead" id="ch6">Chapter 6<span>Cash and internal controls</span></h2>
+  <div class="grid">
     <a class="card" href="/teacher/review-live">
-      <span class="chip">Ch 6</span>
+      <span class="chip">Chapter 6</span>
       <h2>Review Live</h2>
       <p>Chapter 6 review in eight timed rounds, alternating bank reconciliations (all new questions) and internal controls. Ends with class results by skill.</p>
       <div class="stu">Students go to <b>Review Live</b> on the site <span class="go">Host →</span></div>
     </a>
     <a class="card" href="/teacher/bank-rec-live">
-      <span class="chip">Ch 6</span>
+      <span class="chip">Chapter 6</span>
       <h2>Bank Rec Live</h2>
       <p>Six timed rounds on bank reconciliations with a live leaderboard. Ends with class results by skill and what to reteach first.</p>
       <div class="stu">Students go to <b>Bank Rec Live</b> on the site <span class="go">Host →</span></div>
     </a>
     <a class="card" href="/teacher/controls-live">
-      <span class="chip">Ch 6</span>
+      <span class="chip">Chapter 6</span>
       <h2>Controls Live</h2>
       <p>Six timed rounds on internal controls: purpose and limits, the 7 principles, the fraud triangle, control of cash, dividing duties, and spotting weaknesses.</p>
       <div class="stu">Students go to <b>Controls Live</b> on the site <span class="go">Host →</span></div>
     </a>
     <a class="card" href="/teacher/inside-job">
-      <span class="chip">Ch 6</span>
+      <span class="chip">Chapter 6</span>
       <h2>Inside Job</h2>
       <p>Internal controls. Teams buy controls for a coffee cart on one iPad each, then five rounds of fraud update the money board live. Hand out the one-pager first.</p>
       <div class="stu">Teams go to <b>Inside Job</b> on the site <span class="go">Host →</span></div>
     </a>
+  </div>
+
+  <h2 class="chhead" id="ch4">Chapter 4<span>Accounting for retailers</span></h2>
+  <div class="grid">
     <a class="card" href="/teacher/two-books-live">
-      <span class="chip">Ch 4</span>
+      <span class="chip">Chapter 4</span>
       <h2>Two Books Live</h2>
       <p>Six timed rounds on accounting for retailers: freight and FOB, returns, discounts, sales and COGS, journal entries, and the income statement.</p>
       <div class="stu">Students go to <b>Two Books Live</b> on the site <span class="go">Host →</span></div>
     </a>
   </div>
+
+  </div>
+  <aside class="how" aria-label="How to run a game">
+    <h2>How to run</h2>
+    <label class="pick"><span>Pick a game</span>
+      <select id="howSel"></select>
+    </label>
+    <button class="pbtn" type="button" onclick="window.print()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9V3h12v6"/><rect x="3" y="9" width="18" height="8" rx="2"/><path d="M7 14h10v7H7z"/></svg>Print one pager for students</button>
+    <div id="howBody"></div>
+  </aside>
+  </div>
 </div>
+<script>
+/* All seven Kahoot-style games (Bonds, Receivables, Notes, Review, Bank Rec, Controls, Two Books Live)
+   run on the same engine: same setup, same scoring, same host buttons. */
+const KAHOOT_TELL = [
+  "Right answers earn 600 to 1,000 points. Faster right answers earn more.",
+  "Wrong answers cost points (1,000 unless your teacher changes it), so don't just tap something.",
+  "No answer when time runs out earns 0. That beats a wrong guess.",
+  "Every round has its own timer. Math rounds give you more time."
+];
+const KAHOOT_STRAT = [
+  "A careful right answer beats a fast wrong one: speed adds at most 400 points, a wrong answer costs 1,000.",
+  "On math questions, work it out on paper first, then look for your number in the choices.",
+  "On journal entry questions, decide the debit and the credit before you read the choices.",
+  "At the end, open your report and tap Practice this now on your weakest skill."
+];
+const KAHOOT_STEPS = (name, url) => [
+  "Open " + name + ". Pick questions per round, the wrong-answer penalty and the time, then click <b>Create game</b>.",
+  "Students go to <code>" + url + "</code> (or scan the QR) and type the code and their name. Click <b>Start game</b>.",
+  "Each round opens with a title card. Click <b>Show question</b>.",
+  "The answer shows when everyone has answered or time runs out. <b>Show answer now</b> skips ahead.",
+  "Click <b>Next question</b>. After the last one, <b>Final results</b> plays the Top 5 reveal.",
+  "Click <b>Class results</b> for the Reteach first list, then <b>Erase game</b> and <b>Done</b>."
+];
+const KAHOOT_NEED = ["Calculators.", "Questions per round: more = longer game. Extra time (+50%) helps on calculation-heavy days."];
+const HOW = [
+ { id:"bonddesk", name:"The Bond Desk", unit:"Chapter 10", href:"/chapter-10/host",
+   who:"1 iPad per desk (one student or a small group).", go:"/chapter-10/join",
+   learn:[
+    "Fair yield = Treasury rate + the spread for the bond's rating. Compare it to the yield the bond offers.",
+    "When market rates rise, bond prices fall, and long bonds fall the most.",
+    "Cash is a position. Sometimes not buying is the best trade."
+   ],
+   tell:[
+    "Your desk starts with $1,000,000 and runs a bond fund for ten years.",
+    "Every year three bonds hit the market. Put $0, $100K or $200K in each one.",
+    "Money you don't put in bonds sits in cash and earns the Treasury rate.",
+    "Fair yield = Treasury rate + spread. Above fair is a good deal. Below fair is overpriced.",
+    "You can put at most $200K a year in junk bonds (BB or below). Going over costs a $25,000 fine."
+   ],
+   strat:[
+    "Step 1 for every bond: is its yield above or below fair?",
+    "Step 2: read the rate news. Rates up? Stay short or hold cash. Rates down? Long, safe bonds win.",
+    "A high yield is not a good deal if it's still below fair.",
+    "Believe warning signs like lost customers or late bills."
+   ],
+   steps:[
+    "Open The Bond Desk and click <b>Start a new game</b>.",
+    "Students go to <code>/chapter-10/join</code> (or scan the QR) and type the code and their first name(s).",
+    "Click <b>Open Year 1</b> and read the market news together. Click <b>Start</b> on the clock.",
+    "When all desks are in, click <b>Everyone's in: reveal</b>, then <b>What happened</b> and <b>Standings</b>.",
+    "Open the next year. After year 10, <b>Final results</b>."
+   ],
+   need:["The clock starts at 5 minutes a year. Use -1 and +1 to change it.","Ten years is about 100 minutes, so plan two days or stop after fewer years with Finished: final results."],
+   tip:"No Wi-Fi? Click <b>Play without iPads</b>, add desks by hand, and tap a desk's tile to enter its choices."},
+ { id:"bondslive", name:"Bonds Live", unit:"Chapter 10", href:"/teacher/bonds-live",
+   who:"1 student per iPad (Kahoot style).", go:"/chapter-10/bonds-live",
+   learn:[
+    "Contract rate vs. market rate: equal sells at par, contract below market sells at a discount, contract above market sells at a premium.",
+    "Cash interest = par x contract rate x time. For semi-annual bonds, periods = years x 2 and the rate per period = market rate / 2.",
+    "Bond price = PV of the par value (PV of $1) + PV of the interest payments (PV of an annuity), both at the market rate.",
+    "Issuance and interest entries, straight-line amortization, and carrying value moving toward par."
+   ],
+   tell: KAHOOT_TELL,
+   strat: KAHOOT_STRAT.concat(["Price questions: discount at the MARKET rate per period, but the interest payment always uses the CONTRACT rate."]),
+   steps: KAHOOT_STEPS("Bonds Live", "/chapter-10/bonds-live"),
+   need: KAHOOT_NEED,
+   tip:"Seven rounds, 3 questions each by default. A student who drops taps <b>Rejoin</b> on their iPad."},
+ // CH10-SIM
+ { id:"airplane", name:"Paper Airplane Inc.", unit:"Chapter 9", href:"/teacher/paper-airplane",
+   who:"Teams. Every student joins on their own device and picks a team.", go:"/paper-airplane",
+   learn:[
+    "A warranty expense is recorded in the year of the sale, as an estimate, before any claims come in (matching).",
+    "Estimate entry: Dr Warranty Expense, Cr Estimated Warranty Liability.",
+    "Repairs and replacements use up the liability: Dr Estimated Warranty Liability, Cr Salaries Payable (repair labor) or Merchandise Inventory (replacement).",
+    "Comparing the estimate to actual claims at the end."
+   ],
+   tell:[
+    "Your team builds paper airplanes and sells them with a guarantee: each plane must fly 20 feet.",
+    "Everyone books the sale and forecasts how many planes will fail. Your team's estimate is the average of its players.",
+    "Each plane that falls short is a claim: repair or replace. Every claim sends you a journal entry.",
+    "Right entries earn your team 10 points. Wrong entries cost 5. No answer earns 0.",
+    "The team whose estimate is closest to its actual claims earns a 25-point bonus. Nobody's name is shown with an answer."
+   ],
+   strat:[
+    "Build carefully. Every plane that fails is a claim your team has to journalize.",
+    "Forecast honestly: think about how your test flights went.",
+    "Claims never touch Warranty Expense. They reduce Estimated Warranty Liability.",
+    "Repair = labor (Salaries Payable). Replace = a new plane (Merchandise Inventory)."
+   ],
+   steps:[
+    "Open Paper Airplane Inc., check the settings (teams, planes, price, distance, points, timers), and click <b>Create game</b>.",
+    "Students go to <code>/paper-airplane</code> (or scan the QR), type the code and their name, and pick a team.",
+    "Click <b>Assembly instructions</b> to start the build, then <b>Sale day</b> for the sale entry and the forecast.",
+    "Click <b>Reveal team estimates</b>, then <b>Book the estimate</b>.",
+    "Fly each plane and tap the result: no warranty needed, repair, or replace. Click <b>Close claim</b> after each entry. <b>Undo last plane</b> fixes a mis-tap.",
+    "Click <b>Done flying</b> for estimate vs. actual, then <b>Top 5 students</b> and <b>Team standings</b>."
+   ],
+   need:["Paper for every team (16 planes each by default).","Tape or a mark on the floor at the guaranteed distance (20 feet).","Build time is 6 minutes. About 40 to 50 minutes total."],
+   tip:"Set <b>Who journalizes a claim</b> to Only the plane's team if the class is large and you want fewer entries per player."},
+ { id:"credit", name:"The Credit Desk", unit:"Chapter 7", href:"/teacher/credit-desk",
+   who:"1 iPad per team.", go:"/credit-desk",
+   learn:[
+    "Selling on account earns profit, but a customer who never pays costs the whole sale.",
+    "The allowance method: estimate bad debts at year end with an aging schedule (Dr Bad Debt Expense, Cr Allowance for Doubtful Accounts).",
+    "Write-offs: Dr Allowance for Doubtful Accounts, Cr Accounts Receivable. Net realizable value = A/R minus the allowance."
+   ],
+   tell:[
+    "Your team runs the credit desk at a wholesaler that sells team gear on account.",
+    "Every sale you approve earns 40% gross profit. A customer who never pays costs you the whole sale.",
+    "Each wrong entry check costs a $500 audit fee.",
+    "Huddles: write your team's answer. Teams vote on the best one: the perfect pick earns $500, and you earn $250 for every team that picks yours.",
+    "Most net income at the end wins."
+   ],
+   strat:[
+    "Read every clue on the application: payment history, years in business, references.",
+    "Deny everyone and you earn $0. Approve everyone and you get burned. Find the line.",
+    "Older receivables are less likely to be collected, so they get bigger percentages on the aging schedule.",
+    "In huddles, give a specific reason with a number. Vague answers don't win votes."
+   ],
+   steps:[
+    "Open The Credit Desk. Pick <b>Customers: Set 1</b> or <b>Set 2</b> and <b>Credit decisions</b> (about 35 minutes) or <b>Full game</b> (about 50). Click <b>Create game</b>.",
+    "Teams go to <code>/credit-desk</code> (or scan the QR) and type the code and a team name. Click <b>Open the credit desk</b>.",
+    "Teams <b>Approve</b> or <b>Deny</b> each customer and <b>Lock in</b>. Click <b>Reveal decisions</b>, then <b>Reveal the damage</b> when the news comes in.",
+    "Huddles: <b>Start timer</b>, then <b>Show answers</b>. Use <b>Spotlight</b> to discuss one and award bonuses. <b>Skip huddle</b> if you're short on time.",
+    "Click <b>Next</b> through each round. Finish with the standings and <b>Class results</b>."
+   ],
+   need:["Calculators for the aging schedule (Full game).","Set 2 is all new customers for a second play."],
+   tip:"The huddles are the best teaching moments. Spotlight one strong answer and one weak one."},
+ { id:"notedesk", name:"The Note Desk", unit:"Chapter 7", href:"/teacher/note-desk",
+   who:"1 iPad per team.", go:"/note-desk",
+   learn:[
+    "Maturity dates: count the days left in the first month, then whole months.",
+    "Interest = principal x annual rate x days/360. Amount due at maturity = principal + interest.",
+    "Entries for accepting a note, collecting it, a note that replaces an account receivable, a dishonored note, and collecting after a dishonor."
+   ],
+   tell:[
+    "Calendar Race: three notes flash on the board. Tap the maturity date. The top 3 teams get a $150, $100 and $50 head start.",
+    "Rounds 1 and 2: customers offer notes. To accept one, enter the interest and the total amount due. Wrong math cancels the deal.",
+    "You can lend $40,000 in total across both rounds.",
+    "Round 3 is June 30: only interest collected by June 30 counts. A dishonored note costs a $250 collection fee.",
+    "Each entry check is worth $100. Most interest collected wins."
+   ],
+   strat:[
+    "Check each note's due date. A note that matures after June 30 earns you nothing in this game.",
+    "Read the customer's clues. A risky customer can dishonor the note and cost you the fee.",
+    "Use 360 days. A 90-day note at 8% earns 2% of the principal, not 8%.",
+    "Don't spend the whole $40,000 in Round 1. Better notes may come in May."
+   ],
+   steps:[
+    "Open The Note Desk and click <b>Create game</b>.",
+    "Teams go to <code>/note-desk</code> (or scan the QR) and type the code and a team name.",
+    "Click <b>Start the Calendar Race</b>, run the three notes, then <b>Open the note desk</b>.",
+    "Teams <b>Accept</b> or <b>Pass</b> on each note. Click <b>Reveal</b>, then <b>Next</b> through the entry checks.",
+    "On June 30, click <b>Reveal the scores</b>, then the standings and <b>Class results</b>."
+   ],
+   need:["Calculators.","About 30 to 35 minutes."],
+   tip:"After the Calendar Race, put the counting rule on the board before teams start accepting notes."},
+ { id:"receivables", name:"Receivables Live", unit:"Chapter 7", href:"/teacher/receivables-live",
+   who:"1 student per iPad (Kahoot style).", go:"/receivables-live",
+   learn:["Credit sales and write-offs, and the allowance method.","Estimating bad debts and aging schedules.","Interest, maturity and note entries."],
+   tell: KAHOOT_TELL, strat: KAHOOT_STRAT.concat(["Write-offs under the allowance method never touch Bad Debt Expense."]),
+   steps: KAHOOT_STEPS("Receivables Live", "/receivables-live"),
+   need: KAHOOT_NEED,
+   tip:"Six rounds, 4 questions each by default. A student who drops taps <b>Rejoin</b> on their iPad."},
+ { id:"noteslive", name:"Notes Live", unit:"Chapter 7", href:"/teacher/notes-live",
+   who:"1 student per iPad (Kahoot style).", go:"/notes-live",
+   learn:["Note vocabulary: maker, payee, principal, maturity date, dishonored.","Interest (principal x rate x days/360) and the amount due.","Maturity dates and the entries for accepting, collecting and dishonored notes."],
+   tell: KAHOOT_TELL, strat: KAHOOT_STRAT.concat(["Interest uses 360 days. The rate is yearly, so always multiply by days/360."]),
+   steps: KAHOOT_STEPS("Notes Live", "/notes-live"),
+   need: KAHOOT_NEED,
+   tip:"Six rounds, 4 questions each by default. A student who drops taps <b>Rejoin</b> on their iPad."},
+ { id:"review", name:"Review Live", unit:"Chapter 6", href:"/teacher/review-live",
+   who:"1 student per iPad (Kahoot style).", go:"/review-live",
+   learn:["Bank reconciliations: where each item goes, fixing errors, the entries, and balancing.","Internal controls: the principles, the fraud triangle, cash and dividing duties, and spotting weaknesses."],
+   tell: KAHOOT_TELL, strat: KAHOOT_STRAT.concat(["Only items on the BOOK side of the reconciliation need journal entries."]),
+   steps: KAHOOT_STEPS("Review Live", "/review-live"),
+   need: KAHOOT_NEED,
+   tip:"Eight rounds, 3 questions each by default. Good the day before the Chapter 6 test."},
+ { id:"bankrec", name:"Bank Rec Live", unit:"Chapter 6", href:"/teacher/bank-rec-live",
+   who:"1 student per iPad (Kahoot style).", go:"/bank-rec-live",
+   learn:["Where each reconciling item goes: bank side or book side, add or subtract.","Fixing errors and recording the entries for book-side items.","Balancing the reconciliation and why it works."],
+   tell: KAHOOT_TELL, strat: KAHOOT_STRAT.concat(["Ask: does the bank already know about this item? If not, it goes on the bank side."]),
+   steps: KAHOOT_STEPS("Bank Rec Live", "/bank-rec-live"),
+   need: KAHOOT_NEED,
+   tip:"Six rounds, 3 questions each by default. A student who drops taps <b>Rejoin</b> on their iPad."},
+ { id:"controls", name:"Controls Live", unit:"Chapter 6", href:"/teacher/controls-live",
+   who:"1 student per iPad (Kahoot style).", go:"/controls-live",
+   learn:["Why companies use internal controls, and their limits.","The 7 principles of internal control and the fraud triangle.","Control of cash, who should do which job, and spotting weaknesses."],
+   tell: KAHOOT_TELL, strat: KAHOOT_STRAT.concat(["Fraud triangle: opportunity, financial pressure, rationalization. Controls can only remove opportunity."]),
+   steps: KAHOOT_STEPS("Controls Live", "/controls-live"),
+   need:["Questions per round: more = longer game."],
+   tip:"Six rounds, 3 questions each by default. A student who drops taps <b>Rejoin</b> on their iPad."},
+ { id:"insidejob", name:"Inside Job", unit:"Chapter 6", href:"/teacher/inside-job",
+   who:"1 iPad per team.", go:"/inside-job",
+   learn:["How internal controls stop specific fraud schemes.","The cost of a control vs. the cost of the fraud it prevents.","Thinking like a fraudster to find a weakness."],
+   tell:[
+    "Your team runs a coffee cart and starts with $25,000 in cash.",
+    "You can spend up to $10,000 on internal controls. Whatever you spend comes out of your cash.",
+    "Five rounds of fraud. A control that stops a scheme saves you the loss. A scheme you don't catch costs you.",
+    "Before Round 3 you can add up to $3,000 more in controls.",
+    "Round 4 is the Inside Job: attack a secret target. If their controls catch your scheme, you pay a $1,000 fine.",
+    "Most cash at the end wins."
+   ],
+   strat:[
+    "Don't buy every control. Match each control to the schemes it actually stops.",
+    "Dividing duties and counting cash stop a lot of schemes for the money.",
+    "After Rounds 1 and 2, look at what got through and patch that hole in Round 3.",
+    "In Round 4, pick a scheme your target's controls can't stop."
+   ],
+   steps:[
+    "Hand out the one-pager. Open Inside Job and click <b>Create game</b>.",
+    "Teams go to <code>/inside-job</code> (or scan the QR) and type the code and a team name.",
+    "Click <b>Open the control shop</b>. Teams buy controls and lock in.",
+    "Click <b>Start Round 1</b>, then <b>Next</b> through each fraud. The money board updates live.",
+    "Before Round 3, teams upgrade. In Round 4 teams <b>Lock in scheme</b>, then click <b>Reveal the schemes</b>.",
+    "Finish with the standings and <b>Class results</b>."
+   ],
+   need:["The Inside Job one-pager for each team.","At least 2 teams."],
+   tip:"After Round 4, ask the team that got caught which control stopped them, and why."},
+ { id:"twobooks", name:"Two Books Live", unit:"Chapter 4", href:"/teacher/two-books-live",
+   who:"1 student per iPad (Kahoot style).", go:"/two-books-live",
+   learn:["Freight and FOB shipping point vs. FOB destination.","Returns, allowances and purchase/sales discounts.","Sales and cost of goods sold entries, and gross profit on the income statement."],
+   tell: KAHOOT_TELL, strat: KAHOOT_STRAT.concat(["Every sale needs two entries: the sale and the cost of goods sold."]),
+   steps: KAHOOT_STEPS("Two Books Live", "/two-books-live"),
+   need: KAHOOT_NEED,
+   tip:"Six rounds, 3 questions each by default. A student who drops taps <b>Rejoin</b> on their iPad."}
+];
+(function(){
+  const sel=document.getElementById("howSel"), body=document.getElementById("howBody");
+  const groups={};
+  HOW.forEach(g=>{(groups[g.unit]=groups[g.unit]||[]).push(g)});
+  sel.innerHTML=Object.keys(groups).map(u=>'<optgroup label="'+u+'">'+groups[u].map(g=>'<option value="'+g.id+'">'+g.name+'</option>').join("")+'</optgroup>').join("");
+  function show(id){
+    const g=HOW.find(x=>x.id===id)||HOW[0]; sel.value=g.id;
+    const go=g.go.startsWith("/")?'<code>'+g.go+'</code> or scan the QR':g.go;
+    const li=a=>'<ul>'+a.map(x=>'<li>'+x+'</li>').join("")+'</ul>';
+    body.innerHTML='<div class="ttl">'+g.name+'</div>'+
+      '<p class="sub">'+g.unit+'</p>'+
+      '<div class="meta"><div><b>Who plays</b>'+g.who+'</div><div><b>Students go to</b>'+go+'</div></div>'+
+      '<h3><span class="scr">What they learn</span><span class="prt">What you will learn</span></h3>'+li(g.learn)+
+      '<h3><span class="scr">Tell them before you start</span><span class="prt">Before you start</span></h3>'+li(g.tell)+
+      '<h3><span class="scr">Strategy to share</span><span class="prt">Strategy</span></h3>'+li(g.strat)+
+      '<div class="tchr"><h3>Steps</h3><ol>'+g.steps.map(x=>'<li>'+x+'</li>').join("")+'</ol>'+
+      (g.need.length?'<h3>Before class</h3>'+li(g.need):'')+
+      '<div class="tip">'+g.tip+'</div></div>'+
+      '<a class="open" href="'+g.href+'">Open '+g.name+' →</a>';
+    try{localStorage.setItem("howGameAcct",g.id)}catch(e){}
+  }
+  sel.onchange=()=>show(sel.value);
+  let saved=null; try{saved=localStorage.getItem("howGameAcct")}catch(e){}
+  show(saved||HOW[0].id);
+})();
+</script>
 </body>
 </html>

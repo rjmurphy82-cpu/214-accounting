@@ -1,0 +1,1636 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Bond Pricing Practice | District 214 Accounting</title>
+<meta name="description" content="Chapter 10 bond pricing practice: cash interest, periods and rates, present value of the principal and the interest, bond price, and the issuance and interest entries.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* Layout: logo bar, deck title, numbered problem strip, one problem card with click-to-reveal steps */
+:root{
+  --bg:#F4F3F3; --paper:#FFFFFF; --ink:#111111; --muted:#5C5C5C; --line:rgba(17,17,17,.14);
+  --red:#C1102F; --redtext:#B00E2A; --redsoft:#FBE7EA; --black:#111111; --onblack:#FFFFFF;
+  --display:"Oswald","Arial Narrow",Impact,sans-serif;
+  --body:"Barlow",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --scale:1;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){--bg:#121212; --paper:#1E1E1E; --ink:#F2F2F2; --muted:#A8A8A8; --line:rgba(242,242,242,.14); --redtext:#FF5C70; --redsoft:#3A1219; --black:#2B2B2B; color-scheme:dark}
+}
+:root[data-theme="dark"]{--bg:#121212; --paper:#1E1E1E; --ink:#F2F2F2; --muted:#A8A8A8; --line:rgba(242,242,242,.14); --redtext:#FF5C70; --redsoft:#3A1219; --black:#2B2B2B; color-scheme:dark}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;min-height:100%;background:var(--bg);color:var(--ink);font:calc(18px * var(--scale))/1.5 var(--body)}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,a:focus-visible{outline:3px solid var(--red);outline-offset:2px}
+[hidden]{display:none!important}
+/* App shell: fixed dark sidebar on the left with every game and practice, main content on the right */
+:root{--side:#111111; --sidehover:#202020; --sidetext:#E9E9E9; --sidemuted:#8E8E8E; --sidechip:#2A2A2A}
+html,body{height:100%}
+.shell{display:grid;grid-template-columns:272px minmax(0,1fr);min-height:100%}
+.side{position:sticky;top:0;height:100vh;overflow-y:auto;background:var(--side);color:var(--sidetext);padding:24px 16px 20px;display:flex;flex-direction:column;scrollbar-width:thin;scrollbar-color:#333 transparent}
+.side .brandlink img{height:50px;width:auto;display:block;border-radius:3px}
+.side .sitename{font-family:var(--display);font-weight:600;font-size:18px;letter-spacing:.14em;text-transform:uppercase;margin:12px 0 10px 2px;color:#fff}
+.side nav{display:flex;flex-direction:column;gap:2px}
+.side .ng{font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--sidemuted);margin:18px 0 6px 10px}
+.side .nch{font-size:12px;font-weight:600;color:var(--sidemuted);margin:8px 0 2px 10px}
+.side nav a{display:flex;gap:10px;align-items:center;color:var(--sidetext);text-decoration:none;padding:7px 10px;border-radius:6px;font-weight:600;font-size:15px;line-height:1.25}
+.side nav a:hover{background:var(--sidehover)}
+.side nav a:focus-visible{outline:2px solid var(--red);outline-offset:1px}
+.side nav a[aria-current="page"]{background:var(--red);color:#fff}
+.side .ch{flex:0 0 auto;width:24px;height:24px;border-radius:4px;background:var(--sidechip);font-family:var(--display);font-weight:600;font-size:13px;display:grid;place-items:center}
+.side nav a[aria-current="page"] .ch{background:rgba(0,0,0,.28)}
+.side .home .ch{background:transparent;font-size:16px}
+.side .sidefoot{margin-top:auto;padding:18px 10px 0;font-size:12px;color:var(--sidemuted)}
+.mbar{display:none}
+.scrim{display:none}
+.main{min-width:0;padding-block:30px 60px;padding-inline:clamp(20px,4vw,52px)}
+.inner{max-width:1120px}
+@media (max-width:900px){
+  .shell{grid-template-columns:1fr}
+  .side{position:fixed;left:0;top:0;bottom:0;height:auto;width:min(300px,86vw);z-index:30;transform:translateX(-102%);transition:transform .22s ease;padding-top:calc(20px + env(safe-area-inset-top,0px))}
+  .side.open{transform:none;box-shadow:0 0 40px rgba(0,0,0,.5)}
+  .scrim.on{display:block;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:25}
+  .mbar{display:flex;align-items:center;justify-content:space-between;gap:12px;position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--side);padding:10px 16px}
+  .mbar img{height:36px;width:auto;display:block;border-radius:3px}
+  .mbar button{background:transparent;color:#fff;border:2px solid #444;border-radius:8px;padding:6px 14px;font-family:var(--display);font-weight:600;font-size:16px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer}
+  .main{padding-block:22px 48px}
+}
+@media (prefers-reduced-motion: reduce){.side{transition:none}}
+
+.inner{max-width:1080px}
+.top{display:flex;align-items:center;gap:14px;flex-wrap:wrap;font-size:15px;font-weight:600;color:var(--muted)}
+.top a{color:inherit}
+.top .sp{flex:1}
+.size{display:flex;gap:6px}
+.size button{background:var(--paper);border:2px solid var(--line);border-radius:8px;padding:2px 10px;font-weight:700;font-size:15px}
+h1{font-family:var(--display);font-weight:700;font-size:clamp(32px,5vw,52px);line-height:1;margin:20px 0 6px;text-wrap:balance}
+.sub{color:var(--muted);margin:0 0 18px;font-size:calc(17px * var(--scale))}
+.strip{display:flex;gap:6px;overflow-x:auto;padding:4px 2px 10px;scrollbar-width:thin}
+.strip button{flex:0 0 auto;min-width:40px;height:40px;border-radius:8px;border:2px solid var(--line);background:var(--paper);font-family:var(--display);font-weight:600;font-size:17px}
+.strip button.seen{border-color:color-mix(in srgb,var(--red) 40%,var(--line))}
+.strip button[aria-current="true"]{background:var(--red);border-color:var(--red);color:#fff}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:14px;overflow:hidden;margin-top:6px}
+.head{background:var(--black);color:var(--onblack);padding:16px 24px 14px;display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 14px}
+.head .label{font-family:var(--display);font-weight:600;font-size:calc(26px * var(--scale));line-height:1.1}
+.head .tag{background:var(--red);color:#fff;border-radius:999px;padding:2px 12px;font-size:14px;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+.head .date{margin-left:auto;font-weight:600;font-size:15px;letter-spacing:.06em;text-transform:uppercase;opacity:.85}
+.head .section{width:100%;font-size:13px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#FF8A99}
+.body{padding:20px 24px 24px;display:grid;gap:16px}
+.body h2{font-family:var(--display);font-weight:600;font-size:calc(24px * var(--scale));margin:0;line-height:1.15}
+.body p{margin:0;max-width:72ch}
+.body ul{margin:0;padding-left:1.2em}
+.q{font-weight:700;font-size:calc(20px * var(--scale))}
+.tw{overflow-x:auto;min-width:0}
+table{border-collapse:collapse;font-variant-numeric:tabular-nums;font-size:calc(17px * var(--scale));min-width:100%}
+th,td{border:1px solid var(--line);padding:6px 12px;text-align:left;vertical-align:top}
+th{background:var(--black);color:var(--onblack);font-family:var(--display);font-weight:500;letter-spacing:.02em}
+td.s{text-decoration:line-through;text-decoration-color:var(--red);text-decoration-thickness:2px;color:var(--muted)}
+.tnote{font-size:15px;color:var(--muted);margin-top:4px}
+.reveals{display:grid;gap:12px}
+.rv{border-left:6px solid var(--red);background:color-mix(in srgb,var(--redsoft) 55%,var(--paper));border-radius:0 10px 10px 0;padding:12px 18px 14px;display:grid;gap:10px;animation:in .25s ease-out}
+@keyframes in{from{opacity:.2;transform:translateY(6px)}to{opacity:1;transform:none}}
+.rv .rl{font-size:14px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--redtext)}
+.lines{display:grid;gap:2px;font-variant-numeric:tabular-nums;font-size:calc(19px * var(--scale));font-weight:500}
+.answer{justify-self:start;background:var(--red);color:#fff;font-family:var(--display);font-weight:600;font-size:calc(28px * var(--scale));line-height:1.15;padding:6px 18px;border-radius:8px}
+.jt{font-size:15px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+table.journal{min-width:min(100%,560px);background:var(--paper)}
+table.journal td.acct{min-width:16em}
+table.journal td.cr{padding-left:3em}
+table.journal td.n{text-align:right;width:8em}
+.controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center;padding:0 24px 22px}
+.btn{background:var(--red);color:#fff;border:0;border-radius:10px;padding:12px 22px;font-family:var(--display);font-weight:600;font-size:20px}
+.btn.ghost{background:transparent;color:var(--ink);border:2px solid var(--line);padding:10px 18px;font-size:17px}
+.btn:disabled{opacity:.4;cursor:default}
+.left{color:var(--muted);font-size:15px;font-weight:600}
+.nav{display:flex;justify-content:space-between;gap:10px;margin-top:16px;flex-wrap:wrap}
+.hint{color:var(--muted);font-size:14px;margin-top:14px}
+kbd{font-family:var(--display);font-size:13px;border:1.5px solid var(--line);border-bottom-width:3px;border-radius:5px;padding:0 6px;background:var(--paper)}
+@media (max-width:600px){.head,.body{padding-inline:16px}.controls{padding-inline:16px}.head .date{margin-left:0}table.journal td.acct{min-width:10em}}
+@media (prefers-reduced-motion: reduce){.rv{animation:none}}
+</style>
+<style>
+/* ---- simulation layout: problem card on the left, live ledger on the right ---- */
+.inner{max-width:1500px}
+:root{--good:#1E7A3C;--goodsoft:#E7F4EB}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--good:#3FB86A;--goodsoft:#123020}}
+:root[data-theme="dark"]{--good:#3FB86A;--goodsoft:#123020}
+.sim{display:grid;grid-template-columns:minmax(0,1fr);max-width:1100px;gap:18px;align-items:start}
+.body{font-size:20px}
+.body p{max-width:none}
+.q{font-size:22px}
+.lines{font-size:21px}
+table{font-size:19px}
+table.journal td.acct{min-width:12em}
+.why{border-left:6px solid var(--good);background:var(--goodsoft);border-radius:0 10px 10px 0;padding:10px 16px;font-size:19px}
+.why b{font-family:var(--display);font-weight:600}
+.ledger{position:sticky;top:12px;display:grid;gap:12px}
+.lh{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.lh b{font-family:var(--display);font-weight:600;font-size:22px;letter-spacing:.04em;text-transform:uppercase}
+.lh span{font-size:14px;color:var(--muted);font-weight:600}
+.tacct{background:var(--paper);border:2px solid var(--line);border-radius:12px;padding:8px 12px 10px;font-variant-numeric:tabular-nums}
+.tacct .tn{font-family:var(--display);font-weight:600;font-size:20px;text-align:center;border-bottom:3px solid var(--ink);padding-bottom:4px}
+.tcols{display:grid;grid-template-columns:1fr 1fr}
+.tcols>div{padding:4px 8px;display:grid;gap:1px;align-content:start;min-height:30px}
+.tcols>div:first-child{border-right:3px solid var(--ink)}
+.tl{display:flex;justify-content:space-between;gap:8px;font-size:16px;line-height:1.3;padding:1px 4px;border-radius:4px}
+.tl span{color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.tl b{font-weight:700;white-space:nowrap}
+.tl.new{background:var(--redsoft);animation:in .3s ease-out}
+.tl.new span{color:var(--ink)}
+.tbal{display:flex;justify-content:space-between;border-top:2px solid var(--ink);margin-top:4px;padding:4px 8px 0;font-weight:700;font-size:18px}
+.tbal.zero{color:var(--muted)}
+.tacct.off{opacity:.45}
+.nrv{background:var(--black);color:#fff;border-radius:12px;padding:10px 14px;display:grid;gap:4px;font-variant-numeric:tabular-nums}
+.nrv .r{display:flex;justify-content:space-between;gap:10px;font-size:17px}
+.nrv .r.big{font-family:var(--display);font-weight:600;font-size:26px;border-top:2px solid rgba(255,255,255,.4);padding-top:4px;margin-top:2px}
+.nrv .r.big b{color:#FF8A99}
+.bde{display:flex;gap:8px;flex-wrap:wrap}
+.bde span{background:var(--paper);border:2px solid var(--line);border-radius:999px;padding:3px 12px;font-weight:700;font-size:15px;font-variant-numeric:tabular-nums}
+.bde span.new{border-color:var(--red);background:var(--redsoft)}
+table.aging td.n,table.aging th.n{text-align:right}
+table.aging tr.tot td{font-weight:700;border-top:3px double var(--ink)}
+.cmp{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.cmp>div{border:2px solid var(--line);border-radius:10px;padding:8px 12px;background:var(--paper)}
+.cmp>div.bad{border-color:var(--red)}
+.cmp .ct{font-family:var(--display);font-weight:600;font-size:19px;margin-bottom:4px}
+.cmp .ct small{font-family:var(--body);font-weight:600;font-size:14px;color:var(--muted);display:block}
+.cal{display:grid;grid-template-columns:auto auto;gap:2px 28px;justify-content:start;font-variant-numeric:tabular-nums;font-size:20px}
+.cal .u{border-bottom:2px solid var(--ink)}
+.cal .t{font-weight:700}
+.formula{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-family:var(--display);font-weight:600;font-size:24px;font-variant-numeric:tabular-nums}
+.formula span{background:var(--paper);border:2px solid var(--ink);border-radius:8px;padding:2px 12px}
+.formula span.eq{background:var(--red);border-color:var(--red);color:#fff}
+.sim>*{min-width:0}
+.cmp>div{min-width:0}
+.cmp table.journal{min-width:0;width:100%}
+.cmp table.journal td.acct{min-width:0}
+.cmp table.journal td.cr{padding-left:1.4em}
+.cmp table.journal td.n{width:auto}
+.cmp table,.cmp th,.cmp td{font-size:16px}
+@media (max-width:1280px){.sim{grid-template-columns:1fr}.ledger{position:static}}
+@media (max-width:600px){.cmp{grid-template-columns:1fr}}
+
+/* bond pricing additions */
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px}
+.fact{background:var(--paper);border:2px solid var(--line);border-radius:10px;padding:8px 14px;display:grid;gap:2px}
+.fact span{font-size:14px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.fact b{font-family:var(--display);font-weight:600;font-size:28px;line-height:1.1;font-variant-numeric:tabular-nums}
+.factors{background:var(--black);color:#fff;border-radius:12px;padding:10px 16px;display:grid;gap:4px}
+.factors .fh{font-size:13px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#FF8A99}
+.factors .fr{display:flex;justify-content:space-between;gap:16px;font-size:20px;flex-wrap:wrap}
+.factors .fr b{font-family:var(--display);font-weight:600;font-size:26px;font-variant-numeric:tabular-nums}
+.flag{background:var(--ambersoft,#FFF4D6);border:2px solid #9A6700;border-radius:10px;padding:8px 14px;font-weight:700;color:#5c3d00}
+.rv .ex{font-size:18px;color:var(--ink);opacity:.85;max-width:70ch;margin:0}
+.lines{font-size:24px}
+.answer{font-size:32px}
+.formula{font-size:22px}
+@media (max-width:600px){.fact b{font-size:22px}.lines{font-size:19px}.answer{font-size:24px}}
+</style>
+</head>
+<body>
+<div class="shell">
+  <div class="mbar"><a href="/"><img src="/logo-214.png" alt="High School District 214"></a><button id="menuBtn" aria-expanded="false" aria-controls="side">Menu</button></div>
+  <aside class="side" id="side">
+    <a class="brandlink" href="/"><img src="/logo-214.png" alt="High School District 214"></a>
+    <div class="sitename">Accounting</div>
+    <nav aria-label="Site">
+      <a class="home" href="/"><span class="ch">⌂</span>Home</a>
+      <div class="ng">Live Class Games</div>
+      <a href="/chapter-10/join"><span class="ch">10</span>The Bond Desk</a>
+      <a href="/paper-airplane.html"><span class="ch">9</span>Paper Airplane Inc.</a>
+      <a href="/credit-desk.html"><span class="ch">7</span>The Credit Desk</a>
+      <a href="/receivables-live.html"><span class="ch">7</span>Receivables Live</a>
+      <a href="/note-desk.html"><span class="ch">7</span>The Note Desk</a>
+      <a href="/notes-live.html"><span class="ch">7</span>Notes Live</a>
+      <a href="/review-live.html"><span class="ch">6</span>Review Live</a>
+      <a href="/bank-rec-live.html"><span class="ch">6</span>Bank Rec Live</a>
+      <a href="/controls-live.html"><span class="ch">6</span>Controls Live</a>
+      <a href="/inside-job.html"><span class="ch">6</span>Inside Job</a>
+      <a href="/two-books-live.html"><span class="ch">4</span>Two Books Live</a>
+      <div class="ng">Review Games</div>
+      <a href="/chapter-9.html"><span class="ch">9</span>Repair or Replace</a>
+      <a href="/chapter-7.html"><span class="ch">7</span>Collect or Write Off</a>
+      <a href="/chapter-7-notes.html"><span class="ch">7</span>Principal Plus Interest</a>
+      <a href="/chapter-6.html"><span class="ch">6</span>Make It Match</a>
+      <a href="/chapter-5.html"><span class="ch">5</span>Same Goods, Three Costs</a>
+      <a href="/chapter-4.html"><span class="ch">4</span>Same Deal, Two Books</a>
+      <div class="ng">Interactive Practices</div>
+      <div class="nch">Chapter 10</div>
+      <a href="/chapter-10/practice-bond-pricing" aria-current="page"><span class="ch">10</span>Bond Pricing Practice</a>
+      <a href="/chapter-10/practice-bond-desk"><span class="ch">10</span>Bond Desk Solo</a>
+      <div class="nch">Chapter 9</div>
+      <a href="/practice-ch9-warranty-sim.html"><span class="ch">9</span>Warranty Simulation</a>
+      <a href="/practice-ch9-warranties.html"><span class="ch">9</span>Warranty Practice</a>
+      <div class="nch">Chapter 7</div>
+      <a href="/practice-ch7-sim.html"><span class="ch">7</span>Receivables Simulation</a>
+      <a href="/practice-ch7-bad-debts.html"><span class="ch">7</span>Bad Debts Practice</a>
+      <a href="/practice-ch7-notes.html"><span class="ch">7</span>Notes Receivable Practice</a>
+      <div class="nch">Chapter 6</div>
+      <a href="/practice-ch6-bank-rec.html"><span class="ch">6</span>Bank Rec Practice</a>
+      <a href="/practice-ch6-side-by-side.html"><span class="ch">6</span>Side-by-Side Recs</a>
+      <div class="nch">Chapter 5</div>
+      <a href="/practice-ch5-set-1.html"><span class="ch">5</span>Practice Problem Set 1</a>
+      <a href="/practice-ch5-weighted-average.html"><span class="ch">5</span>Weighted Average</a>
+      <div class="nch">Chapter 4</div>
+      <a href="/practice-ch4-round-1.html"><span class="ch">4</span>Problem Set Round 1</a>
+      <a href="/practice-ch4-round-2.html"><span class="ch">4</span>Problem Set Round 2</a>
+      <div class="nch">Chapter 3</div>
+      <a href="/practice-ch3-adjusting.html"><span class="ch">3</span>Adjusting Entries</a>
+      <a href="/practice-ch3-depr-closing.html"><span class="ch">3</span>Depreciation and Closing Entries</a>
+    </nav>
+    <div class="sidefoot">High School District 214 | Accounting</div>
+  </aside>
+  <div class="scrim" id="scrim"></div>
+  <main class="main"><div class="inner">
+  <div class="top">
+    <span><a href="/#practices">Interactive Practices</a> / Chapter 10</span>
+  </div>
+  <h1>Bond Pricing Practice</h1>
+  <p class="sub">Price a bond in 5 steps, then record it. Same 7 steps every time: interest, periods, PV of the principal, PV of the interest, price, issue entry, interest entry.</p>
+  <nav class="strip" id="strip" aria-label="Steps"></nav>
+  <div class="sim">
+    <article class="card">
+      <header class="head" id="head"></header>
+      <div class="body"><div id="given" style="display:grid;gap:14px"></div><div class="reveals" id="reveals"></div></div>
+      <div class="controls">
+        <button class="btn" id="revealBtn">Reveal next</button>
+        <button class="btn ghost" id="allBtn">Show all</button>
+        <button class="btn ghost" id="resetBtn">Hide answers</button>
+        <span class="left" id="left"></span>
+      </div>
+    </article>
+  </div>
+  <div class="nav">
+    <button class="btn ghost" id="prevBtn">Back</button>
+    <span class="left" id="pos" style="align-self:center"></span>
+    <button class="btn ghost" id="nextBtn">Next problem</button>
+  </div>
+  <p class="hint">Keys: <kbd>Space</kbd> or <kbd>→</kbd> reveals the next part, then moves on. <kbd>←</kbd> goes back a step. <kbd>H</kbd> hides answers.</p>
+  </div></main>
+</div>
+<script>
+(function(){const s=document.getElementById("side"),b=document.getElementById("menuBtn"),c=document.getElementById("scrim");
+function set(o){s.classList.toggle("open",o);c.classList.toggle("on",o);b.setAttribute("aria-expanded",o);b.textContent=o?"Close":"Menu"}
+b.addEventListener("click",()=>set(!s.classList.contains("open")));c.addEventListener("click",()=>set(false));
+document.addEventListener("keydown",e=>{if(e.key==="Escape")set(false)});
+const cur=s.querySelector('[aria-current="page"]');if(cur&&cur.scrollIntoView)cur.scrollIntoView({block:"nearest"});})();
+</script>
+<script>
+"use strict";
+/* Every reveal can post to the ledger: post:[[account, "dr"|"cr", amount, short label]]
+   EWL = Estimated Warranty Liability, WE1/WE2 = Warranty Expense by year */
+const STEPS=[
+{
+"label": "Problem 1",
+"tag": "Premium",
+"date": "6% contract | 4% market",
+"heading": "Market rate below the contract rate",
+"given": [
+{
+"p": "Northbrook Outfitters issues $100,000 of 20-year bonds. Interest is paid twice a year (semi-annually)."
+},
+{
+"facts": [
+[
+"Par value",
+"$100,000"
+],
+[
+"Interest payments",
+"Semi-annual"
+],
+[
+"Contract rate",
+"6%"
+],
+[
+"Market rate",
+"4%"
+],
+[
+"Time to maturity",
+"20 years"
+]
+]
+},
+{
+"factors": [
+[
+"PV of $1 (2%, 40 periods)",
+"0.4529"
+],
+[
+"PV of an annuity of $1 (2%, 40 periods)",
+"27.3555"
+]
+]
+},
+{
+"q": "Before you calculate: will this bond sell at par, at a discount, or at a premium?"
+}
+],
+"reveals": [
+{
+"label": "Prediction",
+"answer": "Premium",
+"ex": "The contract rate (6%) is higher than the market rate (4%). The bond pays more than investors can get elsewhere, so they pay extra for it."
+},
+{
+"label": "Step 1: Cash interest each payment",
+"formula": [
+"Par",
+"×",
+"Contract rate",
+"×",
+"Time"
+],
+"lines": [
+"$100,000 × 6% × 1/2"
+],
+"answer": "$3,000",
+"ex": "Every six months the company pays bondholders $3,000 in cash. Cash interest always uses PAR and the CONTRACT rate, never the market rate. The rate is yearly, so × 1/2 for six months."
+},
+{
+"label": "Step 2: Periods and rate per period",
+"lines": [
+"n = 20 years × 2 payments a year = 40 periods",
+"i = 4% market rate ÷ 2 = 2% per period"
+],
+"answer": "2% for 40 periods",
+"ex": "Semi-annual means two periods a year: double the years and cut the rate in half. Use the MARKET rate here, because that is what investors could earn elsewhere."
+},
+{
+"label": "Step 3: PV of the principal repayment",
+"lines": [
+"PV of $1 at 2% for 40 periods = 0.4529",
+"0.4529 × $100,000"
+],
+"answer": "$45,290",
+"ex": "The company repays $100,000 once, at the very end. That one future payment is worth only $45,290 in today's dollars."
+},
+{
+"label": "Step 4: PV of the interest payments",
+"lines": [
+"PV of an annuity of $1 at 2% for 40 periods = 27.3555",
+"27.3555 × $3,000"
+],
+"answer": "$82,067",
+"ex": "The 40 interest payments of $3,000 are a stream of equal payments (an annuity), so use the annuity table. Together they are worth $82,067 today."
+},
+{
+"label": "Step 5: Bond price",
+"lines": [
+"$45,290 + $82,067 = $127,357",
+"$127,357 − $100,000 par"
+],
+"answer": "$127,357: premium of $27,357",
+"ex": "The price is what both pieces are worth today. The contract rate (6%) is higher than the market rate (4%). The bond pays more than investors can get elsewhere, so they pay extra for it."
+},
+{
+"label": "Step 6: Journal entry to issue the bonds",
+"entry": {
+"rows": [
+[
+"Cash",
+"127,357"
+],
+[
+"Premium on Bonds Payable",
+null,
+"27,357"
+],
+[
+"Bonds Payable",
+null,
+"100,000"
+]
+]
+},
+"ex": "Bonds Payable always records PAR. The extra cash goes to Premium on Bonds Payable, which has a credit balance and is added to Bonds Payable on the balance sheet."
+},
+{
+"label": "Step 7: Entry for each semi-annual interest payment",
+"lines": [
+"Amortization: $27,357 ÷ 40 periods = $684 (rounded)",
+"Bond Interest Expense: $3,000 − $684 = $2,316"
+],
+"entry": {
+"rows": [
+[
+"Bond Interest Expense",
+"2,316"
+],
+[
+"Premium on Bonds Payable",
+"684"
+],
+[
+"Cash",
+null,
+"3,000"
+]
+]
+},
+"ex": "Straight-line spreads the premium evenly over all 40 payments. The premium lowers interest expense below the cash paid, and by maturity it is gone, so the bonds are carried at par."
+}
+]
+},
+{
+"label": "Problem 2",
+"tag": "Discount",
+"date": "6% contract | 8% market",
+"heading": "Market rate above the contract rate",
+"given": [
+{
+"p": "Northbrook Outfitters issues $100,000 of 20-year bonds. Interest is paid twice a year (semi-annually)."
+},
+{
+"facts": [
+[
+"Par value",
+"$100,000"
+],
+[
+"Interest payments",
+"Semi-annual"
+],
+[
+"Contract rate",
+"6%"
+],
+[
+"Market rate",
+"8%"
+],
+[
+"Time to maturity",
+"20 years"
+]
+]
+},
+{
+"factors": [
+[
+"PV of $1 (4%, 40 periods)",
+"0.2083"
+],
+[
+"PV of an annuity of $1 (4%, 40 periods)",
+"19.7928"
+]
+]
+},
+{
+"q": "Before you calculate: will this bond sell at par, at a discount, or at a premium?"
+}
+],
+"reveals": [
+{
+"label": "Prediction",
+"answer": "Discount",
+"ex": "The contract rate (6%) is lower than the market rate (8%). Investors can earn more elsewhere, so they only buy it for less than par."
+},
+{
+"label": "Step 1: Cash interest each payment",
+"formula": [
+"Par",
+"×",
+"Contract rate",
+"×",
+"Time"
+],
+"lines": [
+"$100,000 × 6% × 1/2"
+],
+"answer": "$3,000",
+"ex": "Every six months the company pays bondholders $3,000 in cash. Cash interest always uses PAR and the CONTRACT rate, never the market rate. The rate is yearly, so × 1/2 for six months."
+},
+{
+"label": "Step 2: Periods and rate per period",
+"lines": [
+"n = 20 years × 2 payments a year = 40 periods",
+"i = 8% market rate ÷ 2 = 4% per period"
+],
+"answer": "4% for 40 periods",
+"ex": "Semi-annual means two periods a year: double the years and cut the rate in half. Use the MARKET rate here, because that is what investors could earn elsewhere."
+},
+{
+"label": "Step 3: PV of the principal repayment",
+"lines": [
+"PV of $1 at 4% for 40 periods = 0.2083",
+"0.2083 × $100,000"
+],
+"answer": "$20,830",
+"ex": "The company repays $100,000 once, at the very end. That one future payment is worth only $20,830 in today's dollars."
+},
+{
+"label": "Step 4: PV of the interest payments",
+"lines": [
+"PV of an annuity of $1 at 4% for 40 periods = 19.7928",
+"19.7928 × $3,000"
+],
+"answer": "$59,378",
+"ex": "The 40 interest payments of $3,000 are a stream of equal payments (an annuity), so use the annuity table. Together they are worth $59,378 today."
+},
+{
+"label": "Step 5: Bond price",
+"lines": [
+"$20,830 + $59,378 = $80,208",
+"$80,208 vs. $100,000 par"
+],
+"answer": "$80,208: discount of $19,792",
+"ex": "The price is what both pieces are worth today. The contract rate (6%) is lower than the market rate (8%). Investors can earn more elsewhere, so they only buy it for less than par."
+},
+{
+"label": "Step 6: Journal entry to issue the bonds",
+"entry": {
+"rows": [
+[
+"Cash",
+"80,208"
+],
+[
+"Discount on Bonds Payable",
+"19,792"
+],
+[
+"Bonds Payable",
+null,
+"100,000"
+]
+]
+},
+"ex": "Bonds Payable always records PAR. The cash the company did not get is debited to Discount on Bonds Payable, a contra-liability subtracted from Bonds Payable."
+},
+{
+"label": "Step 7: Entry for each semi-annual interest payment",
+"lines": [
+"Amortization: $19,792 ÷ 40 periods = $495 (rounded)",
+"Bond Interest Expense: $3,000 + $495 = $3,495"
+],
+"entry": {
+"rows": [
+[
+"Bond Interest Expense",
+"3,495"
+],
+[
+"Discount on Bonds Payable",
+null,
+"495"
+],
+[
+"Cash",
+null,
+"3,000"
+]
+]
+},
+"ex": "Straight-line spreads the discount evenly over all 40 payments. The discount is extra interest the company pays at maturity, so interest expense is more than the cash paid."
+}
+]
+},
+{
+"label": "Problem 3",
+"tag": "Par",
+"date": "6% contract | 6% market",
+"heading": "Market rate equals the contract rate",
+"given": [
+{
+"p": "Northbrook Outfitters issues $100,000 of 20-year bonds. Interest is paid twice a year (semi-annually)."
+},
+{
+"facts": [
+[
+"Par value",
+"$100,000"
+],
+[
+"Interest payments",
+"Semi-annual"
+],
+[
+"Contract rate",
+"6%"
+],
+[
+"Market rate",
+"6%"
+],
+[
+"Time to maturity",
+"20 years"
+]
+]
+},
+{
+"factors": [
+[
+"PV of $1 (3%, 40 periods)",
+"0.3066"
+],
+[
+"PV of an annuity of $1 (3%, 40 periods)",
+"23.1148"
+]
+]
+},
+{
+"q": "Before you calculate: will this bond sell at par, at a discount, or at a premium?"
+}
+],
+"reveals": [
+{
+"label": "Prediction",
+"answer": "Par",
+"ex": "The contract rate and the market rate are both 6%. The bond pays exactly what the market pays, so investors pay exactly par."
+},
+{
+"label": "Step 1: Cash interest each payment",
+"formula": [
+"Par",
+"×",
+"Contract rate",
+"×",
+"Time"
+],
+"lines": [
+"$100,000 × 6% × 1/2"
+],
+"answer": "$3,000",
+"ex": "Every six months the company pays bondholders $3,000 in cash. Cash interest always uses PAR and the CONTRACT rate, never the market rate. The rate is yearly, so × 1/2 for six months."
+},
+{
+"label": "Step 2: Periods and rate per period",
+"lines": [
+"n = 20 years × 2 payments a year = 40 periods",
+"i = 6% market rate ÷ 2 = 3% per period"
+],
+"answer": "3% for 40 periods",
+"ex": "Semi-annual means two periods a year: double the years and cut the rate in half. Use the MARKET rate here, because that is what investors could earn elsewhere."
+},
+{
+"label": "Step 3: PV of the principal repayment",
+"lines": [
+"PV of $1 at 3% for 40 periods = 0.3066",
+"0.3066 × $100,000"
+],
+"answer": "$30,660",
+"ex": "The company repays $100,000 once, at the very end. That one future payment is worth only $30,660 in today's dollars."
+},
+{
+"label": "Step 4: PV of the interest payments",
+"lines": [
+"PV of an annuity of $1 at 3% for 40 periods = 23.1148",
+"23.1148 × $3,000"
+],
+"answer": "$69,344",
+"ex": "The 40 interest payments of $3,000 are a stream of equal payments (an annuity), so use the annuity table. Together they are worth $69,344 today."
+},
+{
+"label": "Step 5: Bond price",
+"lines": [
+"$30,660 + $69,344 = $100,004"
+],
+"answer": "$100,000: sells at par",
+"ex": "The extra $4 is only rounding in the 4-decimal tables. When the contract rate equals the market rate, a bond always sells at exactly par, so we record $100,000."
+},
+{
+"label": "Step 6: Journal entry to issue the bonds",
+"entry": {
+"rows": [
+[
+"Cash",
+"100,000"
+],
+[
+"Bonds Payable",
+null,
+"100,000"
+]
+]
+},
+"ex": "Cash comes in for the full par value. Bonds Payable always records PAR."
+},
+{
+"label": "Step 7: Entry for each semi-annual interest payment",
+"lines": [
+"No discount or premium to amortize",
+"Bond Interest Expense = cash paid = $3,000"
+],
+"entry": {
+"rows": [
+[
+"Bond Interest Expense",
+"3,000"
+],
+[
+"Cash",
+null,
+"3,000"
+]
+]
+},
+"ex": "At par, interest expense equals the cash paid every period. This same entry is made all 40 times."
+}
+]
+},
+{
+"label": "Problem 4",
+"tag": "Discount",
+"date": "10% contract | 12% market",
+"heading": "King Co.: issued at a discount",
+"given": [
+{
+"p": "King Co. issues $1,000,000 of 5-year bonds on January 1, 2021. Interest is paid twice a year, on June 30 and December 31."
+},
+{
+"facts": [
+[
+"Par value",
+"$1,000,000"
+],
+[
+"Interest payments",
+"Semi-annual"
+],
+[
+"Contract rate",
+"10%"
+],
+[
+"Market rate",
+"12%"
+],
+[
+"Time to maturity",
+"5 years"
+]
+]
+},
+{
+"factors": [
+[
+"PV of $1 (6%, 10 periods)",
+"0.5584"
+],
+[
+"PV of an annuity of $1 (6%, 10 periods)",
+"7.3601"
+]
+]
+},
+{
+"q": "Before you calculate: will this bond sell at par, at a discount, or at a premium?"
+}
+],
+"reveals": [
+{
+"label": "Prediction",
+"answer": "Discount",
+"ex": "The contract rate (10%) is lower than the market rate (12%). Investors can earn more elsewhere, so they only buy it for less than par."
+},
+{
+"label": "Step 1: Cash interest each payment",
+"formula": [
+"Par",
+"×",
+"Contract rate",
+"×",
+"Time"
+],
+"lines": [
+"$1,000,000 × 10% × 1/2"
+],
+"answer": "$50,000",
+"ex": "Every six months the company pays bondholders $50,000 in cash. Cash interest always uses PAR and the CONTRACT rate, never the market rate. The rate is yearly, so × 1/2 for six months."
+},
+{
+"label": "Step 2: Periods and rate per period",
+"lines": [
+"n = 5 years × 2 payments a year = 10 periods",
+"i = 12% market rate ÷ 2 = 6% per period"
+],
+"answer": "6% for 10 periods",
+"ex": "Semi-annual means two periods a year: double the years and cut the rate in half. Use the MARKET rate here, because that is what investors could earn elsewhere."
+},
+{
+"label": "Step 3: PV of the principal repayment",
+"lines": [
+"PV of $1 at 6% for 10 periods = 0.5584",
+"0.5584 × $1,000,000"
+],
+"answer": "$558,400",
+"ex": "The company repays $1,000,000 once, at the very end. That one future payment is worth only $558,400 in today's dollars."
+},
+{
+"label": "Step 4: PV of the interest payments",
+"lines": [
+"PV of an annuity of $1 at 6% for 10 periods = 7.3601",
+"7.3601 × $50,000"
+],
+"answer": "$368,005",
+"ex": "The 10 interest payments of $50,000 are a stream of equal payments (an annuity), so use the annuity table. Together they are worth $368,005 today."
+},
+{
+"label": "Step 5: Bond price",
+"lines": [
+"$558,400 + $368,005 = $926,405",
+"$926,405 vs. $1,000,000 par"
+],
+"answer": "$926,405: discount of $73,595",
+"ex": "The price is what both pieces are worth today. The contract rate (10%) is lower than the market rate (12%). Investors can earn more elsewhere, so they only buy it for less than par."
+},
+{
+"label": "Step 6: Journal entry to issue the bonds",
+"entry": {
+"rows": [
+[
+"Cash",
+"926,405"
+],
+[
+"Discount on Bonds Payable",
+"73,595"
+],
+[
+"Bonds Payable",
+null,
+"1,000,000"
+]
+]
+},
+"ex": "Bonds Payable always records PAR. The cash the company did not get is debited to Discount on Bonds Payable, a contra-liability subtracted from Bonds Payable."
+},
+{
+"label": "Step 7: Entry for each semi-annual interest payment",
+"lines": [
+"Amortization: $73,595 ÷ 10 periods = $7,360 (rounded)",
+"Bond Interest Expense: $50,000 + $7,360 = $57,360"
+],
+"entry": {
+"rows": [
+[
+"Bond Interest Expense",
+"57,360"
+],
+[
+"Discount on Bonds Payable",
+null,
+"7,360"
+],
+[
+"Cash",
+null,
+"50,000"
+]
+]
+},
+"ex": "Straight-line spreads the discount evenly over all 10 payments. The discount is extra interest the company pays at maturity, so interest expense is more than the cash paid."
+}
+]
+},
+{
+"label": "Problem 5",
+"tag": "Premium",
+"date": "10% contract | 8% market",
+"heading": "King Co.: issued at a premium",
+"given": [
+{
+"p": "Same King Co. bonds, but this time the market rate drops to 8% before the bonds are sold."
+},
+{
+"facts": [
+[
+"Par value",
+"$1,000,000"
+],
+[
+"Interest payments",
+"Semi-annual"
+],
+[
+"Contract rate",
+"10%"
+],
+[
+"Market rate",
+"8%"
+],
+[
+"Time to maturity",
+"5 years"
+]
+]
+},
+{
+"factors": [
+[
+"PV of $1 (4%, 10 periods)",
+"0.6756"
+],
+[
+"PV of an annuity of $1 (4%, 10 periods)",
+"8.1109"
+]
+]
+},
+{
+"q": "Before you calculate: will this bond sell at par, at a discount, or at a premium?"
+}
+],
+"reveals": [
+{
+"label": "Prediction",
+"answer": "Premium",
+"ex": "The contract rate (10%) is higher than the market rate (8%). The bond pays more than investors can get elsewhere, so they pay extra for it."
+},
+{
+"label": "Step 1: Cash interest each payment",
+"formula": [
+"Par",
+"×",
+"Contract rate",
+"×",
+"Time"
+],
+"lines": [
+"$1,000,000 × 10% × 1/2"
+],
+"answer": "$50,000",
+"ex": "Every six months the company pays bondholders $50,000 in cash. Cash interest always uses PAR and the CONTRACT rate, never the market rate. The rate is yearly, so × 1/2 for six months."
+},
+{
+"label": "Step 2: Periods and rate per period",
+"lines": [
+"n = 5 years × 2 payments a year = 10 periods",
+"i = 8% market rate ÷ 2 = 4% per period"
+],
+"answer": "4% for 10 periods",
+"ex": "Semi-annual means two periods a year: double the years and cut the rate in half. Use the MARKET rate here, because that is what investors could earn elsewhere."
+},
+{
+"label": "Step 3: PV of the principal repayment",
+"lines": [
+"PV of $1 at 4% for 10 periods = 0.6756",
+"0.6756 × $1,000,000"
+],
+"answer": "$675,600",
+"ex": "The company repays $1,000,000 once, at the very end. That one future payment is worth only $675,600 in today's dollars."
+},
+{
+"label": "Step 4: PV of the interest payments",
+"lines": [
+"PV of an annuity of $1 at 4% for 10 periods = 8.1109",
+"8.1109 × $50,000"
+],
+"answer": "$405,545",
+"ex": "The 10 interest payments of $50,000 are a stream of equal payments (an annuity), so use the annuity table. Together they are worth $405,545 today."
+},
+{
+"label": "Step 5: Bond price",
+"lines": [
+"$675,600 + $405,545 = $1,081,145",
+"$1,081,145 − $1,000,000 par"
+],
+"answer": "$1,081,145: premium of $81,145",
+"ex": "The price is what both pieces are worth today. The contract rate (10%) is higher than the market rate (8%). The bond pays more than investors can get elsewhere, so they pay extra for it."
+},
+{
+"label": "Step 6: Journal entry to issue the bonds",
+"entry": {
+"rows": [
+[
+"Cash",
+"1,081,145"
+],
+[
+"Premium on Bonds Payable",
+null,
+"81,145"
+],
+[
+"Bonds Payable",
+null,
+"1,000,000"
+]
+]
+},
+"ex": "Bonds Payable always records PAR. The extra cash goes to Premium on Bonds Payable, which has a credit balance and is added to Bonds Payable on the balance sheet."
+},
+{
+"label": "Step 7: Entry for each semi-annual interest payment",
+"lines": [
+"Amortization: $81,145 ÷ 10 periods = $8,115 (rounded)",
+"Bond Interest Expense: $50,000 − $8,115 = $41,885"
+],
+"entry": {
+"rows": [
+[
+"Bond Interest Expense",
+"41,885"
+],
+[
+"Premium on Bonds Payable",
+"8,115"
+],
+[
+"Cash",
+null,
+"50,000"
+]
+]
+},
+"ex": "Straight-line spreads the premium evenly over all 10 payments. The premium lowers interest expense below the cash paid, and by maturity it is gone, so the bonds are carried at par."
+}
+]
+},
+{
+"label": "Problem 6",
+"tag": "Discount",
+"date": "8% contract | 10% market",
+"heading": "A bigger, 10-year bond",
+"given": [
+{
+"p": "Prairie Wind Solar issues $500,000 of 10-year bonds to build a new solar farm. Interest is paid twice a year."
+},
+{
+"facts": [
+[
+"Par value",
+"$500,000"
+],
+[
+"Interest payments",
+"Semi-annual"
+],
+[
+"Contract rate",
+"8%"
+],
+[
+"Market rate",
+"10%"
+],
+[
+"Time to maturity",
+"10 years"
+]
+]
+},
+{
+"factors": [
+[
+"PV of $1 (5%, 20 periods)",
+"0.3769"
+],
+[
+"PV of an annuity of $1 (5%, 20 periods)",
+"12.4622"
+]
+]
+},
+{
+"q": "Before you calculate: will this bond sell at par, at a discount, or at a premium?"
+}
+],
+"reveals": [
+{
+"label": "Prediction",
+"answer": "Discount",
+"ex": "The contract rate (8%) is lower than the market rate (10%). Investors can earn more elsewhere, so they only buy it for less than par."
+},
+{
+"label": "Step 1: Cash interest each payment",
+"formula": [
+"Par",
+"×",
+"Contract rate",
+"×",
+"Time"
+],
+"lines": [
+"$500,000 × 8% × 1/2"
+],
+"answer": "$20,000",
+"ex": "Every six months the company pays bondholders $20,000 in cash. Cash interest always uses PAR and the CONTRACT rate, never the market rate. The rate is yearly, so × 1/2 for six months."
+},
+{
+"label": "Step 2: Periods and rate per period",
+"lines": [
+"n = 10 years × 2 payments a year = 20 periods",
+"i = 10% market rate ÷ 2 = 5% per period"
+],
+"answer": "5% for 20 periods",
+"ex": "Semi-annual means two periods a year: double the years and cut the rate in half. Use the MARKET rate here, because that is what investors could earn elsewhere."
+},
+{
+"label": "Step 3: PV of the principal repayment",
+"lines": [
+"PV of $1 at 5% for 20 periods = 0.3769",
+"0.3769 × $500,000"
+],
+"answer": "$188,450",
+"ex": "The company repays $500,000 once, at the very end. That one future payment is worth only $188,450 in today's dollars."
+},
+{
+"label": "Step 4: PV of the interest payments",
+"lines": [
+"PV of an annuity of $1 at 5% for 20 periods = 12.4622",
+"12.4622 × $20,000"
+],
+"answer": "$249,244",
+"ex": "The 20 interest payments of $20,000 are a stream of equal payments (an annuity), so use the annuity table. Together they are worth $249,244 today."
+},
+{
+"label": "Step 5: Bond price",
+"lines": [
+"$188,450 + $249,244 = $437,694",
+"$437,694 vs. $500,000 par"
+],
+"answer": "$437,694: discount of $62,306",
+"ex": "The price is what both pieces are worth today. The contract rate (8%) is lower than the market rate (10%). Investors can earn more elsewhere, so they only buy it for less than par."
+},
+{
+"label": "Step 6: Journal entry to issue the bonds",
+"entry": {
+"rows": [
+[
+"Cash",
+"437,694"
+],
+[
+"Discount on Bonds Payable",
+"62,306"
+],
+[
+"Bonds Payable",
+null,
+"500,000"
+]
+]
+},
+"ex": "Bonds Payable always records PAR. The cash the company did not get is debited to Discount on Bonds Payable, a contra-liability subtracted from Bonds Payable."
+},
+{
+"label": "Step 7: Entry for each semi-annual interest payment",
+"lines": [
+"Amortization: $62,306 ÷ 20 periods = $3,115 (rounded)",
+"Bond Interest Expense: $20,000 + $3,115 = $23,115"
+],
+"entry": {
+"rows": [
+[
+"Bond Interest Expense",
+"23,115"
+],
+[
+"Discount on Bonds Payable",
+null,
+"3,115"
+],
+[
+"Cash",
+null,
+"20,000"
+]
+]
+},
+"ex": "Straight-line spreads the discount evenly over all 20 payments. The discount is extra interest the company pays at maturity, so interest expense is more than the cash paid."
+}
+]
+},
+{
+"label": "Problem 7",
+"tag": "Premium",
+"date": "9% contract | 7% market",
+"heading": "Annual payments",
+"given": [
+{
+"p": "Lakeshore Marine issues $200,000 of 5-year bonds. These bonds pay interest ONCE a year, every December 31."
+},
+{
+"facts": [
+[
+"Par value",
+"$200,000"
+],
+[
+"Interest payments",
+"Annual"
+],
+[
+"Contract rate",
+"9%"
+],
+[
+"Market rate",
+"7%"
+],
+[
+"Time to maturity",
+"5 years"
+]
+]
+},
+{
+"flag": "Heads up: this bond pays interest ONCE a year. Don't divide the rate or double the years."
+},
+{
+"factors": [
+[
+"PV of $1 (7%, 5 periods)",
+"0.7130"
+],
+[
+"PV of an annuity of $1 (7%, 5 periods)",
+"4.1002"
+]
+]
+},
+{
+"q": "Before you calculate: will this bond sell at par, at a discount, or at a premium?"
+}
+],
+"reveals": [
+{
+"label": "Prediction",
+"answer": "Premium",
+"ex": "The contract rate (9%) is higher than the market rate (7%). The bond pays more than investors can get elsewhere, so they pay extra for it."
+},
+{
+"label": "Step 1: Cash interest each payment",
+"formula": [
+"Par",
+"×",
+"Contract rate",
+"×",
+"Time"
+],
+"lines": [
+"$200,000 × 9% × 1"
+],
+"answer": "$18,000",
+"ex": "Every year the company pays bondholders $18,000 in cash. Cash interest always uses PAR and the CONTRACT rate, never the market rate."
+},
+{
+"label": "Step 2: Periods and rate per period",
+"lines": [
+"n = 5 years × 1 payment a year = 5 periods",
+"i = 7% market rate ÷ 1 = 7% per period"
+],
+"answer": "7% for 5 periods",
+"ex": "Annual payments mean one period per year, so the market rate and the years stay as they are. Use the MARKET rate for present value."
+},
+{
+"label": "Step 3: PV of the principal repayment",
+"lines": [
+"PV of $1 at 7% for 5 periods = 0.7130",
+"0.7130 × $200,000"
+],
+"answer": "$142,600",
+"ex": "The company repays $200,000 once, at the very end. That one future payment is worth only $142,600 in today's dollars."
+},
+{
+"label": "Step 4: PV of the interest payments",
+"lines": [
+"PV of an annuity of $1 at 7% for 5 periods = 4.1002",
+"4.1002 × $18,000"
+],
+"answer": "$73,804",
+"ex": "The 5 interest payments of $18,000 are a stream of equal payments (an annuity), so use the annuity table. Together they are worth $73,804 today."
+},
+{
+"label": "Step 5: Bond price",
+"lines": [
+"$142,600 + $73,804 = $216,404",
+"$216,404 − $200,000 par"
+],
+"answer": "$216,404: premium of $16,404",
+"ex": "The price is what both pieces are worth today. The contract rate (9%) is higher than the market rate (7%). The bond pays more than investors can get elsewhere, so they pay extra for it."
+},
+{
+"label": "Step 6: Journal entry to issue the bonds",
+"entry": {
+"rows": [
+[
+"Cash",
+"216,404"
+],
+[
+"Premium on Bonds Payable",
+null,
+"16,404"
+],
+[
+"Bonds Payable",
+null,
+"200,000"
+]
+]
+},
+"ex": "Bonds Payable always records PAR. The extra cash goes to Premium on Bonds Payable, which has a credit balance and is added to Bonds Payable on the balance sheet."
+},
+{
+"label": "Step 7: Entry for each annual interest payment",
+"lines": [
+"Amortization: $16,404 ÷ 5 periods = $3,281 (rounded)",
+"Bond Interest Expense: $18,000 − $3,281 = $14,719"
+],
+"entry": {
+"rows": [
+[
+"Bond Interest Expense",
+"14,719"
+],
+[
+"Premium on Bonds Payable",
+"3,281"
+],
+[
+"Cash",
+null,
+"18,000"
+]
+]
+},
+"ex": "Straight-line spreads the premium evenly over all 5 payments. The premium lowers interest expense below the cash paid, and by maturity it is gone, so the bonds are carried at par."
+}
+]
+},
+{
+"label": "Problem 8",
+"tag": "You try it",
+"date": "7% contract | 6% market",
+"heading": "You try it",
+"given": [
+{
+"p": "Cedar Ridge Hospital issues $300,000 of 10-year bonds to fund a new wing. Interest is paid twice a year."
+},
+{
+"facts": [
+[
+"Par value",
+"$300,000"
+],
+[
+"Interest payments",
+"Semi-annual"
+],
+[
+"Contract rate",
+"7%"
+],
+[
+"Market rate",
+"6%"
+],
+[
+"Time to maturity",
+"10 years"
+]
+]
+},
+{
+"q": "Your turn. Work every step on paper first, with your PV tables, then reveal one step at a time to check."
+}
+],
+"reveals": [
+{
+"label": "Prediction",
+"answer": "Premium",
+"ex": "The contract rate (7%) is higher than the market rate (6%). The bond pays more than investors can get elsewhere, so they pay extra for it."
+},
+{
+"label": "Step 1: Cash interest each payment",
+"formula": [
+"Par",
+"×",
+"Contract rate",
+"×",
+"Time"
+],
+"lines": [
+"$300,000 × 7% × 1/2"
+],
+"answer": "$10,500",
+"ex": "Every six months the company pays bondholders $10,500 in cash. Cash interest always uses PAR and the CONTRACT rate, never the market rate. The rate is yearly, so × 1/2 for six months."
+},
+{
+"label": "Step 2: Periods and rate per period",
+"lines": [
+"n = 10 years × 2 payments a year = 20 periods",
+"i = 6% market rate ÷ 2 = 3% per period"
+],
+"answer": "3% for 20 periods",
+"ex": "Semi-annual means two periods a year: double the years and cut the rate in half. Use the MARKET rate here, because that is what investors could earn elsewhere."
+},
+{
+"label": "Step 3: PV of the principal repayment",
+"lines": [
+"PV of $1 at 3% for 20 periods = 0.5537",
+"0.5537 × $300,000"
+],
+"answer": "$166,110",
+"ex": "The company repays $300,000 once, at the very end. That one future payment is worth only $166,110 in today's dollars."
+},
+{
+"label": "Step 4: PV of the interest payments",
+"lines": [
+"PV of an annuity of $1 at 3% for 20 periods = 14.8775",
+"14.8775 × $10,500"
+],
+"answer": "$156,214",
+"ex": "The 20 interest payments of $10,500 are a stream of equal payments (an annuity), so use the annuity table. Together they are worth $156,214 today."
+},
+{
+"label": "Step 5: Bond price",
+"lines": [
+"$166,110 + $156,214 = $322,324",
+"$322,324 − $300,000 par"
+],
+"answer": "$322,324: premium of $22,324",
+"ex": "The price is what both pieces are worth today. The contract rate (7%) is higher than the market rate (6%). The bond pays more than investors can get elsewhere, so they pay extra for it."
+},
+{
+"label": "Step 6: Journal entry to issue the bonds",
+"entry": {
+"rows": [
+[
+"Cash",
+"322,324"
+],
+[
+"Premium on Bonds Payable",
+null,
+"22,324"
+],
+[
+"Bonds Payable",
+null,
+"300,000"
+]
+]
+},
+"ex": "Bonds Payable always records PAR. The extra cash goes to Premium on Bonds Payable, which has a credit balance and is added to Bonds Payable on the balance sheet."
+},
+{
+"label": "Step 7: Entry for each semi-annual interest payment",
+"lines": [
+"Amortization: $22,324 ÷ 20 periods = $1,116 (rounded)",
+"Bond Interest Expense: $10,500 − $1,116 = $9,384"
+],
+"entry": {
+"rows": [
+[
+"Bond Interest Expense",
+"9,384"
+],
+[
+"Premium on Bonds Payable",
+"1,116"
+],
+[
+"Cash",
+null,
+"10,500"
+]
+]
+},
+"ex": "Straight-line spreads the premium evenly over all 20 payments. The premium lowers interest expense below the cash paid, and by maturity it is gone, so the bonds are carried at par."
+}
+]
+}
+];
+
+(function(){
+const $=id=>document.getElementById(id);
+let i=0,shown=0;const seen=new Set();
+const el=(tag,cls,text)=>{const e=document.createElement(tag);if(cls)e.className=cls;if(text!=null)e.textContent=text;return e};
+const fmt=n=>"$"+Math.round(n).toLocaleString("en-US");
+const plain=n=>Math.round(n).toLocaleString("en-US");
+function table(t){
+  const w=el("div","tw"),tb=el("table",t.cls||null);
+  if(t.head){const tr=el("tr");t.head.forEach((h,k)=>tr.appendChild(el("th",k?"n":null,h)));const th=el("thead");th.appendChild(tr);tb.appendChild(th)}
+  const body=el("tbody");
+  (t.rows||[]).forEach((r,ri)=>{const tr=el("tr",t.cls==="aging"&&ri===t.rows.length-1?"tot":null);r.forEach((c,ci)=>tr.appendChild(el("td",ci&&t.cls==="aging"?"n":null,c)));body.appendChild(tr)});
+  tb.appendChild(body);w.appendChild(tb);return w;
+}
+function entry(e){
+  const box=el("div");if(e.title)box.appendChild(el("div","jt",e.title));
+  const w=el("div","tw"),tb=el("table","journal");
+  const hr=el("tr");["Account","Debit","Credit"].forEach(h=>hr.appendChild(el("th",null,h)));const th=el("thead");th.appendChild(hr);tb.appendChild(th);
+  const body=el("tbody");
+  e.rows.forEach(r=>{if(Array.isArray(r))r=r[1]!=null?{account:r[0],debit:r[1]}:{account:r[0],credit:r[2]};const cr=r.credit!=null;const tr=el("tr");tr.appendChild(el("td","acct"+(cr?" cr":""),r.account));tr.appendChild(el("td","n",r.debit||""));tr.appendChild(el("td","n",r.credit||""));body.appendChild(tr)});
+  tb.appendChild(body);w.appendChild(tb);box.appendChild(w);return box;
+}
+function block(b){
+  if(b.p!=null)return el("p",null,b.p);
+  if(b.q!=null)return el("p","q",b.q);
+  if(b.list){const u=el("ul");b.list.forEach(x=>u.appendChild(el("li",null,x)));return u}
+  if(b.table)return table(b.table);
+  if(b.facts){const d=el("div","facts");b.facts.forEach(([k,v])=>{const c=el("div","fact");c.appendChild(el("span",null,k));c.appendChild(el("b",null,v));d.appendChild(c)});return d}
+  if(b.factors){const d=el("div","factors");d.appendChild(el("div","fh","PV table factors for this bond"));b.factors.forEach(([k,v])=>{const c=el("div","fr");c.appendChild(el("span",null,k));c.appendChild(el("b",null,v));d.appendChild(c)});return d}
+  if(b.flag)return el("p","flag",b.flag);
+  return el("div");
+}
+function reveal(r){
+  if(r.why){const d=el("div","why");d.innerHTML=r.why;return d}
+  const d=el("div","rv");if(r.label)d.appendChild(el("div","rl",r.label));
+  if(r.lines){const l=el("div","lines");r.lines.forEach(x=>l.appendChild(el("div",null,x)));d.appendChild(l)}
+  if(r.cal){const c=el("div","cal");r.cal.forEach(([a,b,u])=>{c.appendChild(el("span",u===2?"t":null,a));c.appendChild(el("span",u===1?"u":u===2?"t":null,b))});d.appendChild(c)}
+  if(r.formula){const f=el("div","formula");r.formula.forEach(x=>{const sp=el("span",null,x);if(x==="×"){sp.style.border="0";sp.style.background="none"}f.appendChild(sp)});d.appendChild(f)}
+  if(r.table)d.appendChild(table(r.table));
+  if(r.entry)d.appendChild(entry(r.entry));
+  if(r.entries){const g=el("div");g.style.cssText="display:grid;gap:10px";r.entries.forEach(e=>g.appendChild(entry(e)));d.appendChild(g)}
+  if(r.cmp){const c=el("div","cmp");r.cmp.forEach(x=>{const b=el("div",x.bad?"bad":null);const t=el("div","ct",x.t);t.appendChild(el("small",null,x.s));b.appendChild(t);b.appendChild(entry(x.e));c.appendChild(b)});d.appendChild(c)}
+  if(r.answer)d.appendChild(el("div","answer",r.answer));
+  if(r.ex)d.appendChild(el("p","ex",r.ex));
+  return d;
+}
+/* ---------- ledger ---------- */
+function posts(){
+  const out=[];
+  STEPS.forEach((s,k)=>{if(k>i)return;s.reveals.forEach((r,ri)=>{if(k===i&&ri>=shown)return;(r.post||[]).forEach(p=>out.push({a:p[0],side:p[1],amt:p[2],lab:p[3],isNew:k===i}))})});
+  return out;
+}
+function ledger(){}
+function strip(){
+  const s=$("strip");s.innerHTML="";
+  STEPS.forEach((p,k)=>{const b=el("button",seen.has(k)?"seen":null,String(k+1));b.title=p.label+": "+p.heading;b.setAttribute("aria-label",b.title);if(k===i)b.setAttribute("aria-current","true");b.onclick=()=>go(k);s.appendChild(b)});
+}
+function render(){
+  const p=STEPS[i],h=$("head");h.innerHTML="";
+  h.appendChild(el("span","label",p.label));h.appendChild(el("span","tag",p.tag));h.appendChild(el("span","date",p.date));
+  const g=$("given");g.innerHTML="";g.appendChild(el("h2",null,p.heading));p.given.forEach(b=>g.appendChild(block(b)));
+  const rv=$("reveals");rv.innerHTML="";p.reveals.slice(0,shown).forEach(r=>rv.appendChild(reveal(r)));
+  const n=p.reveals.length,left=n-shown;
+  $("revealBtn").disabled=left===0&&i===STEPS.length-1;$("allBtn").disabled=left===0;$("resetBtn").disabled=shown===0;
+  $("revealBtn").textContent=left===0?(i===STEPS.length-1?"Done":"Next problem →"):(shown===0?"Reveal":"Reveal next");
+  $("left").textContent=left?`${left} part${left===1?"":"s"} left`:"";
+  $("pos").textContent=`Problem ${i+1} of ${STEPS.length}`;
+  $("prevBtn").disabled=i===0;$("nextBtn").disabled=i===STEPS.length-1;
+  strip();ledger();
+}
+function go(k){i=Math.max(0,Math.min(STEPS.length-1,k));shown=0;seen.add(i);try{history.replaceState(null,"","#s"+(i+1))}catch(_){}render();window.scrollTo({top:0})}
+function advance(){if(shown<STEPS[i].reveals.length){shown++;render();const r=$("reveals").lastElementChild;if(r)r.scrollIntoView({block:"nearest",behavior:"smooth"})}else if(i<STEPS.length-1)go(i+1)}
+$("revealBtn").onclick=advance;
+$("allBtn").onclick=()=>{shown=STEPS[i].reveals.length;render()};
+$("resetBtn").onclick=()=>{shown=0;render()};
+$("prevBtn").onclick=()=>go(i-1);
+$("nextBtn").onclick=()=>go(i+1);
+document.addEventListener("keydown",e=>{
+  if(e.target.closest&&e.target.closest("input,textarea"))return;
+  if(e.key===" "||e.key==="ArrowRight"||e.key==="Enter"){if(e.target.tagName==="BUTTON"&&e.key!=="ArrowRight")return;e.preventDefault();advance()}
+  else if(e.key==="ArrowLeft"){e.preventDefault();go(i-1)}
+  else if(e.key==="h"||e.key==="H"){shown=0;render()}
+});
+const m=/^#s(\d+)$/.exec(location.hash);go(m?(+m[1]-1):0);
+})();
+</script>
+
+<!-- Text size controls: scale the page content, remembered across pages -->
+<style id="tsz-css">
+#tsz{position:fixed;left:14px;bottom:14px;z-index:9999;display:flex;align-items:center;gap:2px;background:#111;color:#fff;border-radius:999px;padding:4px;box-shadow:0 2px 10px rgba(0,0,0,.3);font:600 15px "Barlow",system-ui,sans-serif}
+#tsz button{background:transparent;border:0;color:#fff;font:inherit;cursor:pointer;border-radius:999px;min-width:40px;height:36px;padding:0 10px}
+#tsz button:hover{background:rgba(255,255,255,.15)}
+#tsz button:focus-visible{outline:3px solid #C1102F;outline-offset:1px}
+#tsz button:disabled{opacity:.35;cursor:default}
+#tsz .big{font-size:20px}
+#tsz .pct{min-width:58px;font-variant-numeric:tabular-nums}
+@media print{#tsz{display:none}}
+</style>
+<div id="tsz" role="group" aria-label="Text size">
+  <button type="button" data-d="-1" aria-label="Smaller text" title="Smaller text (-)">A−</button>
+  <button type="button" data-d="0" class="pct" aria-label="Reset text size" title="Reset text size (0)">100%</button>
+  <button type="button" data-d="1" class="big" aria-label="Bigger text" title="Bigger text (+)">A+</button>
+</div>
+<script>
+(function(){
+  var STEPS=[0.8,0.9,1,1.1,1.25,1.4,1.6,1.8,2],KEY="d214-text-size",box=document.getElementById("tsz");
+  var target=document.querySelector("main")||document.body;
+  var i=2;try{var v=parseFloat(localStorage.getItem(KEY));var j=STEPS.indexOf(v);if(j>=0)i=j}catch(e){}
+  function apply(){
+    var z=STEPS[i];target.style.zoom=z;
+    box.style.zoom=target===document.body?1/z:1;
+    box.children[1].textContent=Math.round(z*100)+"%";
+    box.children[0].disabled=i===0;box.children[2].disabled=i===STEPS.length-1;
+    try{localStorage.setItem(KEY,z)}catch(e){}
+  }
+  function step(d){i=d===0?2:Math.max(0,Math.min(STEPS.length-1,i+d));apply()}
+  box.addEventListener("click",function(e){var b=e.target.closest("button");if(b){step(+b.dataset.d);b.blur()}});
+  document.addEventListener("keydown",function(e){
+    if(e.metaKey||e.ctrlKey||e.altKey)return;var t=e.target.tagName;if(t==="INPUT"||t==="TEXTAREA"||t==="SELECT")return;
+    if(e.key==="+"||e.key==="=")step(1);else if(e.key==="-"||e.key==="_")step(-1);else if(e.key==="0")step(0);
+  });
+  apply();
+})();
+</script>
+
+
+</body>
+</html>
