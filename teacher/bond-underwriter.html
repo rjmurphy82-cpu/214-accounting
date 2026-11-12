@@ -2729,7 +2729,7 @@ function fieldsFor(S){const d=DEALS[S.di],x=d.x;
     {k:"n",t:"num",ans:x.n,pts:50,lbl:"Periods (n)",short:"Periods n"},
     {k:"i",t:"pct",ans:x.i,pts:50,lbl:"Market rate per period (i)",short:"Rate per period i"},
     {k:"cash",t:"money",ans:x.cash,pts:100,lbl:"Cash interest every 6 months",short:"Cash interest"},
-    {k:"price",t:"money",ans:x.price,pts:300,pen:100,lbl:"Bond price (cash raised)",short:"Bond price"}];
+    {k:"price",t:"money",ans:x.price,pts:300,pen:100,lbl:"Bond Issue Price",short:"Bond Issue Price"}];
   if(S.k==="interest")return[
     {k:"am",t:"money",ans:x.am,pts:150,lbl:`${x.call} amortized each period`,short:"Amortization per period"},
     {k:"exp",t:"money",ans:x.exp,pts:150,lbl:"Bond interest expense each period",short:"Interest expense"}];
