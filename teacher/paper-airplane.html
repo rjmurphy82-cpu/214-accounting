@@ -2722,7 +2722,7 @@ function scores(st,players){
   const c=st.cfg,s={};for(let t=0;t<c.teams;t++)s[t]=0;
   (st.qs||[]).forEach(q=>{if(st.q&&st.q.open&&st.q.id===q.id)return;const T=tally(st,players,q);for(const t in T)s[t]+=T[t].right*c.pr-(T[t].ans-T[t].right)*c.pw});
   return s}
-function bonusTeams(st){if(!st.cfg.bonus||!st.est)return[];let best=Infinity,who=[];
+function bonusTeams(st){if(!st.cfg.bonus||!st.est||st.noBonus)return[];let best=Infinity,who=[];
   for(let t=0;t<st.cfg.teams;t++){if(!(st.fcs&&st.fcs[t]&&st.fcs[t].n))continue;const d=Math.abs(estOf(st,t)-actualOf(st,t));if(d<best-1e-9){best=d;who=[t]}else if(Math.abs(d-best)<1e-9)who.push(t)}
   return who}
 
@@ -2990,7 +2990,7 @@ function classResults(){
   document.body.classList.remove("finale-on");const st=H.state,c=st.cfg,players=playersArr();
   const kinds=["sale","est","repair","replace","tu"].map(k=>{const per={};let n=0,r=0;(st.qs||[]).filter(q=>(q.kind==="claim"?q.fix:q.kind)===k).forEach(q=>{const T=tally(st,players,q);Object.entries(T).forEach(([t,o])=>{per[t]=per[t]||{n:0,r:0};per[t].n+=o.ans;per[t].r+=o.right;n+=o.ans;r+=o.right})});return{k,n,r,per}}).filter(x=>x.n);
   lastPaint="";
-  app.innerHTML=`<div class="rep"><h2>Class results</h2><p class="note" style="font-size:18px">Share of answers that were right. No names.</p>
+  app.innerHTML=`<div class="rep"><h2>Class results</h2><p class="note" style="font-size:18px">Share of answers that were right. No names.${st.early?" The game ended early, so this covers only the entries that were played.":""}</p>
     ${kinds.map(x=>`<div class="cr"><span><b>${KIND[x.k]}</b></span><span class="b"><i style="width:${x.r/x.n*100}%"></i></span><span>${Math.round(x.r/x.n*100)}% <span class="note">(${x.r} of ${x.n})</span></span></div>`).join("")}
     <table class="sum" style="margin-top:18px"><thead><tr><th>Team</th>${kinds.map(x=>`<th>${KIND[x.k]}</th>`).join("")}<th>Points</th></tr></thead><tbody>
     ${Array.from({length:c.teams},(_,t)=>`<tr style="--c:${tcol(t)}"><td>${tname(t)}</td>${kinds.map(x=>{const p=x.per[t];return `<td>${p&&p.n?Math.round(p.r/p.n*100)+"%":"–"}</td>`}).join("")}<td>${finalRows(st).find(r=>r.t===t).total}</td></tr>`).join("")}</tbody></table>
@@ -3140,6 +3140,36 @@ $("#rejoin").onclick=rejoin;
 $("#zo").onclick=()=>setZ(-.1);$("#zi").onclick=()=>setZ(.1);
 applyZ();
 ROLE==="teacher"?hostSetup():joinForm();
+</script>
+
+<script>
+/* ---------- End game now (teacher only): skip the remaining rounds and go to the final standings ---------- */
+(function(){
+  if(typeof ROLE==="undefined"||ROLE!=="teacher")return;
+  const css=document.createElement("style");
+  css.textContent=`.egn{margin-left:12px;background:transparent;color:#C1102F;border:2px solid #C1102F;border-radius:8px;font:600 15px Oswald,"Arial Narrow",sans-serif;letter-spacing:.02em;padding:4px 12px;cursor:pointer;text-transform:none;line-height:1.2}
+.egn:hover{background:#C1102F;color:#fff}.egn[hidden]{display:none!important}
+.egm{position:fixed;inset:0;background:rgba(0,0,0,.6);display:grid;place-items:center;z-index:99999}.egm[hidden]{display:none!important}
+.egm .bx{background:#fff;color:#111;border-radius:12px;padding:28px 32px;max-width:600px;margin:20px;box-shadow:0 20px 60px rgba(0,0,0,.45);font:21px/1.4 Barlow,system-ui,sans-serif}
+.egm h3{font:700 30px Oswald,"Arial Narrow",sans-serif;margin:0 0 10px}.egm p{margin:0}
+.egm .rw{display:flex;gap:12px;justify-content:flex-end;margin-top:22px}
+.egm button{font:600 19px Oswald,"Arial Narrow",sans-serif;padding:10px 22px;border-radius:8px;cursor:pointer;border:2px solid #111;background:#fff;color:#111}
+.egm .go{background:#C1102F;border-color:#C1102F;color:#fff}`;
+  document.head.appendChild(css);
+  const btn=document.createElement("button");btn.className="egn";btn.id="egn";btn.type="button";btn.hidden=true;btn.textContent="End game now";
+  const top=document.querySelector(".top");if(top)top.appendChild(btn);else{btn.style.cssText="position:fixed;top:10px;right:14px;z-index:9000;background:#fff";document.body.appendChild(btn)}
+  const m=document.createElement("div");m.className="egm";m.hidden=true;
+  m.innerHTML=`<div class="bx" role="dialog" aria-modal="true" aria-labelledby="egnT"><h3 id="egnT">End game now?</h3><p>End the game now and go to the final standings? Remaining rounds will be skipped.</p><div class="rw"><button type="button" id="egnNo">Cancel</button><button type="button" class="go" id="egnYes">End game</button></div></div>`;
+  document.body.appendChild(m);
+  const inProgress=()=>{try{return !!(H&&H.state&&!["lobby","top","end"].includes(H.state.phase)&&!document.body.classList.contains("finale-on"))}catch(e){return false}};
+  const close=()=>{m.hidden=true};
+  btn.onclick=()=>{if(!inProgress())return;m.hidden=false;document.getElementById("egnYes").focus()};
+  document.getElementById("egnNo").onclick=close;
+  m.addEventListener("click",e=>{if(e.target===m)close()});
+  addEventListener("keydown",e=>{if(!m.hidden&&e.key==="Escape"){e.stopPropagation();close()}},true);
+  document.getElementById("egnYes").onclick=()=>{close();if(!inProgress())return;try{const st=H.state;if(H.timer)H.timer.end=null;const open=st.q&&st.q.open?st.q.id:null;H.anim=null;hostSet({...st,phase:"top",q:null,timer:null,fcLock:true,qs:(st.qs||[]).filter(x=>x.id!==open),noBonus:st.phase!=="tu",early:true})}catch(e){console.error(e)}btn.hidden=true};
+  setInterval(()=>{const on=inProgress();if(btn.hidden===on)btn.hidden=!on;if(!on&&!m.hidden)close()},400);
+})();
 </script>
 </body>
 </html>

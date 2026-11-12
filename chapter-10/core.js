@@ -35,7 +35,7 @@ export async function getState(kv, { code, gid, key, hostKey, since }) {
   const s = json(res[0]); if (!s) fail("no_game", "That game has ended.");
   const groups = hobj(res[1]), host = isHost(s, hostKey);
   const me = gid && groups[gid] && groups[gid].key === key ? gid : null;
-  const out = { v: +v, phase: s.phase, r: s.r, step: s.step || null, host,
+  const out = { v: +v, phase: s.phase, r: s.r, step: s.step || null, upto: s.upto ?? null, host,
     groups: Object.entries(groups).sort((a, b) => (a[1].t || 0) - (b[1].t || 0)).map(([id, g]) => ({ gid: id, name: g.name, ...(host ? { pin: g.pin, manual: !!g.manual } : {}) })),
     me: me ? { gid: me, name: groups[me].name, pin: groups[me].pin } : null, decisions: [], locked: [] };
   for (let r = 0; r < NROUNDS; r++) {
@@ -94,6 +94,11 @@ export async function hostOp(kv, { code, hostKey, op, gid, picks, name }) {
   else if (op === "clear") { await save([["HDEL", K(code, "d" + s.r), gid]]); }
   else if (op === "add") { const n = clean(name); if (!n) fail("bad_name", "Name needed."); const id = rid(8); await save([["HSET", K(code, "g"), id, JSON.stringify({ name: n, pin: pin3(), key: rid(16), t: Date.now(), manual: true })]]); return { ok: true, gid: id }; }
   else if (op === "remove") { await save([["HDEL", K(code, "g"), gid], ...Array.from({ length: NROUNDS }, (_, r) => ["HDEL", K(code, "d" + r), gid])]); }
+  else if (op === "finish") { // End game now: a revealed year counts, an open year is dropped
+    if (s.phase !== "open" && s.phase !== "reveal") fail("bad_op", "No game in progress.");
+    const extra = [];
+    if (s.phase === "open") { extra.push(["DEL", K(code, "d" + s.r)]); s.upto = s.r - 1; } else s.upto = s.r;
+    delete s.step; s.phase = "final"; await save(extra); }
   else if (op === "end") { await kv(allKeys(code).map(k => ["DEL", k])); return { ok: true, ended: true }; }
   else fail("bad_op", "Unknown action.");
   return { ok: true };

@@ -263,6 +263,16 @@ body.host-reveal #app{display:grid;grid-template-columns:minmax(0,1fr) minmax(30
 .place.podium-3{background:linear-gradient(135deg,#8E4F1C,#D88B4A);color:#fff}
 .place .mv{align-self:center}
 .place.wait-rank{background:transparent;color:var(--muted);font-size:16px}
+.btn.endnow{background:transparent;color:var(--bad,#C1102F);border:2px solid currentColor;box-shadow:none}
+.btn.endnow:hover{background:var(--bad,#C1102F);color:#fff}
+.sb .btn.endnow{display:block;width:100%;margin-top:12px;font-size:20px;padding:10px 12px;color:#fff;border-color:rgba(255,255,255,.5)}
+.sb .btn.endnow:hover{background:var(--bad,#C1102F);border-color:var(--bad,#C1102F)}
+.endmodal{position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.55);display:grid;place-items:center;padding:20px}
+.endbox{background:var(--paper,#fff);color:var(--ink,#111);border-radius:12px;padding:26px 30px;max-width:560px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.35);border-top:6px solid var(--bad,#C1102F)}
+.endbox h2{font-family:var(--display);font-size:34px;margin:0 0 8px}
+.endbox p{font-size:20px;line-height:1.4;margin:0 0 20px}
+.endbox .row{display:flex;gap:12px;justify-content:flex-end}
+.btn.danger{background:var(--bad,#C1102F);border-color:var(--bad,#C1102F);color:#fff}
 </style>
 </head>
 <body>
@@ -461,7 +471,7 @@ function soloNext(){
       const ok=c===q.ans,pts=points(ok,ms,secs);s.score+=pts;s.log.push({sk:q.sk,ok,ms});ok?beep(990,.15):beep(200,.3);
       showAnswer(app,q,c,ok,pts,`<div class="row next" style="justify-content:flex-end;margin-top:10px"><button class="btn main" id="nx">${s.i===s.ids.length-1?"See my report":"Next"}</button></div>`);
       app.querySelector(".score").textContent=s.score.toLocaleString()+" pts";
-      KEYPICK=null;KEYNEXT=()=>{KEYNEXT=null;s.i++;soloNext()};$("#nx").onclick=KEYNEXT;$("#nx").focus({preventScroll:true});
+      KEYPICK=null;KEYNEXT=()=>{KEYNEXT=null;s.i++;soloNext()};$("#nx").onclick=KEYNEXT;bindEndNow();$("#nx").focus({preventScroll:true});
     }});
   };
   if(first){const roundNo=ORDER.indexOf(q.sk)+1;interstitial(q.sk,roundNo,ORDER.length,go)}else go();
@@ -609,6 +619,27 @@ async function hostSetup(){
   };
 }
 function hostSet(state){HOST.state=state;HOST.N.set("games/"+HOST.code+"/state",state);hostRender()}
+/* ---------- End game now: skip the rest and go straight to the final standings ---------- */
+function adjP(p,cut){const x=cut!=null&&p.a&&p.a[cut];if(!x)return p;const a={...p.a};delete a[cut];return {...p,score:(p.score||0)-(x.pts||0),a}}
+function endNowHTML(){return `<button class="btn endnow" id="endnow" type="button">End game now</button>`}
+function bindEndNow(){const b=$("#endnow");if(b)b.onclick=askEndNow}
+function askEndNow(){
+  if(document.querySelector(".endmodal"))return;
+  const keep=KEYNEXT;KEYNEXT=null;
+  const m=document.createElement("div");m.className="endmodal";m.setAttribute("role","dialog");m.setAttribute("aria-modal","true");
+  m.innerHTML=`<div class="endbox"><h2>End the game now?</h2><p>Go straight to the final standings. Remaining questions will be skipped. A question that is still open will not count for anyone.</p><div class="row"><button class="btn" id="endno" type="button">Cancel</button><button class="btn danger" id="endyes" type="button">End game</button></div></div>`;
+  document.body.appendChild(m);
+  const close=()=>{m.remove();if(HOST&&HOST.state.phase!=="end")KEYNEXT=keep};
+  m.querySelector("#endno").onclick=close;m.onclick=e=>{if(e.target===m)close()};
+  m.querySelector("#endyes").onclick=()=>{m.remove();endNow()};
+  m.querySelector("#endno").focus();
+}
+function endNow(){
+  const H=HOST;if(!H)return;const st=H.state;if(st.phase==="lobby"||st.phase==="end")return;
+  clearInterval(H.watch);stopTick();KEYNEXT=null;
+  const open=st.phase==="question"||st.phase==="intro";
+  hostSet({phase:"end",qi:open?st.qi-1:st.qi,cut:open?st.qi:null,early:true});
+}
 function playersArr(){return Object.entries(HOST.players).map(([id,p])=>({id,...p,score:p.score||0}))}
 function activeArr(){return playersArr().filter(p=>!p.out)}
 function answered(qi){return activeArr().filter(p=>p.a&&p.a[qi]).length}
@@ -635,8 +666,8 @@ function hostRender(){
   }
   if(st.phase==="intro"){
     setFit(false);const sk=byId[H.ids[st.qi]].sk;
-    app.innerHTML=`<div class="interstitial"><div class="r">Round ${ORDER.indexOf(sk)+1} of ${ORDER.length}</div><h2>${esc(SKILLS[sk].name)}</h2><p>${esc(SKILLS[sk].desc)} ${secsLabel(sk)}</p><button class="btn main" id="go">Show question</button></div>`;
-    KEYNEXT=()=>{KEYNEXT=null;hostSet({phase:"question",qi:st.qi,t:Date.now()})};$("#go").onclick=KEYNEXT;requestAnimationFrame(zoomApp);return;
+    app.innerHTML=`<div class="interstitial"><div class="r">Round ${ORDER.indexOf(sk)+1} of ${ORDER.length}</div><h2>${esc(SKILLS[sk].name)}</h2><p>${esc(SKILLS[sk].desc)} ${secsLabel(sk)}</p><button class="btn main" id="go">Show question</button> ${endNowHTML()}</div>`;
+    KEYNEXT=()=>{KEYNEXT=null;hostSet({phase:"question",qi:st.qi,t:Date.now()})};$("#go").onclick=KEYNEXT;bindEndNow();requestAnimationFrame(zoomApp);return;
   }
   const q=inst(byId[H.ids[st.qi]],H.seed),secs=secsFor(q),total=activeArr().length;
   if(st.phase==="question"){
@@ -644,8 +675,8 @@ function hostRender(){
     if(H.rq!==st.qi){H.rq=st.qi;H.qStart=performance.now();
       renderQuestion(app,q,{label:SKILLS[q.sk].name,num:`Question ${st.qi+1} of ${H.ids.length}`,timed:true,secs,onAnswer:()=>{}});
       app.querySelectorAll(".opt").forEach(b=>b.disabled=true);
-      const fb=app.querySelector(".fbbox");fb.innerHTML=`<div class="row" style="justify-content:space-between"><span class="count" id="cnt"></span><button class="btn" id="skip">Show answer now</button></div>`;
-      $("#skip").onclick=()=>hostSet({phase:"reveal",qi:st.qi});
+      const fb=app.querySelector(".fbbox");fb.innerHTML=`<div class="row" style="justify-content:space-between"><span class="count" id="cnt"></span><span class="row" style="gap:10px">${endNowHTML()}<button class="btn" id="skip">Show answer now</button></span></div>`;
+      $("#skip").onclick=()=>hostSet({phase:"reveal",qi:st.qi});bindEndNow();
       clearInterval(H.watch);H.watch=setInterval(()=>{if(H.state.phase!=="question"){clearInterval(H.watch);return}if((performance.now()-H.qStart)/1000>=secs+0.6)hostSet({phase:"reveal",qi:st.qi})},200);
       KEYNEXT=()=>hostSet({phase:"reveal",qi:st.qi});
       requestAnimationFrame(fitHost);
@@ -681,7 +712,7 @@ function hostRender(){
           <span class="sc"><b data-from="${anim?p.prev:p.score}" data-to="${p.score}">${(anim?p.prev:p.score).toLocaleString()}</b>${p.gain>0?`<em>+${p.gain}</em>`:p.gain<0?`<em class="neg">−${-p.gain}</em>`:`<em class="z">+0</em>`}</span>
           <span class="bar"><i style="--w:${Math.max(3,p.score/best*100)}%"></i></span>
         </div>`}).join("")||'<div class="sbr"><span class="nm"><b>No players yet</b></span></div>'}</div>
-      <button class="btn main" id="nx">${last?"Final results":"Next question"} →</button>
+      <button class="btn main" id="nx">${last?"Final results":"Next question"} →</button>${last?"":endNowHTML()}
     </aside>`);
     document.body.classList.add("host-reveal");
     if(anim){const t0=performance.now(),els=[...app.querySelectorAll(".sc b[data-to]")];
@@ -694,7 +725,7 @@ function hostRender(){
   if(st.phase==="end"){
     setFit(false);stopTick();
     if(H.endShown)return;H.endShown=true;
-    finale(activeArr().sort((a,b)=>b.score-a.score));
+    finale(activeArr().map(p=>adjP(p,st.cut)).sort((a,b)=>b.score-a.score));
   }
 
 }
@@ -881,8 +912,9 @@ function joinRender(){
   }
   if(st.phase==="end"){
     stopTick();if(M.rq==="end")return;M.rq="end";
+    if(st.cut!=null&&M.answered[st.cut]){const x=M.answered[st.cut];M.score-=x.pts||0;M.log.pop();delete M.answered[st.cut]}
     const fin=()=>{try{localStorage.removeItem(SKEY)}catch(e){}};
-    M.N.get(`games/${M.code}/players`).then(ps=>{const arr=Object.values(ps||{}).filter(p=>!p.out).map(p=>p.score||0).sort((a,b)=>b-a);const rank=arr.indexOf(M.score)+1;if(M.off)M.off();const keep=M;ME=null;fin();rejoinBtn();report(keep.name,keep.log,keep.score,rank||null)}).catch(()=>{const keep=M;ME=null;fin();rejoinBtn();report(keep.name,keep.log,keep.score,null)});
+    M.N.get(`games/${M.code}/players`).then(ps=>{const arr=Object.values(ps||{}).filter(p=>!p.out).map(p=>adjP(p,st.cut).score||0).sort((a,b)=>b-a);const rank=arr.indexOf(M.score)+1;if(M.off)M.off();const keep=M;ME=null;fin();rejoinBtn();report(keep.name,keep.log,keep.score,rank||null)}).catch(()=>{const keep=M;ME=null;fin();rejoinBtn();report(keep.name,keep.log,keep.score,null)});
   }
 }
 

@@ -494,6 +494,7 @@ const HOW = [
       '<h3><span class="scr">Tell them before you start</span><span class="prt">Before you start</span></h3>'+li(g.tell)+
       '<h3><span class="scr">Strategy to share</span><span class="prt">Strategy</span></h3>'+li(g.strat)+
       '<div class="tchr"><h3>Steps</h3><ol>'+g.steps.map(x=>'<li>'+x+'</li>').join("")+'</ol>'+
+      '<p class="sub" style="margin-top:6px"><b>Out of time?</b> Click <b>End game now</b> at any point to skip straight to the final standings.</p>'+
       (g.need.length?'<h3>Before class</h3>'+li(g.need):'')+
       '<div class="tip">'+g.tip+'</div></div>'+
       '<a class="open" href="'+g.href+'">Open '+g.name+' →</a>';

@@ -2829,7 +2829,11 @@ async function hostSetup(){
 }
 function teamsArr(){return H.solo?[]:Object.entries(H.players).map(([id,p])=>({id,...p})).filter(p=>p&&p.name).sort((a,b)=>(a.joined||0)-(b.joined||0))}
 const colorOf=(teams,id)=>COLORS[Math.max(0,teams.findIndex(t=>t.id===id))%COLORS.length];
-function curThrough(st){if(st.phase==="end")return STEPS.length-1;if(st.phase!=="play")return -1;return st.sub==="reveal"?st.i:st.i-1}
+const ENDTH=st=>st&&st.phase==="end"&&st.upto!=null?st.upto:STEPS.length-1;
+/* a deal counts as played once its price was revealed */
+const DEALPLAYED=(d,th)=>STEPS.some(S=>S.k==="price"&&DEALS[S.di]===d&&S.i<=th);
+const EARLY=()=>H&&H.state&&H.state.upto!=null?`<p class="note" style="font-size:18px;margin:0 0 10px">The game ended early. These results cover only the deals and steps that were played.</p>`:"";
+function curThrough(st){if(st.phase==="end")return ENDTH(st);if(st.phase!=="play")return -1;return st.sub==="reveal"?st.i:st.i-1}
 function hostSet(st){H.state=st;if(H.N)H.N.set("games/"+H.code+"/state",st).catch(()=>{});hostRender()}
 function pushState(st){
   const teams=teamsArr(),th=curThrough(st),sc=scores(teams,th);
@@ -2910,8 +2914,8 @@ function hostRender(fromPoll){
 }
 function mandateHTML(teams,S){const m=mandates(teams,S),w=Object.entries(m).sort((a,b)=>a[1].rank-b[1].rank);
   return `<div class="mand"><div class="kick2">Mandate</div>${w.length?w.map(([id,o])=>`<div class="wk"><span>#${o.rank} ${esc((teams.find(t=>t.id===id)||{}).name)} <span class="note">${((ansOf(teams.find(t=>t.id===id),S).t||0)/1000).toFixed(0)}s</span></span><b>+${money(o.pts)}</b></div>`).join(""):`<p class="story" style="font-size:20px">No desk got the price right. No mandate this time.</p>`}</div>`}
-function soloEnd(){app.innerHTML=`<div class="rep"><h2>Deal recap</h2><table class="t big"><thead><tr><th>Client</th><th class="r">Face</th><th class="r">Contract</th><th class="r">Market</th><th>Call</th><th class="r">Price</th><th class="r">Amortization</th><th class="r">Interest expense</th></tr></thead><tbody>
-  ${DEALS.map(d=>`<tr><td><b>${esc(d.co)}</b></td><td class="r">${money(d.par)}</td><td class="r">${d.c}%</td><td class="r">${pct(d.x.m)}</td><td>${d.x.call}</td><td class="r">${money(d.x.price)}</td><td class="r">${d.x.am?money(d.x.am):"None"}</td><td class="r">${money(d.x.exp)}</td></tr>`).join("")}</tbody></table>
+function soloEnd(){const TH=ENDTH(H.state);app.innerHTML=`<div class="rep"><h2>Deal recap</h2>${H.state.upto!=null?`<p class="note" style="font-size:18px;margin:0 0 10px">The game ended early. Only the deals that were priced are shown.</p>`:""}<table class="t big"><thead><tr><th>Client</th><th class="r">Face</th><th class="r">Contract</th><th class="r">Market</th><th>Call</th><th class="r">Price</th><th class="r">Amortization</th><th class="r">Interest expense</th></tr></thead><tbody>
+  ${DEALS.filter(d=>DEALPLAYED(d,TH)).map(d=>`<tr><td><b>${esc(d.co)}</b></td><td class="r">${money(d.par)}</td><td class="r">${d.c}%</td><td class="r">${pct(d.x.m)}</td><td>${d.x.call}</td><td class="r">${money(d.x.price)}</td><td class="r">${d.x.am?money(d.x.am):"None"}</td><td class="r">${money(d.x.exp)}</td></tr>`).join("")}</tbody></table>
   <div class="row" style="justify-content:center;margin-top:16px"><button class="btn main" id="b">Back to start</button></div></div>`;$("#b").onclick=()=>{H=null;hostSetup()};requestAnimationFrame(zoomApp)}
 async function hostErase(){if(!H||!H.N){H=null;stopFireworks();return hostSetup()}try{H.off&&H.off();await H.N.remove("games/"+H.code)}catch(e){}H=null;stopFireworks();hostSetup()}
 
@@ -2997,7 +3001,7 @@ function startFireworks(on){
   FW.raf=requestAnimationFrame(frame);
 }
 function finale(teams){
-  const sc=scores(teams,STEPS.length-1),val={};teams.forEach(p=>val[p.id]=sc[p.id].total);
+  const sc=scores(teams,ENDTH(H.state)),val={};teams.forEach(p=>val[p.id]=sc[p.id].total);
   const order=[...teams].sort((a,b)=>val[b.id]-val[a.id]),rk=ranks(val),top=order.slice(0,5);
   const slot=(p,i,cls)=>p?`<div class="pod ${cls}" data-i="${i}"><div class="who"><div class="medal">${rk[p.id]}</div><div class="nm">${esc(p.name)}</div><div class="pts">${money(val[p.id])}</div></div><div class="block"><span>${["1st","2nd","3rd"][i]}</span></div></div>`:`<div class="pod ${cls} empty"></div>`;
   const rows=top.slice(3).map((p,k)=>`<div class="row45" data-i="${k+3}"><span class="r">${rk[p.id]}</span><span class="n">${esc(p.name)}</span><span class="s">${money(val[p.id])}</span></div>`).join("");
@@ -3013,22 +3017,22 @@ function finale(teams){
 }
 
 function classResults(teams){
-  document.body.classList.remove("finale-on");const n=Math.max(1,teams.length);
+  document.body.classList.remove("finale-on");const n=Math.max(1,teams.length),TH=ENDTH(H.state),PL=STEPS.filter(S=>S.i<=TH);
   const rate=(S,f)=>Math.round(teams.filter(p=>{const g=grade(p,S);return f?g.res.find(r=>r.f.k===f).ok:g.ok}).length/n*100);
   const skills=[];const add=(name,tip,list)=>{if(list.length)skills.push({name,tip,p:Math.round(list.reduce((t,v)=>t+v,0)/list.length)})};
-  const P=STEPS.filter(S=>S.k==="price");
+  const P=PL.filter(S=>S.k==="price");
   add("Par, discount or premium","Compare the contract rate to the market rate. Contract below market: discount. Above: premium.",P.map(S=>rate(S,"call")));
   add("Finding n and i","n = years × 2. i = market rate ÷ 2. Never the contract rate, never the annual rate.",P.map(S=>Math.round((rate(S,"n")+rate(S,"i"))/2)));
   add("Cash interest","Face value × contract rate × 6/12. The contract rate sets the cash, every time.",P.map(S=>rate(S,"cash")));
   add("Bond price","PV of face value (PV of $1 factor) plus PV of the interest payments (annuity factor), both at the market rate.",P.map(S=>rate(S,"price")));
-  add("Issuance entries","Bonds Payable at face value. Discount is a debit, premium is a credit.",STEPS.filter(S=>S.k==="issue").map(S=>rate(S)));
-  add("Amortization and interest expense","Discount or premium ÷ periods. Discount adds to expense, premium lowers it.",STEPS.filter(S=>S.k==="interest"||S.k==="intEntry").map(S=>rate(S)));
-  add("Carrying value and the balance sheet","Face value minus the discount left, or plus the premium left. It moves toward face value.",STEPS.filter(S=>S.k==="carry"||S.k==="bs").map(S=>rate(S)));
+  add("Issuance entries","Bonds Payable at face value. Discount is a debit, premium is a credit.",PL.filter(S=>S.k==="issue").map(S=>rate(S)));
+  add("Amortization and interest expense","Discount or premium ÷ periods. Discount adds to expense, premium lowers it.",PL.filter(S=>S.k==="interest"||S.k==="intEntry").map(S=>rate(S)));
+  add("Carrying value and the balance sheet","Face value minus the discount left, or plus the premium left. It moves toward face value.",PL.filter(S=>S.k==="carry"||S.k==="bs").map(S=>rate(S)));
   const weak=[...skills].sort((a,b)=>a.p-b.p).slice(0,2).filter(s=>s.p<85);
-  app.innerHTML=`<div class="rep"><h2>Class results</h2>
+  app.innerHTML=`<div class="rep"><h2>Class results</h2>${EARLY()}
     <div style="display:grid;grid-template-columns:1.2fr 1fr;gap:28px">
     <div><h3 style="font-family:var(--display);font-size:26px;margin:6px 0">By skill</h3>${skills.map(s=>`<div class="cr" style="grid-template-columns:minmax(0,1.4fr) 1fr auto"><span><b>${esc(s.name)}</b></span><div class="b"><i style="width:${Math.max(3,s.p)}%"></i></div><span>${s.p}%</span></div>`).join("")}
-      <h3 style="font-family:var(--display);font-size:26px;margin:14px 0 6px">By deal</h3>${DEALS.map(d=>{const ps=STEPS.find(S=>S.k==="price"&&S.di===d.i0);return `<div class="leak okk"><b>${esc(d.co)}: ${rate(ps,"price")}% priced it right</b>${d.x.call} · ${money(d.x.price)}</div>`}).join("")}</div>
+      <h3 style="font-family:var(--display);font-size:26px;margin:14px 0 6px">By deal</h3>${DEALS.filter(d=>DEALPLAYED(d,TH)).map(d=>{const ps=PL.find(S=>S.k==="price"&&S.di===d.i0);return `<div class="leak okk"><b>${esc(d.co)}: ${rate(ps,"price")}% priced it right</b>${d.x.call} · ${money(d.x.price)}</div>`}).join("")}</div>
     <div><h3 style="font-family:var(--display);font-size:26px;margin:6px 0">Reteach first</h3>${weak.length?weak.map(s=>`<div class="leak"><b>${esc(s.name)}: ${s.p}%</b>${esc(s.tip)}</div>`).join(""):`<div class="leak okk"><b>Nothing below 85%.</b>Strong work across the board.</div>`}</div></div>
     <div class="row" style="justify-content:center;margin-top:16px"><button class="btn main" id="pod">Back to standings</button> <button class="btn" id="erase">Erase game</button></div></div>`;
   $("#pod").onclick=()=>finale(teams);$("#erase").onclick=hostErase;requestAnimationFrame(zoomApp);
@@ -3138,11 +3142,11 @@ function teamMC(S,st,head){
   ok?beep(990,.15):beep(220,.3);
 }
 function teamReport(st){
-  const M=ME,p=meP(),n=st.sc?Object.keys(st.sc).length:0,tot=st.sc?st.sc[M.pid]:0;
-  const miss=[];STEPS.forEach(S=>{const g=grade(p,S);if(S.mc){if(!g.ok)miss.push(`${DEALS[S.di].co}: ${STEPNAME[S.k].toLowerCase()}`)}else g.res.filter(r=>!r.ok).forEach(r=>miss.push(`${DEALS[S.di].co}: ${r.f.short.toLowerCase()} (${ansTxt(r.f)})`))});
+  const TH=st.upto!=null?st.upto:STEPS.length-1,M=ME,p=meP(),n=st.sc?Object.keys(st.sc).length:0,tot=st.sc?st.sc[M.pid]:0;
+  const miss=[];STEPS.filter(S=>S.i<=TH).forEach(S=>{const g=grade(p,S);if(S.mc){if(!g.ok)miss.push(`${DEALS[S.di].co}: ${STEPNAME[S.k].toLowerCase()}`)}else g.res.filter(r=>!r.ok).forEach(r=>miss.push(`${DEALS[S.di].co}: ${r.f.short.toLowerCase()} (${ansTxt(r.f)})`))});
   app.innerHTML=`<div class="rep"><h2>${esc(M.name)}: ${money(tot)}</h2><p style="font-size:22px;margin:0">${st.rank?ord(st.rank[M.pid])+" of "+n:""}</p>
     <div class="box" style="max-width:none"><table class="t"><thead><tr><th>Deal</th><th>Call</th><th class="r">Price</th><th class="r">Your price</th></tr></thead><tbody>
-    ${DEALS.map(d=>{const S=STEPS.find(s=>s.k==="price"&&s.di===d.i0),g=grade(p,S);return `<tr><td><b>${esc(d.co)}</b></td><td>${d.x.call}</td><td class="r">${money(d.x.price)}</td><td class="r">${g.priceOK?`<span class="tag">✓</span>`:valTxt(S.fields[4],g.res[4].v)}</td></tr>`}).join("")}</tbody></table></div>
+    ${DEALS.filter(d=>DEALPLAYED(d,TH)).map(d=>{const S=STEPS.find(s=>s.k==="price"&&s.di===d.i0),g=grade(p,S);return `<tr><td><b>${esc(d.co)}</b></td><td>${d.x.call}</td><td class="r">${money(d.x.price)}</td><td class="r">${g.priceOK?`<span class="tag">✓</span>`:valTxt(S.fields[4],g.res[4].v)}</td></tr>`}).join("")}</tbody></table></div>
     ${miss.length?`<div class="leak"><b>Go back over</b>${miss.map(esc).join(". ")}.</div>`:`<div class="leak okk"><b>Every answer right.</b>Underwriter of the year.</div>`}
     <div class="leak okk"><b>Remember</b>Contract rate sets the cash. Market rate sets the price. n = years × 2, i = market rate ÷ 2.</div></div>`;
   try{localStorage.removeItem(SKEY)}catch(e){}
@@ -3156,6 +3160,36 @@ function hostZoom(dz){TZ=Math.min(1.8,Math.max(.6,Math.round((TZ+dz)*10)/10));tr
 if(ROLE==="teacher")$("#zm").hidden=false;
 ROLE==="teacher"?hostSetup():joinForm();
 
+</script>
+
+<script>
+/* ---------- End game now (teacher only): skip the remaining rounds and go to the final standings ---------- */
+(function(){
+  if(typeof ROLE==="undefined"||ROLE!=="teacher")return;
+  const css=document.createElement("style");
+  css.textContent=`.egn{margin-left:12px;background:transparent;color:#C1102F;border:2px solid #C1102F;border-radius:8px;font:600 15px Oswald,"Arial Narrow",sans-serif;letter-spacing:.02em;padding:4px 12px;cursor:pointer;text-transform:none;line-height:1.2}
+.egn:hover{background:#C1102F;color:#fff}.egn[hidden]{display:none!important}
+.egm{position:fixed;inset:0;background:rgba(0,0,0,.6);display:grid;place-items:center;z-index:99999}.egm[hidden]{display:none!important}
+.egm .bx{background:#fff;color:#111;border-radius:12px;padding:28px 32px;max-width:600px;margin:20px;box-shadow:0 20px 60px rgba(0,0,0,.45);font:21px/1.4 Barlow,system-ui,sans-serif}
+.egm h3{font:700 30px Oswald,"Arial Narrow",sans-serif;margin:0 0 10px}.egm p{margin:0}
+.egm .rw{display:flex;gap:12px;justify-content:flex-end;margin-top:22px}
+.egm button{font:600 19px Oswald,"Arial Narrow",sans-serif;padding:10px 22px;border-radius:8px;cursor:pointer;border:2px solid #111;background:#fff;color:#111}
+.egm .go{background:#C1102F;border-color:#C1102F;color:#fff}`;
+  document.head.appendChild(css);
+  const btn=document.createElement("button");btn.className="egn";btn.id="egn";btn.type="button";btn.hidden=true;btn.textContent="End game now";
+  const top=document.querySelector(".top");if(top)top.appendChild(btn);else{btn.style.cssText="position:fixed;top:10px;right:14px;z-index:9000;background:#fff";document.body.appendChild(btn)}
+  const m=document.createElement("div");m.className="egm";m.hidden=true;
+  m.innerHTML=`<div class="bx" role="dialog" aria-modal="true" aria-labelledby="egnT"><h3 id="egnT">End game now?</h3><p>End the game now and go to the final standings? Remaining rounds will be skipped.</p><div class="rw"><button type="button" id="egnNo">Cancel</button><button type="button" class="go" id="egnYes">End game</button></div></div>`;
+  document.body.appendChild(m);
+  const inProgress=()=>{try{return !!(H&&H.state&&H.state.phase==="play"&&!document.body.classList.contains("finale-on"))}catch(e){return false}};
+  const close=()=>{m.hidden=true};
+  btn.onclick=()=>{if(!inProgress())return;m.hidden=false;document.getElementById("egnYes").focus()};
+  document.getElementById("egnNo").onclick=close;
+  m.addEventListener("click",e=>{if(e.target===m)close()});
+  addEventListener("keydown",e=>{if(!m.hidden&&e.key==="Escape"){e.stopPropagation();close()}},true);
+  document.getElementById("egnYes").onclick=()=>{close();if(!inProgress())return;try{TIMER_END=0;pushState({phase:"end",upto:curThrough(H.state)})}catch(e){console.error(e)}btn.hidden=true};
+  setInterval(()=>{const on=inProgress();if(btn.hidden===on)btn.hidden=!on;if(!on&&!m.hidden)close()},400);
+})();
 </script>
 </body>
 </html>

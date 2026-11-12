@@ -75,10 +75,11 @@
 <body>
 <header>
   <div><div class="kicker">District 214 | Accounting | Chapter 10: Bonds</div><h1>The Bond Desk</h1></div>
-  <div style="display:flex;gap:12px;align-items:center"><span id="offlineTag">Offline mode</span><button id="menuBtn" title="Resume, start a new game, or play without iPads">☰ Menu</button><span class="kicker" style="color:#CFCFCF">Mr. Murphy | John Hersey High School</span></div>
+  <div style="display:flex;gap:12px;align-items:center"><span id="offlineTag">Offline mode</span><button id="endNow" type="button" style="display:none;background:transparent;border:2px solid #FF8A99;color:#FF8A99;border-radius:8px;padding:5px 12px;font-size:14px">End game now</button><button id="menuBtn" title="Resume, start a new game, or play without iPads">☰ Menu</button><span class="kicker" style="color:#CFCFCF">Mr. Murphy | John Hersey High School</span></div>
 </header>
 <main id="view"></main>
 <div class="modal" id="enterModal"><div class="mbox" id="enterBox"></div></div>
+<div class="modal" id="endModal"><div class="mbox" role="dialog" aria-modal="true" style="max-width:600px"><h2 style="margin:0 0 10px;color:var(--brown)">End game now?</h2><p style="font-size:20px;margin:0">End the game now and go to the final standings? Remaining rounds will be skipped.</p><div class="actions"><button class="btn ghost" id="endNo">Cancel</button><button class="btn" id="endYes">End game</button></div></div></div>
 <div class="drum" id="drum"><div class="k" id="drumK"></div><div class="big" id="drumBig"></div></div>
 <script type="module" src="/chapter-10/host.js"></script>
 </body>

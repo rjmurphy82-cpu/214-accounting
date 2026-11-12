@@ -164,6 +164,19 @@ body.playing .btn.main{font-size:calc(22px * var(--k,1))}
 body.playing .hint{font-size:calc(13px * var(--k,1));margin-top:calc(6px * var(--k,1))}
 body.playing .solo{font-size:calc(24px * var(--k,1));margin:calc(8px * var(--k,1)) 0}
 </style>
+<style id="egCss">
+#egBtn{position:fixed;right:14px;bottom:14px;z-index:900;font:600 15px Oswald,"Arial Narrow",Arial,sans-serif;letter-spacing:.04em;text-transform:uppercase;background:#fff;color:#B00E2A;border:2px solid #C1102F;border-radius:8px;padding:8px 14px;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.18)}
+#egBtn:hover,#egBtn:focus-visible{background:#C1102F;color:#fff}
+#egBtn[hidden],#egOv[hidden]{display:none!important}
+#egOv{position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,.6);display:grid;place-items:center}
+#egOv .egb{background:#fff;color:#111;border-radius:12px;padding:26px 28px 22px;max-width:620px;width:calc(100% - 40px);box-shadow:0 18px 50px rgba(0,0,0,.35);border-top:6px solid #C1102F}
+#egOv h2{font:700 30px Oswald,"Arial Narrow",Arial,sans-serif;text-transform:uppercase;margin:0 0 10px;color:#111}
+#egOv p{font:500 21px/1.4 Barlow,Arial,sans-serif;margin:0 0 22px;color:#111}
+#egOv .egr{display:flex;gap:12px;justify-content:flex-end;flex-wrap:wrap}
+#egOv .egr button{font:600 19px Oswald,"Arial Narrow",Arial,sans-serif;text-transform:uppercase;letter-spacing:.03em;border-radius:8px;padding:10px 22px;cursor:pointer}
+#egNo{background:#fff;border:2px solid #111;color:#111}
+#egYes{background:#C1102F;border:2px solid #C1102F;color:#fff}
+</style>
 </head>
 <body>
 <div class="wrap">
@@ -617,6 +630,27 @@ document.addEventListener("keydown",e=>{
     if(e.key==="+"||e.key==="=")step(1);else if(e.key==="-"||e.key==="_")step(-1);else if(e.key==="0")step(0);
   });
   apply();
+})();
+</script>
+<button id="egBtn" type="button" hidden title="Skip the rest of the game and go to the final standings">End game now</button>
+<div id="egOv" hidden role="dialog" aria-modal="true" aria-labelledby="egT"><div class="egb"><h2 id="egT">End the game?</h2><p>End the game now and go to the final standings? Remaining questions will be skipped.</p><div class="egr"><button id="egNo" type="button">Cancel</button><button id="egYes" type="button">End game</button></div></div></div>
+<script>
+var EG={
+  active:function(){return !document.getElementById("play").hidden&&S&&S.mode==="teams"&&S.phase!=="end"},
+  end:function(){S.phase="end";try{lockOpts(true)}catch(e){}endTeams()}
+};
+(function(){
+  var b=document.getElementById("egBtn"),ov=document.getElementById("egOv"),yes=document.getElementById("egYes"),no=document.getElementById("egNo");
+  function upd(){var on=false;try{on=EG.active()}catch(e){}b.hidden=!on||!ov.hidden}
+  setInterval(upd,250);upd();
+  b.addEventListener("click",function(){if(!EG.active())return;ov.hidden=false;b.hidden=true;no.focus()});
+  function close(){ov.hidden=true;upd()}
+  no.addEventListener("click",close);
+  ov.addEventListener("click",function(e){if(e.target===ov)close()});
+  yes.addEventListener("click",function(){ov.hidden=true;if(EG.active())EG.end();upd()});
+  window.addEventListener("keydown",function(e){if(ov.hidden)return;e.stopImmediatePropagation();
+    if(e.key==="Escape"){e.preventDefault();close()}
+    else if((e.key===" "||e.key==="Enter")&&!(e.target&&e.target.tagName==="BUTTON"))e.preventDefault();},true);
 })();
 </script>
 </body>

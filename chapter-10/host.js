@@ -38,7 +38,7 @@ function gameSummary() {
   return `${where} · ${S.groups.length} ${S.groups.length === 1 ? "player" : "players"}`;
 }
 function renderMenu(msg = "") {
-  ui.menu = true; $("#menuBtn").style.display = "none";
+  ui.menu = true; $("#menuBtn").style.display = "none"; showEndBtn();
   const live = !!(sess && S);
   $("#view").innerHTML = `<div class="hero">
     ${live ? `<div class="card dark" style="grid-column:1/-1"><div class="label">Game in progress</div>
@@ -96,6 +96,7 @@ async function op(name, extra = {}) {
 function render() {
   if (ui.menu) return;
   $("#menuBtn").style.display = sess ? "inline-block" : "none";
+  showEndBtn();
   const key = S.phase + ":" + S.r;
   if (key !== ui.lastKey) { ui.lastKey = key; ui.tab = "what"; if (S.phase === "open") resetClock(); }
   if (S.phase === "lobby") renderLobby();
@@ -259,12 +260,12 @@ const LESSONS = [
   "Year 9: Buy the comeback when the news removes the risk. A one-product company is a coin flip.",
   "Year 10: Companies repeat their habits. Match the bond's length to where rates are headed."];
 function renderFinal() {
-  const last = G.NROUNDS - 1, rows = standings(last), bench = G.runFund([], last), top = rows.slice(0, 3);
+  const last = S.upto != null ? S.upto : G.NROUNDS - 1, early = S.upto != null, rows = standings(last), bench = G.runFund([], last), top = rows.slice(0, 3);
   const pod = i => top[i] ? `<div class="pod ${i === 0 ? "first" : ""}"><div class="p">${["1st", "2nd", "3rd"][i]}</div><div class="n">${esc(top[i].g.name)}</div><div class="v">${G.money(top[i].f.value)}</div></div>` : "<div></div>";
-  $("#view").innerHTML = `<div class="topbar"><div class="yr"><div class="sub">${G.NROUNDS} years on the desk</div><h2>Final results</h2></div></div>
+  $("#view").innerHTML = `<div class="topbar"><div class="yr"><div class="sub">${early ? `Game ended early: ${last + 1} of ${G.NROUNDS} years played` : `${G.NROUNDS} years on the desk`}</div><h2>Final results</h2></div></div>
     <div class="podium">${pod(1)}${pod(0)}${pod(2)}</div>
     <div class="grid" style="grid-template-columns:minmax(0,2fr) minmax(0,1fr);align-items:start">
-      <div class="card"><table class="standings"><tr><th>Place</th><th>Desk</th>${G.ROUNDS.map(r => `<th class="r" style="padding:7px 4px">Y${r.year}</th>`).join("")}<th class="r">Final value</th></tr>
+      <div class="card"><table class="standings"><tr><th>Place</th><th>Desk</th>${G.ROUNDS.slice(0, last + 1).map(r => `<th class="r" style="padding:7px 4px">Y${r.year}</th>`).join("")}<th class="r">Final value</th></tr>
         ${rows.map(x => `<tr class="${x.place === 1 ? "top" : ""}"><td class="pl">${x.place}</td><td class="nm">${esc(x.g.name)}</td>${x.f.years.map(y => `<td class="r ${y.gain < 0 ? "neg" : ""}" style="font-size:14px;padding:6px 4px">${kk(y.gain)}</td>`).join("")}<td class="r val">${G.money(x.f.value)}</td></tr>`).join("")}
         <tr class="bench"><td></td><td>Play-It-Safe Fund</td>${bench.years.map(y => `<td class="r" style="font-size:14px;padding:6px 4px">${kk(y.gain)}</td>`).join("")}<td class="r val">${G.money(bench.value)}</td></tr></table>
         <div class="small" style="margin-top:8px">${rows.filter(x => x.f.value > bench.value).length} of ${rows.length} desks beat the Play-It-Safe Fund.</div>
@@ -273,12 +274,19 @@ function renderFinal() {
         ${rows.map(x => { const t = k2 => x.f.years.reduce((a, y) => a + y[k2], 0); const int = t("interest") + t("cashGain"), pr = t("priceGain"), fn = t("fine");
           return `<tr><td class="nm" style="font-size:18px">${esc(x.g.name)}</td><td class="r">${G.signed(int)}</td><td class="r ${pr < 0 ? "neg" : ""}">${pr ? G.signed(pr) : "$0"}</td><td class="r ${fn ? "neg" : ""}" style="white-space:nowrap">${fn ? "−" + G.money(fn) : "–"}</td><td class="r val">${G.signed(x.f.value - G.START_FUND)}</td></tr>`; }).join("")}</table>
         <div class="small" style="margin-top:6px">Interest is the steady part of a bond. Prices on the secondary market are where fortunes are made and lost.</div></div>
-      <div class="card dark"><div class="label">Lessons from the desk</div><ul class="lessons" style="font-size:15px">${LESSONS.map(l => `<li>${esc(l)}</li>`).join("")}</ul></div></div>
+      <div class="card dark"><div class="label">Lessons from the desk</div><ul class="lessons" style="font-size:15px">${LESSONS.slice(0, Math.max(1, last + 1)).map(l => `<li>${esc(l)}</li>`).join("")}</ul></div></div>
     <div class="actions"><button class="btn ghost" id="again">Menu</button></div>`;
   $("#again").onclick = () => renderMenu();
 }
 
 $("#menuBtn").onclick = () => renderMenu();
+
+/* ---------- End game now: skip the remaining years and go to the final results ---------- */
+function showEndBtn() { const b = $("#endNow"); if (b) b.style.display = S && sess && !ui.menu && (S.phase === "open" || S.phase === "reveal") ? "inline-block" : "none"; }
+$("#endNow").onclick = () => { if (S && (S.phase === "open" || S.phase === "reveal")) $("#endModal").classList.add("on"); };
+$("#endNo").onclick = () => $("#endModal").classList.remove("on");
+$("#endModal").onclick = e => { if (e.target.id === "endModal") $("#endModal").classList.remove("on"); };
+$("#endYes").onclick = async () => { $("#endModal").classList.remove("on"); clearInterval(tRun); tRun = null; $("#endNow").style.display = "none"; await op("finish"); };
 
 window.__bd = { get S() { return S; }, get sess() { return sess; } };
 boot();

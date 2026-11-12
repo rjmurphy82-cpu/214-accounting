@@ -486,7 +486,10 @@ async function hostSetup(){
 }
 function teamsArr(){return Object.entries(H.players).map(([id,p])=>({id,...p})).filter(p=>p&&p.name).sort((a,b)=>(a.joined||0)-(b.joined||0))}
 const colorOf=(teams,id)=>COLORS[Math.max(0,teams.findIndex(t=>t.id===id))%COLORS.length];
-function curThrough(st){if(st.phase==="end")return STEPS.length-1;if(st.phase!=="play")return -1;return st.sub==="reveal"?st.i:st.i-1}
+const ENDTH=st=>st&&st.phase==="end"&&st.upto!=null?st.upto:STEPS.length-1;
+const PLAYED=f=>STEPS.some((S,j)=>j<=ENDTH(H&&H.state)&&f(S));
+const EARLY=()=>H&&H.state&&H.state.upto!=null?`<p class="note" style="font-size:18px;margin:0 0 10px">The game ended early. These results cover only the rounds that were played.</p>`:"";
+function curThrough(st){if(st.phase==="end")return ENDTH(st);if(st.phase!=="play")return -1;return st.sub==="reveal"?st.i:st.i-1}
 function hostSet(st){H.state=st;H.N.set("games/"+H.code+"/state",st).catch(()=>{});hostRender()}
 function pushState(st){
   const teams=teamsArr(),th=curThrough(st),sc=scores(teams,th);
@@ -620,10 +623,11 @@ function startFireworks(on){
   FW.raf=requestAnimationFrame(frame);
 }
 function finale(teams){
-  const sc=scores(teams,STEPS.length-1),val={};teams.forEach(p=>val[p.id]=sc[p.id].total);
+  const th=ENDTH(H.state),rc=inRace(th),sc=scores(teams,th),val={};teams.forEach(p=>val[p.id]=rc?sc[p.id].race:sc[p.id].total);
+  const fv=v=>rc?v+" pts":money(v);
   const order=[...teams].sort((a,b)=>val[b.id]-val[a.id]),rk=ranks(val),top=order.slice(0,5);
-  const slot=(p,i,cls)=>p?`<div class="pod ${cls}" data-i="${i}"><div class="who"><div class="medal">${rk[p.id]}</div><div class="nm">${esc(p.name)}</div><div class="pts">${money(val[p.id])}</div></div><div class="block"><span>${["1st","2nd","3rd"][i]}</span></div></div>`:`<div class="pod ${cls} empty"></div>`;
-  const rows=top.slice(3).map((p,k)=>`<div class="row45" data-i="${k+3}"><span class="r">${rk[p.id]}</span><span class="n">${esc(p.name)}</span><span class="s">${money(val[p.id])}</span></div>`).join("");
+  const slot=(p,i,cls)=>p?`<div class="pod ${cls}" data-i="${i}"><div class="who"><div class="medal">${rk[p.id]}</div><div class="nm">${esc(p.name)}</div><div class="pts">${fv(val[p.id])}</div></div><div class="block"><span>${["1st","2nd","3rd"][i]}</span></div></div>`:`<div class="pod ${cls} empty"></div>`;
+  const rows=top.slice(3).map((p,k)=>`<div class="row45" data-i="${k+3}"><span class="r">${rk[p.id]}</span><span class="n">${esc(p.name)}</span><span class="s">${fv(val[p.id])}</span></div>`).join("");
   document.body.classList.add("finale-on");app.style.zoom="";
   app.innerHTML=`<div class="finale"><canvas id="fw"></canvas><div class="rays"></div>
     <div class="fhead"><img class="lg" src="/logo-214.png" alt="District 214"><div class="kick">The Note Desk · Final score</div><h2>Final standings</h2></div>
@@ -639,17 +643,17 @@ function classResults(teams){
   const pct=f=>Math.round(teams.filter(f).length/n*100)+"%";
   const row=(x,b)=>{const g=teams.map(p=>graded(p,b).find(y=>y.x===x)),acc=g.filter(y=>y.acc).length,ok=g.filter(y=>y.ok).length;
     return `<div class="cr"><span><b>${esc(x.name)}</b> <span class="note">${money(x.p)} · ${x.r}% · ${x.n} days</span></span><span><span class="tag ${!byJune30(x)?"y":x.out==="dis"?"r":""}">${!byJune30(x)?"Due after June 30":x.out==="dis"?"Dishonored":"Paid "+money(intOf(x))}</span></span><span>${acc} accepted</span><span>${acc?ok+" with right math":"–"}</span></div>`};
-  app.innerHTML=`<div class="rep"><h2>Class results</h2>
+  app.innerHTML=`<div class="rep"><h2>Class results</h2>${EARLY()}
     <div style="display:grid;grid-template-columns:1.4fr 1fr;gap:28px">
-    <div><h3 style="font-family:var(--display);font-size:26px;margin:6px 0">Every note</h3>${NOTES[1].map(x=>row(x,1)).join("")}${NOTES[2].map(x=>row(x,2)).join("")}</div>
-    <div><h3 style="font-family:var(--display);font-size:26px;margin:6px 0">Calendar Race</h3>${RACE.map((q,qi)=>`<div class="leak okk"><b>${q.n} days from ${dshort(q)}: ${pct(p=>raceOK(p,qi))} correct</b>Due ${dtxt(addDays(q.m,q.d,q.n))}</div>`).join("")}
+    <div><h3 style="font-family:var(--display);font-size:26px;margin:6px 0">Every note</h3>${PLAYED(S=>S.k==="offers"&&S.b===1)?NOTES[1].map(x=>row(x,1)).join(""):""}${PLAYED(S=>S.k==="offers"&&S.b===2)?NOTES[2].map(x=>row(x,2)).join(""):""}</div>
+    <div><h3 style="font-family:var(--display);font-size:26px;margin:6px 0">Calendar Race</h3>${RACE.map((q,qi)=>!PLAYED(S=>S.k==="race"&&S.qi===qi)?"":`<div class="leak okk"><b>${q.n} days from ${dshort(q)}: ${pct(p=>raceOK(p,qi))} correct</b>Due ${dtxt(addDays(q.m,q.d,q.n))}</div>`).join("")}
       <h3 style="font-family:var(--display);font-size:26px;margin:14px 0 6px">Entry checks</h3>
-      <div class="leak okk"><b>Accept a note: ${pct(p=>p.chk_acc===0)}</b>Dr Notes Receivable, Cr Sales.</div>
-      <div class="leak okk"><b>Collect a note: ${pct(p=>p.chk_col===0)}</b>Dr Cash, Cr Interest Revenue, Cr Notes Receivable.</div>
-      <div class="leak okk"><b>Collect a note (Lakeshore): ${pct(p=>p.chk_col1===0)}</b>Dr Cash 9,120.</div>
-      <div class="leak okk"><b>Note replaces A/R: ${pct(p=>p.chk_conv===0)}</b>Dr Notes Receivable, Cr Accounts Receivable.</div>
-      <div class="leak okk"><b>Dishonored note: ${pct(p=>p.chk_dis===0)}</b>Dr Accounts Receivable for principal plus interest.</div>
-      <div class="leak okk"><b>Paying after a dishonor: ${pct(p=>p.chk_later===0)}</b>Dr Cash, Cr Accounts Receivable.</div></div></div>
+      ${PLAYED(S=>S.k==="check"&&S.id==="acc")?`<div class="leak okk"><b>Accept a note: ${pct(p=>p.chk_acc===0)}</b>Dr Notes Receivable, Cr Sales.</div>`:""}
+      ${PLAYED(S=>S.k==="check"&&S.id==="col")?`<div class="leak okk"><b>Collect a note: ${pct(p=>p.chk_col===0)}</b>Dr Cash, Cr Interest Revenue, Cr Notes Receivable.</div>`:""}
+      ${PLAYED(S=>S.k==="check"&&S.id==="col1")?`<div class="leak okk"><b>Collect a note (Lakeshore): ${pct(p=>p.chk_col1===0)}</b>Dr Cash 9,120.</div>`:""}
+      ${PLAYED(S=>S.k==="check"&&S.id==="conv")?`<div class="leak okk"><b>Note replaces A/R: ${pct(p=>p.chk_conv===0)}</b>Dr Notes Receivable, Cr Accounts Receivable.</div>`:""}
+      ${PLAYED(S=>S.k==="check"&&S.id==="dis")?`<div class="leak okk"><b>Dishonored note: ${pct(p=>p.chk_dis===0)}</b>Dr Accounts Receivable for principal plus interest.</div>`:""}
+      ${PLAYED(S=>S.k==="check"&&S.id==="later")?`<div class="leak okk"><b>Paying after a dishonor: ${pct(p=>p.chk_later===0)}</b>Dr Cash, Cr Accounts Receivable.</div>`:""}</div></div>
     <div class="row" style="justify-content:center;margin-top:16px"><button class="btn main" id="pod">Back to standings</button> <button class="btn" id="erase">Erase game</button></div></div>`;
   $("#pod").onclick=()=>finale(teams);$("#erase").onclick=hostErase;requestAnimationFrame(zoomApp);
 }
@@ -782,7 +786,7 @@ function teamPayday(S,st,head){
     <div class="box">${mine.map(line).join("")||"<p style='margin:0'>No notes, no interest.</p>"}</div>${myLine(st)}`;
 }
 function teamReport(st){
-  const M=ME,p=meP(),sc=scores([p],STEPS.length-1)[M.pid],n=st.sc?Object.keys(st.sc).length:0,tot=st.sc?st.sc[M.pid]:sc.total;
+  const M=ME,p=meP(),sc=scores([p],ENDTH(st))[M.pid],n=st.sc?Object.keys(st.sc).length:0,tot=st.sc?st.sc[M.pid]:sc.total;
   app.innerHTML=`<div class="rep"><h2>${esc(M.name)}: ${money(tot)}</h2><p style="font-size:22px;margin:0">${st.rank?ord(st.rank[M.pid])+" of "+n:""}</p>
     <div class="box" style="max-width:none"><table class="t"><tbody>
       <tr><td>Calendar Race head start</td><td class="r">+${plain(tot-sc.chk-sc.int+sc.fees)}</td></tr>
@@ -802,6 +806,36 @@ $("#rejoin").onclick=rejoin;
 $("#zo").onclick=()=>teamZoom(-.1);$("#zi").onclick=()=>teamZoom(.1);
 ROLE==="teacher"?hostSetup():joinForm();
 
+</script>
+
+<script>
+/* ---------- End game now (teacher only): skip the remaining rounds and go to the final standings ---------- */
+(function(){
+  if(typeof ROLE==="undefined"||ROLE!=="teacher")return;
+  const css=document.createElement("style");
+  css.textContent=`.egn{margin-left:12px;background:transparent;color:#C1102F;border:2px solid #C1102F;border-radius:8px;font:600 15px Oswald,"Arial Narrow",sans-serif;letter-spacing:.02em;padding:4px 12px;cursor:pointer;text-transform:none;line-height:1.2}
+.egn:hover{background:#C1102F;color:#fff}.egn[hidden]{display:none!important}
+.egm{position:fixed;inset:0;background:rgba(0,0,0,.6);display:grid;place-items:center;z-index:99999}.egm[hidden]{display:none!important}
+.egm .bx{background:#fff;color:#111;border-radius:12px;padding:28px 32px;max-width:600px;margin:20px;box-shadow:0 20px 60px rgba(0,0,0,.45);font:21px/1.4 Barlow,system-ui,sans-serif}
+.egm h3{font:700 30px Oswald,"Arial Narrow",sans-serif;margin:0 0 10px}.egm p{margin:0}
+.egm .rw{display:flex;gap:12px;justify-content:flex-end;margin-top:22px}
+.egm button{font:600 19px Oswald,"Arial Narrow",sans-serif;padding:10px 22px;border-radius:8px;cursor:pointer;border:2px solid #111;background:#fff;color:#111}
+.egm .go{background:#C1102F;border-color:#C1102F;color:#fff}`;
+  document.head.appendChild(css);
+  const btn=document.createElement("button");btn.className="egn";btn.id="egn";btn.type="button";btn.hidden=true;btn.textContent="End game now";
+  const top=document.querySelector(".top");if(top)top.appendChild(btn);else{btn.style.cssText="position:fixed;top:10px;right:14px;z-index:9000;background:#fff";document.body.appendChild(btn)}
+  const m=document.createElement("div");m.className="egm";m.hidden=true;
+  m.innerHTML=`<div class="bx" role="dialog" aria-modal="true" aria-labelledby="egnT"><h3 id="egnT">End game now?</h3><p>End the game now and go to the final standings? Remaining rounds will be skipped.</p><div class="rw"><button type="button" id="egnNo">Cancel</button><button type="button" class="go" id="egnYes">End game</button></div></div>`;
+  document.body.appendChild(m);
+  const inProgress=()=>{try{return !!(H&&H.state&&H.state.phase==="play"&&!document.body.classList.contains("finale-on"))}catch(e){return false}};
+  const close=()=>{m.hidden=true};
+  btn.onclick=()=>{if(!inProgress())return;m.hidden=false;document.getElementById("egnYes").focus()};
+  document.getElementById("egnNo").onclick=close;
+  m.addEventListener("click",e=>{if(e.target===m)close()});
+  addEventListener("keydown",e=>{if(!m.hidden&&e.key==="Escape"){e.stopPropagation();close()}},true);
+  document.getElementById("egnYes").onclick=()=>{close();if(!inProgress())return;try{TIMER_END=0;const st=H.state;pushState({phase:"end",upto:curThrough(st)})}catch(e){console.error(e)}btn.hidden=true};
+  setInterval(()=>{const on=inProgress();if(btn.hidden===on)btn.hidden=!on;if(!on&&!m.hidden)close()},400);
+})();
 </script>
 </body>
 </html>

@@ -2651,7 +2651,9 @@ async function hostSetup(){
 function teamsArr(){return Object.entries(H.players).map(([id,p])=>({id,...p})).filter(p=>p&&p.name).sort((a,b)=>(a.joined||0)-(b.joined||0))}
 const colorOf=(teams,id)=>COLORS[Math.max(0,teams.findIndex(t=>t.id===id))%COLORS.length];
 function hostSet(st){H.state=st;H.N.set("games/"+H.code+"/state",st).catch(()=>{});hostRender()}
-function curThrough(st){if(st.phase==="end")return STEPS.length-1;if(st.phase!=="play")return -1;
+const ENDTH=st=>st&&st.phase==="end"&&st.upto!=null?st.upto:STEPS.length-1;
+const EARLY=()=>H&&H.state&&H.state.upto!=null?`<p class="note" style="font-size:18px;margin:0 0 10px">The game ended early. These results cover only the rounds that were played.</p>`:"";
+function curThrough(st){if(st.phase==="end")return ENDTH(st);if(st.phase!=="play")return -1;
   const k=STEPS[st.i].k;return (st.sub==="reveal"||k==="upgrade"&&st.sub==="done")?st.i:st.i-1}
 function pushState(st){ // add cash, ranks and this step's results so team iPads can show them
   const teams=teamsArr(),th=curThrough(st);st.cash=ledger(teams,th,st.targets||H.state.targets);st.rank=ranks(st.cash);
@@ -2776,7 +2778,7 @@ function startFireworks(on){
 }
 
 function finale(teams){
-  const cash=ledger(teams,STEPS.length-1,H.state.targets),order=[...teams].sort((a,b)=>cash[b.id]-cash[a.id]),rk=ranks(cash),top=order.slice(0,5);
+  const cash=ledger(teams,ENDTH(H.state),H.state.targets),order=[...teams].sort((a,b)=>cash[b.id]-cash[a.id]),rk=ranks(cash),top=order.slice(0,5);
   const slot=(p,i,cls)=>p?`<div class="pod ${cls}" data-i="${i}"><div class="who"><div class="medal">${rk[p.id]}</div><div class="nm">${esc(p.name)}</div><div class="pts">${money(cash[p.id])}</div></div><div class="block"><span>${["1st","2nd","3rd"][i]}</span></div></div>`:`<div class="pod ${cls} empty"></div>`;
   const rows=top.slice(3).map((p,k)=>`<div class="row45" data-i="${k+3}"><span class="r">${rk[p.id]}</span><span class="n">${esc(p.name)}</span><span class="s">${money(cash[p.id])}</span></div>`).join("");
   document.body.classList.add("finale-on");app.style.zoom="";
@@ -2790,9 +2792,9 @@ function finale(teams){
 }
 function classResults(teams){
   document.body.classList.remove("finale-on");
-  const n=teams.length,bought=CONTROLS.map(c=>({c,k:teams.filter(t=>owned(t,99).has(c.id)).length})).sort((a,b)=>b.k-a.k);
-  const leaks=STEPS.map((s,j)=>s.k==="scen"?{s:SCEN[s.id],miss:teams.filter(t=>!SCEN[s.id].stop.some(x=>owned(t,j).has(x))).length}:null).filter(Boolean).sort((a,b)=>b.miss-a.miss);
-  app.innerHTML=`<div class="rep"><h2>Class results</h2>
+  const n=teams.length,TH=ENDTH(H.state),bought=CONTROLS.map(c=>({c,k:teams.filter(t=>owned(t,TH).has(c.id)).length})).sort((a,b)=>b.k-a.k);
+  const leaks=STEPS.map((s,j)=>s.k==="scen"&&j<=TH?{s:SCEN[s.id],miss:teams.filter(t=>!SCEN[s.id].stop.some(x=>owned(t,j).has(x))).length}:null).filter(Boolean).sort((a,b)=>b.miss-a.miss);
+  app.innerHTML=`<div class="rep"><h2>Class results</h2>${EARLY()}
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px">
     <div><h3 style="font-family:var(--display);font-size:26px;margin:6px 0">Controls teams bought</h3>${bought.map(b=>`<div class="cr"><span><b>${esc(b.c.name)}</b></span><span class="b"><i style="width:${b.k/n*100}%"></i></span><span>${b.k} of ${n}</span></div>`).join("")}</div>
     <div><h3 style="font-family:var(--display);font-size:26px;margin:6px 0">Frauds that got through most</h3>${leaks.slice(0,5).map(l=>`<div class="leak"><b>${esc(l.s.title)}: ${l.miss} of ${n} teams lost ${money(l.s.loss)}</b>Stopped by ${esc(orList(l.s.stop))}.</div>`).join("")}</div></div>
@@ -2896,10 +2898,10 @@ function teamRender(){
 }
 function teamReport(st){
   const M=ME,rec=M.rec,n=st.cash?Object.keys(st.cash).length:0;
-  const leaks=[],stops=[];STEPS.forEach((s,j)=>{if(s.k!=="scen")return;const sc=SCEN[s.id],o=owned(rec,j),by=sc.stop.find(x=>o.has(x));(by?stops:leaks).push({sc,by})});
+  const leaks=[],stops=[];const TH=st.upto!=null?st.upto:STEPS.length-1;STEPS.forEach((s,j)=>{if(s.k!=="scen"||j>TH)return;const sc=SCEN[s.id],o=owned(rec,j),by=sc.stop.find(x=>o.has(x));(by?stops:leaks).push({sc,by})});
   app.innerHTML=`<div class="rep"><h2>${esc(M.name)}: ${money(st.cash?st.cash[M.pid]:0)}</h2><p style="font-size:22px;margin:0">${st.rank?ord(st.rank[M.pid])+" of "+n:""} · Started with ${money(START)}</p>
     <h3 style="font-family:var(--display);font-size:26px;margin:16px 0 4px">What got past you</h3>
-    ${leaks.map(l=>`<div class="leak"><b>${esc(l.sc.title)} (−${money(l.sc.loss)})</b>Fix: ${esc(orList(l.sc.stop))}. ${esc(l.sc.why)}</div>`).join("")||`<div class="leak okk"><b>Nothing! Every fraud was caught.</b></div>`}
+    ${leaks.map(l=>`<div class="leak"><b>${esc(l.sc.title)} (−${money(l.sc.loss)})</b>Fix: ${esc(orList(l.sc.stop))}. ${esc(l.sc.why)}</div>`).join("")||(stops.length||st.upto==null?`<div class="leak okk"><b>Nothing! Every fraud was caught.</b></div>`:`<div class="leak okk"><b>No frauds came up before the game ended.</b></div>`)}
     <h3 style="font-family:var(--display);font-size:26px;margin:16px 0 4px">What you caught</h3>
     ${stops.map(l=>`<div class="leak okk"><b>${esc(l.sc.title)}</b>Caught by ${esc(CT[l.by].name)}.</div>`).join("")||`<div class="leak"><b>Nothing caught this time.</b></div>`}
     <p class="note" style="margin-top:14px">Your controls: ${esc(list([...(rec.controls||[]),...(rec.up||[])]).join(", ")||"none")}</p></div>`;
@@ -2909,6 +2911,36 @@ function teamReport(st){
 /* ============================================================ START */
 $("#rejoin").onclick=rejoin;
 ROLE==="teacher"?hostSetup():joinForm();
+</script>
+
+<script>
+/* ---------- End game now (teacher only): skip the remaining rounds and go to the final standings ---------- */
+(function(){
+  if(typeof ROLE==="undefined"||ROLE!=="teacher")return;
+  const css=document.createElement("style");
+  css.textContent=`.egn{margin-left:12px;background:transparent;color:#C1102F;border:2px solid #C1102F;border-radius:8px;font:600 15px Oswald,"Arial Narrow",sans-serif;letter-spacing:.02em;padding:4px 12px;cursor:pointer;text-transform:none;line-height:1.2}
+.egn:hover{background:#C1102F;color:#fff}.egn[hidden]{display:none!important}
+.egm{position:fixed;inset:0;background:rgba(0,0,0,.6);display:grid;place-items:center;z-index:99999}.egm[hidden]{display:none!important}
+.egm .bx{background:#fff;color:#111;border-radius:12px;padding:28px 32px;max-width:600px;margin:20px;box-shadow:0 20px 60px rgba(0,0,0,.45);font:21px/1.4 Barlow,system-ui,sans-serif}
+.egm h3{font:700 30px Oswald,"Arial Narrow",sans-serif;margin:0 0 10px}.egm p{margin:0}
+.egm .rw{display:flex;gap:12px;justify-content:flex-end;margin-top:22px}
+.egm button{font:600 19px Oswald,"Arial Narrow",sans-serif;padding:10px 22px;border-radius:8px;cursor:pointer;border:2px solid #111;background:#fff;color:#111}
+.egm .go{background:#C1102F;border-color:#C1102F;color:#fff}`;
+  document.head.appendChild(css);
+  const btn=document.createElement("button");btn.className="egn";btn.id="egn";btn.type="button";btn.hidden=true;btn.textContent="End game now";
+  const top=document.querySelector(".top");if(top)top.appendChild(btn);else{btn.style.cssText="position:fixed;top:10px;right:14px;z-index:9000;background:#fff";document.body.appendChild(btn)}
+  const m=document.createElement("div");m.className="egm";m.hidden=true;
+  m.innerHTML=`<div class="bx" role="dialog" aria-modal="true" aria-labelledby="egnT"><h3 id="egnT">End game now?</h3><p>End the game now and go to the final standings? Remaining rounds will be skipped.</p><div class="rw"><button type="button" id="egnNo">Cancel</button><button type="button" class="go" id="egnYes">End game</button></div></div>`;
+  document.body.appendChild(m);
+  const inProgress=()=>{try{return !!(H&&H.state&&H.state.phase==="play"&&!document.body.classList.contains("finale-on"))}catch(e){return false}};
+  const close=()=>{m.hidden=true};
+  btn.onclick=()=>{if(!inProgress())return;m.hidden=false;document.getElementById("egnYes").focus()};
+  document.getElementById("egnNo").onclick=close;
+  m.addEventListener("click",e=>{if(e.target===m)close()});
+  addEventListener("keydown",e=>{if(!m.hidden&&e.key==="Escape"){e.stopPropagation();close()}},true);
+  document.getElementById("egnYes").onclick=()=>{close();if(!inProgress())return;try{pushState({phase:"end",upto:curThrough(H.state),targets:H.state.targets})}catch(e){console.error(e)}btn.hidden=true};
+  setInterval(()=>{const on=inProgress();if(btn.hidden===on)btn.hidden=!on;if(!on&&!m.hidden)close()},400);
+})();
 </script>
 </body>
 </html>

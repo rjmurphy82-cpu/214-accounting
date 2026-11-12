@@ -143,8 +143,8 @@ function renderReveal() {
 }
 function renderFinal() {
   $("#barSlot").innerHTML = "";
-  const last = G.NROUNDS - 1, f = G.runFund(myDecs(last), last), rk = rankings(last), bench = G.runFund([], last).value;
-  $("#view").innerHTML = `<div class="center card" style="text-align:center"><div class="label">${G.NROUNDS} years on the desk</div><div class="big" style="font-size:40px">${esc(me.name)}</div>
+  const last = S.upto != null ? S.upto : G.NROUNDS - 1, f = G.runFund(myDecs(last), last), rk = rankings(last), bench = G.runFund([], last).value;
+  $("#view").innerHTML = `<div class="center card" style="text-align:center"><div class="label">${S.upto != null ? `Game over: ${last + 1} of ${G.NROUNDS} years played` : `${G.NROUNDS} years on the desk`}</div><div class="big" style="font-size:40px">${esc(me.name)}</div>
     <div class="rank" style="justify-content:center;margin:16px 0"><div class="p">${rk.place}<span style="font-size:24px">/${rk.of}</span></div><div style="text-align:left"><div class="small">Final fund value</div><div class="big" style="font-size:44px">${G.money(f.value)}</div></div></div>
     <p style="font-size:18px">${f.value > bench ? "You beat" : "You fell short of"} the Play-It-Safe Fund (all cash), which finished at <b>${G.money(bench)}</b>.</p>
     <table class="res" style="margin-top:10px">${f.years.map((yy, i) => `<tr><td>Year ${i + 1}</td><td class="r ${yy.gain < 0 ? "neg" : ""}">${G.signed(yy.gain)}</td></tr>`).join("")}</table>

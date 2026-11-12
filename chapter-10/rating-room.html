@@ -235,13 +235,27 @@ td.num,th.num{text-align:right}
 .fsz{display:flex;align-items:center;gap:6px;margin-left:auto;margin-right:16px;font-family:Oswald,Arial,sans-serif;color:#fff;font-size:15px}
 .fsz button{background:#2B2B2B;color:#fff;border:1px solid #555;border-radius:6px;padding:4px 10px;font-size:16px}
 .top{align-items:center}
+#egBtn{font-family:Oswald,"Arial Narrow",Arial,sans-serif;text-transform:uppercase;letter-spacing:.04em;font-size:15px;background:transparent;color:#FF8A99;border:2px solid #C1102F;border-radius:6px;padding:5px 12px;margin-right:12px;cursor:pointer}
+#egBtn:hover,#egBtn:focus-visible{background:#C1102F;color:#fff}
+#egBtn[hidden],#egOv[hidden],.egFinal[hidden]{display:none!important}
+#egOv{position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,.6);display:grid;place-items:center}
+#egOv .egb{background:#fff;color:#111;border-radius:12px;padding:26px 28px 22px;max-width:620px;width:calc(100% - 40px);box-shadow:0 18px 50px rgba(0,0,0,.35);border-top:6px solid #C1102F}
+#egOv h2{font-size:30px;margin:0 0 10px}
+#egOv p{font-size:21px;line-height:1.4;margin:0 0 22px}
+#egOv .egr{display:flex;gap:12px;justify-content:flex-end;flex-wrap:wrap}
+#egOv .egr button{font-size:19px;letter-spacing:.03em;border-radius:8px;padding:10px 22px}
+#egNo{background:#fff;border:2px solid #111;color:#111}
+#egYes{background:#C1102F;border:2px solid #C1102F;color:#fff}
+.egFinal{background:var(--brown);color:#fff;border-radius:10px;padding:16px 22px;margin-bottom:18px;display:flex;align-items:baseline;gap:18px;flex-wrap:wrap;border-bottom:5px solid var(--orange)}
+.egFinal .k{font-family:Oswald,Arial,sans-serif;text-transform:uppercase;letter-spacing:.08em;color:var(--light);font-size:18px}
+.egFinal .w{font-family:Oswald,Arial,sans-serif;text-transform:uppercase;font-size:40px;line-height:1.1}
 </style>
 </head>
 <body>
 <header>
   <div class="top">
     <div><div class="kicker">District 214 | Accounting | Chapter 10: Bonds</div><h1>The Rating Room</h1></div>
-    <div class="fsz" aria-label="Text size"><button type="button" onclick="rrZoom(-1)" aria-label="Smaller text">A−</button><span id="rrZ">100%</span><button type="button" onclick="rrZoom(1)" aria-label="Bigger text">A+</button></div><div class="kicker" style="color:#CFCFCF">High School District 214</div>
+    <button id="egBtn" type="button" hidden title="Skip the rest of the game and go to the final standings">End game now</button><div class="fsz" aria-label="Text size"><button type="button" onclick="rrZoom(-1)" aria-label="Smaller text">A−</button><span id="rrZ">100%</span><button type="button" onclick="rrZoom(1)" aria-label="Bigger text">A+</button></div><div class="kicker" style="color:#CFCFCF">High School District 214</div>
   </div>
   <nav>
     <button data-tab="guide" class="on">The Scorecard</button>
@@ -364,6 +378,7 @@ td.num,th.num{text-align:right}
 
 <!-- ============ LEADERBOARD ============ -->
 <section class="tab" id="board">
+  <div class="egFinal" id="egFinal" hidden><div class="k">Final standings</div><div class="w" id="egWin"></div></div>
   <div class="boardwrap">
     <div class="card"><div class="label">Standings</div><table class="btable" id="bTable"></table></div>
     <div class="grid" style="align-content:start">
@@ -706,12 +721,50 @@ $("#pClear").onclick=()=>{ if(pChecked) return; pState={}; drawPractice(); };
 /* ---------- init ---------- */
 drawScore(); drawBoard(); drawRound(); showBlitz(); $("#pNew").click();
 window.__rr = { DATA, buildIssuer, teams, PTS, rAns, solve, total, RC, roundResult };
+/* End game now hook (used by the button script at the bottom of the page) */
+var ended=false;
+function tabOn(id){var t=document.getElementById(id);return t&&t.classList.contains("on")}
+window.__EG={
+    active:function(){return !ended&&(tabOn("team")||tabOn("blitz"))},
+    end:function(){
+      clearInterval(rTimer);clearInterval(bTimer);
+      if(drumT.length){finishReveal()}else{document.getElementById("drum").classList.remove("on")}
+      document.getElementById("lockModal").classList.remove("on");
+      // Blitz: count the questions already saved; nothing for the question on screen
+      if(!PTS.blitz&&bHits.some(function(h){return h.size})){var sc=teams.map(function(_,i){return bCount(i)});PTS.blitz=placePoints(sc,sc.map(function(v){return v>0}),1).pts}
+      ended=true;refreshAll();
+      var tots=teams.map(function(_,i){return total(i)}),max=Math.max.apply(null,tots);
+      var top=teams.filter(function(_,i){return tots[i]===max});
+      document.getElementById("egWin").textContent=max<=0?"No points scored":top.length>1?"Tie: "+top.map(function(t){return t.n}).join(" and "):top[0].n+" wins!";
+      document.getElementById("egFinal").hidden=false;
+      document.querySelector('nav button[data-tab="board"]').click();
+      try{confetti()}catch(e){}
+    }
+  };
+document.getElementById("resetAll").addEventListener("click",function(){setTimeout(function(){if(!PTS.blitz&&PTS.r.every(function(r){return !r})){ended=false;document.getElementById("egFinal").hidden=true}},0)});
 })();
 </script>
 <script>
 (function(){let z=1;try{z=+localStorage.getItem("rrZoom")||1}catch(e){}
 function set(v){z=Math.min(1.8,Math.max(.7,Math.round(v*10)/10));document.querySelector("main").style.zoom=z;document.getElementById("rrZ").textContent=Math.round(z*100)+"%";try{localStorage.setItem("rrZoom",z)}catch(e){}}
 window.rrZoom=d=>set(z+d*.1);set(z);})();
+</script>
+<div id="egOv" hidden role="dialog" aria-modal="true" aria-labelledby="egT"><div class="egb"><h2 id="egT">End the game?</h2><p>End the game now and go to the final standings? Remaining questions will be skipped.</p><div class="egr"><button id="egNo" type="button">Cancel</button><button id="egYes" type="button">End game</button></div></div></div>
+<script>
+(function(){
+  var EG={active:function(){return !!(window.__EG&&window.__EG.active())},end:function(){window.__EG.end()}};
+  var b=document.getElementById("egBtn"),ov=document.getElementById("egOv"),yes=document.getElementById("egYes"),no=document.getElementById("egNo");
+  function upd(){var on=false;try{on=EG.active()}catch(e){}b.hidden=!on||!ov.hidden}
+  setInterval(upd,250);upd();
+  b.addEventListener("click",function(){if(!EG.active())return;ov.hidden=false;b.hidden=true;no.focus()});
+  function close(){ov.hidden=true;upd()}
+  no.addEventListener("click",close);
+  ov.addEventListener("click",function(e){if(e.target===ov)close()});
+  yes.addEventListener("click",function(){ov.hidden=true;if(EG.active())EG.end();upd()});
+  window.addEventListener("keydown",function(e){if(ov.hidden)return;e.stopImmediatePropagation();
+    if(e.key==="Escape"){e.preventDefault();close()}
+    else if((e.key===" "||e.key==="Enter")&&!(e.target&&e.target.tagName==="BUTTON"))e.preventDefault();},true);
+})();
 </script>
 </body>
 </html>
