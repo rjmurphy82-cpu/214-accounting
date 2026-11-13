@@ -435,35 +435,42 @@ const hdr=()=>`<h1 class="title">Bonds <span>Live.</span></h1>
   <p class="lede">${ROLE==="teacher"?"Teacher screen. Put this on the projector, create a game, and students join on their devices with the code. Seven rounds on bonds: vocabulary, par, discount or premium, cash interest, periods and rates, pricing with present value, issuance entries, and interest and amortization. Have calculators out; right answers earn 600 points plus up to 400 for speed, and wrong answers cost a lot (set below), so students should never guess.":"Seven quick rounds on bonds, run by your teacher. Have a calculator ready. Right answers earn 600 points plus up to 400 more for speed. Wrong answers cost a lot of points, so never guess. If you are not sure, let the clock run out and you get 0. At the end you get a report on what to practice, and you can practice it right here."}</p>`;
 function home(){
   stopTick();KEYPICK=KEYNEXT=null;setFit(false);$("#who").hidden=true;
+  if(ROLE!=="teacher"&&/[?&]solo=1/.test(location.search))return soloStart();
   ROLE==="teacher"?hostSetup():joinForm();
 }
 
 /* ============================================================ SOLO */
 let SOLO=null;
 function soloStart(){
-  app.innerHTML=`<div class="panel"><h2>What's your name?</h2><p>First name and last initial is perfect.</p>
-    <input class="field" id="nm" maxlength="24" autocomplete="off" placeholder="Jordan M.">
-    <div class="err" id="er"></div><button class="btn main" id="go">Start</button> <button class="btn" id="back">Back</button></div>`;
+  stopTick();setFit(false);KEYPICK=KEYNEXT=null;
+  let last="";try{last=localStorage.getItem("blSoloName")||""}catch(e){}
+  app.innerHTML=`<h1 class="title">Bonds <span>Live.</span></h1><div class="panel" style="margin-top:0"><h2>Practice on your own</h2><p>All seven rounds, three questions each, with the answer and the why after every question. You get a report at the end with what to practice next. Have a calculator ready.</p>
+    <input class="field" id="nm" maxlength="24" autocomplete="off" placeholder="Your name (Jordan M.)" value="${esc(last)}">
+    <div class="err" id="er"></div>
+    <div class="row" style="gap:10px;flex-wrap:wrap"><button class="btn main" id="untimed">No clock</button><button class="btn main" id="timed">Timed, like class</button>${ROLE==="teacher"?"":`<button class="btn" id="back">Join a class game instead</button>`}</div>
+    <p class="note" style="margin-top:10px">No clock: take your time, 1,000 points for each right answer. Timed: the same clock as class, 600 points plus up to 400 for speed.</p></div>`;
   const nm=$("#nm");nm.focus();
-  const go=()=>{const n=nm.value.trim();if(!n){$("#er").textContent="Type your name first.";return}
-    timeMult=1;SOLO={name:n,ids:buildGame(3,Math.floor(Math.random()*1e9)),seed:Math.floor(Math.random()*1e9),i:0,score:0,log:[]};
+  const go=timed=>{const n=nm.value.trim();if(!n){$("#er").textContent="Type your name first.";return}
+    try{localStorage.setItem("blSoloName",n)}catch(e){}
+    timeMult=1;SOLO={name:n,timed,ids:buildGame(3,Math.floor(Math.random()*1e9)),seed:Math.floor(Math.random()*1e9),i:0,score:0,log:[]};
     $("#who").textContent=n;$("#who").hidden=false;soloNext()};
-  $("#go").onclick=go;nm.onkeydown=e=>{if(e.key==="Enter")go()};$("#back").onclick=home;
+  $("#untimed").onclick=()=>go(false);$("#timed").onclick=()=>go(true);nm.onkeydown=e=>{if(e.key==="Enter")go(false)};
+  const bk=$("#back");if(bk)bk.onclick=()=>{history.replaceState(null,"",location.pathname);home()};
 }
 function interstitial(sk,roundNo,total,cb){
   const S=SKILLS[sk];setFit(false);
   app.innerHTML=`<div class="interstitial"><div class="r">Round ${roundNo} of ${total}</div><h2>${esc(S.name)}</h2><p>${esc(S.desc)} ${secsLabel(sk)}</p><button class="btn main" id="go">Go</button></div>`;
   KEYPICK=null;KEYNEXT=()=>{KEYNEXT=null;cb()};$("#go").onclick=KEYNEXT;$("#go").focus();
 }
-const secsLabel=sk=>`${Math.round(SKILLS[sk].secs*timeMult)} seconds per question.`;
+const secsLabel=sk=>SOLO&&SOLO.timed===false?"No clock. Take your time.":`${Math.round(SKILLS[sk].secs*timeMult)} seconds per question.`;
 function soloNext(){
-  const s=SOLO;if(s.i>=s.ids.length)return report(s.name,s.log,s.score,null);
+  const s=SOLO;if(s.i>=s.ids.length)return report(s.name,s.log,s.score,null,true);
   const q=inst(byId[s.ids[s.i]],s.seed);
   const first=s.i===0||byId[s.ids[s.i-1]].sk!==q.sk;
   const go=()=>{
     const secs=secsFor(q),per=s.ids.filter(id=>byId[id].sk===q.sk).length,k=s.ids.slice(0,s.i+1).filter(id=>byId[id].sk===q.sk).length;
-    const view=renderQuestion(app,q,{label:SKILLS[q.sk].name,num:`Question ${k} of ${per}`,score:s.score,timed:true,secs,onAnswer:(c,ms)=>{
-      const ok=c===q.ans,pts=points(ok,ms,secs);s.score+=pts;s.log.push({sk:q.sk,ok,ms});ok?beep(990,.15):beep(200,.3);
+    const view=renderQuestion(app,q,{label:SKILLS[q.sk].name,num:`Question ${k} of ${per}`+(s.timed?"":" · no clock"),score:s.score,timed:s.timed,secs,onAnswer:(c,ms)=>{
+      const ok=c===q.ans,pts=s.timed?points(ok,ms,secs):ok?1000:0;s.score+=pts;s.log.push({sk:q.sk,ok,ms});ok?beep(990,.15):beep(200,.3);
       showAnswer(app,q,c,ok,pts,`<div class="row next" style="justify-content:flex-end;margin-top:10px"><button class="btn main" id="nx">${s.i===s.ids.length-1?"See my report":"Next"}</button></div>`);
       app.querySelector(".score").textContent=s.score.toLocaleString()+" pts";
       KEYPICK=null;KEYNEXT=()=>{KEYNEXT=null;s.i++;soloNext()};$("#nx").onclick=KEYNEXT;bindEndNow();$("#nx").focus({preventScroll:true});
@@ -473,7 +480,7 @@ function soloNext(){
 }
 
 /* ============================================================ REPORT + PRACTICE */
-function report(name,log,score,rank){
+function report(name,log,score,rank,solo){
   stopTick();setFit(false);KEYPICK=null;
   const by={};ORDER.forEach(k=>by[k]={n:0,r:0,ms:0});
   log.forEach(a=>{const b=by[a.sk];if(!b)return;b.n++;if(a.ok)b.r++;b.ms+=a.ms});
@@ -494,11 +501,12 @@ function report(name,log,score,rank){
     <div class="todo"><h3>${perfect?"What to work on":"Practice these next"}</h3>
       ${perfect?`<div class="tip"><div class="t"><b>Every answer right. Nice work.</b>Your next goal is speed. ${slow?`Your slowest round was ${esc(SKILLS[slow].short)}. `:""}Next game, try to beat ${score.toLocaleString()}.</div></div>`:tips}
     </div>
-    <div class="links">More practice on the site: <a href="/">All games and practices</a> · <a href="#" id="home2">Join another game</a></div>
+    ${solo?`<div class="row" style="justify-content:center;margin:14px 0"><button class="btn main" id="again">Play again with new questions</button></div>`:""}
+    <div class="links">More practice on the site: <a href="/">All games and practices</a> · ${solo?`<a href="/chapter-10/practice-bond-pricing">Bond Pricing Practice</a>`:`<a href="#" id="home2">Join another game</a>`}</div>
   </div>`;
-  app.querySelectorAll(".prac").forEach(b=>b.onclick=()=>practice(b.dataset.sk,()=>{report(name,log,score,rank);const pr=PRACTICED[b.dataset.sk];if(pr){const d=app.querySelector(`[data-done="${b.dataset.sk}"]`);if(d)d.textContent=`Practiced: ${pr.r} of ${pr.n} right.`}}));
+  app.querySelectorAll(".prac").forEach(b=>b.onclick=()=>practice(b.dataset.sk,()=>{report(name,log,score,rank,solo);const pr=PRACTICED[b.dataset.sk];if(pr){const d=app.querySelector(`[data-done="${b.dataset.sk}"]`);if(d)d.textContent=`Practiced: ${pr.r} of ${pr.n} right.`}}));
   const ag=$("#again");if(ag)ag.onclick=soloStart;
-  $("#home2").onclick=e=>{e.preventDefault();home()};
+  const h2=$("#home2");if(h2)h2.onclick=e=>{e.preventDefault();home()};
   // restore practice marks
   Object.entries(PRACTICED).forEach(([k,pr])=>{const d=app.querySelector(`[data-done="${k}"]`);if(d)d.textContent=`Practiced: ${pr.r} of ${pr.n} right.`});
   window.scrollTo(0,0);
@@ -572,8 +580,8 @@ async function net(){
 }
 function needSetup(){
   app.innerHTML=`${hdr()}<div class="panel" style="margin-top:0">${ROLE==="teacher"?`<h2>Class games need a one-time setup</h2>
-  <p>In Vercel, open this project, go to <b>Storage</b>, add <b>Upstash for Redis</b> (free plan), connect it to the project, then redeploy.</p>`:`<h2>The class game isn't open yet</h2><p>Wait for your teacher to start it, then reload this page.</p>`}
-  <button class="btn main" id="b">Reload</button></div>`;$("#b").onclick=()=>location.reload();
+  <p>In Vercel, open this project, go to <b>Storage</b>, add <b>Upstash for Redis</b> (free plan), connect it to the project, then redeploy.</p>`:`<h2>The class game isn't open yet</h2><p>Wait for your teacher to start it, then reload this page. Or practice on your own right now.</p>`}
+  <button class="btn main" id="b">Reload</button>${ROLE==="teacher"?"":` <button class="btn main" id="solo">Practice on your own</button>`}</div>`;$("#b").onclick=()=>location.reload();const so=$("#solo");if(so)so.onclick=soloStart;
 }
 
 /* ============================================================ LIVE: HOST */
@@ -812,7 +820,9 @@ async function joinForm(){
   app.innerHTML=`${hdr()}<div class="panel" style="margin-top:0"><h2>Join a class game</h2><p>${qcode?"Code filled in. Type your name (first name and last initial).":"Type the code on the board and your name (first name and last initial)."} Kicked out or closed the page? Join again with the same name and you keep your points.</p>
     <input class="field code" id="cd" inputmode="numeric" maxlength="4" placeholder="0000" autocomplete="off" value="${qcode||(sv?esc(sv.code):"")}">
     <input class="field" id="nm" maxlength="24" placeholder="Jordan M." autocomplete="off" value="${sv&&(!qcode||sv.code===qcode)?esc(sv.name):""}">
-    <div class="err" id="er"></div><button class="btn main" id="go">Join</button></div>`;
+    <div class="err" id="er"></div><button class="btn main" id="go">Join</button></div>
+    <div class="panel"><h2>No class game right now?</h2><p>Play all seven rounds on your own, with or without the clock.</p><button class="btn" id="solo">Practice on your own</button></div>`;
+  $("#solo").onclick=soloStart;
   rejoinBtn();(qcode&&!$("#nm").value)?$("#nm").focus():sv?$("#go").focus():$("#cd").focus();
   const go=async()=>{
     const code=$("#cd").value.trim(),name=$("#nm").value.trim();
