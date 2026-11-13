@@ -2817,12 +2817,23 @@ async function hostSetup(){
     <li><b>Book it.</b> Entry checks ($${MC_PTS} each), the first interest payment with straight-line amortization, carrying value, and a balance sheet on the final deal.</li></ol>
     <p class="note">Deals: par, discount, premium, a mixed-news discount, then a premium with balance sheet presentation. The board shows the worked answer after every step.</p>
     <div class="err" id="er"></div><div class="row"><button class="btn main" id="go">Create game</button><button class="btn" id="solo">Play without iPads</button></div>
-    <p class="note" style="margin-top:8px">Play without iPads runs the same deals on the projector only. The class answers out loud, then you reveal the worked answer.</p></div>`;
+    <p class="note" style="margin-top:8px">Play without iPads runs the same deals on the projector only. The class answers out loud, then you reveal the worked answer.</p>
+    <h2 style="margin-top:22px">Resume a game</h2><p class="note">Closed the tab or lost the screen? Enter the game code to pick up right where you left off. Teams keep their answers.</p>
+    <div class="row"><input class="field" id="rcode" inputmode="numeric" maxlength="4" placeholder="Code" style="max-width:180px" value="${(()=>{try{return localStorage.getItem("uwHostCode")||""}catch(e){return ""}})()}"><button class="btn" id="resume">Resume game</button></div><div class="err" id="rer"></div></div>`;
   $("#solo").onclick=()=>{H={N:null,code:null,players:{},solo:true,state:{phase:"play",i:0,sub:"intro"}};hostRender()};
   if(!N){$("#go").disabled=true;$("#er").textContent="The game database isn't connected, so only Play without iPads works right now.";return}
+  $("#resume").onclick=async()=>{const code=$("#rcode").value.trim();if(!/^\d{4}$/.test(code)){$("#rer").textContent="Enter the 4-digit game code.";return}
+    $("#resume").disabled=true;
+    try{const g=await N.get("games/"+code);if(!g||g.game!==GAME){$("#rer").textContent="No Underwriting Desk game with that code.";$("#resume").disabled=false;return}
+      try{localStorage.setItem("uwHostCode",code)}catch(e){}
+      const st=g.state||{phase:"lobby"};H={N,code,players:g.players||{},state:st};TIMER_END=st.timer||0;TIMER_BEEPED=true;
+      H.off=N.on("games/"+code+"/players",v=>{H.players=v||{};hostRender(true)});
+      hostRender()}catch(e){$("#rer").textContent="Couldn't reach the game database.";$("#resume").disabled=false}};
+  $("#rcode").onkeydown=e=>{if(e.key==="Enter")$("#resume").click()};
   $("#go").onclick=async()=>{$("#go").disabled=true;
     try{let code;for(let t=0;t<20;t++){code=String(Math.floor(1000+Math.random()*9000));if(!(await N.get("games/"+code)))break}
       await N.set("games/"+code,{created:Date.now(),game:GAME,seed:1,ids:[],state:{phase:"lobby"}});
+      try{localStorage.setItem("uwHostCode",code)}catch(e){}
       H={N,code,players:{},state:{phase:"lobby"}};
       H.off=N.on("games/"+code+"/players",v=>{H.players=v||{};hostRender(true)});
       hostRender()}catch(e){$("#er").textContent="Couldn't reach the game database.";$("#go").disabled=false}};
