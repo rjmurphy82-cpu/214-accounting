@@ -2671,26 +2671,26 @@ const GAME="underwriting",FIRM="Lakefront Capital";
 const MC_PTS=200,MANDATE=[300,200,100];
 const SPREADS=[["AAA","+1.5%"],["AA","+2%"],["A","+3%"],["BBB","+4%"],["BB","+5%"]];
 const DEALS=[
- {id:"d1",co:"Prairie Rail Freight",what:"New locomotives for its Chicago to Denver line",rating:"A",par:500000,c:9,yrs:15,tr:6,sp:3,
-  news:{h:"A quiet week in the bond market",p:"Nothing moved. The 15-year Treasury still yields 6%, and A-rated companies pay 3% more than the Treasury."},
+ {id:"d1",co:"Great Lakes Ferry Lines",what:"Two new car ferries for its Milwaukee to Muskegon crossing",rating:"BBB",par:600000,c:12,yrs:7,tr:8,sp:4,
+  news:{h:"Steady as she goes",p:"No surprises today. The 7-year Treasury yields 8%, and BBB-rated companies pay 4% more than the Treasury."},
   why:"The bond pays exactly what investors demand, so they pay exactly face value. No discount, no premium.",
   steps:["price","issue"]},
- {id:"d2",co:"Summit Solar Co.",what:"A solar farm outside Peoria",rating:"A",par:1000000,c:6,yrs:5,tr:5,sp:3,
-  news:{h:"The Fed raises rates",p:"Summit Solar printed 6% on its bonds last month. Since then the 5-year Treasury jumped to 5%, and A-rated companies pay 3% more."},
-  why:"Investors can now earn 8% elsewhere. A 6% bond only sells if they can buy it for less than face value.",
+ {id:"d2",co:"Cornbelt Robotics",what:"A factory in Bloomington that builds farm robots",rating:"AA",par:900000,c:7,yrs:6,tr:7,sp:2,
+  news:{h:"Inflation scare sends rates higher",p:"Cornbelt printed 7% on its bonds two weeks ago. Then an inflation report sent the 6-year Treasury up to 7%, and AA-rated companies pay 2% more."},
+  why:"Investors can now earn 9% elsewhere. A 7% bond only sells if they can buy it for less than face value.",
   steps:["price","issue","interest","intEntry"]},
- {id:"d3",co:"Harbor Point Hotels",what:"A lakefront hotel renovation",rating:"AA",par:800000,c:10,yrs:8,tr:6,sp:2,
-  news:{h:"Rates fall",p:"Harbor Point printed 10% on its bonds when rates were high. The 8-year Treasury has dropped to 6%, and AA-rated companies pay 2% more."},
-  why:"The bond pays 10% when the market only asks 8%. Investors compete for it and pay more than face value.",
+ {id:"d3",co:"Midway Air Cargo",what:"Five cargo jets and a new hangar at Midway Airport",rating:"A",par:700000,c:12,yrs:5,tr:5,sp:3,
+  news:{h:"Rates tumble",p:"Midway printed 12% on its bonds back when rates were high. The 5-year Treasury has since dropped to 5%, and A-rated companies pay 3% more."},
+  why:"The bond pays 12% when the market only asks 8%. Investors compete for it and pay more than face value.",
   steps:["price","issue","interest"]},
- {id:"d4",co:"Northgate Grocers",what:"Twelve new stores across the suburbs",rating:"BB",was:"A",par:600000,c:8,yrs:10,tr:5,sp:5,
-  news:{h:"Good news, bad news",p:"The 10-year Treasury fell to 5%. But Northgate had a weak year and its rating was cut from A to BB. BB companies pay 5% more than the Treasury."},
-  why:"Lower Treasury rates helped, but the rating cut hurt more. Investors want 10% from a BB company, so the 8% bond sells at a discount.",
-  steps:["price","interest","carry"],k:2},
- {id:"d5",co:"Ridgeview Medical Center",what:"A new children's hospital wing",rating:"AAA",par:2000000,c:8,yrs:10,tr:4.5,sp:1.5,
-  news:{h:"Final deal: the biggest client of the year",p:"Ridgeview is rated AAA. The 10-year Treasury yields 4.5%, and AAA borrowers pay only 1.5% more."},
-  why:"Ridgeview is so safe that investors accept 6%. An 8% bond is worth more than face value to them.",
-  steps:["price","interest","bs"],k:4}
+ {id:"d4",co:"Kettle Moraine Outfitters",what:"Eight new camping and paddling stores across the Midwest",rating:"BBB",was:"AA",par:500000,c:9,yrs:8,tr:6,sp:4,
+  news:{h:"Good news, bad news",p:"The 8-year Treasury fell to 6%. But a warm winter crushed Kettle Moraine's sales and its rating was cut from AA to BBB. BBB companies pay 4% more than the Treasury."},
+  why:"Lower Treasury rates helped, but the rating cut hurt more. Investors want 10% from a BBB company, so the 9% bond sells at a discount.",
+  steps:["price","interest","carry"],k:3},
+ {id:"d5",co:"Mid-America Power & Light",what:"A wind farm and new power lines across northern Illinois",rating:"AAA",par:1500000,c:7,yrs:12,tr:3.5,sp:1.5,
+  news:{h:"Final deal: the biggest client of the year",p:"Mid-America Power & Light is rated AAA. The 12-year Treasury yields 3.5%, and AAA borrowers pay only 1.5% more."},
+  why:"Mid-America is so safe that investors accept 5%. A 7% bond is worth more than face value to them.",
+  steps:["price","interest","bs"],k:6}
 ];
 const r4=x=>Math.round(x*10000)/10000;
 const pv1=(i,n)=>r4(Math.pow(1+i/100,-n)),pva=(i,n)=>r4((1-Math.pow(1+i/100,-n))/(i/100));
