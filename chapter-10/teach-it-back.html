@@ -299,7 +299,9 @@ function checkJE(rows,lines){
   return{ok,res}
 }
 
-/* ================= problem generators ================= */
+/* ================= problem generators =================
+   Every n and i must be on the class PV handout: rates 1-10%, 12%, 15%; periods 1-20, 25, 30, 35, 40. */
+const TABLE_RATES=[1,2,3,4,5,6,7,8,9,10,12,15],TABLE_PERIODS=[...Array(20).keys()].map(k=>k+1).concat([25,30,35,40]);
 const COS=["Lakeview Logistics","Prairie Rail Co.","Summit Solar","Harbor Point Hotels","Northgate Grocers","Ridgeview Medical","Fox River Foods","Great Lakes Ferry","Cornbelt Seed Co.","Midway Air Freight","Riverbend Apartments","Maple Leaf Dairy","Crestview Health","Ironwood Builders","Bluewater Marine","Kingsley Sports","Arlington Auto Group","Windy City Bikes","Oak Park Bakery","Northline Airlines","Hersey Hill Water","Pioneer Steel","Redwood Outdoor","Silver Lake Resorts","Copper Canyon Mining","Evergreen Power","Lincoln Park Labs","Juniper Software","Starlight Theaters","Cascade Clinics"];
 const PARS=[100000,200000,250000,300000,400000,500000,600000,750000,800000,1000000,1200000,1500000];
 
@@ -307,7 +309,7 @@ function makeBond(r,opts={}){
   const semi=opts.semi!=null?opts.semi:r()<.7;
   let years,i,mkt;
   if(semi){years=between(r,3,10);i=between(r,2,7);mkt=i*2}
-  else{years=between(r,4,15);i=between(r,3,12);mkt=i}
+  else{years=between(r,4,15);i=pick(r,[3,4,5,6,7,8,9,10,12]);mkt=i}
   let call=opts.call||pick(r,["Discount","Premium","Discount","Premium","Par"]);
   let c;
   if(call==="Par")c=mkt;
@@ -499,13 +501,13 @@ const KAHOOT={
 /* ================= PV tables overlay ================= */
 function pvOverlay(){
   const o=document.createElement("div");o.className="ovl";
-  const rates=[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15];let tab="a";
+  const rates=[1,2,3,4,5,6,7,8,9,10,12,15];let tab="a";
   const draw=()=>{
     const f=tab==="a"?pva:pv1;
     let h=`<div class="row" style="justify-content:space-between"><h2>${tab==="a"?"Present Value of an Annuity of 1":"Present Value of 1"}</h2><button class="btn sec" id="xx">Close</button></div>
     <div class="tabs"><button class="${tab==="1"?"on":""}" data-t="1">PV of $1</button><button class="${tab==="a"?"on":""}" data-t="a">PV of an Annuity</button></div>
     <table class="pvt"><tr><th>n</th>${rates.map(x=>`<th>${x}%</th>`).join("")}</tr>`;
-    for(let n=1;n<=20;n++)h+=`<tr><td>${n}</td>${rates.map(x=>`<td>${f(x/100,n).toFixed(4)}</td>`).join("")}</tr>`;
+    for(const n of [...Array(20).keys()].map(k=>k+1).concat([25,30,35,40]))h+=`<tr><td>${n}</td>${rates.map(x=>`<td>${f(x/100,n).toFixed(4)}</td>`).join("")}</tr>`;
     o.innerHTML=`<div class="box">${h}</table></div>`;
     o.querySelector("#xx").onclick=()=>o.remove();
     o.querySelectorAll("[data-t]").forEach(b=>b.onclick=()=>{tab=b.dataset.t;draw()});
