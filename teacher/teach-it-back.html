@@ -576,9 +576,9 @@ function standings(recs,N){
     const pr=pairAt(recs,r.station,b,N);if(!pr)return;
     if(blk.type==="kahoot"){pr.stay.forEach(n=>add(n,pts));add(pr.move,pts)}
     else if(blk.type==="rot"){const stayT=blk.teach==="stay";pr.stay.forEach(n=>add(n,stayT?pts*TEACH_X:pts,stayT));add(pr.move,stayT?pts:pts*TEACH_X,!stayT)}})});
-  const G=(typeof H!=="undefined"&&H&&H.state)||{};
+  const G=(H&&H.state)||LIVE.state||{},GC=H?H.code:GCODE;
   (G.revealed||[]).forEach(k=>{const [b,p]=k.split("_").map(Number);if(!SCHED[b]||SCHED[b].type!=="def")return;
-    const {pts}=defScores(recs,b,p,H.code,G.hide);
+    const {pts}=defScores(recs,b,p,GC,G.hide);
     Object.entries(pts).forEach(([st,v])=>{const pr=pairAt(recs,+st,b,N);if(!pr)return;pr.stay.forEach(n=>add(n,v));add(pr.move,v)})});
   return{tot,tch}}
 function ranks(val){const ids=Object.keys(val).sort((a,b)=>val[b]-val[a]);const r={};let k=0,prev=null;ids.forEach((id,i)=>{if(val[id]!==prev){k=i+1;prev=val[id]}r[id]=k});return r}
@@ -588,53 +588,90 @@ let ME=null; // {code,station}
 let CUR=null; // {block} currently rendered
 let LIVE={state:null,recs:{}};
 let KTIMER=null;
-const SKEY="tibSession";
+const SKEY="tibPlayer";
 function lkey(b){return `tib_${ME.code}_s${ME.station}_b${b}`}
+let GCODE="";
+function normName(n){return String(n||"").trim().replace(/\s+/g," ").toLowerCase()}
 async function joinForm(err){
   const N=await net().catch(()=>null);if(!N)return needSetup();
-  const sess=store.get(SKEY,null)||{};const qc=params.get("code");if(qc&&/^\d{4}$/.test(qc)&&qc!==sess.code){sess.code=qc;sess.station=0}
-  let opts="";for(let k=1;k<=24;k++)opts+=`<option value="${k}" ${k===sess.station?"selected":""}>Station ${k}</option>`;
+  CUR=null;
+  const sess=store.get(SKEY,null)||{};const qc=params.get("code");
+  const code0=qc&&/^\d{4}$/.test(qc)?qc:(sess.code||"");
   $("#ttl").innerHTML="Teach It Back: <span>Bonds</span>";
-  app.innerHTML=`<div class="panel" style="max-width:720px;margin:0 auto"><h1 style="font-size:38px;margin-bottom:6px">Join Teach It Back</h1>
-   <p class="muted">One iPad per station. This iPad stays at this desk the whole game.</p>
-   <div class="fld"><label>Game code</label><input id="jc" inputmode="numeric" maxlength="4" value="${esc(sess.code||"")}" style="text-align:center;letter-spacing:.2em"></div>
-   <div class="fld"><label>Station number (taped to the desk)</label><select id="js">${opts}</select></div>
-   <div class="fld"><label>Stayer: the student who sits here all game</label><input id="jst" style="text-align:left" placeholder="First name, last initial"></div>
-   <div class="fld"><label>Starting mover: the student who starts here and moves</label><input id="jmv" style="text-align:left" placeholder="First name, last initial"></div>
-   <div class="fld"><label>Second stayer <span class="muted">(only if this station has 3 people)</span></label><input id="jst2" style="text-align:left" placeholder="Leave blank"></div>
+  app.innerHTML=`<div class="panel" style="max-width:640px;margin:0 auto"><h1 style="font-size:38px;margin-bottom:6px">Join Teach It Back</h1>
+   <p class="muted">Type your name. Your teacher will put you at a station with a partner.</p>
+   <div class="fld"><label>Game code</label><input id="jc" inputmode="numeric" maxlength="4" value="${esc(code0)}" style="text-align:center;letter-spacing:.2em"></div>
+   <div class="fld"><label>Your name</label><input id="jn" style="text-align:left" placeholder="First name, last initial" value="${esc(sess.name||"")}" autocomplete="off"></div>
    <div id="jerr" style="color:var(--red);font-weight:700;margin-top:10px">${err||""}</div>
    <div class="acts"><button class="btn" id="jgo">Join</button></div></div>`;
-  $("#js").onchange=()=>prefill();
-  const prefill=async()=>{const c=$("#jc").value.trim(),s=+$("#js").value;if(!/^\d{4}$/.test(c))return;
-    try{const r=await N.get(`games/${c}/players/s${s}`);if(r){$("#jst").value=r.stay||"";$("#jmv").value=r.move||"";$("#jst2").value=r.stay2||""}}catch(e){}};
-  $("#jc").oninput=()=>{if($("#jc").value.trim().length===4)prefill()};
-  if(sess.code)prefill();
+  if(!code0)$("#jc").focus();else $("#jn").focus();
+  $("#jn").onkeydown=e=>{if(e.key==="Enter")$("#jgo").click()};
   $("#jgo").onclick=async()=>{
-    const code=$("#jc").value.trim(),station=+$("#js").value,stay=$("#jst").value.trim(),move=$("#jmv").value.trim(),stay2=$("#jst2").value.trim();
+    const code=$("#jc").value.trim(),name=$("#jn").value.trim().replace(/\s+/g," ");
     if(!/^\d{4}$/.test(code))return $("#jerr").textContent="Type the 4-digit code from the board.";
-    if(!stay||!move)return $("#jerr").textContent="Type both names: the stayer and the starting mover.";
+    if(name.length<2)return $("#jerr").textContent="Type your first name and last initial.";
     $("#jgo").disabled=true;
     try{const g=await N.get("games/"+code);if(!g||g.game!==GAME){$("#jgo").disabled=false;return $("#jerr").textContent="No Teach It Back game with that code."}
-      const old=(g.players||{})["s"+station];
-      if(old&&old.stay&&old.stay!==stay&&!confirm(`Station ${station} already joined as ${old.stay} and ${old.move}. Replace it?`)){$("#jgo").disabled=false;return}
-      await N.set(`games/${code}/players/s${station}`,{station,stay,stay2,move,res:(old&&old.res)||{}});
-      ME={code,station};store.set(SKEY,ME);startStation()}
+      const same=Object.values(g.players||{}).find(r=>r&&r.pid&&normName(r.name)===normName(name));
+      const pid=same?same.pid:"p"+Math.floor(100000+Math.random()*900000);
+      if(!same)await N.set(`games/${code}/players/${pid}`,{pid,name,t:Date.now()});
+      const sess={code,pid,name:same?same.name:name};store.set(SKEY,sess);startDevice(sess)}
     catch(e){$("#jgo").disabled=false;$("#jerr").textContent="Couldn't reach the game. Check the Wi-Fi and try again."}};
 }
-async function startStation(){
+let DEV=null; // {code,pid,name,off}
+async function startDevice(s0){
   const N=await net().catch(()=>null);if(!N)return needSetup();
-  $("#homeBtn").textContent="↻ Rejoin";$("#homeBtn").style.display="";$("#homeBtn").onclick=()=>{CUR=null;joinForm()};
-  $("#ttl").innerHTML=`Station ${ME.station} &nbsp;·&nbsp; <span>Teach It Back</span>`;
-  try{LIVE.recs=(await N.get(`games/${ME.code}/players`))||{}}catch(e){}
-  if(ME.off)ME.off();
-  ME.off=N.on(`games/${ME.code}/state`,st=>{LIVE.state=st;stationRender()});
+  const s=s0||store.get(SKEY,null);if(!s||!s.code||!s.pid)return joinForm();
+  if(DEV&&DEV.off)DEV.off();
+  DEV={...s};GCODE=s.code;
+  $("#homeBtn").textContent="↻ Rejoin";$("#homeBtn").style.display="";$("#homeBtn").onclick=()=>{if(DEV&&DEV.off)DEV.off();CUR=null;ME=null;joinForm()};
+  try{LIVE.recs=(await N.get(`games/${s.code}/players`))||{}}catch(e){}
+  DEV.off=N.on(`games/${s.code}/state`,st=>{LIVE.state=st;deviceRender()});
+}
+function deviceRender(){
+  const st=LIVE.state;
+  if(!st){CUR=null;app.innerHTML=`<div class="panel center"><h2>This game has ended or the code is wrong.</h2><div class="acts" style="justify-content:center"><button class="btn" id="rj">Join another game</button></div></div>`;$("#rj").onclick=()=>joinForm();return}
+  const seat=st.assign&&st.assign.seats&&st.assign.seats[DEV.pid];
+  if(!seat){CUR=null;ME=null;syncClock();
+    $("#ttl").innerHTML=`${esc(DEV.name)} &nbsp;·&nbsp; <span>Teach It Back</span>`;
+    app.innerHTML=`<div class="panel center"><h1 style="font-size:40px">You're in, ${esc(DEV.name)}!</h1><p style="font-size:1.2em">${st.phase==="lobby"?"Waiting for your teacher to set up the stations.":"Your teacher will add you to a station in a moment."}</p><p class="muted">Grab a whiteboard, a marker and a calculator.</p></div>`;return}
+  if(seat.primary){
+    if(!ME||ME.station!==seat.station){CUR=null;ME={code:DEV.code,station:seat.station}}
+    $("#ttl").innerHTML=`Station ${ME.station} &nbsp;·&nbsp; <span>Teach It Back</span>`;
+    return stationRender()}
+  ME=null;CUR=null;companionRender(seat);
+}
+function seatNow(seat,bIdx,N){if(seat.role!=="move")return seat.station;return((seat.station-1)+(rotOf(bIdx)-1))%N+1}
+function companionRender(seat){
+  const st=LIVE.state;syncClock();
+  const go=()=>net().then(N=>N.get(`games/${DEV.code}/players`)).then(r=>{LIVE.recs=r||LIVE.recs;draw()}).catch(draw);
+  const draw=()=>{
+    const recs=LIVE.recs,N=st.stations,home=recs["s"+seat.station]||{};
+    $("#ttl").innerHTML=`${esc(DEV.name)} &nbsp;·&nbsp; <span>Teach It Back</span>`;
+    if(st.phase==="lobby"){
+      app.innerHTML=`<div class="panel center"><div class="muted" style="font-size:1.2em">You're a <b>${seat.role==="move"?"MOVER":"STAYER"}</b>. Start at</div><div class="osw" style="font-size:120px;line-height:1;color:var(--red)">Station ${seat.station}</div>
+       <p style="font-size:1.2em">${seat.role==="move"?`You start with <b>${esc(home.stay)}</b>${home.stay2?" and <b>"+esc(home.stay2)+"</b>":""}. Every rotation you move up one station. This screen always tells you where to go.`:`You stay here all game with <b>${esc(home.stay)}</b>. Work on ${esc(home.stay)}'s iPad.`}</p>
+       <p class="muted">Work on the station iPad (the stayer's). Keep this screen open to see where to go.</p></div>`;return}
+    if(st.phase==="end"){app.innerHTML=`<div class="panel center"><h1 style="font-size:44px">That's the game!</h1><p style="font-size:1.2em">Eyes on the board for the final standings.</p></div>`;return}
+    const b=SCHED[st.block],at=seatNow(seat,st.block,N),pr=pairAt(recs,at,st.block,N)||{stay:[],move:""},host=recs["s"+at]||{};
+    const mates=[...pr.stay,pr.move].filter(n=>n&&normName(n)!==normName(DEV.name));
+    let role="";
+    if(b.type==="rot"){const teach=(b.teach==="move")===(seat.role==="move");
+      role=`<div class="${teach?"te":"le"}" style="border-radius:12px;padding:14px 18px;color:#fff;background:${teach?"var(--ink)":"var(--red)"};font-size:1.2em;margin-top:12px"><b class="osw" style="font-size:1.5em;display:block">${teach?"You're the TEACHER · 3× points":"You're the LEARNER · 1× points"}</b>${teach?"Coach on the whiteboard. Don't touch the iPad.":"Work it out on the whiteboard, then type it in."}</div>`}
+    else role=`<div style="border-radius:12px;padding:14px 18px;color:#fff;background:var(--k2);font-size:1.2em;margin-top:12px"><b class="osw" style="font-size:1.5em;display:block">${b.type==="kahoot"?"Kahoot Break":"Define It"}: you're teammates</b>You both get the points.</div>`;
+    const {tot}=standings(recs,N),mine=tot[home.stay===DEV.name||home.stay2===DEV.name||home.move===DEV.name?DEV.name:""];
+    app.innerHTML=`<div class="panel center"><div class="muted" style="font-size:1.1em">${b.type==="rot"?b.label+": "+ROUNDS[b.round].name:b.label}</div>
+      <div class="muted" style="font-size:1.3em;margin-top:10px">${seat.role==="move"&&b.type==="rot"?"Go to":"You're at"}</div><div class="osw" style="font-size:130px;line-height:1;color:var(--red)">Station ${at}</div>
+      <p style="font-size:1.3em;margin:8px 0">Partner: <b>${mates.map(esc).join(" & ")||"your partner"}</b></p><p style="font-size:1.1em;margin:0" class="muted">Work on ${esc(host.stay||"the stayer")}'s iPad</p>${role}
+      ${mine!=null?`<p style="font-size:1.15em;margin-top:14px">Your points so far: <b>${fmt(mine)}</b></p>`:""}</div>`;
+  };
+  go();
 }
 function stationRender(){
   const st=LIVE.state;
-  if(!st){app.innerHTML=`<div class="panel center"><h2>This game has ended or the code is wrong.</h2><div class="acts" style="justify-content:center"><button class="btn" id="rj">Join another game</button></div></div>`;$("#rj").onclick=()=>joinForm();return}
   syncClock();
   if(st.phase==="lobby"){CUR=null;const me=LIVE.recs["s"+ME.station]||{};
-    app.innerHTML=`<div class="panel center"><h1 style="font-size:40px">You're in! Station ${ME.station}</h1><p style="font-size:1.2em">Stayer: <b>${esc(me.stay||"")}</b>${me.stay2?" and <b>"+esc(me.stay2)+"</b>":""} &nbsp;·&nbsp; Starting mover: <b>${esc(me.move||"")}</b></p><p class="muted">Get a whiteboard, marker and calculator. The game starts from the board.</p></div>`;
+    app.innerHTML=`<div class="panel center"><div class="muted" style="font-size:1.2em">You're a <b>STAYER</b>. You sit at</div><div class="osw" style="font-size:120px;line-height:1;color:var(--red)">Station ${ME.station}</div><p style="font-size:1.2em">all game${me.stay2?" with <b>"+esc(me.stay2)+"</b>":""}. <b>Your iPad is the station iPad.</b> Leave it on this desk.</p><p style="font-size:1.1em">Your first partner: <b>${esc(me.move||"")}</b></p><p class="muted">Get a whiteboard, marker and calculator. The game starts from the board.</p></div>`;
     net().then(N=>N.get(`games/${ME.code}/players`)).then(r=>{LIVE.recs=r||LIVE.recs}).catch(()=>{});return}
   if(st.phase==="end"){CUR=null;clearInterval(KTIMER);app.innerHTML=`<div class="panel center"><h1 style="font-size:44px">That's the game!</h1><p style="font-size:1.2em">Eyes on the board for the final standings.</p></div>`;return}
   const isDef=SCHED[st.block].type==="def",key=isDef?`${st.block}|${st.dp||0}|${st.dph||"write"}|${JSON.stringify((st.hide||{})[defKey(st.block,st.dp||0)]||[])}`:String(st.block);
@@ -890,25 +927,53 @@ function hostRender(fresh){
   if(fresh)hostPlay();else hostLiveBits();
 }
 function stationList(){return Object.values(H.recs).filter(r=>r&&r.station).sort((a,b)=>a.station-b.station)}
+function hostPlayers(){return Object.values(H.recs||{}).filter(r=>r&&r.pid).sort((a,b)=>a.name.localeCompare(b.name))}
+function unplaced(){const A=H.state.assign;return hostPlayers().filter(p=>!(A&&A.seats&&A.seats[p.pid]))}
+async function assignStations(){
+  const ps=shuffle(rng(Date.now()%2147483647),hostPlayers());if(ps.length<2)return;
+  const used={},nameOf=p=>{let n=p.name,k=2;while(used[normName(n)])n=p.name+" ("+(k++)+")";used[normName(n)]=1;return n};
+  const nm={};ps.forEach(p=>nm[p.pid]=nameOf(p));
+  const N=Math.floor(ps.length/2),seats={},recs={};
+  for(let k=1;k<=N;k++){const s=ps[k-1],m=ps[N+k-1];recs[k]={station:k,stay:nm[s.pid],stay2:"",move:nm[m.pid],res:{}};
+    seats[s.pid]={station:k,role:"stay",primary:true};seats[m.pid]={station:k,role:"move"}}
+  if(ps.length%2){const x=ps[2*N],k=1+Math.floor(Math.random()*N);recs[k].stay2=nm[x.pid];seats[x.pid]={station:k,role:"stay",primary:false}}
+  const old=stationList().map(r=>r.station).filter(k=>k>N);
+  try{await Promise.all([...Object.values(recs).map(r=>H.N.set(`games/${H.code}/players/s${r.station}`,r)),...old.map(k=>H.N.set(`games/${H.code}/players/s${k}`,null))])}catch(e){alert("Couldn't save the stations. Try again.");return}
+  setState({assign:{seats},stations:N});
+}
+async function placeLate(){
+  const A=H.state.assign;if(!A)return;const seats={...A.seats};const late=unplaced();const full=[];
+  for(const p of late){
+    const open=stationList().filter(r=>!r.stay2&&!Object.values(seats).some(s=>s.station===r.station&&s.role==="stay"&&!s.primary));
+    if(!open.length){full.push(p.name);continue}
+    const r=open[Math.floor(Math.random()*open.length)];
+    try{await H.N.update(`games/${H.code}/players/s${r.station}`,{stay2:p.name});r.stay2=p.name}catch(e){continue}
+    seats[p.pid]={station:r.station,role:"stay",primary:false};
+  }
+  await setState({assign:{seats}});
+  if(full.length)alert("Every station already has 3 people, so these students weren't placed: "+full.join(", "));
+}
 function hostLobby(){
-  const list=stationList(),max=list.length?list[list.length-1].station:0;
-  const gaps=[];for(let k=1;k<=max;k++)if(!H.recs["s"+k])gaps.push(k);
-  const url=location.host?location.host+"/chapter-10/teach-it-back":"/chapter-10/teach-it-back";
+  const ps=hostPlayers(),A=H.state.assign,list=stationList(),late=A?unplaced():[];
   const joinURL=location.origin+"/chapter-10/teach-it-back?code="+H.code;
+  const url=location.host?location.host+"/chapter-10/teach-it-back":"/chapter-10/teach-it-back";
   $("#ttl").innerHTML=`Teach It Back: <span>Bonds</span> &nbsp;·&nbsp; Code ${H.code}`;
-  app.innerHTML=`<div class="hostgrid"><div class="panel"><div class="muted" style="font-size:22px">Station iPads go to</div><div class="osw" style="font-size:40px">${esc(url)}</div>
-    <div class="muted" style="font-size:22px;margin-top:14px">Game code</div><div class="row" style="gap:28px;align-items:center;flex-wrap:nowrap"><div class="osw" style="font-size:150px;line-height:1;letter-spacing:.08em;color:var(--red)">${H.code}</div><div id="qr" style="width:300px;height:300px;flex:none" title="Scan to join"></div></div>
-    <p class="muted" style="font-size:18px;margin-top:4px">Scan the code with the iPad camera to open the game with the code filled in.</p>
-    <p style="font-size:22px">Each iPad types the code, its station number, the <b>stayer</b> (sits here all game) and the <b>starting mover</b>.</p>
-    <p style="font-size:19px" class="muted">Movers slide up one station each rotation. The last station goes to Station 1. Odd number of students? Put the extra student at a station as a second stayer.</p>
-    <div class="acts"><button class="btn" id="start" ${list.length<2||gaps.length?"disabled":""}>Start Rotation 1 with ${list.length} stations</button><button class="btn sec" id="erase">Erase game</button></div>
-    ${gaps.length?`<p style="color:var(--red);font-weight:700;font-size:19px">Missing station ${gaps.join(", ")}. Stations must be numbered 1 to ${max} with no gaps.</p>`:""}</div>
-   <div class="panel"><h3 style="font-size:28px">Stations joined: ${list.length}</h3><table class="pvt" style="font-size:19px;margin-top:10px"><tr><th>#</th><th style="text-align:left">Stayer</th><th style="text-align:left">Starting mover</th></tr>
-    ${list.map(r=>`<tr><td>${r.station}</td><td style="text-align:left">${esc(r.stay)}${r.stay2?" & "+esc(r.stay2):""}</td><td style="text-align:left">${esc(r.move)}</td></tr>`).join("")}</table></div></div>`;
+  const right=!A?`<h3 style="font-size:28px">Students joined: ${ps.length}</h3><div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:12px">${ps.map(p=>`<span style="background:var(--bg);border-radius:20px;padding:6px 14px;font-size:20px">${esc(p.name)}</span>`).join("")||`<p class="muted" style="font-size:20px">Waiting for students...</p>`}</div>`
+    :`<h3 style="font-size:28px">${list.length} stations</h3><table class="pvt" style="font-size:19px;margin-top:10px"><tr><th>#</th><th style="text-align:left">Stayer (station iPad)</th><th style="text-align:left">Starting mover</th></tr>
+      ${list.map(r=>`<tr><td>${r.station}</td><td style="text-align:left">${esc(r.stay)}${r.stay2?" & "+esc(r.stay2):""}</td><td style="text-align:left">${esc(r.move)}</td></tr>`).join("")}</table>
+      ${late.length?`<p style="font-size:19px;margin-top:12px"><b style="color:var(--red)">Joined after you assigned:</b> ${late.map(p=>esc(p.name)).join(", ")} <button class="btn sec" id="late" style="margin-left:6px">Add them as extra stayers</button></p>`:""}`;
+  app.innerHTML=`<div class="hostgrid"><div class="panel"><div class="muted" style="font-size:22px">Scan to join, or go to</div><div class="osw" style="font-size:36px">${esc(url)}</div>
+    <div class="row" style="gap:28px;align-items:center;flex-wrap:nowrap;margin-top:10px"><div><div class="muted" style="font-size:22px">Game code</div><div class="osw" style="font-size:140px;line-height:1;letter-spacing:.08em;color:var(--red)">${H.code}</div></div><div id="qr" style="width:300px;height:300px;flex:none" title="Scan to join"></div></div>
+    <p style="font-size:22px;margin-top:12px">Everyone joins on their own iPad and types <b>just their name</b>.</p>
+    <p style="font-size:19px" class="muted">${A?"Each pair has a <b>stayer</b> and a <b>mover</b>. The stayer's iPad is the station iPad and stays on the desk. Movers slide up one station each rotation, and their own iPad shows where to go.":"When everyone is in, click <b>Assign stations</b>. Students are paired at random: one stayer and one mover per station. With an odd number, one station gets a second stayer."}</p>
+    <div class="acts">${A?`<button class="btn" id="start">Start Rotation 1 with ${list.length} stations</button><button class="btn sec" id="assign">Reshuffle</button>`:`<button class="btn" id="assign" ${ps.length<2?"disabled":""}>Assign stations (${ps.length} students)</button>`}<button class="btn sec" id="erase">Erase game</button></div></div>
+   <div class="panel">${right}</div></div>`;
   const qr=$("#qr");
   if(H.qrFor===joinURL&&H.qrSvg)qr.innerHTML=H.qrSvg;
   else import("/chapter-10/qr.js").then(m=>{H.qrSvg=m.qrSVG(joinURL,"#141414");H.qrFor=joinURL;const el=$("#qr");if(el)el.innerHTML=H.qrSvg}).catch(()=>{if($("#qr"))$("#qr").style.display="none"});
-  $("#start").onclick=()=>setState({phase:"play",block:0,stations:list.length,timerEnd:0,paused:null});
+  $("#assign").onclick=()=>{if(A&&!confirm("Reshuffle every station?"))return;assignStations()};
+  if($("#start"))$("#start").onclick=()=>{if(late.length&&!confirm(late.length+" student(s) aren't at a station yet. Start anyway?"))return;setState({phase:"play",block:0,timerEnd:0,paused:null,dp:0,dph:"write"})};
+  if($("#late"))$("#late").onclick=placeLate;
   $("#erase").onclick=hostErase;
 }
 function hostPlay(){
@@ -953,11 +1018,11 @@ function hostLiveBits(){
   const list=stationList(),dn=list.filter(r=>r.res&&r.res[st.block]&&r.res[st.block].done).length;
   const d=$("#done");if(d)d.innerHTML=`<b>${dn}</b> of ${list.length} stations finished this block`;
   if(SCHED[st.block].type==="def")hostDefBits();
-  let warn=$("#latejoin");const max=list.length?list[list.length-1].station:0;
-  if(max!==N||list.length!==N){
+  let warn=$("#latejoin");const late=unplaced();
+  if(late.length){
     if(!warn){warn=document.createElement("div");warn.id="latejoin";warn.className="panel";warn.style.cssText="border:3px solid var(--red);font-size:19px";app.prepend(warn)}
-    warn.innerHTML=`<b style="color:var(--red)">The game started with ${N} stations, but ${list.length} have joined now.</b> Stations must be numbered 1 to ${list.length}. <button class="btn" id="fixN" style="margin-left:10px">Use ${list.length} stations</button> <span class="muted">Best done before Rotation 2. Changing it re-pairs who-moved-where for the whole game.</span>`;
-    $("#fixN").onclick=()=>{if(confirm(`Switch the game to ${list.length} stations?`))setState({stations:list.length})}}
+    warn.innerHTML=`<b style="color:var(--red)">Joined late:</b> ${late.map(p=>esc(p.name)).join(", ")} <button class="btn" id="late" style="margin-left:10px">Add them as extra stayers</button> <span class="muted">Each joins a station that has 2 people. Their iPad shows where to sit.</span>`;
+    $("#late").onclick=placeLate}
   else if(warn)warn.remove();
 }
 function hostDefBits(){
@@ -1041,7 +1106,7 @@ async function hostErase(){if(!confirm("Erase this game and all its scores?"))re
 function mmss(s){s=Math.max(0,Math.round(s));return Math.floor(s/60)+":"+String(s%60).padStart(2,"0")}
 /* ---------- start ---------- */
 if(ROLE==="teacher"){$("#pvBtn").style.display="none";app.style.maxWidth="1700px";$("#homeBtn").style.display="none";hostSetup()}
-else{const s=store.get(SKEY,null);if(s&&s.code&&s.station){ME=s;startStation()}else joinForm()}
+else{const s=store.get(SKEY,null),qc=params.get("code");if(s&&s.code&&s.pid&&(!qc||qc===s.code))startDevice(s);else joinForm()}
 
 </script>
 </body>
