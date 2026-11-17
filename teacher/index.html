@@ -96,7 +96,7 @@ h1{font-family:var(--display);font-weight:700;font-size:clamp(40px,6vw,64px);lin
     <a class="card" href="/teacher/teach-it-back">
       <span class="chip">Chapter 10</span>
       <h2>Teach It Back</h2>
-      <p>Bonds. Students join with just their name and the game pairs them at stations: a stayer and a mover. Every rotation the movers slide up one station, so each pair is new, and whoever learned a skill teaches it to the next partner. Five skills (PV table lookup, pricing with factors, issuance entries from a price quote, interest entries with straight-line amortization, cash interest rapid fire), then four rotations of the whole bond process. Teachers earn 3× points, learners 1×. Every problem has two hints that cut its points (½, then ¼), a bonus problem every rotation for pairs who finish early, a Kahoot break after every four rotations followed by a Define It round (every team writes a definition, then everyone votes on which one is real), a live leaderboard, and a slow 5th-to-1st finale. About two class periods; the game is saved for 3 days.</p>
+      <p>Bonds. Students join with just their name and the game pairs them at stations: a stayer and a mover. Skills come in pairs: odd stations learn one skill while even stations learn the other (with a free worked example), then movers teach what they learned, then stayers teach what they learned, so every teacher has done the skill as a learner first. Six skills (PV table lookup, pricing with factors, issuance entries, interest entries, cash interest, par/discount/premium), then four rotations of the whole bond process. Teachers earn 3× points, learners 1×. Every problem has two hints that cut its points (½, then ¼), a bonus problem every rotation, a Kahoot break and a Define It round after every three rotations, a live leaderboard, and a slow 5th-to-1st finale. About two class periods; the game is saved for 3 days.</p>
       <div class="stu">Stations go to <b>Teach It Back</b> on the site <span class="go">Host →</span></div>
     </a>
     <a class="card" href="/teacher/bond-underwriter">
@@ -304,6 +304,7 @@ const HOW = [
    tell:[
     "Stayers sit at one station all game. Movers slide up one station number every rotation (the last station goes to Station 1).",
     "The learner works on the whiteboard and types into the iPad. The teacher coaches and does not touch the iPad.",
+    "First rotation of each skill pair: you're BOTH learners (a free worked example is on the iPad). Next rotation one of you teaches it, so you both need to know it.",
     "Teachers earn 3 times the points their pair scores. Learners earn 1 times. Teach well!",
     "Right on the first try: full points. Second try: half. After two misses the iPad shows how to do it.",
     "Stuck? Hint 1 cuts that problem's points in half. Hint 2 cuts them to a quarter.",
@@ -317,7 +318,7 @@ const HOW = [
     "If you learned it last rotation, you teach it this rotation, so pay attention as the learner."
    ],
    steps:[
-    "Number the desks 1, 2, 3 and so on (about half as many desks as students).",
+    "Number the desks 1, 2, 3 and so on (about half as many desks as students). The game always uses an even number of stations.",
     "Open Teach It Back and click <b>Create game</b>.",
     "Students scan the QR code (or go to <code>/chapter-10/teach-it-back</code>) and type just their name.",
     "Click <b>Assign stations</b>. Each student's iPad shows their station and whether they stay or move. The stayer's iPad is the station iPad and stays on the desk.",
