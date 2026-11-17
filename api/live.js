@@ -4,6 +4,7 @@
 const URL_ = process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL;
 const TOKEN = process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN;
 const TTL = 60 * 60 * 4; // games erase themselves after 4 hours
+const MAX_DAYS = 7; // a game can ask to be kept longer with { days: n } when it is created (Teach It Back runs over two days)
 
 async function r(cmd) {
   const res = await fetch(URL_, { method: "POST", headers: { Authorization: "Bearer " + TOKEN, "Content-Type": "application/json" }, body: JSON.stringify(cmd) });
@@ -26,6 +27,7 @@ module.exports = async (req, res) => {
   const code = parts[1], rest = parts.slice(2);
   if (parts[0] !== "games" || !/^\d{4}$/.test(code || "")) return res.status(400).json({ error: "Bad path" });
   const K = keys(code);
+  const ttlNow = async () => { const t = await r(["TTL", K.meta]); return t > 0 ? t : TTL; };
   try {
     if (b.op === "get") {
       if (!rest.length) {
@@ -41,15 +43,16 @@ module.exports = async (req, res) => {
     if (b.op === "set") {
       if (!rest.length) {
         const { state, players, ...meta } = b.v || {};
-        const ok = await r(["SET", K.meta, JSON.stringify(meta), "EX", TTL, "NX"]);
+        const life = meta.days > 0 ? Math.round(Math.min(MAX_DAYS, Number(meta.days)) * 86400) : TTL;
+        const ok = await r(["SET", K.meta, JSON.stringify(meta), "EX", life, "NX"]);
         if (!ok) return res.status(409).json({ error: "Code in use" });
-        await r(["SET", K.state, JSON.stringify(state || null), "EX", TTL]);
+        await r(["SET", K.state, JSON.stringify(state || null), "EX", life]);
         return res.json({ ok: true });
       }
-      if (rest[0] === "state") { await r(["SET", K.state, JSON.stringify(b.v), "EX", TTL]); return res.json({ ok: true }); }
+      if (rest[0] === "state") { await r(["SET", K.state, JSON.stringify(b.v), "EX", await ttlNow()]); return res.json({ ok: true }); }
       if (rest[0] === "players" && rest[1]) {
         if (!(await r(["EXISTS", K.meta]))) return res.status(404).json({ error: "No game" });
-        await r(["HSET", K.players, rest[1], JSON.stringify(b.v)]); await r(["EXPIRE", K.players, TTL]);
+        await r(["HSET", K.players, rest[1], JSON.stringify(b.v)]); await r(["EXPIRE", K.players, await ttlNow()]);
         return res.json({ ok: true });
       }
     }

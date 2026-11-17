@@ -93,6 +93,12 @@ h1{font-family:var(--display);font-weight:700;font-size:clamp(40px,6vw,64px);lin
       <p>Kahoot-style review of Chapter 10 bonds: seven timed rounds from bond vocabulary and par, discount or premium through cash interest, periods and rates, pricing with PV factors, issuance entries, and straight-line amortization and carrying value, with a live leaderboard, then a report of what to reteach. About 12 to 15 minutes.</p>
       <div class="stu">Students go to <b>Bonds Live</b> on the site <span class="go">Host →</span></div>
     </a>
+    <a class="card" href="/teacher/teach-it-back">
+      <span class="chip">Chapter 10</span>
+      <h2>Teach It Back</h2>
+      <p>Bonds. One iPad per station, two students per station: a stayer and a mover. Every rotation the movers slide up one station, so each pair is new, and whoever learned a skill teaches it to the next partner. Five skills (PV table lookup, pricing with factors, issuance entries from a price quote, interest entries with straight-line amortization, cash interest rapid fire), then four rotations of the whole bond process. Teachers earn 3× points, learners 1×. A bonus problem every rotation for pairs who finish early, Kahoot breaks after every four rotations, a live leaderboard, and a slow 5th-to-1st finale. About two class periods; the game is saved for 3 days.</p>
+      <div class="stu">Stations go to <b>Teach It Back</b> on the site <span class="go">Host →</span></div>
+    </a>
     <a class="card" href="/teacher/bond-underwriter">
       <span class="chip">Chapter 10</span>
       <h2>The Underwriting Desk</h2>
@@ -287,6 +293,38 @@ const HOW = [
    steps: KAHOOT_STEPS("Bonds Live", "/chapter-10/bonds-live"),
    need: KAHOOT_NEED,
    tip:"Seven rounds, 3 questions each by default. A student who drops taps <b>Rejoin</b> on their iPad."},
+ { id:"teachback", name:"Teach It Back", unit:"Chapter 10", href:"/teacher/teach-it-back",
+   who:"1 iPad per station, 2 students per station (a stayer and a mover). Odd number? One station gets a second stayer.", go:"/chapter-10/teach-it-back",
+   learn:[
+    "Finding n, i and both factors on the PV tables (always the MARKET rate per period).",
+    "Pricing a bond: PV of par + PV of the interest payments.",
+    "Issuance entries from a price quote, and interest entries with straight-line amortization.",
+    "Cash interest per payment, then the whole bond process start to finish."
+   ],
+   tell:[
+    "Stayers sit at one station all game. Movers slide up one station number every rotation (the last station goes to Station 1).",
+    "The learner works on the whiteboard and types into the iPad. The teacher coaches and does not touch the iPad.",
+    "Teachers earn 3 times the points their pair scores. Learners earn 1 times. Teach well!",
+    "Right on the first try: full points. Second try: half. After two misses the iPad shows how to do it.",
+    "Finish early? Do the bonus problem for up to 30 more points. Kahoot breaks: you and your partner are teammates and both get the points."
+   ],
+   strat:[
+    "Teachers: make the learner say each step out loud before typing it.",
+    "Use the MARKET rate for n and i and the PV factors. Use the CONTRACT rate for cash interest.",
+    "Bonds Payable is always recorded at par. A discount is a debit, a premium is a credit.",
+    "If you learned it last rotation, you teach it this rotation, so pay attention as the learner."
+   ],
+   steps:[
+    "Number the desks 1, 2, 3 and so on. One iPad per desk.",
+    "Open Teach It Back and click <b>Create game</b>.",
+    "Each iPad goes to <code>/chapter-10/teach-it-back</code> and enters the code, its station number, the stayer and the starting mover.",
+    "When every station shows in the list, click <b>Start Rotation 1</b>. The iPads follow the board automatically.",
+    "Start the timer each block. When time is up, movers slide up one station and you click <b>Next block</b>.",
+    "Day 2: open Teach It Back, click <b>Resume</b> with the same code, and pick the block to start on from the schedule.",
+    "After Rotation 14, click <b>Final standings</b> for the 5th-to-1st reveal. <b>End game now</b> jumps there any time. <b>Download scores</b> saves a spreadsheet."
+   ],
+   need:["Mini whiteboards, markers and calculators. PV tables (also on the iPad).","About two class periods: 7 minutes per skill rotation, 9 per full-process rotation, 5 per Kahoot break."],
+   tip:"Students who leave the page tap <b>Rejoin</b> and pick their station. Their work and points are kept."},
  { id:"underwriting", name:"The Underwriting Desk", unit:"Chapter 10", href:"/teacher/bond-underwriter",
    who:"1 iPad per team (a desk of 2 to 4 students).", go:"/chapter-10/bond-underwriter",
    learn:[

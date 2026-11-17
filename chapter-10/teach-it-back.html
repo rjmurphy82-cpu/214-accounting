@@ -1,0 +1,898 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>Teach It Back: Bonds | Accounting Chapter 10</title>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--red:#C1102F;--dk:#8E0B22;--ink:#141414;--mu:#5E5E5E;--ln:#DADADA;--bg:#F4F4F2;--ok:#1E8A4C;--bad:#C1102F;--gold:#E3A500;
+  --k1:#E21B3C;--k2:#1368CE;--k3:#D89E00;--k4:#26890C;--fs:1}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:Barlow,system-ui,sans-serif;-webkit-tap-highlight-color:transparent}
+body{font-size:calc(19px*var(--fs))}
+h1,h2,h3,.osw{font-family:Oswald,"Arial Narrow",Arial,sans-serif;font-weight:600;letter-spacing:.02em;margin:0}
+button{font:inherit;cursor:pointer;border:none;border-radius:10px}
+input,select{font:inherit}
+.top{background:var(--ink);color:#fff;display:flex;align-items:center;gap:14px;padding:10px 18px;position:sticky;top:0;z-index:5}
+.logo{background:var(--red);font-family:Oswald,"Arial Narrow",Arial,sans-serif;font-weight:700;padding:4px 10px;border-radius:6px;font-size:20px}
+.top .t{font-family:Oswald,"Arial Narrow",Arial,sans-serif;font-size:21px;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.top .t span{color:#ff8a9c}
+.tb{background:#2b2b2b;color:#fff;padding:7px 12px;font-size:16px}
+.tb:active{background:#444}
+.wrap{max-width:1180px;margin:0 auto;padding:18px}
+.panel{background:#fff;border-radius:14px;padding:20px 22px;box-shadow:0 1px 3px rgba(0,0,0,.08);margin-bottom:16px}
+.btn{background:var(--red);color:#fff;padding:13px 22px;font-weight:700;font-size:1.05em}
+.btn:active{background:var(--dk)}
+.btn.sec{background:#e9e9e9;color:var(--ink)}
+.btn.gold{background:var(--gold);color:#111}
+.btn.ok{background:var(--ok)}
+.btn:disabled{opacity:.45}
+.grid17{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:12px}
+.blk{background:#fff;border:2px solid var(--ln);border-radius:12px;padding:12px;text-align:left;min-height:96px}
+.blk .n{font-family:Oswald,"Arial Narrow",Arial,sans-serif;font-size:15px;color:var(--mu);text-transform:uppercase}
+.blk .nm{font-family:Oswald,"Arial Narrow",Arial,sans-serif;font-size:20px;margin:2px 0}
+.blk .rl{font-size:15px;color:var(--mu)}
+.blk.k{border-color:var(--k2);background:#EEF4FC}
+.blk.done{border-color:var(--ok);background:#EFF8F2}
+.blk.done .n::after{content:"  ✓ done";color:var(--ok)}
+.role{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
+.role div{border-radius:12px;padding:12px 16px;color:#fff}
+.role .te{background:var(--ink)}
+.role .le{background:var(--red)}
+.role b{font-family:Oswald,"Arial Narrow",Arial,sans-serif;font-size:1.15em;display:block}
+.role small{opacity:.85;font-size:.85em}
+.work{display:grid;grid-template-columns:1fr 1.05fr;gap:16px;align-items:start}
+.prob{font-size:1.12em;line-height:1.45}
+.prob .co{font-family:Oswald,"Arial Narrow",Arial,sans-serif;font-size:1.25em;color:var(--red)}
+.facts{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;margin-top:10px;background:var(--bg);padding:12px 14px;border-radius:10px}
+.facts dt{color:var(--mu)}
+.facts dd{margin:0;font-weight:700}
+.prog{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+.prog i{width:30px;height:9px;border-radius:5px;background:var(--ln)}
+.prog i.on{background:var(--ink)}
+.prog i.ok{background:var(--ok)}
+.prog i.half{background:var(--gold)}
+.prog i.miss{background:var(--bad)}
+.fld{display:grid;grid-template-columns:1fr 190px;gap:10px;align-items:center;padding:7px 0;border-bottom:1px solid #eee}
+.fld label{font-weight:600}
+.fld input,.fld select{width:100%;padding:10px 12px;border:2px solid var(--ln);border-radius:9px;font-size:1.05em;text-align:right;background:#fff}
+.fld select{text-align:left}
+.good{border-color:var(--ok)!important;background:#EFF8F2!important}
+.wrong{border-color:var(--bad)!important;background:#FDEEF0!important}
+.je{width:100%;border-collapse:collapse;margin-top:6px}
+.je th{background:var(--ink);color:#fff;font-family:Oswald,"Arial Narrow",Arial,sans-serif;font-weight:500;padding:6px 8px;text-align:left;font-size:.85em}
+.je td{padding:4px}
+.je select,.je input{width:100%;padding:9px 8px;border:2px solid var(--ln);border-radius:8px;font-size:.98em;background:#fff}
+.je input{text-align:right}
+.je td.a{width:24%}
+.jelbl{font-family:Oswald,"Arial Narrow",Arial,sans-serif;margin-top:14px;font-size:1.05em}
+.fb{margin-top:14px;padding:12px 14px;border-radius:10px;font-size:1em;line-height:1.4}
+.fb.ok{background:#EFF8F2;border-left:6px solid var(--ok)}
+.fb.no{background:#FDEEF0;border-left:6px solid var(--bad)}
+.fb.show{background:#FFF7E0;border-left:6px solid var(--gold)}
+.acts{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}
+.big{font-family:Oswald,"Arial Narrow",Arial,sans-serif;font-size:64px;line-height:1}
+.center{text-align:center}
+.code{font-family:Oswald,"Arial Narrow",Arial,sans-serif;font-size:46px;letter-spacing:.2em;background:var(--ink);color:#fff;display:inline-block;padding:6px 22px;border-radius:12px}
+.muted{color:var(--mu)}
+.tag{display:inline-block;font-family:Oswald,"Arial Narrow",Arial,sans-serif;font-size:.8em;padding:2px 9px;border-radius:20px;background:var(--gold);color:#111;margin-left:8px;vertical-align:middle}
+.steps{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.steps span{font-family:Oswald,"Arial Narrow",Arial,sans-serif;padding:5px 12px;border-radius:20px;background:#e9e9e9;font-size:.85em}
+.steps span.on{background:var(--ink);color:#fff}
+.steps span.ok{background:var(--ok);color:#fff}
+/* kahoot */
+.kq{font-family:Oswald,"Arial Narrow",Arial,sans-serif;font-size:1.65em;line-height:1.25;text-align:center;margin:8px 0 16px}
+.kopts{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.kopt{color:#fff;font-size:1.15em;font-weight:700;padding:22px 18px;min-height:110px;text-align:left;display:flex;gap:14px;align-items:center;border-radius:12px}
+.kopt .sh{font-size:1.6em;width:34px;flex:none;text-align:center}
+.kopt:nth-child(1){background:var(--k1)}.kopt:nth-child(2){background:var(--k2)}.kopt:nth-child(3){background:var(--k3)}.kopt:nth-child(4){background:var(--k4)}
+.kopt.dim{opacity:.3}
+.kopt.right{outline:6px solid #111}
+.kbar{height:12px;background:#e3e3e3;border-radius:6px;overflow:hidden;margin-bottom:10px}
+.kbar i{display:block;height:100%;background:var(--k2);transition:width .25s linear}
+.kmeta{display:flex;justify-content:space-between;font-family:Oswald,"Arial Narrow",Arial,sans-serif;font-size:1.1em;margin-bottom:8px}
+/* pv tables */
+.ovl{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:20;display:flex;align-items:center;justify-content:center;padding:16px}
+.ovl .box{background:#fff;border-radius:14px;max-width:1100px;width:100%;max-height:92vh;overflow:auto;padding:16px}
+.pvt{border-collapse:collapse;font-size:14px;width:100%}
+.pvt th,.pvt td{border:1px solid #ddd;padding:3px 5px;text-align:right}
+.pvt th{background:var(--ink);color:#fff;position:sticky;top:0}
+.pvt td:first-child,.pvt th:first-child{text-align:center;font-weight:700;background:#f1f1f1;color:#111}
+.tabs{display:flex;gap:8px;margin-bottom:10px}
+.tabs button{padding:8px 14px;background:#e9e9e9}
+.tabs button.on{background:var(--ink);color:#fff}
+/* host */
+.hostgrid{display:grid;grid-template-columns:1.5fr 1fr;gap:18px}
+.timer{font-family:Oswald,"Arial Narrow",Arial,sans-serif;font-size:150px;line-height:1;text-align:center;letter-spacing:.02em}
+.timer.low{color:var(--red)}
+.now{font-family:Oswald,"Arial Narrow",Arial,sans-serif;font-size:46px;line-height:1.1}
+.now small{display:block;font-size:24px;color:var(--mu);margin-bottom:6px}
+.whob{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:16px 0}
+.whob div{border-radius:12px;padding:14px;color:#fff;font-size:22px}
+.whob b{font-family:Oswald,"Arial Narrow",Arial,sans-serif;font-size:30px;display:block}
+.sched{list-style:none;padding:0;margin:0;max-height:640px;overflow:auto}
+.sched li{display:flex;gap:10px;align-items:center;padding:7px 10px;border-radius:8px;font-size:17px;cursor:pointer}
+.sched li.on{background:var(--ink);color:#fff}
+.sched li .no{font-family:Oswald,"Arial Narrow",Arial,sans-serif;width:56px}
+.sched li.kk{color:var(--k2);font-weight:700}
+.sched li.on.kk{color:#fff;background:var(--k2)}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.chk input{padding:9px;border:2px solid var(--ln);border-radius:8px;width:110px;font-size:17px}
+/* print scorecard */
+.sc{display:none}
+@media print{
+  body{background:#fff}
+  .noprint,.top,.wrap{display:none!important}
+  .sc{display:block;font-family:Barlow,sans-serif;font-size:11pt}
+  .sc .pg{page-break-after:always;padding:.2in}
+  .sc h1{font-family:Oswald,"Arial Narrow",Arial,sans-serif;font-size:20pt;margin-bottom:2px}
+  .sc table{width:100%;border-collapse:collapse;margin-top:8px}
+  .sc th{background:#141414;color:#fff;font-family:Oswald,"Arial Narrow",Arial,sans-serif;font-weight:500;padding:5px;text-align:left;font-size:10pt;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .sc td{border-bottom:1px solid #999;padding:0 6px;height:.39in}
+  .sc tr.k td{background:#EEF4FC;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .sc .nm{display:flex;gap:30px;margin-top:6px}
+  .sc .nm div{flex:1;border-bottom:1.5px solid #000;padding-bottom:2px}
+  @page{size:letter;margin:.4in}
+}
+@media (max-width:900px){.work,.hostgrid{grid-template-columns:1fr}}
+:root{--display:Oswald,"Arial Narrow",Arial,sans-serif}
+body.finale-on{overflow:hidden}
+body.finale-on .top{visibility:hidden}
+.finale{position:fixed;inset:0;z-index:50;background:radial-gradient(120% 80% at 50% 110%,#5a0614 0%,#1a0207 45%,#070707 100%);color:#fff;display:grid;grid-template-rows:auto 1fr auto auto;justify-items:center;padding:2.2vh 3vw 2vh;overflow:hidden}
+.finale canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:1}
+.finale .rays{position:absolute;left:50%;top:62%;width:160vmax;height:160vmax;transform:translate(-50%,-50%);background:repeating-conic-gradient(from 0deg,rgba(255,255,255,.05) 0deg 8deg,transparent 8deg 22deg);animation:spin 60s linear infinite;z-index:0;mask:radial-gradient(circle,#000 0%,transparent 55%);-webkit-mask:radial-gradient(circle,#000 0%,transparent 55%)}
+@keyframes spin{to{transform:translate(-50%,-50%) rotate(360deg)}}
+.fhead{position:relative;z-index:2;text-align:center}
+.fhead .lg{height:clamp(34px,6vh,64px);display:block;margin:0 auto 1vh;border-radius:4px}
+.fhead .kick{font-family:var(--display);letter-spacing:.3em;text-transform:uppercase;color:#FF4D63;font-size:clamp(14px,2.2vh,26px)}
+.fhead h2{font-family:var(--display);font-weight:700;font-size:clamp(48px,10vh,130px);line-height:.95;margin:0;background:linear-gradient(180deg,#fff 45%,#F4B6C0);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 4px 18px rgba(193,16,47,.6))}
+.podium{position:relative;z-index:2;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));align-items:end;gap:1.6vw;width:min(92vw,1500px);align-self:end}
+.pod{display:flex;flex-direction:column;align-items:center;opacity:0;transform:translateY(40px) scale(.9);transition:opacity .5s, transform .7s cubic-bezier(.2,1.6,.4,1)}
+.pod.in{opacity:1;transform:none}
+.pod.empty{visibility:hidden}
+.pod .who{text-align:center;margin-bottom:1.2vh;max-width:100%}
+.pod .medal{width:clamp(44px,8vh,96px);height:clamp(44px,8vh,96px);border-radius:50%;display:grid;place-items:center;margin:0 auto .8vh;font-family:var(--display);font-weight:700;font-size:clamp(24px,4.6vh,56px);color:#3b2600;box-shadow:inset 0 -6px 0 rgba(0,0,0,.18),0 6px 24px rgba(0,0,0,.4)}
+.p1 .medal{background:radial-gradient(circle at 35% 30%,#FFF3B0,#FFC93C 55%,#C98A00)}
+.p2 .medal{background:radial-gradient(circle at 35% 30%,#FFFFFF,#CFD6DD 55%,#8C98A3)}
+.p3 .medal{background:radial-gradient(circle at 35% 30%,#FFD9B8,#D88B4A 55%,#8E4F1C);color:#2b1300}
+.pod .nm{font-family:var(--display);font-weight:600;font-size:clamp(26px,5.4vh,72px);line-height:1.05;overflow-wrap:anywhere}
+.p1 .nm{font-size:clamp(32px,7vh,96px);color:#fff;text-shadow:0 0 24px rgba(232,25,60,.8)}
+.pod .pts{font-weight:700;font-size:clamp(18px,3.2vh,40px);opacity:.85}
+.pod .block{width:100%;border-radius:12px 12px 0 0;display:grid;place-items:start center;padding-top:1.4vh;font-family:var(--display);font-weight:700;font-size:clamp(28px,6vh,80px);color:rgba(255,255,255,.92);background:linear-gradient(180deg,#E0213F,#8F0A20);box-shadow:inset 0 3px 0 rgba(255,255,255,.25),0 -10px 40px rgba(193,16,47,.35)}
+.p1 .block{height:26vh;background:linear-gradient(180deg,#F23A55,#A90C26)}
+.p2 .block{height:18vh}
+.p3 .block{height:13vh}
+.p1.in .who{animation:pop 1.2s ease-out .2s 2}
+@keyframes pop{50%{transform:scale(1.08)}}
+.rest{position:relative;z-index:2;display:grid;grid-template-columns:1fr 1fr;gap:1.4vw;width:min(92vw,1500px);margin-top:1.6vh}
+.row45{display:flex;align-items:center;gap:1.2vw;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);border-radius:12px;padding:1vh 1.4vw;font-size:clamp(20px,3.6vh,44px);font-weight:700;opacity:0;transform:translateX(-30px);transition:opacity .5s, transform .5s}
+.row45.in{opacity:1;transform:none}
+.row45 .r{font-family:var(--display);color:#FF4D63;min-width:1.4em}
+.row45 .n{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.row45 .s{opacity:.8}
+.fbar{position:relative;z-index:4;display:flex;gap:10px;margin-top:1.6vh;opacity:.55;transition:opacity .2s}
+.fbar:hover{opacity:1}
+.fbar .btn{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.25);color:#fff;font-size:15px;padding:6px 14px}
+@media (max-width:700px){.rest{grid-template-columns:1fr}}
+@media (prefers-reduced-motion: reduce){.finale .rays{animation:none}.pod,.row45{transition:none}.p1.in .who{animation:none}.timer.done{animation:none}}
+.btn{border:1px solid transparent}
+</style>
+</head>
+<body>
+<div class="top noprint"><a href="/" style="display:flex"><img src="/logo-214.png" alt="District 214" style="height:30px;border-radius:4px" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'logo',textContent:'214'}))"></a><div class="t" id="ttl">Teach It Back: <span>Bonds</span></div>
+<button class="tb" id="pvBtn">PV Tables</button><button class="tb" id="aMinus">A−</button><button class="tb" id="aPlus">A+</button><button class="tb" id="homeBtn" style="display:none">↻ Rejoin</button></div>
+<div class="wrap" id="app"></div>
+<div class="sc" id="sc"></div>
+<script>
+/* ================= utilities ================= */
+const $=s=>document.querySelector(s);
+const app=$("#app");
+const fmt=n=>Math.round(n).toLocaleString("en-US");
+const money=n=>"$"+fmt(n);
+const r4=x=>Math.round(x*10000)/10000;
+const pv1=(i,n)=>r4(Math.pow(1+i,-n));
+const pva=(i,n)=>r4((1-Math.pow(1+i,-n))/i);
+function rng(seed){let s=seed>>>0||1;return()=>{s^=s<<13;s>>>=0;s^=s>>17;s^=s<<5;s>>>=0;return s/4294967296}}
+const pick=(r,a)=>a[Math.floor(r()*a.length)];
+const between=(r,a,b)=>a+Math.floor(r()*(b-a+1));
+function shuffle(r,a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(r()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+const store={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+const params=new URLSearchParams(location.search);
+const HOST=params.has("host");
+const NOTABLES=params.has("notables");
+let FS=store.get("tibFS",1);
+function setFS(v){FS=Math.max(.8,Math.min(1.6,v));document.documentElement.style.setProperty("--fs",FS);store.set("tibFS",FS)}
+setFS(FS);
+$("#aMinus").onclick=()=>setFS(FS-.1);$("#aPlus").onclick=()=>setFS(FS+.1);
+if(NOTABLES)$("#pvBtn").style.display="none";
+
+/* ================= schedule ================= */
+const ROUNDS={
+ r1:{name:"Find It on the PV Tables",short:"PV Table Lookup"},
+ r2:{name:"Price the Bond",short:"Bond Pricing"},
+ r3:{name:"Issue the Bonds",short:"Issuance Entry"},
+ r4:{name:"Pay the Interest",short:"Interest Entry"},
+ r5:{name:"How Much Interest?",short:"Interest Payments"},
+ full:{name:"The Whole Deal",short:"Full Bond Process"}
+};
+const SCHED=[];
+[["r1"],["r1"],["r2"],["r2"],["K",1],["r3"],["r3"],["r4"],["r4"],["K",2],["r5"],["r5"],["full"],["full"],["K",3],["full"],["full"]].forEach(([t,k])=>{
+  if(t==="K")SCHED.push({type:"kahoot",k,label:"Kahoot Break "+k});
+  else{const rot=SCHED.filter(b=>b.type==="rot").length+1;SCHED.push({type:"rot",round:t,rot,teach:rot%2===1?"stay":"move",label:"Rotation "+rot})}
+});
+const MINUTES={rot:7,full:9,kahoot:5};
+function blockMinutes(b){return b.type==="kahoot"?MINUTES.kahoot:(b.round==="full"?MINUTES.full:MINUTES.rot)}
+
+/* ================= check codes ================= */
+function checkCode(station,blockIdx,pts){
+  const s=`${station}|${blockIdx}|${pts}|bonds-tib`;let h=2166136261;
+  for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)>>>0}
+  const A="ACDEFHJKLMNPRTUVWXY";let c="";for(let i=0;i<3;i++){c+=A[h%A.length];h=Math.floor(h/A.length)}return c}
+
+/* ================= answer checking ================= */
+function num(v){if(v==null)return NaN;v=String(v).replace(/[$,%\s]/g,"");if(v.startsWith("(")&&v.endsWith(")"))v="-"+v.slice(1,-1);return v===""?NaN:Number(v)}
+function near(kind,val,ans){
+  if(kind==="choice")return String(val||"").toLowerCase()===String(ans).toLowerCase();
+  const x=num(val);if(isNaN(x))return false;
+  if(kind==="int")return Math.round(x)===ans&&Math.abs(x-ans)<.01;
+  if(kind==="rate"){return Math.abs(x-ans)<=.011||Math.abs(x*100-ans)<=.011}
+  if(kind==="factor")return Math.abs(x-ans)<=Math.max(.0011,ans*.002);
+  return Math.abs(x-ans)<=Math.max(2,Math.abs(ans)*.005); // money: any reasonable rounding
+}
+const ACCTS=["Cash","Bonds Payable","Discount on Bonds Payable","Premium on Bonds Payable","Bond Interest Expense","Interest Payable"];
+function checkJE(rows,lines){
+  // rows: [{acct,dr,cr}] entered. lines: [[acct,"Dr"/"Cr",amt]]
+  const used=rows.filter(r=>r.acct||r.dr||r.cr);
+  const res=rows.map(()=>false);let ok=used.length===lines.length;
+  const remaining=lines.slice();
+  rows.forEach((r,ix)=>{
+    if(!(r.acct||r.dr||r.cr)){res[ix]=null;return}
+    const side=num(r.dr)>0&&!(num(r.cr)>0)?"Dr":(num(r.cr)>0&&!(num(r.dr)>0)?"Cr":null);
+    const amt=side==="Dr"?num(r.dr):num(r.cr);
+    const k=remaining.findIndex(l=>l[0]===r.acct&&l[1]===side&&near("money",amt,l[2]));
+    if(k>=0){res[ix]=true;remaining.splice(k,1)}else{res[ix]=false;ok=false}
+  });
+  if(remaining.length)ok=false;
+  return{ok,res}
+}
+
+/* ================= problem generators ================= */
+const COS=["Lakeview Logistics","Prairie Rail Co.","Summit Solar","Harbor Point Hotels","Northgate Grocers","Ridgeview Medical","Fox River Foods","Great Lakes Ferry","Cornbelt Seed Co.","Midway Air Freight","Riverbend Apartments","Maple Leaf Dairy","Crestview Health","Ironwood Builders","Bluewater Marine","Kingsley Sports","Arlington Auto Group","Windy City Bikes","Oak Park Bakery","Northline Airlines","Hersey Hill Water","Pioneer Steel","Redwood Outdoor","Silver Lake Resorts","Copper Canyon Mining","Evergreen Power","Lincoln Park Labs","Juniper Software","Starlight Theaters","Cascade Clinics"];
+const PARS=[100000,200000,250000,300000,400000,500000,600000,750000,800000,1000000,1200000,1500000];
+
+function makeBond(r,opts={}){
+  const semi=opts.semi!=null?opts.semi:r()<.7;
+  let years,i,mkt;
+  if(semi){years=between(r,3,10);i=between(r,2,7);mkt=i*2}
+  else{years=between(r,4,15);i=between(r,3,12);mkt=i}
+  let call=opts.call||pick(r,["Discount","Premium","Discount","Premium","Par"]);
+  let c;
+  if(call==="Par")c=mkt;
+  else if(call==="Discount")c=Math.max(1,mkt-pick(r,semi?[2,2,4]:[1,1,2]));
+  else c=mkt+pick(r,semi?[2,2,4]:[1,1,2]);
+  const par=opts.par||pick(r,PARS);
+  const per=semi?2:1,n=years*per,iRate=i/100;
+  const cash=Math.round(par*c/100/per);
+  const f1=pv1(iRate,n),fa=pva(iRate,n);
+  const pvPar=Math.round(par*f1),pvInt=Math.round(cash*fa),price=pvPar+pvInt;
+  call=price>par?"Premium":price<par?"Discount":"Par";
+  const diff=Math.abs(par-price),am=Math.round(diff/n);
+  const exp=call==="Discount"?cash+am:call==="Premium"?cash-am:cash;
+  const cv1=call==="Discount"?price+am:call==="Premium"?price-am:price;
+  const cv2=call==="Discount"?price+2*am:call==="Premium"?price-2*am:price;
+  return{co:opts.co||pick(r,COS),semi,years,mkt,c,par,per,n,i,cash,f1,fa,pvPar,pvInt,price,call,diff,am,exp,cv1,cv2,
+    pay:semi?"semi-annually (June 30 and December 31)":"annually (December 31)",firstDate:semi?"June 30":"December 31"}
+}
+const bondFacts=b=>[["Face (par) value",money(b.par)],["Life",b.years+" years"],["Contract rate",b.c+"%"],["Market rate",b.mkt+"%"],["Interest paid",b.semi?"Semi-annually":"Annually"]];
+
+function issueLines(b){
+  if(b.call==="Par")return[["Cash","Dr",b.price],["Bonds Payable","Cr",b.par]];
+  return b.call==="Discount"?[["Cash","Dr",b.price],["Discount on Bonds Payable","Dr",b.diff],["Bonds Payable","Cr",b.par]]
+    :[["Cash","Dr",b.price],["Premium on Bonds Payable","Cr",b.diff],["Bonds Payable","Cr",b.par]]}
+function interestLines(b){
+  if(b.call==="Par")return[["Bond Interest Expense","Dr",b.cash],["Cash","Cr",b.cash]];
+  return b.call==="Discount"?[["Bond Interest Expense","Dr",b.exp],["Discount on Bonds Payable","Cr",b.am],["Cash","Cr",b.cash]]
+    :[["Bond Interest Expense","Dr",b.exp],["Premium on Bonds Payable","Dr",b.am],["Cash","Cr",b.cash]]}
+
+const GEN={
+ r1(r,bonus){
+  const b=makeBond(r);
+  return{title:b.co,text:`${b.co} issues ${b.years}-year bonds. Interest is paid <b>${b.semi?"twice a year":"once a year"}</b>. Find the number of periods and the market rate per period, then find both factors on the PV tables.`,
+   facts:bondFacts(b),
+   fields:[{k:"n",label:"Number of periods (n)",kind:"int",ans:b.n},{k:"i",label:"Market rate per period (%)",kind:"rate",ans:b.i},
+     {k:"f1",label:"PV of $1 factor",kind:"factor",ans:b.f1},{k:"fa",label:"PV of an annuity factor",kind:"factor",ans:b.fa}],
+   why:`n = ${b.years} years × ${b.per} = ${b.n}. i = ${b.mkt}% ÷ ${b.per} = ${b.i}%. Use the MARKET rate, not the ${b.c}% contract rate. Row ${b.n}, column ${b.i}%: PV of $1 = ${b.f1.toFixed(4)}, PV of an annuity = ${b.fa.toFixed(4)}.`}
+ },
+ r2(r,bonus){
+  const b=makeBond(r);
+  return{title:b.co,text:`${b.co} issues ${money(b.par)} of bonds. Each interest payment is <b>${money(b.cash)}</b>. Use the factors below to price the bonds.`,
+   facts:[["Par value",money(b.par)],["Interest payment",money(b.cash)],["PV of $1 factor",b.f1.toFixed(4)],["PV of an annuity factor",b.fa.toFixed(4)]],
+   fields:[{k:"pvPar",label:"PV of the par value",kind:"money",ans:b.pvPar},{k:"pvInt",label:"PV of the interest payments",kind:"money",ans:b.pvInt},
+     {k:"price",label:"Bond price (cash received)",kind:"money",ans:b.price},{k:"call",label:"Issued at",kind:"choice",opts:["Par","Discount","Premium"],ans:b.call}],
+   why:`PV of par = ${fmt(b.par)} × ${b.f1.toFixed(4)} = ${money(b.pvPar)}. PV of interest = ${fmt(b.cash)} × ${b.fa.toFixed(4)} = ${money(b.pvInt)}. Price = ${money(b.price)}, which is ${b.call==="Par"?"exactly par":b.call==="Discount"?"below par, a discount":"above par, a premium"}.`}
+ },
+ r3(r,bonus,which){
+  const call=which||pick(r,["Discount","Premium"]);
+  const par=pick(r,PARS);
+  const q=call==="Premium"?between(r,10050,10650)/100:between(r,9350,9950)/100;
+  const price=Math.round(par*q/100),diff=Math.abs(price-par);
+  const b={call,par,price,diff};const co=pick(r,COS);
+  return{title:co,text:`On January 1, ${co} issues ${money(par)} of bonds at <b>${q.toFixed(2)}</b>. Find the cash received and record the issuance.`,
+   facts:[["Par value",money(par)],["Price quote",q.toFixed(2)]],
+   fields:[{k:"cash",label:"Cash received",kind:"money",ans:price},{k:"diff",label:(call==="Premium"?"Premium":"Discount")+" amount",kind:"money",ans:diff,hideLabel:true,label2:"Discount or premium amount"}],
+   je:{label:"January 1: issue the bonds",lines:issueLines(b)},
+   why:`Cash = ${fmt(par)} × ${q.toFixed(2)}% = ${money(price)}. That is ${call==="Premium"?"above":"below"} par by ${money(diff)}, so ${call==="Premium"?"credit Premium":"debit Discount"} on Bonds Payable for ${money(diff)}. Bonds Payable is always credited at par, ${money(par)}.`}
+ },
+ r4(r,bonus,which){
+  const call=which||pick(r,["Discount","Premium"]);
+  const semi=r()<.7,years=semi?between(r,4,10):between(r,5,15),per=semi?2:1,n=years*per;
+  const par=pick(r,PARS),c=pick(r,[5,6,7,8,9,10]);
+  const cash=Math.round(par*c/100/per);
+  let am=between(r,Math.max(300,Math.round(par*.002)),Math.round(par*.012));
+  const total=am*n;am=Math.round(total/n);
+  const exp=call==="Discount"?cash+am:cash-am;const co=pick(r,COS);
+  const b={call,cash,am,exp};
+  return{title:co,text:`${co} issued ${money(par)} of ${years}-year, ${c}% bonds at a <b>${call.toLowerCase()}</b> of <b>${money(total)}</b>. Interest is paid ${semi?"semi-annually":"annually"}. Record the first interest payment using straight-line amortization.`,
+   facts:[["Par value",money(par)],["Contract rate",c+"%"],["Life",years+" years"],["Interest paid",semi?"Semi-annually":"Annually"],["Total "+call.toLowerCase(),money(total)]],
+   fields:[{k:"cash",label:"Cash interest per payment",kind:"money",ans:cash},{k:"am",label:"Amortization per period",kind:"money",ans:am},{k:"exp",label:"Bond Interest Expense",kind:"money",ans:exp}],
+   je:{label:`${semi?"June 30":"December 31"}: first interest payment`,lines:interestLines(b)},
+   why:`Cash = ${fmt(par)} × ${c}%${semi?" × 6/12":""} = ${money(cash)}. Amortization = ${fmt(total)} ÷ ${n} periods = ${money(am)}. ${call==="Discount"?`Discount: expense = ${fmt(cash)} + ${fmt(am)} = ${money(exp)}, and CREDIT Discount to shrink it.`:`Premium: expense = ${fmt(cash)} − ${fmt(am)} = ${money(exp)}, and DEBIT Premium to shrink it.`}`}
+ },
+ r5(r,bonus){
+  const items=[];const count=bonus?3:4;
+  for(let k=0;k<count;k++){
+   const par=pick(r,PARS),c=pick(r,[3,4,4.5,5,5.5,6,6.5,7,7.5,8,9,10,11,12]);
+   const freq=pick(r,["semi","semi","annual"]);
+   const per=freq==="semi"?2:1;const years=between(r,3,10);
+   const cash=Math.round(par*c/100/per);
+   if(bonus){const tot=cash*years*per;
+     items.push({k:"q"+k,label:`${money(par)}, ${c}%, ${years}-year bonds paid ${freq==="semi"?"semi-annually":"annually"}: TOTAL cash interest over the life`,kind:"money",ans:tot,
+       why:`${money(cash)} per payment × ${years*per} payments = ${money(tot)}`})}
+   else items.push({k:"q"+k,label:`${money(par)} at ${c}%, paid ${freq==="semi"?"semi-annually":"annually"}`,kind:"money",ans:cash,
+       why:`${fmt(par)} × ${c}%${per>1?` × ${12/per}/12`:""} = ${money(cash)}`});
+  }
+  return{title:bonus?"Lifetime interest":"Rapid fire: 4 bonds",wide:true,text:bonus?"Find the TOTAL cash interest each company pays over the whole life of its bonds.":"Find the cash interest paid on EACH payment date. Par × contract rate × the fraction of a year.",
+   fields:items,why:items.map((f,ix)=>`${ix+1}. ${f.why}`).join("<br>")}
+ },
+ full(r,bonus){
+  const b=makeBond(r,{call:pick(r,["Discount","Premium"])});
+  if(bonus){
+   return{title:b.co+" (two payments later)",text:`${b.co} issued ${money(b.par)} of bonds for <b>${money(b.price)}</b>. The ${b.call.toLowerCase()} is amortized straight-line at <b>${money(b.am)}</b> per period. Find the carrying value after each of the first two payments, and the unamortized ${b.call.toLowerCase()} after two payments.`,
+    facts:[["Par",money(b.par)],["Issue price",money(b.price)],["Amortization per period",money(b.am)]],
+    fields:[{k:"cv1",label:"Carrying value after payment 1",kind:"money",ans:b.cv1},{k:"cv2",label:"Carrying value after payment 2",kind:"money",ans:b.cv2},{k:"left",label:"Unamortized "+b.call.toLowerCase()+" after 2",kind:"money",ans:b.diff-2*b.am}],
+    why:`${b.call==="Discount"?"Discount bonds: carrying value goes UP":"Premium bonds: carrying value goes DOWN"} by ${money(b.am)} each payment: ${money(b.price)} → ${money(b.cv1)} → ${money(b.cv2)}. ${b.call} left = ${fmt(b.diff)} − ${fmt(2*b.am)} = ${money(b.diff-2*b.am)}.`}
+  }
+  return{title:b.co,full:true,text:`On January 1, ${b.co} issues ${money(b.par)} of ${b.years}-year, ${b.c}% bonds when the market rate is ${b.mkt}%. Interest is paid ${b.pay}. Take it all the way: tables, price, issue, first payment.`,
+   facts:bondFacts(b),
+   stages:[
+    {name:"1. PV Tables",fields:[{k:"n",label:"Number of periods (n)",kind:"int",ans:b.n},{k:"i",label:"Market rate per period (%)",kind:"rate",ans:b.i},{k:"cash",label:"Cash interest per payment",kind:"money",ans:b.cash},{k:"f1",label:"PV of $1 factor",kind:"factor",ans:b.f1},{k:"fa",label:"PV of an annuity factor",kind:"factor",ans:b.fa}],
+     why:`n = ${b.years} × ${b.per} = ${b.n}; i = ${b.mkt}% ÷ ${b.per} = ${b.i}%. Cash = ${fmt(b.par)} × ${b.c}%${b.semi?" × 6/12":""} = ${money(b.cash)}. Factors: ${b.f1.toFixed(4)} and ${b.fa.toFixed(4)}.`},
+    {name:"2. Price",fields:[{k:"pvPar",label:"PV of the par value",kind:"money",ans:b.pvPar},{k:"pvInt",label:"PV of the interest payments",kind:"money",ans:b.pvInt},{k:"price",label:"Bond price",kind:"money",ans:b.price},{k:"diff",label:"Discount or premium amount",kind:"money",ans:b.diff}],
+     why:`${fmt(b.par)} × ${b.f1.toFixed(4)} = ${money(b.pvPar)}; ${fmt(b.cash)} × ${b.fa.toFixed(4)} = ${money(b.pvInt)}. Price ${money(b.price)}, a ${b.call.toLowerCase()} of ${money(b.diff)}.`},
+    {name:"3. Issue",fields:[],je:{label:"January 1: issue the bonds",lines:issueLines(b)},
+     why:`Debit Cash ${money(b.price)}, ${b.call==="Discount"?"debit Discount":"credit Premium"} ${money(b.diff)}, credit Bonds Payable at par ${money(b.par)}.`},
+    {name:"4. First Payment",fields:[{k:"am",label:"Amortization per period",kind:"money",ans:b.am},{k:"exp",label:"Bond Interest Expense",kind:"money",ans:b.exp}],je:{label:`${b.firstDate}: first interest payment`,lines:interestLines(b)},
+     why:`Amortization = ${fmt(b.diff)} ÷ ${b.n} = ${money(b.am)}. Expense = ${fmt(b.cash)} ${b.call==="Discount"?"+":"−"} ${fmt(b.am)} = ${money(b.exp)}.`}
+   ]}
+ }
+};
+const MAIN_COUNT={r1:3,r2:3,r3:2,r4:2,r5:3,full:1};
+function buildSet(station,bIdx,round){
+  const r=rng(station*7919+bIdx*104729+13);
+  const probs=[];
+  for(let k=0;k<MAIN_COUNT[round];k++){
+    const which=(round==="r3"||round==="r4")?(k===0?(r()<.5?"Premium":"Discount"):null):null;
+    let p=GEN[round](r,false,which);
+    if(round==="r3"||round==="r4"){if(k===1){const first=probs[0].calltype;p=GEN[round](r,false,first==="Premium"?"Discount":"Premium")}}
+    p.calltype=(p.text.match(/a <b>(discount|premium)/i)||[])[1];
+    if(round==="r3")p.calltype=p.fields[1].label.startsWith("Premium")?"Premium":"Discount";
+    if(round==="r4")p.calltype=/discount/i.test(p.text.match(/at a <b>\w+/)[0])?"Discount":"Premium";
+    probs.push(p)
+  }
+  const bonus=GEN[round](r,true);
+  return{probs,bonus}
+}
+
+/* ================= kahoot banks ================= */
+const KAHOOT={
+1:[
+ ["Bonds Payable is always recorded at:",["The cash received","Par value","The present value","The market price"],1],
+ ["The CONTRACT rate decides:",["The bond's price","The cash interest paid","The bond's rating","The Fed's target rate"],1],
+ ["The MARKET rate decides:",["The bond's price","The cash interest paid","The par value","The life of the bond"],0],
+ ["The Federal Reserve's 'dual mandate' is:",["Low taxes and low spending","Maximum employment and stable prices","A strong dollar and high stock prices","Balanced budgets and low debt"],1],
+ ["The Fed's long-run inflation target is about:",["0%","2%","5%","10%"],1],
+ ["Which Fed group votes on interest rate policy?",["The FOMC","The SEC","Congress","The U.S. Treasury"],0],
+ ["The interest rate the Fed targets is the:",["Prime rate","Mortgage rate","Federal funds rate","Contract rate"],2],
+ ["When inflation is too high, the Fed usually:",["Lowers interest rates","Raises interest rates","Prints more bonds","Cuts taxes"],1],
+ ["When market interest rates rise, prices of existing bonds:",["Rise","Fall","Stay the same","Go to par"],1],
+ ["When the Fed BUYS government bonds, money in the banking system:",["Increases","Decreases","Stays the same","Disappears"],0],
+ ["A bond quoted at 97 sells for:",["$97","97% of par","103% of par","Par minus $97"],1],
+ ["Bondholders are the company's:",["Owners","Lenders","Customers","Employees"],1]],
+2:[
+ ["Inflation means:",["Prices in general are rising","Prices in general are falling","Interest rates are zero","The stock market is rising"],0],
+ ["The most common measure of inflation for consumers is the:",["GDP","CPI","S&P 500","Federal funds rate"],1],
+ ["If investors expect HIGHER inflation, they want bond interest rates to be:",["Lower","Higher","The same","Zero"],1],
+ ["On the Underwriting Desk, a company's market rate =",["Contract rate + par","Treasury yield + credit spread","Price quote ÷ 100","Inflation × 2"],1],
+ ["A LOWER credit rating makes the credit spread:",["Bigger","Smaller","Zero","Negative"],0],
+ ["Treasury yield 4% and a BBB spread of 2.5%. The market rate is:",["1.5%","4%","6.5%","10%"],2],
+ ["A 6% bond is sold when the market rate is 6.5%. It sells at:",["Par","A discount","A premium","Face value plus interest"],1],
+ ["Discount on Bonds Payable is a:",["Contra-liability","Revenue account","Asset","Adjunct liability"],0],
+ ["Premium on Bonds Payable is a:",["Contra-liability","Adjunct liability","Expense","Contra-asset"],1],
+ ["The normal balance of Discount on Bonds Payable is a:",["Credit","Debit","Either one","It has no balance"],1],
+ ["The LOWEST investment-grade rating is:",["AAA","A","BBB","BB"],2],
+ ["An underwriter is the:",["Company borrowing the money","Investment bank that buys the bonds and resells them to investors","Fed official who sets rates","Auditor who checks the books"],1]],
+3:[
+ ["Amortizing a DISCOUNT makes Bond Interest Expense:",["Higher than the cash paid","Lower than the cash paid","Equal to the cash paid","Zero"],0],
+ ["The carrying value of a PREMIUM bond over time:",["Goes up to par","Goes down to par","Stays the same","Goes to zero"],1],
+ ["At maturity, carrying value equals:",["Zero","Par value","The issue price","Par plus the premium"],1],
+ ["Paying off bonds at maturity:",["Dr Cash, Cr Bonds Payable","Dr Bonds Payable, Cr Cash","Dr Interest Expense, Cr Cash","Dr Discount, Cr Cash"],1],
+ ["Inflation is 6% and the Fed wants 2%. The Fed will most likely:",["Raise interest rates","Lower interest rates","Stop issuing money","Buy more bonds"],0],
+ ["Why does inflation hurt people who own bonds?",["The par value shrinks","The fixed interest payments buy less","The bond's rating rises","The contract rate goes to zero"],1],
+ ["A rating cut from AA to BB will usually make a company's new bonds sell at:",["A bigger discount","A bigger premium","Par","The same price as before"],0],
+ ["10-year bonds pay interest semi-annually. n =",["5","10","20","40"],2],
+ ["The market rate is 8% and interest is paid semi-annually. i =",["2%","4%","8%","16%"],1],
+ ["Bond price =",["Par × contract rate","PV of par + PV of the interest payments","Cash interest × years","Par ÷ the market rate"],1],
+ ["On the balance sheet, Premium on Bonds Payable is:",["Added to Bonds Payable","Subtracted from Bonds Payable","Shown as revenue","Shown as an asset"],0],
+ ["Which is an ADVANTAGE of issuing bonds instead of stock?",["Interest is tax deductible","Interest can be skipped","Bondholders vote","Par never has to be repaid"],0]]
+};
+
+/* ================= PV tables overlay ================= */
+function pvOverlay(){
+  const o=document.createElement("div");o.className="ovl";
+  const rates=[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15];let tab="a";
+  const draw=()=>{
+    const f=tab==="a"?pva:pv1;
+    let h=`<div class="row" style="justify-content:space-between"><h2>${tab==="a"?"Present Value of an Annuity of 1":"Present Value of 1"}</h2><button class="btn sec" id="xx">Close</button></div>
+    <div class="tabs"><button class="${tab==="1"?"on":""}" data-t="1">PV of $1</button><button class="${tab==="a"?"on":""}" data-t="a">PV of an Annuity</button></div>
+    <table class="pvt"><tr><th>n</th>${rates.map(x=>`<th>${x}%</th>`).join("")}</tr>`;
+    for(let n=1;n<=20;n++)h+=`<tr><td>${n}</td>${rates.map(x=>`<td>${f(x/100,n).toFixed(4)}</td>`).join("")}</tr>`;
+    o.innerHTML=`<div class="box">${h}</table></div>`;
+    o.querySelector("#xx").onclick=()=>o.remove();
+    o.querySelectorAll("[data-t]").forEach(b=>b.onclick=()=>{tab=b.dataset.t;draw()});
+  };
+  draw();o.onclick=e=>{if(e.target===o)o.remove()};document.body.appendChild(o);
+}
+$("#pvBtn").onclick=pvOverlay;
+
+/* ================= live game ================= */
+const ROLE=window.TIB_ROLE||"station";
+const MOCK=/[?&]mock=1/.test(location.search);
+const GAME="teachback";
+const TEACH_X=3; // teachers earn triple
+
+/* ---------- backend (same database as the other live games) ---------- */
+function mockNet(){
+  const KEY="tibLiveMock",bc=("BroadcastChannel" in window)?new BroadcastChannel(KEY):null,subs=[];
+  const read=()=>{try{return JSON.parse(localStorage.getItem(KEY)||"{}")}catch(e){return{}}};
+  const write=t=>{localStorage.setItem(KEY,JSON.stringify(t));fire();if(bc)bc.postMessage(1)};
+  const at=(t,p)=>p.split("/").filter(Boolean).reduce((o,k)=>o==null?undefined:o[k],t);
+  const put=(t,p,v)=>{const ks=p.split("/").filter(Boolean);let o=t;ks.slice(0,-1).forEach(k=>{if(typeof o[k]!=="object"||o[k]===null)o[k]={};o=o[k]});if(v===null)delete o[ks[ks.length-1]];else o[ks[ks.length-1]]=v};
+  const fire=()=>{const t=read();subs.forEach(s=>{const v=JSON.stringify(at(t,s.p)??null);if(v!==s.last){s.last=v;s.cb(JSON.parse(v))}})};
+  if(bc)bc.onmessage=fire;window.addEventListener("storage",e=>{if(e.key===KEY)fire()});
+  return{kind:"mock",
+    get:async p=>at(read(),p)??null,
+    set:async(p,v)=>{const t=read();if(p.split("/").filter(Boolean).length===2&&at(t,p))throw new Error("Code in use");put(t,p,v);write(t)},
+    update:async(p,o)=>{const t=read();Object.entries(o).forEach(([k,v])=>put(t,p+"/"+k,v));write(t)},
+    remove:async p=>{const t=read();put(t,p,null);write(t)},
+    on:(p,cb)=>{const s={p,cb,last:undefined};subs.push(s);setTimeout(fire,0);return()=>{const i=subs.indexOf(s);if(i>=0)subs.splice(i,1)}}};
+}
+async function vercelNet(){
+  const call=async(op,path,v)=>{const r=await fetch("/api/live",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({op,path,v})});
+    const j=await r.json().catch(()=>({}));if(!r.ok)throw new Error(j.error||r.status);return j};
+  try{const p=await call("ping");if(!p.ok)return null}catch(e){return null}
+  return{kind:"vercel",
+    get:async p=>(await call("get",p)).v??null,
+    set:(p,v)=>call("set",p,v),
+    update:(p,o)=>call("update",p,o),
+    remove:p=>call("remove",p),
+    on:(p,cb)=>{let last,stop=false,t;
+      const tick=async()=>{if(stop)return;
+        if(!document.hidden){try{const v=(await call("get",p)).v??null,s=JSON.stringify(v);if(s!==last){last=s;cb(v)}}catch(e){}}
+        if(!stop)t=setTimeout(tick,1500)};
+      tick();return()=>{stop=true;clearTimeout(t)}}};
+}
+let NET=null;
+async function net(){if(NET)return NET;NET=MOCK?mockNet():await vercelNet();return NET}
+function needSetup(){app.innerHTML=`<div class="panel"><h2>${ROLE==="teacher"?"Class games need a one-time setup":"The game isn't open yet"}</h2><p>${ROLE==="teacher"?"This uses the same Upstash for Redis database as the other live games on this site. Connect it to the Vercel project, then reload.":"Ask your teacher to start the game, then reload this page."}</p><button class="btn" onclick="location.reload()">Reload</button></div>`}
+const esc=s=>String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"})[c]);
+function beep(f,d){try{const c=beep.c||(beep.c=new (window.AudioContext||window.webkitAudioContext)());const o=c.createOscillator(),g=c.createGain();o.frequency.value=f;g.gain.value=.08;o.connect(g);g.connect(c.destination);const t=c.currentTime;g.gain.exponentialRampToValueAtTime(.0001,t+d);o.start(t);o.stop(t+d)}catch(e){}}
+
+/* ---------- who is where ---------- */
+// Stayers never move. Movers slide up one station number every rotation (the last station wraps to Station 1).
+// Kahoot breaks keep the pair from the rotation before.
+function rotOf(bIdx){for(let i=bIdx;i>=0;i--)if(SCHED[i].type==="rot")return SCHED[i].rot;return 1}
+function moverStartAt(station,rot,N){return((station-1-(rot-1))%N+N)%N+1}
+function pairAt(recs,station,bIdx,N){
+  const st=recs&&recs["s"+station];if(!st||!N)return null;
+  const m=recs["s"+moverStartAt(station,rotOf(bIdx),N)];
+  return{stay:[st.stay,st.stay2].filter(Boolean),move:m&&m.move?m.move:"(mover)"}}
+function roster(recs){const n=[];Object.values(recs||{}).forEach(r=>{[r.stay,r.stay2,r.move].forEach(x=>{if(x&&!n.includes(x))n.push(x)})});return n}
+function standings(recs,N){
+  const tot={},tch={};roster(recs).forEach(n=>{tot[n]=0;tch[n]=0});
+  const add=(n,p,t)=>{if(!(n in tot))return;tot[n]+=p;if(t)tch[n]+=p};
+  Object.values(recs||{}).forEach(r=>{Object.entries(r.res||{}).forEach(([b,v])=>{b=+b;const blk=SCHED[b];const pts=(v&&v.pts)||0;if(!blk||!pts)return;
+    const pr=pairAt(recs,r.station,b,N);if(!pr)return;
+    if(blk.type==="kahoot"){pr.stay.forEach(n=>add(n,pts));add(pr.move,pts)}
+    else{const stayT=blk.teach==="stay";pr.stay.forEach(n=>add(n,stayT?pts*TEACH_X:pts,stayT));add(pr.move,stayT?pts:pts*TEACH_X,!stayT)}})});
+  return{tot,tch}}
+function ranks(val){const ids=Object.keys(val).sort((a,b)=>val[b]-val[a]);const r={};let k=0,prev=null;ids.forEach((id,i)=>{if(val[id]!==prev){k=i+1;prev=val[id]}r[id]=k});return r}
+
+/* ============================================================ STATION (iPad) */
+let ME=null; // {code,station}
+let CUR=null; // {block} currently rendered
+let LIVE={state:null,recs:{}};
+let KTIMER=null;
+const SKEY="tibSession";
+function lkey(b){return `tib_${ME.code}_s${ME.station}_b${b}`}
+async function joinForm(err){
+  const N=await net().catch(()=>null);if(!N)return needSetup();
+  const sess=store.get(SKEY,null)||{};
+  let opts="";for(let k=1;k<=24;k++)opts+=`<option value="${k}" ${k===sess.station?"selected":""}>Station ${k}</option>`;
+  $("#ttl").innerHTML="Teach It Back: <span>Bonds</span>";
+  app.innerHTML=`<div class="panel" style="max-width:720px;margin:0 auto"><h1 style="font-size:38px;margin-bottom:6px">Join Teach It Back</h1>
+   <p class="muted">One iPad per station. This iPad stays at this desk the whole game.</p>
+   <div class="fld"><label>Game code</label><input id="jc" inputmode="numeric" maxlength="4" value="${esc(sess.code||"")}" style="text-align:center;letter-spacing:.2em"></div>
+   <div class="fld"><label>Station number (taped to the desk)</label><select id="js">${opts}</select></div>
+   <div class="fld"><label>Stayer: the student who sits here all game</label><input id="jst" style="text-align:left" placeholder="First name, last initial"></div>
+   <div class="fld"><label>Starting mover: the student who starts here and moves</label><input id="jmv" style="text-align:left" placeholder="First name, last initial"></div>
+   <div class="fld"><label>Second stayer <span class="muted">(only if this station has 3 people)</span></label><input id="jst2" style="text-align:left" placeholder="Leave blank"></div>
+   <div id="jerr" style="color:var(--red);font-weight:700;margin-top:10px">${err||""}</div>
+   <div class="acts"><button class="btn" id="jgo">Join</button></div></div>`;
+  $("#js").onchange=()=>prefill();
+  const prefill=async()=>{const c=$("#jc").value.trim(),s=+$("#js").value;if(!/^\d{4}$/.test(c))return;
+    try{const r=await N.get(`games/${c}/players/s${s}`);if(r){$("#jst").value=r.stay||"";$("#jmv").value=r.move||"";$("#jst2").value=r.stay2||""}}catch(e){}};
+  $("#jc").oninput=()=>{if($("#jc").value.trim().length===4)prefill()};
+  if(sess.code)prefill();
+  $("#jgo").onclick=async()=>{
+    const code=$("#jc").value.trim(),station=+$("#js").value,stay=$("#jst").value.trim(),move=$("#jmv").value.trim(),stay2=$("#jst2").value.trim();
+    if(!/^\d{4}$/.test(code))return $("#jerr").textContent="Type the 4-digit code from the board.";
+    if(!stay||!move)return $("#jerr").textContent="Type both names: the stayer and the starting mover.";
+    $("#jgo").disabled=true;
+    try{const g=await N.get("games/"+code);if(!g||g.game!==GAME){$("#jgo").disabled=false;return $("#jerr").textContent="No Teach It Back game with that code."}
+      const old=(g.players||{})["s"+station];
+      if(old&&old.stay&&old.stay!==stay&&!confirm(`Station ${station} already joined as ${old.stay} and ${old.move}. Replace it?`)){$("#jgo").disabled=false;return}
+      await N.set(`games/${code}/players/s${station}`,{station,stay,stay2,move,res:(old&&old.res)||{}});
+      ME={code,station};store.set(SKEY,ME);startStation()}
+    catch(e){$("#jgo").disabled=false;$("#jerr").textContent="Couldn't reach the game. Check the Wi-Fi and try again."}};
+}
+async function startStation(){
+  const N=await net().catch(()=>null);if(!N)return needSetup();
+  $("#homeBtn").textContent="↻ Rejoin";$("#homeBtn").style.display="";$("#homeBtn").onclick=()=>{CUR=null;joinForm()};
+  $("#ttl").innerHTML=`Station ${ME.station} &nbsp;·&nbsp; <span>Teach It Back</span>`;
+  try{LIVE.recs=(await N.get(`games/${ME.code}/players`))||{}}catch(e){}
+  if(ME.off)ME.off();
+  ME.off=N.on(`games/${ME.code}/state`,st=>{LIVE.state=st;stationRender()});
+}
+function stationRender(){
+  const st=LIVE.state;
+  if(!st){app.innerHTML=`<div class="panel center"><h2>This game has ended or the code is wrong.</h2><div class="acts" style="justify-content:center"><button class="btn" id="rj">Join another game</button></div></div>`;$("#rj").onclick=()=>joinForm();return}
+  syncClock();
+  if(st.phase==="lobby"){CUR=null;const me=LIVE.recs["s"+ME.station]||{};
+    app.innerHTML=`<div class="panel center"><h1 style="font-size:40px">You're in! Station ${ME.station}</h1><p style="font-size:1.2em">Stayer: <b>${esc(me.stay||"")}</b>${me.stay2?" and <b>"+esc(me.stay2)+"</b>":""} &nbsp;·&nbsp; Starting mover: <b>${esc(me.move||"")}</b></p><p class="muted">Get a whiteboard, marker and calculator. The game starts from the board.</p></div>`;
+    net().then(N=>N.get(`games/${ME.code}/players`)).then(r=>{LIVE.recs=r||LIVE.recs}).catch(()=>{});return}
+  if(st.phase==="end"){CUR=null;clearInterval(KTIMER);app.innerHTML=`<div class="panel center"><h1 style="font-size:44px">That's the game!</h1><p style="font-size:1.2em">Eyes on the board for the final standings.</p></div>`;return}
+  if(CUR&&CUR.block===st.block)return; // already showing this block
+  clearInterval(KTIMER);CUR={block:st.block};
+  net().then(N=>N.get(`games/${ME.code}/players`)).then(r=>{LIVE.recs=r||LIVE.recs;draw()}).catch(draw);
+  function draw(){if(!CUR||CUR.block!==st.block)return;SCHED[st.block].type==="kahoot"?kahoot(st.block):rotation(st.block)}
+}
+let CLOCK=null;
+function syncClock(){
+  let el=$("#clk");if(!el){el=document.createElement("span");el.id="clk";el.className="tb osw";el.style.fontSize="20px";$(".top").insertBefore(el,$("#pvBtn"))}
+  clearInterval(CLOCK);const st=LIVE.state||{};
+  const paint=()=>{if(!st.timerEnd&&st.paused==null){el.style.display="none";return}el.style.display="";const ms=st.paused!=null?st.paused:st.timerEnd-Date.now();el.textContent="⏱ "+mmss(ms/1000);el.style.background=ms<60000?"var(--red)":"#2b2b2b"};
+  paint();CLOCK=setInterval(paint,500);
+}
+function pushResult(bIdx,obj){net().then(N=>N.update(`games/${ME.code}/players/s${ME.station}`,{["res/"+bIdx]:obj})).catch(()=>{})}
+function names(bIdx){const N=LIVE.state&&LIVE.state.stations;return pairAt(LIVE.recs,ME.station,bIdx,N)||{stay:["The stayer"],move:"The mover"}}
+
+/* ---------- rotation ---------- */
+const MAIN_PTS=100,BONUS_PTS=30;
+function rotation(bIdx){
+  const b=SCHED[bIdx],R=ROUNDS[b.round];
+  const set=buildSet(ME.station,bIdx,b.round);
+  let st=store.get(lkey(bIdx),null)||{pts:[],bonus:null,bonusPts:0,finished:false,idx:0,inBonus:false};
+  const total=()=>st.pts.reduce((a,c)=>a+(c||0),0)+(st.bonusPts||0);
+  const save=()=>{store.set(lkey(bIdx),st);pushResult(bIdx,{pts:total(),done:!!st.finished})};
+  const per=Math.round(MAIN_PTS/set.probs.length);
+  const live=()=>CUR&&CUR.block===bIdx;
+  $("#ttl").innerHTML=`Station ${ME.station} · ${b.label}: <span>${R.name}</span>`;
+  const nm=names(bIdx),stay=b.teach==="stay";
+  const tName=stay?nm.stay.join(" & "):nm.move,lName=stay?nm.move:nm.stay.join(" & ");
+  const roleHTML=()=>`<div class="role"><div class="te"><small>TEACHER · earns ${TEACH_X}× points</small><b>${esc(tName)}</b><small>${stay?"Stays here":"Just moved here"}. Coach on the whiteboard. Don't touch the iPad.</small></div>
+    <div class="le"><small>LEARNER · earns 1× points</small><b>${esc(lName)}</b><small>${stay?"Just moved here":"Stays here"}. Work it out on the whiteboard, then type it in.</small></div></div>`;
+  function draw(){
+    if(!live())return;
+    if(st.finished)return receipt();
+    if(st.inBonus)return problem(set.bonus,true);
+    if(st.idx>=set.probs.length)return mainDone();
+    problem(set.probs[st.idx],false);
+  }
+  function progress(){return `<div class="prog">${set.probs.map((p,k)=>{const v=st.pts[k];return `<i class="${v==null?(k===st.idx?"on":""):v>=per?"ok":v>0?"half":"miss"}"></i>`}).join("")}<i class="${st.bonus==null?(st.inBonus?"on":""):st.bonus?"ok":"miss"}" style="background:${st.bonus==null&&!st.inBonus?"#f3dd9a":""}" title="Bonus"></i><span class="muted" style="margin-left:auto;font-size:.85em">So far: <b>${total()}</b> pts · teacher gets ${total()*TEACH_X}</span></div>`}
+  function problem(p,isBonus){
+    const worth=isBonus?BONUS_PTS:(st.idx===set.probs.length-1?MAIN_PTS-per*(set.probs.length-1):per);
+    if(p.full)return fullProblem(p,worth);
+    let tries=0;
+    app.innerHTML=`${roleHTML()}<div class="panel">${progress()}
+      <div class="work" style="${p.wide?"grid-template-columns:1fr":""}">
+       <div class="prob"><div class="co">${isBonus?"BONUS: ":""}${p.title}${isBonus?'<span class="tag">+'+BONUS_PTS+' bonus</span>':""}</div><p>${p.text}</p>${p.facts?`<dl class="facts">${p.facts.map(([a,c])=>`<dt>${a}</dt><dd>${c}</dd>`).join("")}</dl>`:""}</div>
+       <div>${fieldsHTML(p.fields,p.wide)}${p.je?jeHTML(p.je):""}
+        <div id="fb"></div><div class="acts"><button class="btn" id="chk">Check</button><button class="btn sec" id="nx" style="display:none">Next</button></div></div>
+      </div></div>`;
+    $("#chk").onclick=()=>{
+      tries++;const r=grade(p.fields,p.je);
+      if(r.ok){const got=tries===1?worth:Math.round(worth/2);
+        $("#fb").innerHTML=`<div class="fb ok"><b>Correct! +${got} points${tries>1?" (second try)":""}.</b><br>${p.why}</div>`;finish(got)}
+      else if(tries<2){$("#fb").innerHTML=`<div class="fb no"><b>Not yet.</b> The red boxes are off. Teacher: find the mistake on the whiteboard, then try once more for half points.</div>`}
+      else{showAnswers(p.fields,p.je);$("#fb").innerHTML=`<div class="fb show"><b>Here's how it works.</b> Teacher: walk through it before moving on.<br>${p.why}</div>`;finish(0)}
+    };
+    function finish(got){
+      $("#chk").style.display="none";$("#nx").style.display="";
+      if(isBonus){st.bonus=got>0;st.bonusPts=got}else{st.pts[st.idx]=got}
+      save();
+      $("#nx").onclick=()=>{if(isBonus){st.finished=true;st.inBonus=false}else st.idx++;save();draw()};
+    }
+  }
+  function fullProblem(p,worth){
+    const stageW=Math.round(worth/p.stages.length);
+    let s=st.fullStage||0,earned=st.fullEarned||0;
+    const one=()=>{
+      if(!live())return;
+      const sg=p.stages[s];let tries=0;
+      app.innerHTML=`${roleHTML()}<div class="panel">${progress()}<div class="steps">${p.stages.map((x,k)=>`<span class="${k<s?"ok":k===s?"on":""}">${x.name}</span>`).join("")}</div>
+       <div class="work"><div class="prob"><div class="co">${p.title}</div><p>${p.text}</p><dl class="facts">${p.facts.map(([a,c])=>`<dt>${a}</dt><dd>${c}</dd>`).join("")}</dl>${s>0?`<p class="muted" style="font-size:.85em">Keep your earlier numbers on the whiteboard. You will need them.</p>`:""}</div>
+       <div>${fieldsHTML(sg.fields)}${sg.je?jeHTML(sg.je):""}<div id="fb"></div><div class="acts"><button class="btn" id="chk">Check</button><button class="btn sec" id="nx" style="display:none">Next step</button></div></div></div></div>`;
+      $("#chk").onclick=()=>{tries++;const r=grade(sg.fields,sg.je);
+        if(r.ok){const got=tries===1?stageW:Math.round(stageW/2);earned+=got;$("#fb").innerHTML=`<div class="fb ok"><b>Correct! +${got}.</b><br>${sg.why}</div>`;fin()}
+        else if(tries<2)$("#fb").innerHTML=`<div class="fb no"><b>Not yet.</b> Fix the red boxes for half points.</div>`;
+        else{showAnswers(sg.fields,sg.je);$("#fb").innerHTML=`<div class="fb show"><b>Here's how it works.</b> Use these numbers for the next step.<br>${sg.why}</div>`;fin()}};
+      function fin(){$("#chk").style.display="none";$("#nx").style.display="";st.fullStage=s+1;st.fullEarned=earned;st.pts[st.idx]=earned;save();
+        $("#nx").onclick=()=>{s++;if(s>=p.stages.length){st.pts[st.idx]=earned;st.idx++;st.fullStage=0;st.fullEarned=0;save();draw()}else one()}}
+    };one();
+  }
+  function mainDone(){
+    app.innerHTML=`${roleHTML()}<div class="panel center">${progress()}<h2 style="font-size:32px">Main problems done: ${total()} points</h2>
+     <p>Still have time? Try the <b>bonus problem</b> for up to ${BONUS_PTS} more points. If time is called first, the iPad moves on by itself.</p>
+     <div class="acts" style="justify-content:center"><button class="btn gold" id="bon">Bonus problem</button><button class="btn sec" id="fin">Finish without bonus</button></div></div>`;
+    $("#bon").onclick=()=>{st.inBonus=true;save();draw()};
+    $("#fin").onclick=()=>{st.finished=true;save();draw()};
+  }
+  function receipt(){
+    const t=total();
+    app.innerHTML=`${roleHTML()}<div class="panel center"><h2 style="font-size:30px">${b.label} complete</h2><p class="muted">${t-(st.bonusPts||0)} main + ${st.bonusPts||0} bonus</p>
+     <div class="row" style="justify-content:center;gap:40px;margin:14px 0"><div><div class="muted">${esc(tName)} (teacher)</div><div class="big">+${t*TEACH_X}</div></div><div><div class="muted">${esc(lName)} (learner)</div><div class="big">+${t}</div></div></div>
+     <p class="muted">Points are already on the class scoreboard. Wait for the signal to rotate.</p></div>`;
+  }
+  draw();
+}
+
+/* ---------- answer forms ---------- */
+function fieldsHTML(fields,wide){
+  if(!fields||!fields.length)return "";
+  return `<div style="${wide?"display:grid;grid-template-columns:1fr 1fr;column-gap:22px":""}">`+fields.map(f=>`<div class="fld"><label>${f.label2||f.label}</label>${f.kind==="choice"
+    ?`<select data-k="${f.k}"><option value="">Choose</option>${f.opts.map(o=>`<option>${o}</option>`).join("")}</select>`
+    :`<input data-k="${f.k}" inputmode="decimal" autocomplete="off" placeholder="${f.kind==="rate"?"%":f.kind==="factor"?"0.0000":f.kind==="int"?"#":"$"}">`}</div>`).join("")+`</div>`;
+}
+function jeHTML(je){
+  const rows=je.lines.length+(je.lines.length<3?1:0);
+  let h=`<div class="jelbl">${je.label}</div><table class="je"><tr><th>Account</th><th>Debit</th><th>Credit</th></tr>`;
+  for(let k=0;k<rows;k++)h+=`<tr data-r="${k}"><td><select><option value="">Account</option>${ACCTS.map(a=>`<option>${a}</option>`).join("")}</select></td><td class="a"><input inputmode="decimal" class="dr"></td><td class="a"><input inputmode="decimal" class="cr"></td></tr>`;
+  return h+`</table><p class="muted" style="font-size:.8em;margin:4px 0 0">Leave a row blank if you don't need it.</p>`;
+}
+function grade(fields,je){
+  let ok=true;
+  (fields||[]).forEach(f=>{const el=app.querySelector(`[data-k="${f.k}"]`);const g=near(f.kind,el.value,f.ans);el.classList.toggle("good",g);el.classList.toggle("wrong",!g);if(!g)ok=false});
+  if(je){
+    const trs=[...app.querySelectorAll(".je tr[data-r]")];
+    const rows=trs.map(tr=>({acct:tr.querySelector("select").value,dr:tr.querySelector(".dr").value,cr:tr.querySelector(".cr").value}));
+    const r=checkJE(rows,je.lines);
+    trs.forEach((tr,ix)=>{tr.querySelectorAll("select,input").forEach(e=>{e.classList.remove("good","wrong");if(r.res[ix]===true)e.classList.add("good");else if(r.res[ix]===false)e.classList.add("wrong")})});
+    if(!r.ok)ok=false;
+  }
+  return{ok}
+}
+function showAnswers(fields,je){
+  (fields||[]).forEach(f=>{const el=app.querySelector(`[data-k="${f.k}"]`);
+    el.value=f.kind==="money"?fmt(f.ans):f.kind==="factor"?f.ans.toFixed(4):f.ans;el.classList.remove("wrong");el.classList.add("good");el.disabled=true});
+  if(je){const trs=[...app.querySelectorAll(".je tr[data-r]")];trs.forEach((tr,ix)=>{const l=je.lines[ix];
+    const s=tr.querySelector("select"),d=tr.querySelector(".dr"),c=tr.querySelector(".cr");
+    s.value=l?l[0]:"";d.value=l&&l[1]==="Dr"?fmt(l[2]):"";c.value=l&&l[1]==="Cr"?fmt(l[2]):"";
+    [s,d,c].forEach(e=>{e.classList.remove("wrong");if(l)e.classList.add("good");e.disabled=true})})}
+}
+
+/* ---------- kahoot ---------- */
+const KSEC=20,KMAX=10;
+function kahoot(bIdx){
+  const b=SCHED[bIdx];const live=()=>CUR&&CUR.block===bIdx;
+  const nm=names(bIdx);const team=[...nm.stay,nm.move].map(esc).join(" & ");
+  let st=store.get(lkey(bIdx),null);
+  $("#ttl").innerHTML=`Station ${ME.station} · <span>${b.label}</span>`;
+  const done=s=>{app.innerHTML=`<div class="panel center"><h2 style="font-size:32px;color:var(--k2)">Kahoot Break ${b.k} done</h2><p>${team}</p><div class="big" style="margin:10px 0">+${s.total} each</div><p class="muted">${s.right} of ${KAHOOT[b.k].length} right. Points are on the class scoreboard.</p></div>`};
+  if(st&&st.finished)return done(st);
+  const r=rng(ME.station*31+b.k*977);
+  const qs=shuffle(r,KAHOOT[b.k]).map(([q,o,a])=>{const idx=shuffle(r,[0,1,2,3]);return{q,o:idx.map(i=>o[i]),a:idx.indexOf(a)}});
+  let qi=(st&&st.qi)||0,total=(st&&st.total)||0,right=(st&&st.right)||0;
+  const save=fin=>{const s={qi,total,right,finished:!!fin};store.set(lkey(bIdx),s);pushResult(bIdx,{pts:total,done:!!fin})};
+  app.innerHTML=`<div class="panel center"><h1 style="font-size:46px;color:var(--k2)">Kahoot Break ${b.k}</h1><p style="font-size:1.25em"><b>${team}</b>, you're teammates now.</p><p>${qs.length} questions, ${KSEC} seconds each. Faster right answers earn more (up to ${KMAX} each), and you BOTH get the points.</p>
+   <div class="acts" style="justify-content:center"><button class="btn" id="go" style="background:var(--k2);font-size:1.3em;padding:16px 40px">${qi?"Keep going":"Start"}</button></div></div>`;
+  $("#go").onclick=ask;
+  const SH=["▲","◆","●","■"];
+  function ask(){
+    if(!live())return;
+    const q=qs[qi];let left=KSEC*10,answered=false;
+    app.innerHTML=`<div class="panel"><div class="kmeta"><span>Question ${qi+1} of ${qs.length}</span><span id="tl">${KSEC}</span><span>${total} pts</span></div><div class="kbar"><i id="bar" style="width:100%"></i></div>
+     <div class="kq">${q.q}</div><div class="kopts">${q.o.map((o,k)=>`<button class="kopt" data-k="${k}"><span class="sh">${SH[k]}</span><span>${o}</span></button>`).join("")}</div><div id="kf"></div></div>`;
+    clearInterval(KTIMER);
+    KTIMER=setInterval(()=>{if(!live()){clearInterval(KTIMER);return}left--;$("#bar").style.width=(left/(KSEC*10)*100)+"%";$("#tl").textContent=Math.ceil(left/10);if(left<=0)answer(-1)},100);
+    app.querySelectorAll(".kopt").forEach(el=>el.onclick=()=>answer(+el.dataset.k));
+    function answer(k){
+      if(answered)return;answered=true;clearInterval(KTIMER);
+      const ok=k===q.a;const got=ok?Math.round(KMAX/2+KMAX/2*Math.max(0,left)/(KSEC*10)):0;
+      if(ok){total+=got;right++}qi++;save(qi>=qs.length);
+      app.querySelectorAll(".kopt").forEach((el,ix)=>{if(ix===q.a)el.classList.add("right");else el.classList.add("dim")});
+      $("#kf").innerHTML=`<div class="fb ${ok?"ok":"no"}" style="font-size:1.2em"><b>${ok?"Correct! +"+got:k<0?"Time's up!":"Not this time."}</b>${ok?"":" The answer was: "+q.o[q.a]}</div><div class="acts" style="justify-content:center"><button class="btn" id="nk" style="background:var(--k2)">${qi<qs.length?"Next question":"See results"}</button></div>`;
+      $("#nk").onclick=()=>{if(qi<qs.length)ask();else done({total,right})};
+    }
+  }
+}
+
+/* ============================================================ TEACHER (projector) */
+let H=null; // {N,code,state,recs,off}
+const HKEY="tibHostCode";
+async function hostSetup(err){
+  const N=await net().catch(()=>null);if(!N)return needSetup();
+  stopFireworks();
+  $("#ttl").innerHTML="Teach It Back: <span>Bonds</span> &nbsp;·&nbsp; Teacher";
+  let last="";try{last=localStorage.getItem(HKEY)||""}catch(e){}
+  app.innerHTML=`<div class="panel" style="max-width:820px;margin:20px auto"><h1 style="font-size:44px">Teach It Back: Bonds</h1>
+   <p style="font-size:1.1em">Pairs at stations, one iPad per station. Every rotation the pair gets a new partner, a new skill or a new problem, and the learner from the last rotation becomes the teacher. Teachers earn <b>${TEACH_X}× points</b>, learners 1×. Kahoot breaks after every four rotations. About two class periods; the game is saved for 3 days so you can pick up tomorrow with <b>Resume</b>.</p>
+   <div class="acts"><button class="btn" id="go">Create game</button></div>
+   <h3 style="margin-top:22px">Resume a game</h3><div class="row" style="margin-top:8px"><input id="rc" value="${esc(last)}" maxlength="4" inputmode="numeric" style="width:130px;padding:10px;font-size:22px;letter-spacing:.2em;text-align:center;border:2px solid var(--ln);border-radius:9px"><button class="btn sec" id="resume">Resume</button></div>
+   <div id="rer" style="color:var(--red);font-weight:700;margin-top:8px">${err||""}</div></div>`;
+  $("#resume").onclick=async()=>{const code=$("#rc").value.trim();if(!/^\d{4}$/.test(code))return $("#rer").textContent="Type the 4-digit code.";
+    try{const g=await N.get("games/"+code);if(!g||g.game!==GAME)return $("#rer").textContent="No Teach It Back game with that code (games are erased after 3 days).";hostOpen(N,code,g.state)}catch(e){$("#rer").textContent="Couldn't reach the game database."}};
+  $("#go").onclick=async()=>{$("#go").disabled=true;
+    for(let t=0;t<6;t++){const code=String(1000+Math.floor(Math.random()*9000));
+      try{await N.set("games/"+code,{game:GAME,created:Date.now(),days:3,state:{phase:"lobby"}});return hostOpen(N,code,{phase:"lobby"})}catch(e){if(!/in use|409/i.test(String(e.message)))break}}
+    $("#go").disabled=false;$("#rer").textContent="Couldn't create a game. Check the connection and try again."};
+}
+function hostOpen(N,code,state){
+  try{localStorage.setItem(HKEY,code)}catch(e){}
+  if(H&&H.off)H.off();
+  H={N,code,state:state||{phase:"lobby"},recs:{}};
+  H.off=N.on(`games/${code}/players`,v=>{H.recs=v||{};hostRender(false)});
+  hostRender(true);
+}
+const setState=async patch=>{H.state={...H.state,...patch};hostRender(true);try{await H.N.set(`games/${H.code}/state`,H.state)}catch(e){}};
+let HTICK=null;
+function hostRender(fresh){
+  const st=H.state;
+  if(st.phase==="lobby")return hostLobby();
+  if(st.phase==="end"){if(fresh)finale();return}
+  if(st.phase==="standings"){return fullStandings()}
+  if(fresh)hostPlay();else hostLiveBits();
+}
+function stationList(){return Object.values(H.recs).filter(r=>r&&r.station).sort((a,b)=>a.station-b.station)}
+function hostLobby(){
+  const list=stationList(),max=list.length?list[list.length-1].station:0;
+  const gaps=[];for(let k=1;k<=max;k++)if(!H.recs["s"+k])gaps.push(k);
+  const url=location.host?location.host+"/chapter-10/teach-it-back":"/chapter-10/teach-it-back";
+  $("#ttl").innerHTML=`Teach It Back: <span>Bonds</span> &nbsp;·&nbsp; Code ${H.code}`;
+  app.innerHTML=`<div class="hostgrid"><div class="panel"><div class="muted" style="font-size:22px">Station iPads go to</div><div class="osw" style="font-size:40px">${esc(url)}</div>
+    <div class="muted" style="font-size:22px;margin-top:14px">Game code</div><div class="osw" style="font-size:150px;line-height:1;letter-spacing:.08em;color:var(--red)">${H.code}</div>
+    <p style="font-size:22px">Each iPad types the code, its station number, the <b>stayer</b> (sits here all game) and the <b>starting mover</b>.</p>
+    <p style="font-size:19px" class="muted">Movers slide up one station each rotation. The last station goes to Station 1. Odd number of students? Put the extra student at a station as a second stayer.</p>
+    <div class="acts"><button class="btn" id="start" ${list.length<2||gaps.length?"disabled":""}>Start Rotation 1 with ${list.length} stations</button><button class="btn sec" id="erase">Erase game</button></div>
+    ${gaps.length?`<p style="color:var(--red);font-weight:700;font-size:19px">Missing station ${gaps.join(", ")}. Stations must be numbered 1 to ${max} with no gaps.</p>`:""}</div>
+   <div class="panel"><h3 style="font-size:28px">Stations joined: ${list.length}</h3><table class="pvt" style="font-size:19px;margin-top:10px"><tr><th>#</th><th style="text-align:left">Stayer</th><th style="text-align:left">Starting mover</th></tr>
+    ${list.map(r=>`<tr><td>${r.station}</td><td style="text-align:left">${esc(r.stay)}${r.stay2?" & "+esc(r.stay2):""}</td><td style="text-align:left">${esc(r.move)}</td></tr>`).join("")}</table></div></div>`;
+  $("#start").onclick=()=>setState({phase:"play",block:0,stations:list.length,timerEnd:0,paused:null});
+  $("#erase").onclick=hostErase;
+}
+function hostPlay(){
+  const st=H.state,b=SCHED[st.block];
+  $("#ttl").innerHTML=`Teach It Back: <span>Bonds</span> &nbsp;·&nbsp; Code ${H.code}`;
+  const what=b.type==="kahoot"?`<small>Kahoot Break ${b.k} of 3</small>Partners are teammates`:`<small>${b.label} of 14</small>${ROUNDS[b.round].name}`;
+  const roles=b.type==="kahoot"?`<div class="whob"><div style="background:var(--k2);grid-column:span 2"><b>Stay with your partner</b>Answer together. You both get the points.</div></div>`
+   :`<div class="whob"><div style="background:var(--ink)"><b>TEACHER · ${TEACH_X}× points</b>${b.teach==="stay"?"The STAYER":"The MOVER"}</div><div style="background:var(--red)"><b>LEARNER · 1× points</b>${b.teach==="stay"?"The MOVER":"The STAYER"}</div></div>`;
+  const move=b.type==="kahoot"?"No moving. Same partner as the last rotation.":(b.rot===1?"Movers: start at your own station.":"MOVERS: slide up one station. The last station goes to Station 1.");
+  const note=b.type==="rot"&&b.round!=="full"?(b.rot%2?"New skill. Next rotation, today's learner teaches it to a new partner.":"You learned this last rotation. Now you teach it."):b.type==="rot"?"The whole bond process. Over these four rotations everyone teaches twice and learns twice.":"";
+  const last=st.block===SCHED.length-1;
+  app.innerHTML=`<div class="hostgrid"><div><div class="panel"><div class="now">${what}</div>${roles}
+    <p style="font-size:24px;margin:4px 0"><b>${move}</b></p><p style="font-size:20px" class="muted">${note}</p>
+    <div class="timer" id="tm"></div>
+    <div class="row" style="justify-content:center;margin-top:8px"><button class="btn" id="tgo">${st.timerEnd||st.paused!=null?"Restart timer":"Start timer ("+blockMinutes(b)+":00)"}</button><button class="btn sec" id="tpause">${st.paused!=null?"Resume":"Pause"}</button><button class="btn sec" id="tm1">−1 min</button><button class="btn sec" id="tp1">+1 min</button></div>
+    <div id="done" style="font-size:22px;text-align:center;margin-top:12px"></div>
+    <div class="row" style="justify-content:space-between;margin-top:16px"><button class="btn sec" id="prev">◀ Back</button><button class="btn sec" id="stand">Standings</button><button class="btn sec" id="end">End game now</button><button class="btn" id="next">${last?"Final standings ▶":"Next block ▶"}</button></div></div></div>
+   <div><div class="panel"><h3 style="font-size:26px">Top 8 right now</h3><div id="top8"></div><p class="muted" style="font-size:15px;margin-top:6px">Teachers earn ${TEACH_X}× the points their pair scores. Learners and Kahoot teammates earn 1×.</p></div>
+    <div class="panel"><h3>Schedule</h3><ul class="sched">${SCHED.map((x,ix)=>`<li data-i="${ix}" class="${ix===st.block?"on":""} ${x.type==="kahoot"?"kk":""}"><span class="no">${x.type==="kahoot"?"Quiz "+x.k:"Rot "+x.rot}</span><span>${x.type==="kahoot"?"Kahoot Break":ROUNDS[x.round].short+(x.round!=="full"?(x.rot%2?" (A)":" (B)"):"")}</span><span class="muted" style="margin-left:auto;font-size:14px">${blockMinutes(x)}m</span></li>`).join("")}</ul></div></div></div>`;
+  app.querySelectorAll("[data-i]").forEach(li=>li.onclick=()=>{if(+li.dataset.i!==st.block&&confirm("Jump to "+SCHED[+li.dataset.i].label+"? Every iPad will switch."))goBlock(+li.dataset.i)});
+  $("#prev").onclick=()=>{if(st.block>0&&confirm("Go back a block? Every iPad will switch."))goBlock(st.block-1)};
+  $("#next").onclick=()=>last?setState({phase:"end"}):goBlock(st.block+1);
+  $("#end").onclick=()=>{if(confirm("End the game now and show the final standings?"))setState({phase:"end"})};
+  $("#stand").onclick=()=>{H.back=st.phase;fullStandings()};
+  $("#tgo").onclick=()=>setState({timerEnd:Date.now()+blockMinutes(b)*60000,paused:null});
+  $("#tpause").onclick=()=>{if(H.state.paused!=null)setState({timerEnd:Date.now()+H.state.paused,paused:null});else if(H.state.timerEnd)setState({paused:Math.max(0,H.state.timerEnd-Date.now()),timerEnd:0})};
+  $("#tm1").onclick=()=>{if(H.state.paused!=null)setState({paused:Math.max(0,H.state.paused-60000)});else if(H.state.timerEnd)setState({timerEnd:H.state.timerEnd-60000})};
+  $("#tp1").onclick=()=>{if(H.state.paused!=null)setState({paused:H.state.paused+60000});else if(H.state.timerEnd)setState({timerEnd:H.state.timerEnd+60000})};
+  hostLiveBits();
+  clearInterval(HTICK);let beeped=false;
+  const paint=()=>{const el=$("#tm");if(!el){clearInterval(HTICK);return}const s=H.state;const ms=s.paused!=null?s.paused:s.timerEnd?s.timerEnd-Date.now():blockMinutes(b)*60000;el.textContent=mmss(ms/1000);el.classList.toggle("low",ms<60000);
+    if(s.timerEnd&&ms<=0&&!beeped){beeped=true;beep(880,.3);setTimeout(()=>beep(660,.4),320)}};
+  paint();HTICK=setInterval(paint,250);
+}
+function goBlock(i){setState({block:i,timerEnd:0,paused:null})}
+function hostLiveBits(){
+  const st=H.state;if(st.phase!=="play")return;
+  const N=st.stations,{tot}=standings(H.recs,N),rk=ranks(tot);
+  const order=Object.keys(tot).sort((a,b)=>tot[b]-tot[a]).slice(0,8);
+  const t8=$("#top8");if(t8)t8.innerHTML=order.map(n=>`<div class="row" style="font-size:21px;padding:5px 0;border-bottom:1px solid #eee"><span class="osw" style="width:36px;color:var(--red)">${rk[n]}</span><span style="flex:1">${esc(n)}</span><b>${fmt(tot[n])}</b></div>`).join("")||`<p class="muted">No points yet.</p>`;
+  const list=stationList(),dn=list.filter(r=>r.res&&r.res[st.block]&&r.res[st.block].done).length;
+  const d=$("#done");if(d)d.innerHTML=`<b>${dn}</b> of ${list.length} stations finished this block`;
+}
+function fullStandings(){
+  stopFireworks();
+  const N=H.state.stations,{tot,tch}=standings(H.recs,N),rk=ranks(tot);
+  const order=Object.keys(tot).sort((a,b)=>tot[b]-tot[a]);
+  const half=Math.ceil(order.length/2);
+  const col=arr=>`<table class="pvt" style="font-size:20px"><tr><th>#</th><th style="text-align:left">Student</th><th>Total</th><th>From teaching</th></tr>${arr.map(n=>`<tr><td>${rk[n]}</td><td style="text-align:left">${esc(n)}</td><td><b>${fmt(tot[n])}</b></td><td>${fmt(tch[n])}</td></tr>`).join("")}</table>`;
+  app.innerHTML=`<div class="panel"><div class="row" style="justify-content:space-between"><h1 style="font-size:40px">Standings</h1><div class="row"><button class="btn sec" id="csv">Download scores</button><button class="btn" id="bk">Back</button></div></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:12px">${col(order.slice(0,half))}${col(order.slice(half))}</div></div>`;
+  $("#bk").onclick=()=>{if(H.state.phase==="end")finale();else hostRender(true)};
+  $("#csv").onclick=()=>{const rows=[["Rank","Student","Total","From teaching"],...order.map(n=>[rk[n],n,tot[n],tch[n]])];
+    const blob=new Blob([rows.map(r=>r.map(x=>`"${String(x).replace(/"/g,'""')}"`).join(",")).join("\n")],{type:"text/csv"});
+    const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=`teach-it-back-${H.code}.csv`;a.click()};
+}
+/* ---------- finale (5th to 1st, slow, with room for applause) ---------- */
+function fanfare(){[[523,0],[659,.12],[784,.24],[1047,.4]].forEach(([f,t])=>setTimeout(()=>beep(f,.35),t*1000))}
+let FW=null,FIN=[];
+function stopFireworks(){FIN.forEach(clearTimeout);FIN=[];if(FW){cancelAnimationFrame(FW.raf);FW=null}document.body.classList.remove("finale-on")}
+function startFireworks(on){
+  const cv=$("#fw");if(!cv)return;const cx=cv.getContext("2d");if(FW)cancelAnimationFrame(FW.raf);
+  const dpr=Math.min(2,devicePixelRatio||1);const size=()=>{cv.width=innerWidth*dpr;cv.height=innerHeight*dpr};size();addEventListener("resize",size);
+  const COLS=["#C1102F","#E8193C","#FFFFFF","#FFFFFF","#D9D9D9","#C1102F"];
+  const rockets=[],parts=[];const t0=performance.now();
+  const launch=()=>{const W=cv.width,Hh=cv.height;rockets.push({x:W*(.12+Math.random()*.76),y:Hh,vx:(Math.random()-.5)*1.2*dpr,vy:-(Hh*.0125+Math.random()*Hh*.004),ty:Hh*(.12+Math.random()*.35),c:COLS[Math.floor(Math.random()*COLS.length)]})};
+  const burst=(r)=>{const n=70+Math.floor(Math.random()*40),sp=(2.2+Math.random()*2.2)*dpr,ring=Math.random()<.35;
+    for(let k=0;k<n;k++){const a=Math.PI*2*k/n+Math.random()*.1,v=ring?sp:sp*(.35+Math.random()*.75);parts.push({x:r.x,y:r.y,vx:Math.cos(a)*v,vy:Math.sin(a)*v,life:1,d:.008+Math.random()*.01,c:Math.random()<.25?"#FFFFFF":r.c,s:(1.6+Math.random()*1.4)*dpr})}};
+  FW={raf:0};
+  const frame=(now)=>{if(!FW)return;const el=now-t0;
+    const rate=el<7000?260:el<20000?900:1800;
+    if(on&&now-(FW.lastL||0)>rate){FW.lastL=now;launch();if(el<7000&&Math.random()<.5)launch()}
+    cx.globalCompositeOperation="destination-out";cx.fillStyle="rgba(0,0,0,.22)";cx.fillRect(0,0,cv.width,cv.height);cx.globalCompositeOperation="lighter";
+    for(let i=rockets.length-1;i>=0;i--){const r=rockets[i];r.x+=r.vx;r.y+=r.vy;r.vy+=.09*dpr;cx.fillStyle=r.c;cx.beginPath();cx.arc(r.x,r.y,2.2*dpr,0,7);cx.fill();if(r.y<=r.ty||r.vy>=0){burst(r);rockets.splice(i,1)}}
+    for(let i=parts.length-1;i>=0;i--){const p=parts[i];p.x+=p.vx;p.y+=p.vy;p.vx*=.985;p.vy=p.vy*.985+.045*dpr;p.life-=p.d;if(p.life<=0){parts.splice(i,1);continue}
+      cx.globalAlpha=Math.max(0,p.life);cx.fillStyle=p.c;cx.beginPath();cx.arc(p.x,p.y,p.s,0,7);cx.fill()}
+    cx.globalAlpha=1;FW.raf=requestAnimationFrame(frame)};
+  if(!on){[0,1,2].forEach(()=>{launch()});rockets.forEach(r=>{r.y=r.ty;burst(r)});rockets.length=0;parts.forEach(p=>{p.x+=p.vx*25;p.y+=p.vy*25});
+    cx.globalCompositeOperation="lighter";parts.forEach(p=>{cx.fillStyle=p.c;cx.beginPath();cx.arc(p.x,p.y,p.s,0,7);cx.fill()});return}
+  FW.raf=requestAnimationFrame(frame);
+}
+function finale(){
+  clearInterval(HTICK);
+  const N=H.state.stations,{tot}=standings(H.recs,N),rk=ranks(tot);
+  const order=Object.keys(tot).sort((a,b)=>tot[b]-tot[a]),top=order.slice(0,5);
+  const slot=(n,i,cls)=>n?`<div class="pod ${cls}" data-i="${i}"><div class="who"><div class="medal">${rk[n]}</div><div class="nm">${esc(n)}</div><div class="pts">${fmt(tot[n])} pts</div></div><div class="block"><span>${["1st","2nd","3rd"][i]}</span></div></div>`:`<div class="pod ${cls} empty"></div>`;
+  const rows=top.slice(3).map((n,k)=>`<div class="row45" data-i="${k+3}"><span class="r">${rk[n]}</span><span class="n">${esc(n)}</span><span class="s">${fmt(tot[n])}</span></div>`).join("");
+  document.body.classList.add("finale-on");
+  app.innerHTML=`<div class="finale"><canvas id="fw"></canvas><div class="rays"></div>
+    <div class="fhead"><img class="lg" src="/logo-214.png" alt="District 214"><div class="kick">Teach It Back · Bonds</div><h2>Final standings</h2></div>
+    <div class="podium">${slot(order[1],1,"p2")}${slot(order[0],0,"p1")}${slot(order[2],2,"p3")}</div><div class="rest">${rows}</div>
+    <div class="fbar"><button class="btn" id="cr">All standings</button><button class="btn" id="again">Replay</button><button class="btn" id="resumeG">Back to the game</button><button class="btn" id="erase">Erase game</button></div></div>`;
+  $("#cr").onclick=()=>fullStandings();$("#again").onclick=()=>{stopFireworks();finale()};$("#erase").onclick=()=>{stopFireworks();hostErase()};
+  $("#resumeG").onclick=()=>{stopFireworks();setState({phase:"play"})};
+  const ord5=[4,3,2,1,0].filter(i=>order[i]),at=[2000,7000,12500,18000,24500];
+  const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
+  FIN.forEach(clearTimeout);FIN=ord5.map((i,n)=>setTimeout(()=>{const el=app.querySelector(`.finale [data-i="${i}"]`);if(!el)return;el.classList.add("in");if(i===0){fanfare();startFireworks(!reduce)}else beep(i<3?660:520,.12)},at[n+(5-ord5.length)]||at[n]));
+}
+async function hostErase(){if(!confirm("Erase this game and all its scores?"))return;try{H.off&&H.off();await H.N.remove("games/"+H.code)}catch(e){}try{localStorage.removeItem(HKEY)}catch(e){}H=null;stopFireworks();hostSetup()}
+
+function mmss(s){s=Math.max(0,Math.round(s));return Math.floor(s/60)+":"+String(s%60).padStart(2,"0")}
+/* ---------- start ---------- */
+if(ROLE==="teacher"){$("#pvBtn").style.display="none";app.style.maxWidth="1700px";$("#homeBtn").style.display="none";hostSetup()}
+else{const s=store.get(SKEY,null);if(s&&s.code&&s.station){ME=s;startStation()}else joinForm()}
+
+</script>
+</body>
+</html>
