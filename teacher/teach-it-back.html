@@ -252,7 +252,7 @@ const DEFS={
    {kind:"Explain",term:"Why do we use present value to price a bond?",real:"money later is worth less than money now, so you shrink future payments to today's value"}],
 2:[{kind:"Define",term:"Premium on Bonds Payable",real:"the extra cash investors pay above face value, which adds to what the company owes"},
    {kind:"Define",term:"Federal funds rate",real:"the rate banks charge each other on overnight loans, which the Fed pushes up or down"}],
-3:[{kind:"Define",term:"Carrying value",real:"what the bonds are worth on the books right now, slowly moving toward face value"},
+3:[{kind:"Define",term:"Contract rate",real:"the rate printed on the bond, which sets how much cash interest gets paid"},
    {kind:"Explain",term:"Why does a lower credit rating hurt a company selling bonds?",real:"investors want a higher rate for more risk, so the bonds sell for less cash"}]};
 const DEF_RIGHT=50,DEF_FOOL=25;
 function normDef(t){t=String(t||"").trim().replace(/\s+/g," ").replace(/[.!\s]+$/,"");return t?t.charAt(0).toUpperCase()+t.slice(1):""}
@@ -412,11 +412,13 @@ const GEN={
  full(r,bonus){
   const b=makeBond(r,{call:pick(r,["Discount","Premium"])});
   if(bonus){
-   return{title:b.co+" (two payments later)",text:`${b.co} issued ${money(b.par)} of bonds for <b>${money(b.price)}</b>. The ${b.call.toLowerCase()} is amortized straight-line at <b>${money(b.am)}</b> per period. Find the carrying value after each of the first two payments, and the unamortized ${b.call.toLowerCase()} after two payments.`,
-    facts:[["Par",money(b.par)],["Issue price",money(b.price)],["Amortization per period",money(b.am)]],
-    fields:[{k:"cv1",label:"Carrying value after payment 1",kind:"money",ans:b.cv1},{k:"cv2",label:"Carrying value after payment 2",kind:"money",ans:b.cv2},{k:"left",label:"Unamortized "+b.call.toLowerCase()+" after 2",kind:"money",ans:b.diff-2*b.am}],
-    hints:["Discount bonds: carrying value goes UP by the amortization every payment. Premium bonds: it goes DOWN.",`Start at the issue price, ${money(b.price)}, and ${b.call==="Discount"?"add":"subtract"} ${money(b.am)} for each payment.`],
-    why:`${b.call==="Discount"?"Discount bonds: carrying value goes UP":"Premium bonds: carrying value goes DOWN"} by ${money(b.am)} each payment: ${money(b.price)} → ${money(b.cv1)} → ${money(b.cv2)}. ${b.call} left = ${fmt(b.diff)} − ${fmt(2*b.am)} = ${money(b.diff-2*b.am)}.`}
+   const totCash=b.cash*b.n,totExp=b.call==="Discount"?totCash+b.diff:totCash-b.diff;
+   return{title:b.co+" (the whole life)",text:`${b.co} issued ${money(b.par)} of ${b.years}-year, ${b.c}% bonds for <b>${money(b.price)}</b>, a ${b.call.toLowerCase()} of <b>${money(b.diff)}</b>. Interest is paid ${b.semi?"semi-annually":"annually"}. Look at the whole life of the bonds, then record paying them off at maturity.`,
+    facts:[["Par",money(b.par)],["Issue price",money(b.price)],["Cash interest per payment",money(b.cash)],["Life",b.years+" years"]],
+    fields:[{k:"tc",label:"Total cash interest over the life",kind:"money",ans:totCash},{k:"te",label:"Total Bond Interest Expense over the life",kind:"money",ans:totExp}],
+    je:{label:"At maturity: pay off the bonds",lines:[["Bonds Payable","Dr",b.par],["Cash","Cr",b.par]]},
+    hints:["Total cash interest = one payment × the number of payments. A discount adds to the total cost of borrowing; a premium lowers it.",`There are ${b.years} × ${b.per} = ${b.n} payments. At maturity the company pays back par, ${money(b.par)}.`],
+    why:`Cash: ${fmt(b.cash)} × ${b.n} = ${money(totCash)}. Expense: ${fmt(totCash)} ${b.call==="Discount"?"+":"−"} the ${fmt(b.diff)} ${b.call.toLowerCase()} = ${money(totExp)}. At maturity, debit Bonds Payable and credit Cash for par, ${money(b.par)}.`}
   }
   return{title:b.co,full:true,text:`On January 1, ${b.co} issues ${money(b.par)} of ${b.years}-year, ${b.c}% bonds when the market rate is ${b.mkt}%. Interest is paid ${b.pay}. Take it all the way: tables, price, issue, first payment.`,
    facts:bondFacts(b),
@@ -483,8 +485,8 @@ const KAHOOT={
  ["An underwriter is the:",["Company borrowing the money","Investment bank that buys the bonds and resells them to investors","Fed official who sets rates","Auditor who checks the books"],1]],
 3:[
  ["Amortizing a DISCOUNT makes Bond Interest Expense:",["Higher than the cash paid","Lower than the cash paid","Equal to the cash paid","Zero"],0],
- ["The carrying value of a PREMIUM bond over time:",["Goes up to par","Goes down to par","Stays the same","Goes to zero"],1],
- ["At maturity, carrying value equals:",["Zero","Par value","The issue price","Par plus the premium"],1],
+ ["Amortizing a PREMIUM makes Bond Interest Expense:",["Higher than the cash paid","Lower than the cash paid","Equal to the cash paid","Zero"],1],
+ ["When a discount is amortized, Discount on Bonds Payable is:",["Debited","Credited","Closed to Cash","Left alone"],1],
  ["Paying off bonds at maturity:",["Dr Cash, Cr Bonds Payable","Dr Bonds Payable, Cr Cash","Dr Interest Expense, Cr Cash","Dr Discount, Cr Cash"],1],
  ["Inflation is 6% and the Fed wants 2%. The Fed will most likely:",["Raise interest rates","Lower interest rates","Stop issuing money","Buy more bonds"],0],
  ["Why does inflation hurt people who own bonds?",["The par value shrinks","The fixed interest payments buy less","The bond's rating rises","The contract rate goes to zero"],1],
