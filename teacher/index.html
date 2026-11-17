@@ -96,7 +96,7 @@ h1{font-family:var(--display);font-weight:700;font-size:clamp(40px,6vw,64px);lin
     <a class="card" href="/teacher/teach-it-back">
       <span class="chip">Chapter 10</span>
       <h2>Teach It Back</h2>
-      <p>Bonds. One iPad per station, two students per station: a stayer and a mover. Every rotation the movers slide up one station, so each pair is new, and whoever learned a skill teaches it to the next partner. Five skills (PV table lookup, pricing with factors, issuance entries from a price quote, interest entries with straight-line amortization, cash interest rapid fire), then four rotations of the whole bond process. Teachers earn 3× points, learners 1×. A bonus problem every rotation for pairs who finish early, Kahoot breaks after every four rotations, a live leaderboard, and a slow 5th-to-1st finale. About two class periods; the game is saved for 3 days.</p>
+      <p>Bonds. One iPad per station, two students per station: a stayer and a mover. Every rotation the movers slide up one station, so each pair is new, and whoever learned a skill teaches it to the next partner. Five skills (PV table lookup, pricing with factors, issuance entries from a price quote, interest entries with straight-line amortization, cash interest rapid fire), then four rotations of the whole bond process. Teachers earn 3× points, learners 1×. Every problem has two hints that cut its points (½, then ¼), a bonus problem every rotation for pairs who finish early, a Kahoot break after every four rotations followed by a Define It round (every team writes a definition, then everyone votes on which one is real), a live leaderboard, and a slow 5th-to-1st finale. About two class periods; the game is saved for 3 days.</p>
       <div class="stu">Stations go to <b>Teach It Back</b> on the site <span class="go">Host →</span></div>
     </a>
     <a class="card" href="/teacher/bond-underwriter">
@@ -306,7 +306,9 @@ const HOW = [
     "The learner works on the whiteboard and types into the iPad. The teacher coaches and does not touch the iPad.",
     "Teachers earn 3 times the points their pair scores. Learners earn 1 times. Teach well!",
     "Right on the first try: full points. Second try: half. After two misses the iPad shows how to do it.",
-    "Finish early? Do the bonus problem for up to 30 more points. Kahoot breaks: you and your partner are teammates and both get the points."
+    "Stuck? Hint 1 cuts that problem's points in half. Hint 2 cuts them to a quarter.",
+    "Finish early? Do the bonus problem for up to 30 more points. Kahoot breaks: you and your partner are teammates and both get the points.",
+    "Define It: write a definition that sounds real. +50 for picking the real one, +25 every time another team picks yours."
    ],
    strat:[
     "Teachers: make the learner say each step out loud before typing it.",
@@ -320,10 +322,11 @@ const HOW = [
     "Each iPad goes to <code>/chapter-10/teach-it-back</code> and enters the code, its station number, the stayer and the starting mover.",
     "When every station shows in the list, click <b>Start Rotation 1</b>. The iPads follow the board automatically.",
     "Start the timer each block. When time is up, movers slide up one station and you click <b>Next block</b>.",
+    "Define It: when teams have written, click <b>Start voting</b>, then <b>Reveal the real one</b>, then <b>Next prompt</b>. <b>Hide</b> removes a silly answer.",
     "Day 2: open Teach It Back, click <b>Resume</b> with the same code, and pick the block to start on from the schedule.",
     "After Rotation 14, click <b>Final standings</b> for the 5th-to-1st reveal. <b>End game now</b> jumps there any time. <b>Download scores</b> saves a spreadsheet."
    ],
-   need:["Mini whiteboards, markers and calculators. PV tables (also on the iPad).","About two class periods: 7 minutes per skill rotation, 9 per full-process rotation, 5 per Kahoot break."],
+   need:["Mini whiteboards, markers and calculators. PV tables (also on the iPad).","About two class periods: 7 minutes per skill rotation, 9 per full-process rotation, 5 per Kahoot break, 7 per Define It round."],
    tip:"Students who leave the page tap <b>Rejoin</b> and pick their station. Their work and points are kept."},
  { id:"underwriting", name:"The Underwriting Desk", unit:"Chapter 10", href:"/teacher/bond-underwriter",
    who:"1 iPad per team (a desk of 2 to 4 students).", go:"/chapter-10/bond-underwriter",

@@ -28,6 +28,10 @@ input,select{font:inherit}
 .btn.gold{background:var(--gold);color:#111}
 .btn.ok{background:var(--ok)}
 .btn:disabled{opacity:.45}
+.hintbox{margin-top:12px}
+.hintbox .worth{font-size:.9em;margin-bottom:6px}
+.hint{background:#FFF7E0;border-left:5px solid var(--gold);padding:8px 12px;border-radius:8px;margin-bottom:6px;font-size:.92em;line-height:1.4}
+.hbtn{background:#FFF7E0;color:#5a4300;border:2px solid var(--gold);padding:9px 14px;font-size:.92em}
 .grid17{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:12px}
 .blk{background:#fff;border:2px solid var(--ln);border-radius:12px;padding:12px;text-align:left;min-height:96px}
 .blk .n{font-family:Oswald,"Arial Narrow",Arial,sans-serif;font-size:15px;color:var(--mu);text-transform:uppercase}
@@ -88,6 +92,17 @@ input,select{font:inherit}
 .kopt .sh{font-size:1.6em;width:34px;flex:none;text-align:center}
 .kopt:nth-child(1){background:var(--k1)}.kopt:nth-child(2){background:var(--k2)}.kopt:nth-child(3){background:var(--k3)}.kopt:nth-child(4){background:var(--k4)}
 .kopt.dim{opacity:.3}
+.dvote{display:grid;gap:10px}
+.dopt{text-align:left;background:#fff;border:2px solid var(--ln);padding:14px 16px;font-size:1.1em;line-height:1.35;display:flex;gap:14px;align-items:flex-start}
+.dopt .osw{font-size:1.3em;color:var(--red);min-width:24px}
+.dopt.on{border-color:var(--k2);background:#EEF4FC;box-shadow:0 0 0 3px var(--k2)}
+.dlist{display:grid;gap:8px}
+.dent{display:flex;gap:14px;align-items:flex-start;padding:10px 14px;border-radius:10px;background:var(--bg);font-size:22px;line-height:1.3}
+.dent .osw{font-size:28px;color:var(--red);min-width:30px}
+.dent.real{background:#EFF8F2;outline:3px solid var(--ok)}
+.dent .by{font-size:16px;color:var(--mu);margin-top:3px}
+.dent .vc{margin-left:auto;font-family:Oswald,"Arial Narrow",Arial,sans-serif;font-size:26px;white-space:nowrap}
+.dent .hd{margin-left:auto;background:#e3e3e3;padding:4px 10px;font-size:14px}
 .kopt.right{outline:6px solid #111}
 .kbar{height:12px;background:#e3e3e3;border-radius:6px;overflow:hidden;margin-bottom:10px}
 .kbar i{display:block;height:100%;background:var(--k2);transition:width .25s linear}
@@ -217,12 +232,38 @@ const ROUNDS={
  full:{name:"The Whole Deal",short:"Full Bond Process"}
 };
 const SCHED=[];
-[["r1"],["r1"],["r2"],["r2"],["K",1],["r3"],["r3"],["r4"],["r4"],["K",2],["r5"],["r5"],["full"],["full"],["K",3],["full"],["full"]].forEach(([t,k])=>{
+[["r1"],["r1"],["r2"],["r2"],["K",1],["D",1],["r3"],["r3"],["r4"],["r4"],["K",2],["D",2],["r5"],["r5"],["full"],["full"],["K",3],["D",3],["full"],["full"]].forEach(([t,k])=>{
   if(t==="K")SCHED.push({type:"kahoot",k,label:"Kahoot Break "+k});
+  else if(t==="D")SCHED.push({type:"def",d:k,label:"Define It "+k});
   else{const rot=SCHED.filter(b=>b.type==="rot").length+1;SCHED.push({type:"rot",round:t,rot,teach:rot%2===1?"stay":"move",label:"Rotation "+rot})}
 });
-const MINUTES={rot:7,full:9,kahoot:5};
-function blockMinutes(b){return b.type==="kahoot"?MINUTES.kahoot:(b.round==="full"?MINUTES.full:MINUTES.rot)}
+const MINUTES={rot:7,full:9,kahoot:5,def:7};
+function blockMinutes(b){return b.type==="kahoot"?MINUTES.kahoot:b.type==="def"?MINUTES.def:(b.round==="full"?MINUTES.full:MINUTES.rot)}
+const SCHED_NO=x=>x.type==="kahoot"?"Quiz "+x.k:x.type==="def"?"Def "+x.d:"Rot "+x.rot;
+const SCHED_NAME=x=>x.type==="kahoot"?"Kahoot Break":x.type==="def"?"Define It":ROUNDS[x.round].short+(x.round!=="full"?(x.rot%2?" (A)":" (B)"):"");
+
+/* ================= Define It bank =================
+   The real answer is written the way a strong student would say it, so it doesn't stand out. */
+const DEFS={
+1:[{kind:"Define",term:"Market rate",real:"what investors could earn somewhere else right now, so it sets the bond's price"},
+   {kind:"Explain",term:"Why do we use present value to price a bond?",real:"money later is worth less than money now, so you shrink future payments to today's value"}],
+2:[{kind:"Define",term:"Premium on Bonds Payable",real:"the extra cash investors pay above face value, which adds to what the company owes"},
+   {kind:"Define",term:"Federal funds rate",real:"the rate banks charge each other on overnight loans, which the Fed pushes up or down"}],
+3:[{kind:"Define",term:"Carrying value",real:"what the bonds are worth on the books right now, slowly moving toward face value"},
+   {kind:"Explain",term:"Why does a lower credit rating hurt a company selling bonds?",real:"investors want a higher rate for more risk, so the bonds sell for less cash"}]};
+const DEF_RIGHT=50,DEF_FOOL=25;
+function normDef(t){t=String(t||"").trim().replace(/\s+/g," ").replace(/[.!\s]+$/,"");return t?t.charAt(0).toUpperCase()+t.slice(1):""}
+function defKey(b,p){return b+"_"+p}
+function defEntries(recs,b,p,code,hide){
+  const k=defKey(b,p),hid=(hide&&hide[k])||[];
+  const list=Object.values(recs||{}).filter(r=>r&&r.def&&r.def[k]&&normDef(r.def[k].t)&&!hid.includes("s"+r.station)).map(r=>({id:"s"+r.station,station:r.station,text:normDef(r.def[k].t)}));
+  list.push({id:"real",text:normDef(DEFS[SCHED[b].d][p].real)});
+  return shuffle(rng((+code||1)*7+b*131+p*17),list.sort((a,c)=>a.id<c.id?-1:1))}
+function defScores(recs,b,p,code,hide){
+  const ents=defEntries(recs,b,p,code,hide),ids=ents.map(e=>e.id),pts={},votes={};ents.forEach(e=>votes[e.id]=0);
+  Object.values(recs||{}).forEach(r=>{const d=r&&r.def&&r.def[defKey(b,p)];if(!d||!d.v||!ids.includes(d.v)||d.v==="s"+r.station)return;
+    votes[d.v]++;if(d.v==="real")pts[r.station]=(pts[r.station]||0)+DEF_RIGHT;else{const st=+d.v.slice(1);pts[st]=(pts[st]||0)+DEF_FOOL}});
+  return{pts,votes,ents}}
 
 /* ================= check codes ================= */
 function checkCode(station,blockIdx,pts){
@@ -302,6 +343,8 @@ const GEN={
    facts:bondFacts(b),
    fields:[{k:"n",label:"Number of periods (n)",kind:"int",ans:b.n},{k:"i",label:"Market rate per period (%)",kind:"rate",ans:b.i},
      {k:"f1",label:"PV of $1 factor",kind:"factor",ans:b.f1},{k:"fa",label:"PV of an annuity factor",kind:"factor",ans:b.fa}],
+   hints:["Periods = years × payments per year. Rate per period = the MARKET rate ÷ payments per year. Ignore the contract rate here.",
+     `This bond runs ${b.years} years with ${b.per} payment${b.per>1?"s":""} a year and a ${b.mkt}% market rate. Find row n and column i in BOTH tables.`],
    why:`n = ${b.years} years × ${b.per} = ${b.n}. i = ${b.mkt}% ÷ ${b.per} = ${b.i}%. Use the MARKET rate, not the ${b.c}% contract rate. Row ${b.n}, column ${b.i}%: PV of $1 = ${b.f1.toFixed(4)}, PV of an annuity = ${b.fa.toFixed(4)}.`}
  },
  r2(r,bonus){
@@ -310,6 +353,8 @@ const GEN={
    facts:[["Par value",money(b.par)],["Interest payment",money(b.cash)],["PV of $1 factor",b.f1.toFixed(4)],["PV of an annuity factor",b.fa.toFixed(4)]],
    fields:[{k:"pvPar",label:"PV of the par value",kind:"money",ans:b.pvPar},{k:"pvInt",label:"PV of the interest payments",kind:"money",ans:b.pvInt},
      {k:"price",label:"Bond price (cash received)",kind:"money",ans:b.price},{k:"call",label:"Issued at",kind:"choice",opts:["Par","Discount","Premium"],ans:b.call}],
+   hints:["PV of par = par × the PV of $1 factor. PV of interest = one interest payment × the annuity factor. Add them to get the price.",
+     `Start with ${fmt(b.par)} × ${b.f1.toFixed(4)}. A price below ${money(b.par)} is a discount; above it is a premium.`],
    why:`PV of par = ${fmt(b.par)} × ${b.f1.toFixed(4)} = ${money(b.pvPar)}. PV of interest = ${fmt(b.cash)} × ${b.fa.toFixed(4)} = ${money(b.pvInt)}. Price = ${money(b.price)}, which is ${b.call==="Par"?"exactly par":b.call==="Discount"?"below par, a discount":"above par, a premium"}.`}
  },
  r3(r,bonus,which){
@@ -322,6 +367,8 @@ const GEN={
    facts:[["Par value",money(par)],["Price quote",q.toFixed(2)]],
    fields:[{k:"cash",label:"Cash received",kind:"money",ans:price},{k:"diff",label:(call==="Premium"?"Premium":"Discount")+" amount",kind:"money",ans:diff,hideLabel:true,label2:"Discount or premium amount"}],
    je:{label:"January 1: issue the bonds",lines:issueLines(b)},
+   hints:["Cash = par × (price quote ÷ 100). Bonds Payable is ALWAYS credited at par. The gap is the discount or premium.",
+     `${q.toFixed(2)} is ${call==="Premium"?"above":"below"} 100, so this is a ${call.toLowerCase()}. ${call==="Premium"?"A premium goes on the CREDIT side.":"A discount goes on the DEBIT side."}`],
    why:`Cash = ${fmt(par)} × ${q.toFixed(2)}% = ${money(price)}. That is ${call==="Premium"?"above":"below"} par by ${money(diff)}, so ${call==="Premium"?"credit Premium":"debit Discount"} on Bonds Payable for ${money(diff)}. Bonds Payable is always credited at par, ${money(par)}.`}
  },
  r4(r,bonus,which){
@@ -337,6 +384,8 @@ const GEN={
    facts:[["Par value",money(par)],["Contract rate",c+"%"],["Life",years+" years"],["Interest paid",semi?"Semi-annually":"Annually"],["Total "+call.toLowerCase(),money(total)]],
    fields:[{k:"cash",label:"Cash interest per payment",kind:"money",ans:cash},{k:"am",label:"Amortization per period",kind:"money",ans:am},{k:"exp",label:"Bond Interest Expense",kind:"money",ans:exp}],
    je:{label:`${semi?"June 30":"December 31"}: first interest payment`,lines:interestLines(b)},
+   hints:["Cash = par × contract rate (× 6/12 if paid semi-annually). Amortization = the total discount or premium ÷ the number of PERIODS.",
+     `There are ${years} × ${per} = ${n} periods. ${call==="Discount"?"Discount: expense = cash + amortization, and you CREDIT Discount.":"Premium: expense = cash − amortization, and you DEBIT Premium."}`],
    why:`Cash = ${fmt(par)} × ${c}%${semi?" × 6/12":""} = ${money(cash)}. Amortization = ${fmt(total)} ÷ ${n} periods = ${money(am)}. ${call==="Discount"?`Discount: expense = ${fmt(cash)} + ${fmt(am)} = ${money(exp)}, and CREDIT Discount to shrink it.`:`Premium: expense = ${fmt(cash)} − ${fmt(am)} = ${money(exp)}, and DEBIT Premium to shrink it.`}`}
  },
  r5(r,bonus){
@@ -347,13 +396,15 @@ const GEN={
    const per=freq==="semi"?2:1;const years=between(r,3,10);
    const cash=Math.round(par*c/100/per);
    if(bonus){const tot=cash*years*per;
-     items.push({k:"q"+k,label:`${money(par)}, ${c}%, ${years}-year bonds paid ${freq==="semi"?"semi-annually":"annually"}: TOTAL cash interest over the life`,kind:"money",ans:tot,
+     items.push({k:"q"+k,yr:par*c/100,n:years*per,years,per,label:`${money(par)}, ${c}%, ${years}-year bonds paid ${freq==="semi"?"semi-annually":"annually"}: TOTAL cash interest over the life`,kind:"money",ans:tot,
        why:`${money(cash)} per payment × ${years*per} payments = ${money(tot)}`})}
-   else items.push({k:"q"+k,label:`${money(par)} at ${c}%, paid ${freq==="semi"?"semi-annually":"annually"}`,kind:"money",ans:cash,
+   else items.push({k:"q"+k,yr:par*c/100,par,c,label:`${money(par)} at ${c}%, paid ${freq==="semi"?"semi-annually":"annually"}`,kind:"money",ans:cash,
        why:`${fmt(par)} × ${c}%${per>1?` × ${12/per}/12`:""} = ${money(cash)}`});
   }
   return{title:bonus?"Lifetime interest":"Rapid fire: 4 bonds",wide:true,text:bonus?"Find the TOTAL cash interest each company pays over the whole life of its bonds.":"Find the cash interest paid on EACH payment date. Par × contract rate × the fraction of a year.",
-   fields:items,why:items.map((f,ix)=>`${ix+1}. ${f.why}`).join("<br>")}
+   fields:items,why:items.map((f,ix)=>`${ix+1}. ${f.why}`).join("<br>"),
+   hints:bonus?["Total cash interest = the interest on ONE payment × the total number of payments.",`For #1: ${items[0].years} years × ${items[0].per} payment${items[0].per>1?"s":""} a year = ${items[0].n} payments.`]
+     :["Par × contract rate = one full YEAR of interest. Paid twice a year? Cut it in half.",`For #1: ${fmt(items[0].par)} × ${items[0].c}% = ${money(items[0].yr)} for the whole year.`]}
  },
  full(r,bonus){
   const b=makeBond(r,{call:pick(r,["Discount","Premium"])});
@@ -361,18 +412,23 @@ const GEN={
    return{title:b.co+" (two payments later)",text:`${b.co} issued ${money(b.par)} of bonds for <b>${money(b.price)}</b>. The ${b.call.toLowerCase()} is amortized straight-line at <b>${money(b.am)}</b> per period. Find the carrying value after each of the first two payments, and the unamortized ${b.call.toLowerCase()} after two payments.`,
     facts:[["Par",money(b.par)],["Issue price",money(b.price)],["Amortization per period",money(b.am)]],
     fields:[{k:"cv1",label:"Carrying value after payment 1",kind:"money",ans:b.cv1},{k:"cv2",label:"Carrying value after payment 2",kind:"money",ans:b.cv2},{k:"left",label:"Unamortized "+b.call.toLowerCase()+" after 2",kind:"money",ans:b.diff-2*b.am}],
+    hints:["Discount bonds: carrying value goes UP by the amortization every payment. Premium bonds: it goes DOWN.",`Start at the issue price, ${money(b.price)}, and ${b.call==="Discount"?"add":"subtract"} ${money(b.am)} for each payment.`],
     why:`${b.call==="Discount"?"Discount bonds: carrying value goes UP":"Premium bonds: carrying value goes DOWN"} by ${money(b.am)} each payment: ${money(b.price)} → ${money(b.cv1)} → ${money(b.cv2)}. ${b.call} left = ${fmt(b.diff)} − ${fmt(2*b.am)} = ${money(b.diff-2*b.am)}.`}
   }
   return{title:b.co,full:true,text:`On January 1, ${b.co} issues ${money(b.par)} of ${b.years}-year, ${b.c}% bonds when the market rate is ${b.mkt}%. Interest is paid ${b.pay}. Take it all the way: tables, price, issue, first payment.`,
    facts:bondFacts(b),
    stages:[
     {name:"1. PV Tables",fields:[{k:"n",label:"Number of periods (n)",kind:"int",ans:b.n},{k:"i",label:"Market rate per period (%)",kind:"rate",ans:b.i},{k:"cash",label:"Cash interest per payment",kind:"money",ans:b.cash},{k:"f1",label:"PV of $1 factor",kind:"factor",ans:b.f1},{k:"fa",label:"PV of an annuity factor",kind:"factor",ans:b.fa}],
+     hints:["Periods = years × payments per year. Rate per period = MARKET rate ÷ payments per year. Cash interest uses the CONTRACT rate.",`${b.years} years, ${b.per} payment${b.per>1?"s":""} a year, ${b.mkt}% market rate. Cash = ${fmt(b.par)} × ${b.c}%${b.semi?" × 6/12":""}.`],
      why:`n = ${b.years} × ${b.per} = ${b.n}; i = ${b.mkt}% ÷ ${b.per} = ${b.i}%. Cash = ${fmt(b.par)} × ${b.c}%${b.semi?" × 6/12":""} = ${money(b.cash)}. Factors: ${b.f1.toFixed(4)} and ${b.fa.toFixed(4)}.`},
     {name:"2. Price",fields:[{k:"pvPar",label:"PV of the par value",kind:"money",ans:b.pvPar},{k:"pvInt",label:"PV of the interest payments",kind:"money",ans:b.pvInt},{k:"price",label:"Bond price",kind:"money",ans:b.price},{k:"diff",label:"Discount or premium amount",kind:"money",ans:b.diff}],
+     hints:["PV of par = par × PV of $1 factor. PV of interest = cash interest × annuity factor. Price = the two added together.",`Start with ${fmt(b.par)} × ${b.f1.toFixed(4)}. The gap between the price and ${money(b.par)} is the ${b.call.toLowerCase()}.`],
      why:`${fmt(b.par)} × ${b.f1.toFixed(4)} = ${money(b.pvPar)}; ${fmt(b.cash)} × ${b.fa.toFixed(4)} = ${money(b.pvInt)}. Price ${money(b.price)}, a ${b.call.toLowerCase()} of ${money(b.diff)}.`},
     {name:"3. Issue",fields:[],je:{label:"January 1: issue the bonds",lines:issueLines(b)},
+     hints:["Debit Cash for what you actually received. Credit Bonds Payable at par.",b.call==="Discount"?"Cash is below par, so the gap is a DEBIT to Discount on Bonds Payable.":"Cash is above par, so the gap is a CREDIT to Premium on Bonds Payable."],
      why:`Debit Cash ${money(b.price)}, ${b.call==="Discount"?"debit Discount":"credit Premium"} ${money(b.diff)}, credit Bonds Payable at par ${money(b.par)}.`},
     {name:"4. First Payment",fields:[{k:"am",label:"Amortization per period",kind:"money",ans:b.am},{k:"exp",label:"Bond Interest Expense",kind:"money",ans:b.exp}],je:{label:`${b.firstDate}: first interest payment`,lines:interestLines(b)},
+     hints:["Amortization = the discount or premium ÷ the number of periods. Cash interest is the same as step 1.",b.call==="Discount"?"Discount: expense = cash + amortization, and you CREDIT Discount.":"Premium: expense = cash − amortization, and you DEBIT Premium."],
      why:`Amortization = ${fmt(b.diff)} ÷ ${b.n} = ${money(b.am)}. Expense = ${fmt(b.cash)} ${b.call==="Discount"?"+":"−"} ${fmt(b.am)} = ${money(b.exp)}.`}
    ]}
  }
@@ -514,7 +570,11 @@ function standings(recs,N){
   Object.values(recs||{}).forEach(r=>{Object.entries(r.res||{}).forEach(([b,v])=>{b=+b;const blk=SCHED[b];const pts=(v&&v.pts)||0;if(!blk||!pts)return;
     const pr=pairAt(recs,r.station,b,N);if(!pr)return;
     if(blk.type==="kahoot"){pr.stay.forEach(n=>add(n,pts));add(pr.move,pts)}
-    else{const stayT=blk.teach==="stay";pr.stay.forEach(n=>add(n,stayT?pts*TEACH_X:pts,stayT));add(pr.move,stayT?pts:pts*TEACH_X,!stayT)}})});
+    else if(blk.type==="rot"){const stayT=blk.teach==="stay";pr.stay.forEach(n=>add(n,stayT?pts*TEACH_X:pts,stayT));add(pr.move,stayT?pts:pts*TEACH_X,!stayT)}})});
+  const G=(typeof H!=="undefined"&&H&&H.state)||{};
+  (G.revealed||[]).forEach(k=>{const [b,p]=k.split("_").map(Number);if(!SCHED[b]||SCHED[b].type!=="def")return;
+    const {pts}=defScores(recs,b,p,H.code,G.hide);
+    Object.entries(pts).forEach(([st,v])=>{const pr=pairAt(recs,+st,b,N);if(!pr)return;pr.stay.forEach(n=>add(n,v));add(pr.move,v)})});
   return{tot,tch}}
 function ranks(val){const ids=Object.keys(val).sort((a,b)=>val[b]-val[a]);const r={};let k=0,prev=null;ids.forEach((id,i)=>{if(val[id]!==prev){k=i+1;prev=val[id]}r[id]=k});return r}
 
@@ -572,10 +632,11 @@ function stationRender(){
     app.innerHTML=`<div class="panel center"><h1 style="font-size:40px">You're in! Station ${ME.station}</h1><p style="font-size:1.2em">Stayer: <b>${esc(me.stay||"")}</b>${me.stay2?" and <b>"+esc(me.stay2)+"</b>":""} &nbsp;·&nbsp; Starting mover: <b>${esc(me.move||"")}</b></p><p class="muted">Get a whiteboard, marker and calculator. The game starts from the board.</p></div>`;
     net().then(N=>N.get(`games/${ME.code}/players`)).then(r=>{LIVE.recs=r||LIVE.recs}).catch(()=>{});return}
   if(st.phase==="end"){CUR=null;clearInterval(KTIMER);app.innerHTML=`<div class="panel center"><h1 style="font-size:44px">That's the game!</h1><p style="font-size:1.2em">Eyes on the board for the final standings.</p></div>`;return}
-  if(CUR&&CUR.block===st.block)return; // already showing this block
-  clearInterval(KTIMER);CUR={block:st.block};
+  const isDef=SCHED[st.block].type==="def",key=isDef?`${st.block}|${st.dp||0}|${st.dph||"write"}|${JSON.stringify((st.hide||{})[defKey(st.block,st.dp||0)]||[])}`:String(st.block);
+  if(CUR&&CUR.key===key)return; // already showing this
+  clearInterval(KTIMER);CUR={block:st.block,key};
   net().then(N=>N.get(`games/${ME.code}/players`)).then(r=>{LIVE.recs=r||LIVE.recs;draw()}).catch(draw);
-  function draw(){if(!CUR||CUR.block!==st.block)return;SCHED[st.block].type==="kahoot"?kahoot(st.block):rotation(st.block)}
+  function draw(){if(!CUR||CUR.key!==key)return;const t=SCHED[st.block].type;t==="kahoot"?kahoot(st.block):t==="def"?defBlock(st.block):rotation(st.block)}
 }
 let CLOCK=null;
 function syncClock(){
@@ -587,6 +648,19 @@ function syncClock(){
 function pushResult(bIdx,obj){net().then(N=>N.update(`games/${ME.code}/players/s${ME.station}`,{["res/"+bIdx]:obj})).catch(()=>{})}
 function names(bIdx){const N=LIVE.state&&LIVE.state.stations;return pairAt(LIVE.recs,ME.station,bIdx,N)||{stay:["The stayer"],move:"The mover"}}
 
+/* ---------- hints ---------- */
+// Hint 1 cuts what the problem is worth in half. Hint 2 cuts it to a quarter.
+const HINT_MULT=[1,.5,.25];
+function hintsHTML(){return `<div class="hintbox" id="hb"></div>`}
+function mountHints(hints,base,used,onUse){
+  const box=$("#hb");if(!box||!hints||!hints.length)return;
+  const draw=()=>{const now=Math.round(base*HINT_MULT[used]);
+    box.innerHTML=`<div class="worth">Worth now: <b>${now}</b> pts${used?` <span class="muted">(hints used: ${used})</span>`:""}</div>`+
+      hints.slice(0,used).map((h,i)=>`<div class="hint"><b>Hint ${i+1}:</b> ${h}</div>`).join("")+
+      (used<hints.length?`<button class="btn hbtn" id="hbtn">💡 Hint ${used+1}: drops this to ${Math.round(base*HINT_MULT[used+1])} pts</button>`:"");
+    const b=$("#hbtn");if(b)b.onclick=()=>{used++;onUse(used);draw()}};
+  draw();
+}
 /* ---------- rotation ---------- */
 const MAIN_PTS=100,BONUS_PTS=30;
 function rotation(bIdx){
@@ -613,19 +687,20 @@ function rotation(bIdx){
   function problem(p,isBonus){
     const worth=isBonus?BONUS_PTS:(st.idx===set.probs.length-1?MAIN_PTS-per*(set.probs.length-1):per);
     if(p.full)return fullProblem(p,worth);
-    let tries=0;
+    let tries=0;st.h=st.h||{};const hk=isBonus?"b":"p"+st.idx;let used=st.h[hk]||0;
     app.innerHTML=`${roleHTML()}<div class="panel">${progress()}
       <div class="work" style="${p.wide?"grid-template-columns:1fr":""}">
-       <div class="prob"><div class="co">${isBonus?"BONUS: ":""}${p.title}${isBonus?'<span class="tag">+'+BONUS_PTS+' bonus</span>':""}</div><p>${p.text}</p>${p.facts?`<dl class="facts">${p.facts.map(([a,c])=>`<dt>${a}</dt><dd>${c}</dd>`).join("")}</dl>`:""}</div>
+       <div class="prob"><div class="co">${isBonus?"BONUS: ":""}${p.title}${isBonus?'<span class="tag">+'+BONUS_PTS+' bonus</span>':""}</div><p>${p.text}</p>${p.facts?`<dl class="facts">${p.facts.map(([a,c])=>`<dt>${a}</dt><dd>${c}</dd>`).join("")}</dl>`:""}${hintsHTML()}</div>
        <div>${fieldsHTML(p.fields,p.wide)}${p.je?jeHTML(p.je):""}
         <div id="fb"></div><div class="acts"><button class="btn" id="chk">Check</button><button class="btn sec" id="nx" style="display:none">Next</button></div></div>
       </div></div>`;
+    mountHints(p.hints,worth,used,u=>{used=u;st.h[hk]=u;store.set(lkey(bIdx),st)});
     $("#chk").onclick=()=>{
       tries++;const r=grade(p.fields,p.je);
-      if(r.ok){const got=tries===1?worth:Math.round(worth/2);
+      if(r.ok){const w=Math.round(worth*HINT_MULT[used]);const got=tries===1?w:Math.round(w/2);$("#hbtn")&&$("#hbtn").remove();
         $("#fb").innerHTML=`<div class="fb ok"><b>Correct! +${got} points${tries>1?" (second try)":""}.</b><br>${p.why}</div>`;finish(got)}
       else if(tries<2){$("#fb").innerHTML=`<div class="fb no"><b>Not yet.</b> The red boxes are off. Teacher: find the mistake on the whiteboard, then try once more for half points.</div>`}
-      else{showAnswers(p.fields,p.je);$("#fb").innerHTML=`<div class="fb show"><b>Here's how it works.</b> Teacher: walk through it before moving on.<br>${p.why}</div>`;finish(0)}
+      else{$("#hbtn")&&$("#hbtn").remove();showAnswers(p.fields,p.je);$("#fb").innerHTML=`<div class="fb show"><b>Here's how it works.</b> Teacher: walk through it before moving on.<br>${p.why}</div>`;finish(0)}
     };
     function finish(got){
       $("#chk").style.display="none";$("#nx").style.display="";
@@ -639,14 +714,15 @@ function rotation(bIdx){
     let s=st.fullStage||0,earned=st.fullEarned||0;
     const one=()=>{
       if(!live())return;
-      const sg=p.stages[s];let tries=0;
+      const sg=p.stages[s];let tries=0;st.h=st.h||{};const hk="f"+st.idx+"_"+s;let used=st.h[hk]||0;
       app.innerHTML=`${roleHTML()}<div class="panel">${progress()}<div class="steps">${p.stages.map((x,k)=>`<span class="${k<s?"ok":k===s?"on":""}">${x.name}</span>`).join("")}</div>
-       <div class="work"><div class="prob"><div class="co">${p.title}</div><p>${p.text}</p><dl class="facts">${p.facts.map(([a,c])=>`<dt>${a}</dt><dd>${c}</dd>`).join("")}</dl>${s>0?`<p class="muted" style="font-size:.85em">Keep your earlier numbers on the whiteboard. You will need them.</p>`:""}</div>
+       <div class="work"><div class="prob"><div class="co">${p.title}</div><p>${p.text}</p><dl class="facts">${p.facts.map(([a,c])=>`<dt>${a}</dt><dd>${c}</dd>`).join("")}</dl>${s>0?`<p class="muted" style="font-size:.85em">Keep your earlier numbers on the whiteboard. You will need them.</p>`:""}${hintsHTML()}</div>
        <div>${fieldsHTML(sg.fields)}${sg.je?jeHTML(sg.je):""}<div id="fb"></div><div class="acts"><button class="btn" id="chk">Check</button><button class="btn sec" id="nx" style="display:none">Next step</button></div></div></div></div>`;
+      mountHints(sg.hints,stageW,used,u=>{used=u;st.h[hk]=u;store.set(lkey(bIdx),st)});
       $("#chk").onclick=()=>{tries++;const r=grade(sg.fields,sg.je);
-        if(r.ok){const got=tries===1?stageW:Math.round(stageW/2);earned+=got;$("#fb").innerHTML=`<div class="fb ok"><b>Correct! +${got}.</b><br>${sg.why}</div>`;fin()}
+        if(r.ok){const w=Math.round(stageW*HINT_MULT[used]);const got=tries===1?w:Math.round(w/2);$("#hbtn")&&$("#hbtn").remove();earned+=got;$("#fb").innerHTML=`<div class="fb ok"><b>Correct! +${got}.</b><br>${sg.why}</div>`;fin()}
         else if(tries<2)$("#fb").innerHTML=`<div class="fb no"><b>Not yet.</b> Fix the red boxes for half points.</div>`;
-        else{showAnswers(sg.fields,sg.je);$("#fb").innerHTML=`<div class="fb show"><b>Here's how it works.</b> Use these numbers for the next step.<br>${sg.why}</div>`;fin()}};
+        else{$("#hbtn")&&$("#hbtn").remove();showAnswers(sg.fields,sg.je);$("#fb").innerHTML=`<div class="fb show"><b>Here's how it works.</b> Use these numbers for the next step.<br>${sg.why}</div>`;fin()}};
       function fin(){$("#chk").style.display="none";$("#nx").style.display="";st.fullStage=s+1;st.fullEarned=earned;st.pts[st.idx]=earned;save();
         $("#nx").onclick=()=>{s++;if(s>=p.stages.length){st.pts[st.idx]=earned;st.idx++;st.fullStage=0;st.fullEarned=0;save();draw()}else one()}}
     };one();
@@ -701,6 +777,41 @@ function showAnswers(fields,je){
     [s,d,c].forEach(e=>{e.classList.remove("wrong");if(l)e.classList.add("good");e.disabled=true})})}
 }
 
+/* ---------- Define It (station) ---------- */
+function defBlock(bIdx){
+  const st=LIVE.state,b=SCHED[bIdx],p=st.dp||0,ph=st.dph||"write",D=DEFS[b.d][p],k=defKey(bIdx,p);
+  const nm=names(bIdx);const team=[...nm.stay,nm.move].map(esc).join(" & ");
+  const mine=((LIVE.recs["s"+ME.station]||{}).def||{})[k]||{};
+  const local=store.get(lkey(bIdx)+"_"+p,{})||{};
+  $("#ttl").innerHTML=`Station ${ME.station} · <span>${b.label}</span>`;
+  const head=`<div class="panel center" style="background:var(--ink);color:#fff"><div class="osw" style="font-size:20px;letter-spacing:.2em;color:#ff8a9c">${D.kind.toUpperCase()} IT · PROMPT ${p+1} OF ${DEFS[b.d].length}</div><div class="osw" style="font-size:44px;line-height:1.15;margin-top:4px">${esc(D.term)}</div><div style="opacity:.8;margin-top:6px">${team}, you're a team for this round.</div></div>`;
+  const save=o=>{const cur={...local,...o};store.set(lkey(bIdx)+"_"+p,cur);net().then(N=>N.update(`games/${ME.code}/players/s${ME.station}`,Object.fromEntries(Object.entries(o).map(([a,v])=>[`def/${k}/${a}`,v])))).catch(()=>{})};
+  if(ph==="write"){
+    const val=local.t!=null?local.t:(mine.t||"");
+    app.innerHTML=`${head}<div class="panel"><p style="font-size:1.1em;margin-top:0">Write the best ${D.kind==="Explain"?"explanation":"definition"} you can, in your own words. Next, everyone sees every answer plus the <b>real</b> one, mixed together, and votes for the one they think is real.</p>
+      <p class="muted">+${DEF_RIGHT} if you pick the real one. +${DEF_FOOL} every time another team picks yours. Keep it to one sentence and make it sound real!</p>
+      <textarea id="dt" maxlength="170" rows="3" style="width:100%;font:inherit;font-size:1.15em;padding:12px;border:2px solid var(--ln);border-radius:10px">${esc(val)}</textarea>
+      <div class="row" style="justify-content:space-between;margin-top:10px"><span class="muted" id="dc"></span><button class="btn" id="dsub">${mine.t?"Update answer":"Lock it in"}</button></div><div id="dmsg" style="font-weight:700;color:var(--ok);margin-top:8px">${mine.t?"✓ Saved. You can change it until voting starts.":""}</div></div>`;
+    const ta=$("#dt"),cnt=()=>$("#dc").textContent=`${ta.value.length}/170`;cnt();ta.oninput=cnt;
+    $("#dsub").onclick=()=>{const t=ta.value.trim();if(t.length<8){$("#dmsg").style.color="var(--red)";$("#dmsg").textContent="Write a full answer first.";return}
+      save({t});$("#dmsg").style.color="var(--ok)";$("#dmsg").textContent="✓ Saved. You can change it until voting starts.";$("#dsub").textContent="Update answer"};
+    return}
+  const ents=defEntries(LIVE.recs,bIdx,p,ME.code,st.hide);
+  if(ph==="vote"){
+    let v=local.v||mine.v||"";
+    const draw=()=>{app.innerHTML=`${head}<div class="panel"><p style="font-size:1.1em;margin-top:0">Which one is <b>REAL</b>? Tap your pick. You can change it until your teacher reveals the answer.</p>
+      <div class="dvote">${ents.filter(e=>e.id!=="s"+ME.station).map((e,i)=>`<button class="dopt ${v===e.id?"on":""}" data-v="${e.id}"><span class="osw">${String.fromCharCode(65+ents.indexOf(e))}</span>${esc(e.text)}</button>`).join("")}</div>
+      ${ents.some(e=>e.id==="s"+ME.station)?`<p class="muted" style="margin-top:10px">Your own answer is hidden from your list.</p>`:""}</div>`;
+      app.querySelectorAll(".dopt").forEach(el=>el.onclick=()=>{v=el.dataset.v;save({v});draw()})};
+    draw();return}
+  // reveal
+  const {votes}=defScores(LIVE.recs,bIdx,p,ME.code,st.hide);
+  const myVote=local.v||mine.v,gotRight=myVote==="real",fooled=votes["s"+ME.station]||0;
+  const tot=(gotRight?DEF_RIGHT:0)+fooled*DEF_FOOL;
+  app.innerHTML=`${head}<div class="panel"><div class="osw muted" style="font-size:18px;letter-spacing:.1em">THE REAL ANSWER</div><div style="font-size:1.35em;font-weight:700;margin:6px 0 14px;padding:14px;background:#EFF8F2;border-left:6px solid var(--ok);border-radius:10px">${esc(normDef(D.real))}</div>
+    <div class="row" style="justify-content:center;gap:40px;text-align:center"><div><div class="muted">${myVote?(gotRight?"You picked the real one":"You were fooled"):"You didn't vote"}</div><div class="big">+${gotRight?DEF_RIGHT:0}</div></div><div><div class="muted">Teams who picked yours</div><div class="big">${fooled} × ${DEF_FOOL}</div></div></div>
+    <p class="center" style="font-size:1.2em;margin-top:12px"><b>${team}: +${tot} each</b></p></div>`;
+}
 /* ---------- kahoot ---------- */
 const KSEC=20,KMAX=10;
 function kahoot(bIdx){
@@ -793,20 +904,21 @@ function hostLobby(){
 function hostPlay(){
   const st=H.state,b=SCHED[st.block];
   $("#ttl").innerHTML=`Teach It Back: <span>Bonds</span> &nbsp;·&nbsp; Code ${H.code}`;
-  const what=b.type==="kahoot"?`<small>Kahoot Break ${b.k} of 3</small>Partners are teammates`:`<small>${b.label} of 14</small>${ROUNDS[b.round].name}`;
-  const roles=b.type==="kahoot"?`<div class="whob"><div style="background:var(--k2);grid-column:span 2"><b>Stay with your partner</b>Answer together. You both get the points.</div></div>`
+  const what=b.type==="kahoot"?`<small>Kahoot Break ${b.k} of 3</small>Partners are teammates`:b.type==="def"?`<small>Define It ${b.d} of 3</small>Write it. Then spot the real one.`:`<small>${b.label} of 14</small>${ROUNDS[b.round].name}`;
+  const roles=b.type==="def"?"":b.type==="kahoot"?`<div class="whob"><div style="background:var(--k2);grid-column:span 2"><b>Stay with your partner</b>Answer together. You both get the points.</div></div>`
    :`<div class="whob"><div style="background:var(--ink)"><b>TEACHER · ${TEACH_X}× points</b>${b.teach==="stay"?"The STAYER":"The MOVER"}</div><div style="background:var(--red)"><b>LEARNER · 1× points</b>${b.teach==="stay"?"The MOVER":"The STAYER"}</div></div>`;
-  const move=b.type==="kahoot"?"No moving. Same partner as the last rotation.":(b.rot===1?"Movers: start at your own station.":"MOVERS: slide up one station. The last station goes to Station 1.");
+  const move=b.type==="def"?"No moving. Same partner as the Kahoot break.":b.type==="kahoot"?"No moving. Same partner as the last rotation.":(b.rot===1?"Movers: start at your own station.":"MOVERS: slide up one station. The last station goes to Station 1.");
   const note=b.type==="rot"&&b.round!=="full"?(b.rot%2?"New skill. Next rotation, today's learner teaches it to a new partner.":"You learned this last rotation. Now you teach it."):b.type==="rot"?"The whole bond process. Over these four rotations everyone teaches twice and learns twice.":"";
   const last=st.block===SCHED.length-1;
   app.innerHTML=`<div class="hostgrid"><div><div class="panel"><div class="now">${what}</div>${roles}
     <p style="font-size:24px;margin:4px 0"><b>${move}</b></p><p style="font-size:20px" class="muted">${note}</p>
-    <div class="timer" id="tm"></div>
+    ${b.type==="def"?`<div id="defLive" style="margin-top:10px"></div><div class="row" style="justify-content:center;margin-top:12px" id="defCtl"></div>`:""}
+    <div class="timer" id="tm" style="${b.type==="def"?"font-size:72px;margin-top:14px":""}"></div>
     <div class="row" style="justify-content:center;margin-top:8px"><button class="btn" id="tgo">${st.timerEnd||st.paused!=null?"Restart timer":"Start timer ("+blockMinutes(b)+":00)"}</button><button class="btn sec" id="tpause">${st.paused!=null?"Resume":"Pause"}</button><button class="btn sec" id="tm1">−1 min</button><button class="btn sec" id="tp1">+1 min</button></div>
-    <div id="done" style="font-size:22px;text-align:center;margin-top:12px"></div>
+    ${b.type==="def"?"":`<div id="done" style="font-size:22px;text-align:center;margin-top:12px"></div>`}
     <div class="row" style="justify-content:space-between;margin-top:16px"><button class="btn sec" id="prev">◀ Back</button><button class="btn sec" id="stand">Standings</button><button class="btn sec" id="end">End game now</button><button class="btn" id="next">${last?"Final standings ▶":"Next block ▶"}</button></div></div></div>
-   <div><div class="panel"><h3 style="font-size:26px">Top 8 right now</h3><div id="top8"></div><p class="muted" style="font-size:15px;margin-top:6px">Teachers earn ${TEACH_X}× the points their pair scores. Learners and Kahoot teammates earn 1×.</p></div>
-    <div class="panel"><h3>Schedule</h3><ul class="sched">${SCHED.map((x,ix)=>`<li data-i="${ix}" class="${ix===st.block?"on":""} ${x.type==="kahoot"?"kk":""}"><span class="no">${x.type==="kahoot"?"Quiz "+x.k:"Rot "+x.rot}</span><span>${x.type==="kahoot"?"Kahoot Break":ROUNDS[x.round].short+(x.round!=="full"?(x.rot%2?" (A)":" (B)"):"")}</span><span class="muted" style="margin-left:auto;font-size:14px">${blockMinutes(x)}m</span></li>`).join("")}</ul></div></div></div>`;
+   <div><div class="panel"><h3 style="font-size:26px">Top 8 right now</h3><div id="top8"></div><p class="muted" style="font-size:15px;margin-top:6px">Teachers earn ${TEACH_X}× the points their pair scores. Learners, Kahoot teammates and Define It teams earn 1×.</p></div>
+    <div class="panel"><h3>Schedule</h3><ul class="sched">${SCHED.map((x,ix)=>`<li data-i="${ix}" class="${ix===st.block?"on":""} ${x.type!=="rot"?"kk":""}"><span class="no">${SCHED_NO(x)}</span><span>${SCHED_NAME(x)}</span><span class="muted" style="margin-left:auto;font-size:14px">${blockMinutes(x)}m</span></li>`).join("")}</ul></div></div></div>`;
   app.querySelectorAll("[data-i]").forEach(li=>li.onclick=()=>{if(+li.dataset.i!==st.block&&confirm("Jump to "+SCHED[+li.dataset.i].label+"? Every iPad will switch."))goBlock(+li.dataset.i)});
   $("#prev").onclick=()=>{if(st.block>0&&confirm("Go back a block? Every iPad will switch."))goBlock(st.block-1)};
   $("#next").onclick=()=>last?setState({phase:"end"}):goBlock(st.block+1);
@@ -822,7 +934,7 @@ function hostPlay(){
     if(s.timerEnd&&ms<=0&&!beeped){beeped=true;beep(880,.3);setTimeout(()=>beep(660,.4),320)}};
   paint();HTICK=setInterval(paint,250);
 }
-function goBlock(i){setState({block:i,timerEnd:0,paused:null})}
+function goBlock(i){setState({block:i,timerEnd:0,paused:null,dp:0,dph:"write"})}
 function hostLiveBits(){
   const st=H.state;if(st.phase!=="play")return;
   const N=st.stations,{tot}=standings(H.recs,N),rk=ranks(tot);
@@ -830,6 +942,34 @@ function hostLiveBits(){
   const t8=$("#top8");if(t8)t8.innerHTML=order.map(n=>`<div class="row" style="font-size:21px;padding:5px 0;border-bottom:1px solid #eee"><span class="osw" style="width:36px;color:var(--red)">${rk[n]}</span><span style="flex:1">${esc(n)}</span><b>${fmt(tot[n])}</b></div>`).join("")||`<p class="muted">No points yet.</p>`;
   const list=stationList(),dn=list.filter(r=>r.res&&r.res[st.block]&&r.res[st.block].done).length;
   const d=$("#done");if(d)d.innerHTML=`<b>${dn}</b> of ${list.length} stations finished this block`;
+  if(SCHED[st.block].type==="def")hostDefBits();
+  let warn=$("#latejoin");const max=list.length?list[list.length-1].station:0;
+  if(max!==N||list.length!==N){
+    if(!warn){warn=document.createElement("div");warn.id="latejoin";warn.className="panel";warn.style.cssText="border:3px solid var(--red);font-size:19px";app.prepend(warn)}
+    warn.innerHTML=`<b style="color:var(--red)">The game started with ${N} stations, but ${list.length} have joined now.</b> Stations must be numbered 1 to ${list.length}. <button class="btn" id="fixN" style="margin-left:10px">Use ${list.length} stations</button> <span class="muted">Best done before Rotation 2. Changing it re-pairs who-moved-where for the whole game.</span>`;
+    $("#fixN").onclick=()=>{if(confirm(`Switch the game to ${list.length} stations?`))setState({stations:list.length})}}
+  else if(warn)warn.remove();
+}
+function hostDefBits(){
+  const st=H.state,b=st.block,p=st.dp||0,ph=st.dph||"write",D=DEFS[SCHED[b].d][p],k=defKey(b,p),N=st.stations;
+  const list=stationList(),box=$("#defLive"),ctl=$("#defCtl");if(!box)return;
+  const head=`<div class="osw" style="font-size:20px;color:var(--red);letter-spacing:.15em">${D.kind.toUpperCase()} IT · PROMPT ${p+1} OF ${DEFS[SCHED[b].d].length}</div><div class="osw" style="font-size:52px;line-height:1.1;margin:4px 0 12px">${esc(D.term)}</div>`;
+  if(ph==="write"){const n=list.filter(r=>r.def&&r.def[k]&&normDef(r.def[k].t)).length;
+    box.innerHTML=head+`<p style="font-size:24px">Every team writes the best ${D.kind==="Explain"?"explanation":"definition"} they can. <b>${n}</b> of ${list.length} teams have locked in.</p><p class="muted" style="font-size:19px">Then everyone votes for the real one. +${DEF_RIGHT} for picking the real one, +${DEF_FOOL} for every team that picks yours.</p>`;
+    if(!$("#dgo")){ctl.innerHTML=`<button class="btn" id="dgo">Start voting ▶</button>`;$("#dgo").onclick=()=>setState({dph:"vote"})}
+    return}
+  const ents=defEntries(H.recs,b,p,H.code,st.hide);
+  const nm=e=>{if(e.id==="real")return "";const pr=pairAt(H.recs,e.station,b,N);return pr?[...pr.stay,pr.move].map(esc).join(" & "):"Station "+e.station};
+  if(ph==="vote"){const nv=list.filter(r=>r.def&&r.def[k]&&r.def[k].v).length;
+    box.innerHTML=head+`<div class="dlist">${ents.map((e,i)=>`<div class="dent"><span class="osw">${String.fromCharCode(65+i)}</span><span>${esc(e.text)}</span>${e.id!=="real"?`<button class="btn hd" data-hide="${e.id}" title="Hide this answer">Hide</button>`:`<span class="hd" style="visibility:hidden">Hide</span>`}</div>`).join("")}</div><p style="font-size:22px;margin-top:10px"><b>${nv}</b> of ${list.length} teams have voted.</p>`;
+    box.querySelectorAll("[data-hide]").forEach(bt=>bt.onclick=()=>{if(!confirm("Hide this answer? Votes for it won't count."))return;const hide={...(st.hide||{})};hide[k]=[...(hide[k]||[]),bt.dataset.hide];setState({hide})});
+    if(!$("#drev")){ctl.innerHTML=`<button class="btn" id="drev">Reveal the real one ▶</button>`;$("#drev").onclick=()=>setState({dph:"reveal",revealed:[...new Set([...(H.state.revealed||[]),k])]})}
+    return}
+  const {votes}=defScores(H.recs,b,p,H.code,st.hide);
+  box.innerHTML=head+`<div class="dlist">${ents.map((e,i)=>`<div class="dent ${e.id==="real"?"real":""}"><span class="osw">${String.fromCharCode(65+i)}</span><span>${esc(e.text)}<div class="by">${e.id==="real"?"✓ THE REAL ANSWER":"Written by "+nm(e)}</div></span><span class="vc">${votes[e.id]||0} vote${votes[e.id]===1?"":"s"}</span></div>`).join("")}</div>`;
+  const more=p<DEFS[SCHED[b].d].length-1;
+  if(more&&!$("#dnx")){ctl.innerHTML=`<button class="btn" id="dnx">Next prompt ▶</button>`;$("#dnx").onclick=()=>setState({dp:p+1,dph:"write",timerEnd:0,paused:null})}
+  if(!more)ctl.innerHTML=`<span class="muted" style="font-size:19px">Last prompt. Click <b>Next block</b> when you're ready.</span>`;
 }
 function fullStandings(){
   stopFireworks();
