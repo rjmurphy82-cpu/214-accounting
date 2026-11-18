@@ -1062,7 +1062,7 @@ function hostPlay(){
     <div class="timer" id="tm" style="${b.type==="def"?"font-size:72px;margin-top:14px":""}"></div>
     <div class="row" style="justify-content:center;margin-top:8px"><button class="btn" id="tgo">${st.timerEnd||st.paused!=null?"Restart timer":"Start timer ("+blockMinutes(b)+":00)"}</button><button class="btn sec" id="tpause">${st.paused!=null?"Resume":"Pause"}</button><button class="btn sec" id="tm1">−1 min</button><button class="btn sec" id="tp1">+1 min</button></div>
     ${b.type==="def"?"":`<div id="done" style="font-size:22px;text-align:center;margin-top:12px"></div>`}
-    <div class="row" style="justify-content:space-between;margin-top:16px"><button class="btn sec" id="prev">◀ Back</button><button class="btn sec" id="stand">Standings</button><button class="btn sec" id="end">End game now</button><button class="btn" id="next">${last?"Final standings ▶":"Next block ▶"}</button></div></div></div>
+    <div class="row" style="justify-content:space-between;margin-top:16px"><button class="btn sec" id="prev">◀ Back</button><button class="btn sec" id="qrb">Join QR</button><button class="btn sec" id="stand">Standings</button><button class="btn sec" id="end">End game now</button><button class="btn" id="next">${last?"Final standings ▶":"Next block ▶"}</button></div></div></div>
    <div><div class="panel"><h3 style="font-size:26px">Top 8 right now</h3><div id="top8"></div><p class="muted" style="font-size:15px;margin-top:6px">Teachers earn ${TEACH_X}× the points their pair scores. Learners, Kahoot teammates and Define It teams earn 1×.</p></div>
     <div class="panel"><h3>Schedule</h3><ul class="sched">${SCHED.map((x,ix)=>`<li data-i="${ix}" class="${ix===st.block?"on":""} ${x.type!=="rot"?"kk":""}"><span class="no">${SCHED_NO(x)}</span><span>${SCHED_NAME(x)}</span><span class="muted" style="margin-left:auto;font-size:14px">${blockMinutes(x)}m</span></li>`).join("")}</ul></div></div></div>`;
   app.querySelectorAll("[data-i]").forEach(li=>li.onclick=()=>{if(+li.dataset.i!==st.block&&confirm("Jump to "+SCHED[+li.dataset.i].label+"? Every iPad will switch."))goBlock(+li.dataset.i)});
@@ -1070,6 +1070,7 @@ function hostPlay(){
   $("#next").onclick=()=>last?setState({phase:"end"}):goBlock(st.block+1);
   $("#end").onclick=()=>{if(confirm("End the game now and show the final standings?"))setState({phase:"end"})};
   $("#stand").onclick=()=>{H.back=st.phase;fullStandings()};
+  $("#qrb").onclick=showJoinQR;
   $("#tgo").onclick=()=>setState({timerEnd:Date.now()+blockMinutes(b)*60000,paused:null});
   $("#tpause").onclick=()=>{if(H.state.paused!=null)setState({timerEnd:Date.now()+H.state.paused,paused:null});else if(H.state.timerEnd)setState({paused:Math.max(0,H.state.timerEnd-Date.now()),timerEnd:0})};
   $("#tm1").onclick=()=>{if(H.state.paused!=null)setState({paused:Math.max(0,H.state.paused-60000)});else if(H.state.timerEnd)setState({timerEnd:H.state.timerEnd-60000})};
@@ -1079,6 +1080,19 @@ function hostPlay(){
   const paint=()=>{const el=$("#tm");if(!el){clearInterval(HTICK);return}const s=H.state;const ms=s.paused!=null?s.paused:s.timerEnd?s.timerEnd-Date.now():blockMinutes(b)*60000;el.textContent=mmss(ms/1000);el.classList.toggle("low",ms<60000);
     if(s.timerEnd&&ms<=0&&!beeped){beeped=true;beep(880,.3);setTimeout(()=>beep(660,.4),320)}};
   paint();HTICK=setInterval(paint,250);
+}
+/* Big join QR for students who arrive after the game starts. */
+function showJoinQR(){
+  const joinURL=location.origin+"/chapter-10/teach-it-back?code="+H.code,url=(location.host||"")+"/chapter-10/teach-it-back";
+  const o=document.createElement("div");o.className="ovl";
+  o.innerHTML=`<div class="box center" style="max-width:760px"><div class="muted" style="font-size:24px">Scan to join, or go to</div><div class="osw" style="font-size:34px">${esc(url)}</div>
+    <div class="row" style="justify-content:center;gap:36px;flex-wrap:nowrap;margin:14px 0"><div><div class="muted" style="font-size:22px">Game code</div><div class="osw" style="font-size:130px;line-height:1;letter-spacing:.08em;color:var(--red)">${H.code}</div></div><div id="qrBig" style="width:340px;height:340px;flex:none"></div></div>
+    <p style="font-size:22px;margin:0 0 6px">Type <b>just your name</b>. Your teacher will add you to a station.</p>
+    <button class="btn" id="qrx" style="margin-top:8px">Close</button></div>`;
+  document.body.appendChild(o);const close=()=>o.remove();o.onclick=e=>{if(e.target===o)close()};o.querySelector("#qrx").onclick=close;
+  const put=svg=>{const el=o.querySelector("#qrBig");if(el)el.innerHTML=svg.replace("<svg",'<svg style="width:100%;height:100%;display:block"')};
+  if(H.qrFor===joinURL&&H.qrSvg)put(H.qrSvg);
+  else import("/chapter-10/qr.js").then(m=>{H.qrSvg=m.qrSVG(joinURL,"#141414");H.qrFor=joinURL;put(H.qrSvg)}).catch(()=>{const el=o.querySelector("#qrBig");if(el)el.style.display="none"});
 }
 function goBlock(i){setState({block:i,timerEnd:0,paused:null,dp:0,dph:"write"})}
 function hostLiveBits(){
