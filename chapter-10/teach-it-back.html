@@ -234,13 +234,15 @@ const ROUNDS={
  full:{name:"The Whole Deal",short:"Full Bond Process"}
 };
 /* How "the teacher always learned it first" works.
-   Skills come in pairs (X, Y). Each pair takes three rotations, and there is always an even number of stations:
+   Skills come in pairs (X, Y). Each pair takes three rotations:
      1. LEARN:  odd stations learn X together, even stations learn Y together (both partners are learners).
      2. MOVER TEACHES: movers slide up one station, so every mover lands at a station that learned the OTHER skill,
         and teaches the skill they just learned.  (Odd stations now do Y, even stations do X.)
      3. STAYER TEACHES: movers slide again. Each stayer teaches the skill they learned in step 2 to a mover
         who hasn't had it yet.
-   After three rotations everyone has learned both skills, taught one, and only ever taught something they learned first. */
+   After three rotations everyone has learned both skills, taught one, and only ever taught something they learned first.
+   ODD number of stations: the mover coming from the last station wraps to Station 1, which learned the same skill.
+   So Station 1 learns the other skill together in step 2, and its stayer teaches the first skill in step 3. */
 const PAIRS=[["r1","r2"],["r3","r4"],["r5","r0"]];
 const SCHED=[];
 const addRot=o=>{const rot=SCHED.filter(b=>b.type==="rot").length+1;SCHED.push({type:"rot",rot,label:"Rotation "+rot,...o})};
@@ -250,7 +252,9 @@ PAIRS.forEach((pr,ix)=>{
 });
 ["stay","move","stay","move"].forEach(t=>addRot({round:"full",teach:t}));
 const ROT_TOTAL=SCHED.filter(b=>b.type==="rot").length;
-function roundAt(b,station){if(!b.pair)return b.round;const odd=station%2===1;return b.phase==="co"?(odd?b.pair[0]:b.pair[1]):(odd?b.pair[1]:b.pair[0])}
+function wrapFix(N,station){return N>2&&N%2===1&&station===1}
+function roundAt(b,station,N){if(!b.pair)return b.round;const odd=station%2===1;if(b.phase==="st"&&wrapFix(N,station))return b.pair[0];return b.phase==="co"?(odd?b.pair[0]:b.pair[1]):(odd?b.pair[1]:b.pair[0])}
+function teachAt(b,station,N){return b.pair&&b.phase==="mt"&&wrapFix(N,station)?"co":b.teach}
 const MINUTES={rot:7,full:9,kahoot:5,def:7};
 function blockMinutes(b){return b.type==="kahoot"?MINUTES.kahoot:b.type==="def"?MINUTES.def:(b.round==="full"?MINUTES.full:MINUTES.rot)}
 const PHASE_NAME={co:"learn together",mt:"mover teaches",st:"stayer teaches"};
@@ -489,6 +493,12 @@ function buildSet(station,bIdx,round){
   const bonus=GEN[round](r,true);
   return{probs,bonus}
 }
+/* Bonus problems never run out: after the main problems, a new one appears every time until the teacher moves on.
+   They alternate between the harder bonus version and a fresh regular problem of the same skill. */
+function bonusAt(station,bIdx,round,k){
+  const r=rng(station*7919+bIdx*104729+977*(k+1)+31);
+  if(round==="full"||k%2===0)return GEN[round](r,true);
+  return GEN[round](r,false,round==="r0"?(k%4===1?1:0):undefined)}
 
 /* ================= kahoot banks ================= */
 const KAHOOT={
@@ -610,7 +620,7 @@ function standings(recs,N){
   Object.values(recs||{}).forEach(r=>{Object.entries(r.res||{}).forEach(([b,v])=>{b=+b;const blk=SCHED[b];const pts=(v&&v.pts)||0;if(!blk||!pts)return;
     const pr=pairAt(recs,r.station,b,N);if(!pr)return;
     if(blk.type==="kahoot"){pr.stay.forEach(n=>add(n,pts));add(pr.move,pts)}
-    else if(blk.type==="rot"&&blk.teach==="co"){pr.stay.forEach(n=>add(n,pts));add(pr.move,pts)}
+    else if(blk.type==="rot"&&teachAt(blk,r.station,N)==="co"){pr.stay.forEach(n=>add(n,pts));add(pr.move,pts)}
     else if(blk.type==="rot"){const stayT=blk.teach==="stay";pr.stay.forEach(n=>add(n,stayT?pts*TEACH_X:pts,stayT));add(pr.move,stayT?pts:pts*TEACH_X,!stayT)}})});
   const G=(H&&H.state)||LIVE.state||{},GC=H?H.code:GCODE;
   (G.revealed||[]).forEach(k=>{const [b,p]=k.split("_").map(Number);if(!SCHED[b]||SCHED[b].type!=="def")return;
@@ -692,12 +702,12 @@ function companionRender(seat){
     const b=SCHED[st.block],at=seatNow(seat,st.block,N),pr=pairAt(recs,at,st.block,N)||{stay:[],move:""},host=recs["s"+at]||{};
     const mates=[...pr.stay,pr.move].filter(n=>n&&normName(n)!==normName(DEV.name));
     let role="";
-    if(b.type==="rot"&&b.teach==="co")role=`<div style="border-radius:12px;padding:14px 18px;color:#fff;background:var(--k2);font-size:1.2em;margin-top:12px"><b class="osw" style="font-size:1.5em;display:block">Learn it together · 1× points</b>You're both learners. Next rotation, one of you teaches it.</div>`;
+    if(b.type==="rot"&&teachAt(b,at,N)==="co")role=`<div style="border-radius:12px;padding:14px 18px;color:#fff;background:var(--k2);font-size:1.2em;margin-top:12px"><b class="osw" style="font-size:1.5em;display:block">Learn it together · 1× points</b>You're both learners. Next rotation, one of you teaches it.</div>`;
     else if(b.type==="rot"){const teach=(b.teach==="move")===(seat.role==="move");
       role=`<div class="${teach?"te":"le"}" style="border-radius:12px;padding:14px 18px;color:#fff;background:${teach?"var(--ink)":"var(--red)"};font-size:1.2em;margin-top:12px"><b class="osw" style="font-size:1.5em;display:block">${teach?"You're the TEACHER · 3× points":"You're the LEARNER · 1× points"}</b>${teach?"Coach on the whiteboard. Don't touch the iPad.":"Work it out on the whiteboard, then type it in."}</div>`}
     else role=`<div style="border-radius:12px;padding:14px 18px;color:#fff;background:var(--k2);font-size:1.2em;margin-top:12px"><b class="osw" style="font-size:1.5em;display:block">${b.type==="kahoot"?"Kahoot Break":"Define It"}: you're teammates</b>You both get the points.</div>`;
     const {tot}=standings(recs,N),mine=tot[[home.stay,home.stay2,home.stay3,home.move].includes(DEV.name)?DEV.name:""];
-    app.innerHTML=`<div class="panel center"><div class="muted" style="font-size:1.1em">${b.type==="rot"?b.label+": "+ROUNDS[roundAt(b,at)].name:b.label}</div>
+    app.innerHTML=`<div class="panel center"><div class="muted" style="font-size:1.1em">${b.type==="rot"?b.label+": "+ROUNDS[roundAt(b,at,N)].name:b.label}</div>
       <div class="muted" style="font-size:1.3em;margin-top:10px">${seat.role==="move"&&b.type==="rot"?"Go to":"You're at"}</div><div class="osw" style="font-size:130px;line-height:1;color:var(--red)">Station ${at}</div>
       <p style="font-size:1.3em;margin:8px 0">Partner: <b>${mates.map(esc).join(" & ")||"your partner"}</b></p><p style="font-size:1.1em;margin:0" class="muted">Work on ${esc(host.stay||"the stayer")}'s iPad</p>${role}
       ${mine!=null?`<p style="font-size:1.15em;margin-top:14px">Your points so far: <b>${fmt(mine)}</b></p>`:""}</div>`;
@@ -755,33 +765,33 @@ document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest
 /* ---------- rotation ---------- */
 const MAIN_PTS=100,BONUS_PTS=30;
 function rotation(bIdx){
-  const b=SCHED[bIdx],RK=roundAt(b,ME.station),R=ROUNDS[RK];
+  const SN=LIVE.state&&LIVE.state.stations,b=SCHED[bIdx],RK=roundAt(b,ME.station,SN),R=ROUNDS[RK];
   const set=buildSet(ME.station,bIdx,RK);
   let st=store.get(lkey(bIdx),null)||{pts:[],bonus:null,bonusPts:0,finished:false,idx:0,inBonus:false};
   const total=()=>st.pts.reduce((a,c)=>a+(c||0),0)+(st.bonusPts||0);
-  const save=()=>{store.set(lkey(bIdx),st);pushResult(bIdx,{pts:total(),done:!!st.finished})};
+  if(st.finished&&!st.sub)st.sub=true; // older saves
+  st.bk=st.bk||0;
+  const save=()=>{if(st.idx>=set.probs.length)st.sub=true;store.set(lkey(bIdx),st);pushResult(bIdx,{pts:total(),done:!!st.sub,bon:st.bk})};
   const per=Math.round(MAIN_PTS/set.probs.length);
   const live=()=>CUR&&CUR.block===bIdx;
   $("#ttl").innerHTML=`Station ${ME.station} · ${b.label}: <span>${R.name}</span>`;
-  const nm=names(bIdx),stay=b.teach==="stay",co=b.teach==="co";
+  const nm=names(bIdx),TT=teachAt(b,ME.station,SN),stay=TT==="stay",co=TT==="co";
   const tName=stay?nm.stay.join(" & "):nm.move,lName=stay?nm.move:nm.stay.join(" & ");
   const roleHTML=()=>co?`<div class="role"><div class="le" style="grid-column:span 2;background:var(--k2)"><small>LEARN IT TOGETHER · both earn 1×</small><b>${esc([...nm.stay,nm.move].join(" & "))}</b><small>You're both learners this time. Next rotation one of you teaches ${esc(R.name)} to a new partner, so make sure you BOTH can do it. <button class="btn" id="exBtn" data-ex="${RK}|${ME.station*97+bIdx*13+5}" style="background:#fff;color:var(--k2);padding:6px 12px;margin-left:8px;font-size:.95em">📖 Show a worked example</button></small></div></div><div id="exBox"></div>`:`<div class="role"><div class="te"><small>TEACHER · earns ${TEACH_X}× points</small><b>${esc(tName)}</b><small>${stay?"Stays here":"Just moved here"}. Coach on the whiteboard. Don't touch the iPad.</small></div>
     <div class="le"><small>LEARNER · earns 1× points</small><b>${esc(lName)}</b><small>${stay?"Just moved here":"Stays here"}. Work it out on the whiteboard, then type it in.</small></div></div>`;
   function draw(){
     if(!live())return;
-    if(st.finished)return receipt();
-    if(st.inBonus)return problem(set.bonus,true);
-    if(st.idx>=set.probs.length)return mainDone();
+    if(st.idx>=set.probs.length){if(!st.sub)save();return problem(bonusAt(ME.station,bIdx,RK,st.bk),true)}
     problem(set.probs[st.idx],false);
   }
-  function progress(){return `<div class="prog">${set.probs.map((p,k)=>{const v=st.pts[k];return `<i class="${v==null?(k===st.idx?"on":""):v>=per?"ok":v>0?"half":"miss"}"></i>`}).join("")}<i class="${st.bonus==null?(st.inBonus?"on":""):st.bonus?"ok":"miss"}" style="background:${st.bonus==null&&!st.inBonus?"#f3dd9a":""}" title="Bonus"></i><span class="muted" style="margin-left:auto;font-size:.85em">So far: <b>${total()}</b> pts · teacher gets ${total()*TEACH_X}</span></div>`}
+  function progress(){return `<div class="prog">${set.probs.map((p,k)=>{const v=st.pts[k];return `<i class="${v==null?(k===st.idx?"on":""):v>=per?"ok":v>0?"half":"miss"}"></i>`}).join("")}${st.sub?`<span class="tag" style="background:var(--ok);color:#fff;margin-left:4px">✓ Submitted</span><span class="tag">Bonus ${st.bk+1} · ${st.bonusPts||0} bonus pts</span>`:""}<span class="muted" style="margin-left:auto;font-size:.85em">So far: <b>${total()}</b> pts · teacher gets ${total()*TEACH_X}</span></div>`}
   function problem(p,isBonus){
     const worth=isBonus?BONUS_PTS:(st.idx===set.probs.length-1?MAIN_PTS-per*(set.probs.length-1):per);
     if(p.full)return fullProblem(p,worth);
-    let tries=0;st.h=st.h||{};const hk=isBonus?"b":"p"+st.idx;let used=st.h[hk]||0;
+    let tries=0;st.h=st.h||{};const hk=isBonus?"b"+st.bk:"p"+st.idx;let used=st.h[hk]||0;
     app.innerHTML=`${roleHTML()}<div class="panel">${progress()}
       <div class="work" style="${p.wide?"grid-template-columns:1fr":""}">
-       <div class="prob"><div class="co">${isBonus?"BONUS: ":""}${p.title}${isBonus?'<span class="tag">+'+BONUS_PTS+' bonus</span>':""}</div><p>${p.text}</p>${p.facts?`<dl class="facts">${p.facts.map(([a,c])=>`<dt>${a}</dt><dd>${c}</dd>`).join("")}</dl>`:""}${hintsHTML()}</div>
+       <div class="prob">${isBonus&&st.bk===0?`<div class="fb ok" style="margin:0 0 12px"><b>Main problems submitted: ${total()} points.</b> Keep going! Bonus problems keep coming until your teacher moves on. Each one is worth up to ${BONUS_PTS} more points.</div>`:""}<div class="co">${isBonus?"BONUS "+(st.bk+1)+": ":""}${p.title}${isBonus?'<span class="tag">+'+BONUS_PTS+' bonus</span>':""}</div><p>${p.text}</p>${p.facts?`<dl class="facts">${p.facts.map(([a,c])=>`<dt>${a}</dt><dd>${c}</dd>`).join("")}</dl>`:""}${hintsHTML()}</div>
        <div>${fieldsHTML(p.fields,p.wide)}${p.je?jeHTML(p.je):""}
         <div id="fb"></div><div class="acts"><button class="btn" id="chk">Check</button><button class="btn sec" id="nx" style="display:none">Next</button></div></div>
       </div></div>`;
@@ -795,9 +805,10 @@ function rotation(bIdx){
     };
     function finish(got){
       $("#chk").style.display="none";$("#nx").style.display="";
-      if(isBonus){st.bonus=got>0;st.bonusPts=got}else{st.pts[st.idx]=got}
+      if(isBonus){st.bonusPts=(st.bonusPts||0)+got;st.bk++}else{st.pts[st.idx]=got;st.idx++}
       save();
-      $("#nx").onclick=()=>{if(isBonus){st.finished=true;st.inBonus=false}else st.idx++;save();draw()};
+      $("#nx").textContent=isBonus||st.idx>=set.probs.length?"Next bonus problem":"Next";
+      $("#nx").onclick=()=>draw();
     }
   }
   function fullProblem(p,worth){
@@ -978,12 +989,16 @@ function hostRender(fresh){
 function stationList(){return Object.values(H.recs).filter(r=>r&&r.station).sort((a,b)=>a.station-b.station)}
 function hostPlayers(){return Object.values(H.recs||{}).filter(r=>r&&r.pid).sort((a,b)=>a.name.localeCompare(b.name))}
 function unplaced(){const A=H.state.assign;return hostPlayers().filter(p=>!(A&&A.seats&&A.seats[p.pid]))}
+const isWill=n=>normName(n).split(" ")[0]==="will";
 async function assignStations(){
   const ps=shuffle(rng(Date.now()%2147483647),hostPlayers());if(ps.length<2)return;
   const used={},nameOf=p=>{let n=p.name,k=2;while(used[normName(n)])n=p.name+" ("+(k++)+")";used[normName(n)]=1;return n};
   const nm={};ps.forEach(p=>nm[p.pid]=nameOf(p));
-  // The learn-then-teach pattern needs an EVEN number of stations. Extra students become second stayers.
-  let N=Math.floor(ps.length/2);if(N%2&&N>1)N--;
+  // Pairs everywhere. An odd class gets ONE group of 3 (a second stayer at one station).
+  // Will is always the Station 2 stayer.
+  const wi=ps.findIndex(p=>isWill(p.name));
+  if(wi>=0&&ps.length>=4){const w=ps.splice(wi,1)[0];ps.splice(1,0,w)}
+  let N=Math.floor(ps.length/2);
   const seats={},recs={};
   for(let k=1;k<=N;k++){const s=ps[k-1],m=ps[N+k-1];recs[k]={station:k,stay:nm[s.pid],stay2:"",move:nm[m.pid],res:{}};
     seats[s.pid]={station:k,role:"stay",primary:true};seats[m.pid]={station:k,role:"move"}}
@@ -1018,7 +1033,7 @@ function hostLobby(){
   app.innerHTML=`<div class="hostgrid"><div class="panel"><div class="muted" style="font-size:22px">Scan to join, or go to</div><div class="osw" style="font-size:36px">${esc(url)}</div>
     <div class="row" style="gap:28px;align-items:center;flex-wrap:nowrap;margin-top:10px"><div><div class="muted" style="font-size:22px">Game code</div><div class="osw" style="font-size:140px;line-height:1;letter-spacing:.08em;color:var(--red)">${H.code}</div></div><div id="qr" style="width:300px;height:300px;flex:none" title="Scan to join"></div></div>
     <p style="font-size:22px;margin-top:12px">Everyone joins on their own iPad and types <b>just their name</b>.</p>
-    <p style="font-size:19px" class="muted">${A?"Each pair has a <b>stayer</b> and a <b>mover</b>. The stayer's iPad is the station iPad and stays on the desk. Movers slide up one station each rotation, and their own iPad shows where to go.":"When everyone is in, click <b>Assign stations</b>. Students are paired at random: one stayer and one mover per station, always an even number of stations. Extra students join a station as a second stayer."}</p>
+    <p style="font-size:19px" class="muted">${A?"Each pair has a <b>stayer</b> and a <b>mover</b>. The stayer's iPad is the station iPad and stays on the desk. Movers slide up one station each rotation, and their own iPad shows where to go.":"When everyone is in, click <b>Assign stations</b>. Students are paired at random: one stayer and one mover per station. With an odd number of students, one station gets a group of 3 (a second stayer). Will is always the Station 2 stayer."}</p>
     <div class="acts">${A?`<button class="btn" id="start">Start Rotation 1 with ${list.length} stations</button><button class="btn sec" id="assign">Reshuffle</button>`:`<button class="btn" id="assign" ${ps.length<2?"disabled":""}>Assign stations (${ps.length} students)</button>`}<button class="btn sec" id="erase">Erase game</button></div></div>
    <div class="panel">${right}</div></div>`;
   const qr=$("#qr");
@@ -1032,7 +1047,7 @@ function hostLobby(){
 function hostPlay(){
   const st=H.state,b=SCHED[st.block];
   $("#ttl").innerHTML=`Teach It Back: <span>Bonds</span> &nbsp;·&nbsp; Code ${H.code}`;
-  const what=b.type==="kahoot"?`<small>Kahoot Break ${b.k} of 3</small>Partners are teammates`:b.type==="def"?`<small>Define It ${b.d} of 3</small>Write it. Then spot the real one.`:(b.pair?`<small>${b.label} of ${ROT_TOTAL} · ${PHASE_NAME[b.phase]}</small><span style="font-size:.8em">Odd stations: ${ROUNDS[roundAt(b,1)].name}<br>Even stations: ${ROUNDS[roundAt(b,2)].name}</span>`:`<small>${b.label} of ${ROT_TOTAL}</small>${ROUNDS[b.round].name}`);
+  const what=b.type==="kahoot"?`<small>Kahoot Break ${b.k} of 3</small>Partners are teammates`:b.type==="def"?`<small>Define It ${b.d} of 3</small>Write it. Then spot the real one.`:(b.pair?`<small>${b.label} of ${ROT_TOTAL} · ${PHASE_NAME[b.phase]}</small><span style="font-size:.8em">Odd stations: ${ROUNDS[roundAt(b,3,st.stations)].name}<br>Even stations: ${ROUNDS[roundAt(b,2,st.stations)].name}${wrapFix(st.stations,1)&&b.phase!=="co"?`<br>Station 1: ${ROUNDS[roundAt(b,1,st.stations)].name}${b.phase==="mt"?" (learn together)":""}`:""}</span>`:`<small>${b.label} of ${ROT_TOTAL}</small>${ROUNDS[b.round].name}`);
   const roles=b.type==="def"?"":b.type==="kahoot"?`<div class="whob"><div style="background:var(--k2);grid-column:span 2"><b>Stay with your partner</b>Answer together. You both get the points.</div></div>`
    :b.teach==="co"?`<div class="whob"><div style="background:var(--k2);grid-column:span 2"><b>LEARN IT TOGETHER · 1× points</b>Both partners are learners. Use the free worked example if you need it.</div></div>`
    :`<div class="whob"><div style="background:var(--ink)"><b>TEACHER · ${TEACH_X}× points</b>${b.teach==="stay"?"The STAYER":"The MOVER"}</div><div style="background:var(--red)"><b>LEARNER · 1× points</b>${b.teach==="stay"?"The MOVER":"The STAYER"}</div></div>`;
@@ -1069,8 +1084,10 @@ function hostLiveBits(){
   const N=st.stations,{tot}=standings(H.recs,N),rk=ranks(tot);
   const order=Object.keys(tot).sort((a,b)=>tot[b]-tot[a]).slice(0,8);
   const t8=$("#top8");if(t8)t8.innerHTML=order.map(n=>`<div class="row" style="font-size:21px;padding:5px 0;border-bottom:1px solid #eee"><span class="osw" style="width:36px;color:var(--red)">${rk[n]}</span><span style="flex:1">${esc(n)}</span><b>${fmt(tot[n])}</b></div>`).join("")||`<p class="muted">No points yet.</p>`;
-  const list=stationList(),dn=list.filter(r=>r.res&&r.res[st.block]&&r.res[st.block].done).length;
-  const d=$("#done");if(d)d.innerHTML=`<b>${dn}</b> of ${list.length} stations finished this block`;
+  const list=stationList(),R=r=>(r.res&&r.res[st.block])||{},dn=list.filter(r=>R(r).done).length,isRot=SCHED[st.block].type==="rot";
+  const d=$("#done");if(d)d.innerHTML=`<div style="font-size:24px"><b>${dn}</b> of ${list.length} stations ${isRot?"submitted":"finished"}</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px;margin-top:10px">${list.map(r=>{const v=R(r),ok=!!v.done;
+      return `<div style="border-radius:10px;padding:8px 6px;text-align:center;border:2px solid ${ok?"var(--ok)":"var(--ln)"};background:${ok?"#EFF8F2":"#fff"}"><div class="osw" style="font-size:22px">Station ${r.station}</div><div style="font-size:16px;font-weight:700;color:${ok?"var(--ok)":"var(--mu)"}">${ok?(isRot?"✓ Submitted":"✓ Done"):"Working..."}</div>${isRot&&ok?`<div style="font-size:14px" class="muted">${v.bon||0} bonus done</div>`:""}</div>`}).join("")}</div>`;
   if(SCHED[st.block].type==="def")hostDefBits();
   let warn=$("#latejoin");const late=unplaced();
   if(late.length){
