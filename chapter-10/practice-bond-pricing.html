@@ -183,6 +183,9 @@ h1{margin-top:8px}
 .lcol{display:grid;gap:12px;position:sticky;top:10px}
 .rcol{display:grid;gap:12px;min-width:0}
 .rcol .controls{padding:0;gap:8px}
+.advance{display:flex;flex-direction:column;align-items:flex-start;gap:10px;margin-top:16px}
+.advance .skip{background:none;border:0;padding:2px 0;color:var(--muted);font-size:14px;font-weight:600;text-decoration:underline;cursor:pointer}
+.advance .skip:disabled{opacity:.4;cursor:default;text-decoration:none}
 .lcol .facts{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
 .lcol .fact{padding:6px 10px}
 .lcol .fact span{font-size:12px}
@@ -347,12 +350,15 @@ table.je tr.good td{background:var(--goodsoft)}
         <div class="rcol">
           <div class="controls">
             <button class="btn ghost" id="backStepBtn">Back</button>
-            <button class="btn" id="revealBtn">Reveal next</button>
             <button class="btn ghost" id="allBtn">Show all answers</button>
             <button class="btn ghost" id="resetBtn">Start over</button>
             <span class="left" id="left"></span>
           </div>
           <div class="reveals" id="reveals"></div>
+          <div class="advance">
+            <button class="btn" id="revealBtn">Reveal next</button>
+            <button class="skip" id="nextBtn">Skip to next problem</button>
+          </div>
         </div>
       </div>
     </article>
@@ -360,7 +366,6 @@ table.je tr.good td{background:var(--goodsoft)}
   <div class="nav">
     <button class="btn ghost" id="prevBtn">← Previous problem</button>
     <span class="left" id="pos" style="align-self:center"></span>
-    <button class="btn ghost" id="nextBtn">Skip to next problem</button>
   </div>
   <p class="hint">Type your answer and press <kbd>Enter</kbd> or <b>Check answer</b>. Dollar signs and commas are optional; round dollars to the nearest whole dollar. Stuck? <b>Show answer</b> reveals it. <b>Back</b> goes to the last part.</p>
   </div></main>
@@ -548,7 +553,7 @@ function check(r){const g=grade(STEPS[i],r),s=S(r);s.tries++;
   if(g.ok){s.status="ok";s.bad=[];s.msg="";shown++;render();scrollCur()}
   else{s.status="bad";s.bad=g.bad;s.msg=g.msg;render();focusFirst()}}
 function showAns(r){const s=S(r);s.status=s.status==="ok"?"ok":"shown";shown++;render();scrollCur()}
-function scrollCur(){const r=$("reveals").lastElementChild;if(r)r.scrollIntoView({block:"nearest",behavior:"smooth"})}
+function scrollCur(){const r=document.querySelector(".advance");if(r)r.scrollIntoView({block:"nearest",behavior:"smooth"})}
 /* the question on screen right now, if it still needs an answer */
 function pending(){const p=STEPS[i],sq=seq(p);if(shown===0)return p.reveals[0];const last=sq[shown-1];return last.t==="q"?last.r:null}
 function render(){
